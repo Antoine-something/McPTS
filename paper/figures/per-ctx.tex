@@ -1,0 +1,28 @@
+\begin{figure}
+  \[
+  \begin{array}{c}
+    \infer{
+      \ctxempty = \ctxempty \in \perctx \searrow R
+    }{
+      \forall \rho, \rho'.\ \rho = \rho' \in R \iff \rho = \rho' = \denvempty
+    }
+    \\[8pt]
+    \infer{
+      \ctxext \Gamma A = \ctxext \Delta B \in \perctx \searrow R
+    }{
+      \begin{array}{c}
+        \Gamma = \Delta \in \perctx \searrow R'
+        \qquad
+        \mhighlight{R' \text{ is PER}}
+        \\
+        \forall \DD :: \rho = \rho' \in R'.\ \evalexpfunc A \rho = \evalexpfunc {B} {\rho'} \in \persort \searrow R''(\DD)
+        \\
+        \forall \rho, \rho', m, m'.\ \denvext \rho m = \denvext {\rho'} {m'} \in R \iff (\exists \DD :: \rho = \rho' \in R' ~ \text{and} ~ m = m' \in R''(\DD))
+      \end{array}
+    }
+  \end{array}
+  \]
+  %
+  \caption{Definition of the \ac{PER} for contexts}
+  \label{fig:per-ctx}
+\end{figure}

@@ -1,0 +1,40 @@
+\begin{figure}
+  \[
+  \begin{array}{c}
+    \infer{
+      \tmcst s = \tmcst s \in \persort[\tmcst s'] \searrow R
+    }{
+      (\tmcst s : \tmcst s') \in \Ax
+      &
+      R \iff \persort
+    }
+    \qquad
+    \infer{
+      \dreflect {\tmcst s} e = \dreflect {\tmcst s} {e'} \in \persort \searrow R
+    }{
+      e = e' \in \perne
+      &
+      R \iff \perneu
+    }
+    \\[8pt]
+    \infer{
+      \dpi a B \rho = \dpi {a'} {B'} {\rho'} \in \persort[\tmcst s_3] \searrow R
+    }{
+      \begin{array}{c}
+        (\tmcst s_1, \tmcst s_2, \tmcst s_3) \in \Ru
+        \qquad
+        a = a' \in \persort[\tmcst s_1] \searrow R_I
+        \qquad
+        \mhighlight {R_I \text{ is PER}}
+        \\
+        \forall \DD :: n = n' \in R_I.\ \evalexpfunc B {\denvext \rho n} = \evalexpfunc {B'} {\denvext {\rho'} {n'}} \in \persort[\tmcst s_2] \searrow R_O(\DD)
+        \\
+        \forall m, m' \in \Dom.\ m = m' \in R \iff (\forall \DD :: n = n' \in R_I.\ \evalappfunc m n = \evalappfunc {m'} {n'} \in R_O(\DD))
+      \end{array}
+    }
+  \end{array}
+  \]
+  %
+  \caption{Definition of the \acp{PER} for sorts}
+  \label{fig:per-sorts}
+\end{figure}
