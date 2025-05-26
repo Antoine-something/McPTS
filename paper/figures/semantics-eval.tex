@@ -1,0 +1,110 @@
+\begin{figure}
+  \raggedright
+  \noindent
+  $\boxed{\evalexp M \rho m}$ -- $M$ evaluates to $m$ in environment $\rho$.
+  \[
+  \begin{array}{c}
+    \infer{
+      \evalexp {x_i} \rho {\rho(i)}
+    }{
+      % Axiom
+    }
+    \qquad
+    \infer{
+      \evalexp {\tmcst s} \rho {\dcst s}
+    }{
+      % Axiom
+    }
+    \qquad
+    \infer{
+      \evalexp {\tppi A B} \rho {\dpi a B \rho}
+    }{
+      \evalexp A \rho a
+    }
+    \qquad
+    \infer{
+      \evalexp {\tmlam M} \rho {\dlam M \rho}
+    }{
+      % Axiom
+    }
+    \\[8pt]
+    \infer{
+      \evalexp {\tmapp M N} \rho {m'}
+    }{
+      \evalexp M \rho m
+      &
+      \evalexp N \rho n
+      &
+      \evalapp m n {m'}
+    }
+    \qquad
+    \infer{
+      \evalexp {\tmclo \sigma M} \rho m
+    }{
+      \evalsub \sigma \rho {\rho'}
+      &
+      \evalexp M {\rho'} m
+    }
+  \end{array}
+  \]
+
+  \noindent
+  $\boxed{\evalsub \sigma \rho {\rho'}}$ -- $\sigma$ evaluates to $\rho'$ in environment $\rho$.
+  \[
+  \begin{array}{c}
+    \infer{
+      \evalsub \subempty \rho \denvempty
+    }{
+      % Axiom
+    }
+    \qquad
+    \infer{
+      \evalsub \subid \rho \rho
+    }{
+      % axiom
+    }
+    \qquad
+    \infer{
+      \evalsub \subwk {\rho, m} \rho
+    }{
+      % axiom
+    }
+    \\[8pt]
+    \infer{
+      \evalsub {\subext \sigma M} \rho {\rho', m}
+    }{
+      \evalsub \sigma \rho {\rho'}
+      &
+      \evalexp M \rho m
+    }
+    \qquad
+    \infer{
+      \evalsub {\subclo \sigma \tau} {\rho_1} {\rho_3}
+    }{
+      \evalsub \sigma {\rho_1} {\rho_2}
+      &
+      \evalsub \tau {\rho_2} {\rho_3}
+    }
+  \end{array}
+  \]
+
+  \noindent
+  $\boxed{\evalapp {m_1} {m_2} {m_3}}$ -- Applying function $m_1$ to $m_2$ yields $m_3$.
+  \[
+  \begin{array}{c}
+    \infer{
+      \evalapp {\dreflect {\dpi a B \rho} e} n {\dreflect b {(\dapp e {\dreify a n})}}
+    }{
+      \evalexp B {\rho, n} b
+    }
+    \qquad
+    \infer{
+      \evalapp {\dlam M \rho} m n
+    }{
+      \evalexp M {\rho, m} n
+    }
+  \end{array}
+  \]
+  \caption{Evaluation relations}
+  \label{fig:eval}
+\end{figure}

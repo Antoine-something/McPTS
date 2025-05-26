@@ -1,0 +1,274 @@
+\section{Semantics}
+
+We now move on to discussing the semantics of \ac{PTS}.
+We use an untyped domain model, where expressions are viewed as normal forms programs in the untyped $\lambda$-calculus.
+Our normal forms are $\beta$-short and $\eta$-long.
+We can represent $\beta$-short terms in the usual way, by separating expressions into neutral and normal as follows:
+\[
+\begin{array}{llcrcl}
+  \mbox{Neutral expressions} & \Ne & \ni & E & ::= & x_i \mid \tmapp E V \\
+  \mbox{Normal expressions}  & \Nf & \ni & V & ::= & \tmcst s \mid \tppi {V_1} {V_2} \mid \tmlam V \\
+\end{array}
+\]
+Ensuring that expressions are also $\eta$-long is instead achieved through typing rules.
+
+The \ac{NbE} procedure is performed in two steps:
+First, syntactic expressions are evaluated into the domain, removing all $\beta$-redeces in the process.
+Second, domain objects are readback into normal expressions, performing any necessary $\eta$-expansions in the process.
+
+Semantic judgments are defined using a \ac{PER} model over domain objects.
+We adapt \citet{icfp}'s PER model for \mltt, where the \ac{PER} model is defined using impredicativity instead of induction-recursion.
+They used this technique in order to mechanize their system in \rocq, which does not support the more familiar inductive-recursive definition.
+In our setting, induction-recursion is simply not applicable since \acp{PTS} can be impredicative, in which case the inductive part of the definition is not well-founded.
+
+
+
+\subsection{Domain model}
+
+We now define the domain model.
+
+\[
+\begin{array}{llcrcl}
+  \mbox{Neutral domain objects} & \Dne & \ni & e       & ::=  & z_j \mid \dapp e v \\
+  \mbox{Domain objects}         & \Dom & \ni & m,n,a,b & ::=  & \dreflect a e \mid \dcst s \mid \dpi a B \rho \mid \dlam M \rho  \\
+  \mbox{Normal domain objects}  & \Dnf & \ni & v       & ::=  & \dreify a m \\
+  \mbox{Environments}           & \Env & \ni & \rho    & ::=  & \denvempty \mid \denvext \rho m \\
+\end{array}
+\]
+
+Like neutral expressions, neutral domain objects consist of variables and function application.
+Here, we represent variables $z_j$ with de Bruijn levels (not indices), which means that we count their position from the left of the context instead of the right.
+This ensures that variables have a unique identifier throughout an expression, i.e. the level is never shifted, contrary to indices.
+
+Domain object are similar to normal expressions.
+They include type-annotated reflected neutrals $\dreflect a e$, sorts, function spaces, and functions themselves.
+Functions and their types are defunctionalized by pairing a syntactic expression with an environment interpreting its free variables.
+For function spaces $\dpi a B \rho$, the domain $a$ is actually a domain object, but $B$ relies on a variable of type $a$ that has yet to be interpreted, i.e. whose value is not yet in $\rho$.
+Likewise, in the function $\dlam M \rho$, the environment $\rho$ provides an interpretation for all variables of $M$ except the newly bound one.
+While it is possible to define a domain without referencing any syntactic object, the defunctionalization approach has the advantage of keeping the domain definition inductive.
+
+Finally, normal domain objects consist only of reified domain objects $\dreify a m$,
+  where the type annotation $a$ indicates what $\eta$-expansion needs to be performed.
+In this setting, reification is not an actual operation performing $\eta$-expansions, but rather a marker that can later guide an actual computation.
+
+
+\subsection{Normalization functions}
+
+We now move on to defining the normalization procedure.
+Since not all terms of all \acp{PTS} are normalizing, we define the procedure using partial functions.
+We present them in relational style, as this better lends itself to mechanization.
+
+
+\subsubsection{Evaluation}
+
+\input{figures/semantics-eval.tex}
+
+The first step in normalization is evaluating syntacting expressions into domain objects.
+Evaluation consists of three functions, defined in \Cref{fig:eval}.
+The main function is the evaluation of expressions, denoted $\evalexp M \rho m$.
+We cannot evaluate the body of functions $\tmlam M$ since the environment $\rho$ does not provide an interpretation for the newly bound variable.
+Instead, we simply perform the closure to obtain the domain object $\dlam M \rho$.
+The case of function spaces $\tppi A B$ is similar, except that we first evaluate the domain.
+
+Most of the actual work occurs in the function application case,
+  which relies on the auxiliairy function that computes function application within the domain, denoted by $\evalapp m n {m'}$.
+Application is defined based on the shape of the function $m$.
+If $m$ is a concrete function $\dlam M \rho$, then we now have the interpretation $n$ for the newly bound variable, so we can evaluate the body $M$ in the extended environment.
+If $m$ is a neutral object $e$ reflected at a function space $\dpi a B \rho$, then we apply $e$ to the reified argument $n$ and reflect the result at the co-domain type,
+  which we can correctly evaluate now that we have an interpretation for the newly bound variable.
+  
+The last function, $\evalsub \sigma \rho {\rho'}$, evaluates substitutions into environments, and is needed to deal with explicit substitutions.
+Intuitively, a substitution is a list of expressions, and evaluation simply evaluates each expression in the list.
+
+
+
+\subsubsection{Readback}
+
+\input{figures/semantics-readback.tex}
+
+Next, we define readback relations that translate domain objects back into $\eta$-expanded syntactic normal forms.
+There are three kinds of readbacks: one for normal objects, one for neutral objects, and one types.
+Each readback is indexed by a natural number $i$ corresponding to the number of variables in the context.
+This index serves two purposes:
+First, it is needed by the neutral readback to translate de Bruijn levels back into de Bruijn indices;
+Second, it tells what the level of a fresh variable should be.
+
+The main readback is the one for normal domain objects, denoted as $\rbnf v V$.
+The normal readback is defined based on the type at which the object is reified.
+If the type is a sort $\dcst s$, then we simply invoke the readback specialized in dealing with types.
+If it is a function space $\dpi a B \rho$, then we use the domain application relation to apply the function to a fresh variable, readback the result, and wrap it in a lambda.
+This is how $\eta$-expansion is performed.
+
+The readback for neutral domain objects, denoted $\rbne e E$, mainly performs the conversion from de Bruijn levels to de Bruijn indices.
+It $\Gamma$ is a context of length $i$ and $j < i$, then the $j^{th}$ position from the left is the $(i - j + 1)^{th}$ position from the right.
+That is, a variable with de Bruijn level $j$ has de Bruijn index $i - j + 1$.
+To readback a function application, we simply use the appropriate readbacks on the function and arguments.
+
+Finally, we have the readback specialized in dealing with types, denoted $\rbtyp a V$.
+This readback is straightforward:
+The case of a reflected neutral simply invokes the neutral readback;
+The case of a sort simply reads it back to itself;
+The case of a function space is essentially a congruence on the domain and co-domain.
+
+
+
+\subsubsection{Normalization}
+
+Given a derivation of $\wfexp \Gamma M A$, we want to compute the normal form of $M$.
+Since $M$ is well-formed in context $\Gamma$, it can contain free variables.
+Moreover, the necessary $\eta$-expansions are given by the type $A$.
+Consequently, we cannot simply normalize $M$ in isolation, and we must intead take into account the entire information contained in the typing judgment.
+
+To deal with the free variables, we need to define an initial environment for $\Gamma$, which we denote as $\denvinit \Gamma$.
+Intuitively, $\denvinit \Gamma$ is an identity environment, that is, it consists only of variables, suitable reflected at the types in $\Gamma$.
+Formally, we define initial environments as follows:
+\[
+\begin{array}{lcll}
+%  \denvinit \_                 & : & \Ctx \to \Env \\
+  \denvinit \ctxempty          & = & \denvempty \\
+  \denvinit {\ctxext \Gamma A} & = & \denvext {\denvinit \Gamma} {\dreflect a {z_{|\Gamma|}}} & \text{where } \evalexp A {\denvinit \Gamma} a \\[8pt]
+\end{array}
+\]
+
+Now, we can define a normalization relation $\nbeexp \Gamma M A V$, meaning that an expression $M$ of type $A$ in context $\Gamma$ has normal form $V$.
+This relation is define simply by composing the evaluation and readback relations, as follows:
+\[
+\infer{
+  \nbeexp \Gamma M A V
+}{
+  \evalexp A {\denvinit \Gamma} a
+  &
+  \evalexp M {\denvinit \Gamma} m
+  &
+  \rbnf[|\Gamma|] {\dreify a m} V
+}
+\]
+
+
+
+\subsubsection{Properties of evaluation relations}
+
+\begin{lemma}[Determinacy]
+  All evaluation, readback, and normalization judgments are deterministic.
+  Specifically:
+  \begin{enumerate}
+  \item If $\evalexp M \rho m$ and $\evalexp M \rho {m'}$, then $m = m'$.
+  \item If $\evalsub \sigma \rho {\rho_1}$ and $\evalsub \sigma \rho {\rho_2}$, then $\rho_1 = \rho_2$.
+  \item If $\evalapp {m_1} {m_2} {m_3}$ and $\evalapp {m_1} {m_2} {m_3'}$, then $m_3 = m_3'$.
+  \item If $\rbne e E$ and $\rbne e {E'}$, then $E = E'$.
+  \item If $\rbnf v V$ and $\rbnf v {V'}$, then $V = V'$.
+  \item If $\rbtyp a V$ and $\rbtyp a {V'}$, then $V = V'$.
+  \item If $\nbeexp \Gamma M A V$ and $\nbeexp \Gamma M A {V'}$, then $V = V'$.
+  \end{enumerate}
+\end{lemma}
+\begin{proof}
+  By induction on the first derivation.
+\end{proof}
+
+This lemma tells us that we can view the judgments as partial functions.
+We denote the functional versions by omitting the $\searrow$ symbol and the output.
+For example, if $\evalexp M \rho m$, then we write $\evalexpfunc M \rho$ to mean $m$.
+
+
+\subsection{PER model}
+
+The last things we need to define are the semantic analogues to our syntactic judgments.
+This is achieved using a \ac{PER} model, i.e. symmetric and transitive relations that represent types.
+Given a \ac{PER} $\per A$, we denote the relation of objects as $\perrel m n {\per A}$, and interpret it as meaning that $m$ and $n$ are equal at type $\per A$.
+We write $m \in \per A$ as shorthand for $\perrel m m {\per A}$, and interpret this as meaning that $m$ has type $\per A$.
+While \acp{PER} are not reflexive over the entire domain, it follows from symmetry and transitivity that if $\perrel m n {\per A}$, then $m \in \per A$.
+
+The key idea behind defining a \ac{PER} model is that we want to represent the intensional syntactic judgments in an extensional style.
+For example, two functions are syntactically equal if their bodies are syntactically equal in an extended context, where the new variable is only equal to itself.
+In contrast, two functions are semantically equal if they map any semantically equal inputs to semantically equal outputs.
+
+
+
+
+\subsubsection{PERs for neutral and normal domain objects}
+
+\[
+\begin{array}{l@{~\iff~}l}
+  \perrel e {e'} \perne  & \forall i \in \Nat.\exists E \in \Ne.\ \rbne e E ~ \text{and} ~ \rbne {e'} E \\
+  \perrel v {v'} \pernf  & \forall i \in \Nat.\exists V \in \Nf.\ \rbnf v V ~ \text{and} ~ \rbnf {v'} V \\
+  \perrel a {a'} \pertyp & \forall i \in \Nat.\exists V \in \Nf.\ \rbtyp a V ~ \text{and} ~ \rbtyp {a'} V \\[12pt]
+  \perrel {\dreflect a e} {\dreflect {a'} {e'}} \perneu & \perrel e {e'} \perne
+\end{array}
+\]
+
+
+\subsubsection{PERs for sorts}
+
+The main challenge with defining the \ac{PER} model for a \ac{PTS} is providing a \ac{PER} for sorts.
+Due to the extensional nature of the judgment, relating two function spaces requires us to extract a \ac{PER} interpretation of their domains and co-domains,
+  so that we can meaningfully speak of related inputs and outputs.
+This means that a sort essentially needs to be represented as a \ac{PER} of \acp{PER}, while simultaneously being a relation over domain objects.
+A common approach to tackle this problem is to define an inductive relation over domain objects simultaneously with a recursive function mapping domain objects to \acp{PER}.
+However, this only works for predicative type systems, while our system should be general enough to deal with impredicativity.
+
+\[
+\begin{array}{c}
+  \infer{
+    \tmcst s = \tmcst s \in \persort[\tmcst s'] \searrow R
+  }{
+    (\tmcst s : \tmcst s') \in \Ax
+    &
+    R \iff \persort
+  }
+  \qquad
+  \infer{
+    \dreflect {\tmcst s} e = \dreflect {\tmcst s} {e'} \in \persort \searrow R
+  }{
+    e = e' \in \perne
+    &
+    R \iff \perneu
+  }
+  \\[8pt]
+  \infer{
+    \dpi a B \rho = \dpi {a'} {B'} {\rho'} \in \persort[\tmcst s_3] \searrow R
+  }{
+    \begin{array}{c}
+      (\tmcst s_1, \tmcst s_2, \tmcst s_3) \in \Ru
+      \qquad
+      a = a' \in \persort[\tmcst s_1] \searrow R_I
+      \qquad
+      \mhighlight {R_I \text{ is PER}}
+      \\
+      \forall \DD :: n = n' \in R_I.\ \evalexpfunc B {\denvext \rho n} = \evalexpfunc {B'} {\denvext {\rho'} {n'}} \in \persort[\tmcst s_2] \searrow R_O(\DD)
+      \\
+      \forall m, m' \in \Dom.\ m = m' \in R \iff (\forall \DD :: n = n' \in R_I.\ \evalappfunc m n = \evalappfunc {m'} {n'} \in R_O(\DD))
+    \end{array}
+  }
+\end{array}
+\]
+
+\subsubsection{PERs for contexts}
+
+\[
+\begin{array}{c}
+  \infer{
+    \ctxempty = \ctxempty \in \perctx \searrow R
+  }{
+    \forall \rho, \rho'. \rho = \rho' \in R \iff \rho = \rho' = \denvempty
+  }
+  \\[8pt]
+  \infer{
+    \ctxext \Gamma A = \ctxext \Delta B \in \perctx \searrow R
+  }{
+    \begin{array}{c}
+      \Gamma = \Delta \in \perctx \searrow R'
+      \qquad
+      \mhighlight{R' \text{ is PER}}
+      \\
+      \forall \DD :: \rho = \rho' \in R'.\ \evalexpfunc A \rho = \evalexpfunc {A'} {\rho'} \in \persort \searrow R''(\DD)
+      \\
+      \forall \rho, \rho', m, m'.\ \denvext \rho m = \denvext {\rho'} {m'} \in R \iff (\exists \DD :: \rho = \rho' \in R' ~ \text{and} ~ m = m' \in R''(\DD))
+    \end{array}
+  }
+\end{array}
+\]
+
+
+\subsubsection{Properties of PER model}
+
+

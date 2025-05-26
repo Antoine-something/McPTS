@@ -1,0 +1,183 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Common math notation %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\Nat}{\mathbb{N}}
+\newcommand{\bbrackets}[1]{[\![#1]\!]}
+\newcommand{\parto}{\rightharpoonup}
+
+%% Calligraphic letters
+\newcommand{\DD}{\mathcal{D}}
+\newcommand{\EE}{\mathcal{E}}
+\newcommand{\LL}{\mathcal{L}}
+\newcommand{\MM}{\mathcal{M}}
+\newcommand{\OO}{\mathcal{O}}
+\newcommand{\PP}{\mathcal{P}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+%% PTS Syntax notation %%
+%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% PTS signature
+\newcommand{\St}{\mathcal{S}t}
+\newcommand{\Ax}{\mathcal{A}x}
+\newcommand{\Ru}{\mathcal{R}u}
+
+
+%% Names of syntactic categories
+\newcommand{\Exp}{\mathsf{Exp}}
+\newcommand{\Typ}{\mathsf{Typ}}
+\newcommand{\Sub}{\mathsf{Sub}}
+\newcommand{\Ctx}{\mathsf{Ctx}}
+
+\newcommand{\Ne}{\mathsf{Ne}}
+\newcommand{\Nf}{\mathsf{Nf}}
+
+%% For types
+\newcommand{\tppi}[2]{\Pi #1.#2}
+
+%% For terms
+\newcommand{\tmcst}[1]{\textbf{#1}}
+\newcommand{\tmclo}[2]{[#1]#2}
+\newcommand{\tmlam}[1]{\lambda #1}
+\newcommand{\tmapp}[2]{#1~#2}
+
+%% For contexts
+\newcommand{\ctxempty}{\cdot}
+\DeclareDocumentCommand{\ctxext}{m m}{#1, #2}
+%% Operations on contexts
+\DeclareDocumentCommand{\ctxlookup}{m m m}{#1 \judg^{\scalebox{0.75}{\ensuremath \#}} #2 : #3}
+
+
+%%For substitutions
+\newcommand{\subempty}{\cdot}
+\newcommand{\subid}{\texttt{id}}
+\newcommand{\subwk}{\texttt{wk}}
+\DeclareDocumentCommand{\subext}{m m}{#1, #2}
+\newcommand{\subclo}[2]{#1 \circ #2}
+
+
+%% Judgments
+\newcommand{\judg}{\vdash}
+
+\DeclareDocumentCommand{\wfctx}{m}{\judg #1}
+\DeclareDocumentCommand{\wfexp}{m m m}{#1 \judg #2 : #3}
+\DeclareDocumentCommand{\wfsub}{m m m}{#1 \judg #2 : #3}
+\DeclareDocumentCommand{\wftyp}{m m}{#1 \judg #2}
+
+\DeclareDocumentCommand{\eqctx}{m m}{\judg #1 \equiv #2}
+\DeclareDocumentCommand{\eqexp}{m m m m}{#1 \judg #2 \equiv #3 : #4}
+\DeclareDocumentCommand{\eqsub}{m m m m}{#1 \judg #2 \equiv #3 : #4}
+\DeclareDocumentCommand{\eqtyp}{m m m}{#1 \judg #2 \equiv #3}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% PTS Semantics notation %%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Names of semantic categories
+\newcommand{\Dom}{\mathsf{D}}
+\newcommand{\Dne}{\Dom^{\Ne}}
+\newcommand{\Dnf}{\Dom^{\Nf}}
+\newcommand{\Env}{\mathsf{Env}}
+
+%% Neutral domain expressions
+\DeclareDocumentCommand{\dapp}{m m}{#1~#2}
+
+%% Domain expressions
+\DeclareDocumentCommand{\dcst}{m}{\textbf{#1}}
+\DeclareDocumentCommand{\dreflect}{m m}{\Uparrow^{#1}\!#2}
+\DeclareDocumentCommand{\dpi}{m m m}{\Pi#1.#2(#3)}
+\DeclareDocumentCommand{\dlam}{m m}{\lambda #1(#2)}
+
+%% Normal domain expressions
+\DeclareDocumentCommand{\dreify}{m m}{\Downarrow^{#1}\!#2}
+
+%% Environments
+\DeclareDocumentCommand{\denvempty}{}{\cdot}
+\DeclareDocumentCommand{\denvext}{m m}{#1, #2}
+
+
+%% Evaluation
+\DeclareDocumentCommand{\evalexp}{m m m}{{\bbrackets{#1}}^{\Exp}(#2) \searrow #3}
+\DeclareDocumentCommand{\evalsub}{m m m}{{\bbrackets{#1}}^{\Sub}(#2) \searrow #3}
+\DeclareDocumentCommand{\evalapp}{m m m}{#1 \cdot #2 \searrow #3}
+%% Functional versions of evaluation judgments
+\DeclareDocumentCommand{\evalexpfunc}{m m}{{\bbrackets{#1}}^{\Exp}(#2)}
+\DeclareDocumentCommand{\evalsubfunc}{m m}{{\bbrackets{#1}}^{\Sub}(#2)}
+\DeclareDocumentCommand{\evalappfunc}{m m}{#1 \cdot #2}
+
+
+%% Readbacks
+\DeclareDocumentCommand{\rbne}{O{i} m m}{\mathsf{R}_{#1}^{\Ne}(#2) \searrow #3}
+\DeclareDocumentCommand{\rbnf}{O{i} m m}{\mathsf{R}_{#1}^{\Nf}(#2) \searrow #3}
+\DeclareDocumentCommand{\rbtyp}{O{i} m m}{\mathsf{R}_{#1}^{\Typ}(#2) \searrow #3}
+\DeclareDocumentCommand{\rbenv}{O{i} m m}{\mathsf{R}_{#1}^{\Env}(#2) \searrow #3}
+%% Functional readbacks
+\DeclareDocumentCommand{\rbnefunc}{O{i} m}{\mathsf{R}_{#1}^{\Ne}(#2)}
+\DeclareDocumentCommand{\rbnffunc}{O{i} m}{\mathsf{R}_{#1}^{\Nf}(#2)}
+\DeclareDocumentCommand{\rbtypfunc}{O{i} m}{\mathsf{R}_{#1}^{\Typ}(#2)}
+\DeclareDocumentCommand{\rbenvfunc}{O{i} m}{\mathsf{R}_{#1}^{\Env}(#2)}
+
+
+%% Operations on environments
+\DeclareDocumentCommand{\denvlookup}{m m}{#1(#2)}
+\DeclareDocumentCommand{\denvconcat}{m m}{#1;#2}
+\DeclareDocumentCommand{\denvsize}{m}{|#1|}
+
+\DeclareDocumentCommand{\denvinit}{m}{\rho^*_{#1}}
+
+\DeclareDocumentCommand{\nbeexp}{m m m m}{\texttt{nbe}^{\Exp}(#1 \judg #2 : #3) \searrow #4}
+\DeclareDocumentCommand{\nbeexpfunc}{m m m}{\texttt{nbe}^{\Exp}(#1 \judg #2 : #3)}
+
+
+
+%%% PER Model %%%
+
+\newcommand{\per}[1]{\mathcal{#1}}
+
+\newcommand{\perne}{Ne}
+\newcommand{\pernf}{Nf}
+\newcommand{\pertyp}{Typ}
+
+\newcommand{\perneu}{Neu}
+
+\DeclareDocumentCommand{\persort}{O{\tmcst s}}{\mathcal{S}ort_{#1}}
+
+\newcommand{\perctx}{\mathcal{C}tx}
+
+
+\DeclareDocumentCommand{\perrel}{m m m}{#1 = #2 \in #3}
+
+
+%% Candidate spaces
+\DeclareDocumentCommand{\perleast}{m}{\underline{#1}}
+\DeclareDocumentCommand{\permost}{m}{\overline{#1}}
+
+\DeclareDocumentCommand{\realizes}{}{\vdash\!\!\vdash}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+%% Names of languages %%
+%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\cocon}{\textsc{Cocon}\xspace}
+\newcommand{\stlc}{\textsc{STLC}\xspace}
+\newcommand{\lf}{\textsc{LF}\xspace}
+\newcommand{\mltt}{\textsc{MLTT}\xspace}
+\newcommand{\coc}{\textsc{CoC}\xspace}
+\newcommand{\sysf}{\textsc{System F}\xspace}
+\newcommand{\agda}{\textsc{Agda}\xspace}
+\newcommand{\rocq}{\textsc{Rocq}\xspace}
+\newcommand{\lean}{\textsc{Lean}\xspace}
+
+
+
+%%%%%%%%%%%%%
+%% Editing %%
+%%%%%%%%%%%%%
+\newcommand{\AG}[1]{{\color{green!60!black}AG: #1}}
+\newcommand{\BP}[1]{{\color{red}BP: #1}}
+
+\newcommand{\mhighlight}[1]{\colorbox{light-gray}{\ensuremath{#1}}}

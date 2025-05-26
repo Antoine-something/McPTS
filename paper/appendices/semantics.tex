@@ -1,0 +1,378 @@
+\section{Semantics}
+\label{app:pts-semantics}
+
+\subsection{Normal forms}
+
+\[
+\begin{array}{lrcl}
+  \mbox{Neutral terms}        & E      & ::= & x_i \mid \tmapp E V \\
+  \mbox{Normal terms}         & V      & ::= & \tmcst s \mid \tppi {V_1} {V_2} \mid \tmlam V \\
+%  \mbox{Normal substitutions} & \theta & ::= & \subempty \mid \subext \theta V
+\end{array}
+\]
+
+\subsection{Untyped domain}
+
+\[
+\begin{array}{lrcl}             
+  \mbox{De Bruijn levels}       & j \\
+  \mbox{Neutral domain objects} & e       & ::=  & z_j \mid \dapp e v \\
+  \mbox{Domain objects}         & m,n,a,b & ::=  & \dreflect a e \mid \dcst s \mid \dpi a B \rho \mid \dlam M \rho  \\
+  \mbox{Normal domain objects}  & v       & ::=  & \dreify a m \\
+  \mbox{Environments}           & \rho    & ::=  & \denvempty \mid \denvext \rho m \\
+\end{array}
+\]
+
+\subsubsection{Operations on environments}
+
+\noindent
+Environment lookup
+
+\[
+\begin{array}{rcl}
+  \denvlookup \_ \_                       & : & \Env \parto \Nat \parto \Dom \\
+  \denvlookup {(\denvext \rho m)} 0       & = & m \\
+  \denvlookup {(\denvext \rho m)} {i + 1} & = & \denvlookup \rho i
+\end{array}
+\]
+
+\noindent
+Environment concatenation
+
+\[
+\begin{array}{rcl}
+  \denvconcat \_ \_                     & : & \Env \to \Env \to \Env \\
+  \denvconcat \rho {\denvempty}         & = & \rho \\
+  \denvconcat \rho {(\denvext {\rho'} m)} & = & \denvext {(\denvconcat \rho {\rho'})} m
+\end{array}
+\]
+
+\noindent
+Environment size
+
+\[
+\begin{array}{rcl}
+  \denvsize \_                & : & \Env \to \Nat \\
+  \denvsize \denvempty        & = & 0 \\
+  \denvsize {\denvext \rho m} & = & \denvsize \rho + 1
+\end{array}
+\]
+
+
+\subsection{Normalization operation}
+
+\subsubsection{Evaluation} \hfill\\
+
+\noindent
+$\boxed{\evalexp M \rho m}$ -- $M$ evaluates to $m$ in environment $\rho$.
+\[
+\begin{array}{c}
+  \infer{
+    \evalexp {x_i} \rho {\rho(i)}
+  }{
+    % Axiom
+  }
+  \qquad
+  \infer{
+    \evalexp {\tmcst s} \rho {\dcst s}
+  }{
+    % Axiom
+  }
+  \qquad
+  \infer{
+    \evalexp {\tppi A B} \rho {\dpi a B \rho}
+  }{
+    \evalexp A \rho a
+  }
+  \qquad
+  \infer{
+    \evalexp {\tmlam M} \rho {\dlam M \rho}
+  }{
+    % Axiom
+  }
+  \\[8pt]
+  \infer{
+    \evalexp {\tmapp M N} \rho {m'}
+  }{
+    \evalexp M \rho m
+    &
+    \evalexp N \rho n
+    &
+    \evalapp m n {m'}
+  }
+  \qquad
+  \infer{
+    \evalexp {\tmclo \sigma M} \rho m
+  }{
+    \evalsub \sigma \rho {\rho'}
+    &
+    \evalexp M {\rho'} m
+  }
+\end{array}
+\]
+
+\noindent
+$\boxed{\evalsub \sigma \rho {\rho'}}$ -- $\sigma$ evaluates to $\rho'$ in environment $\rho$.
+\[
+\begin{array}{c}
+  \infer{
+    \evalsub \subid \rho \rho
+  }{
+    % axiom
+  }
+  \qquad
+  \infer{
+    \evalsub {\subext \sigma M} \rho {\rho', m}
+  }{
+    \evalsub \sigma \rho {\rho'}
+    &
+    \evalexp M \rho m
+  }
+  \\[8pt]
+  \infer{
+    \evalsub \subwk {\rho, m} \rho
+  }{
+    % axiom
+  }
+  \qquad
+  \infer{
+    \evalsub {\subclo \sigma \tau} {\rho_1} {\rho_3}
+  }{
+    \evalsub \sigma {\rho_1} {\rho_2}
+    &
+    \evalsub \tau {\rho_2} {\rho_3}
+  }
+\end{array}
+\]
+
+\noindent
+$\boxed{\evalapp {m_1} {m_2} {m_3}}$ -- Applying function $m_1$ to $m_2$ yields $m_3$.
+\[
+\begin{array}{c}
+  \infer{
+    \evalapp {\dreflect {\dpi a B \rho} e} n {\dreflect b {(\dapp e {\dreify a n})}}
+  }{
+    \evalexp B {\rho, n} b
+  }
+  \qquad
+  \infer{
+    \evalapp {\dlam M \rho} m n
+  }{
+    \evalexp M {\rho, m} n
+  }
+\end{array}
+\]
+
+
+
+\subsubsection{Readback} \hfill\\
+
+\noindent
+$\boxed{\rbne e E}$ -- Neutral domain object $e$ reads back to neutral term $E$.
+\[
+\begin{array}{c}
+  \infer{
+    \rbne {z_j} {x_{i - j + 1}}
+  }{
+    % Axiom
+  }
+  \qquad
+  \infer{
+    \rbne {\dapp e v} {\tmapp E V}
+  }{
+    \rbne e E
+    &
+    \rbnf v V
+  }
+\end{array}
+\]
+
+
+\noindent
+$\boxed{\rbnf v V}$ -- Normal domain object $v$ reads back to normal term $V$
+\[
+\begin{array}{c}
+  \infer{
+    \rbnf {\dreify {\dcst s} a} V
+  }{
+    \rbtyp a V
+  }
+  \qquad
+  \infer{
+    \rbnf {\dreify {\dpi a B \rho} m} {\tmlam V}
+  }{
+    \evalexp B {\rho, \dreflect a {z_i}} b
+    &
+    \evalapp m {\dreflect a {z_i}} n
+    &
+    \rbnf[i+1] {\dreify b n} V
+  }
+\end{array}
+\]
+
+
+\noindent
+$\boxed{\rbtyp a V}$ -- Domain type $a$ readbacks to normal type $V$.
+\[
+\begin{array}{c}
+  \infer{
+    \rbtyp {\dreflect {\tmcst s} e} E
+  }{
+    \rbne e E
+  }
+  \qquad
+  \infer{
+    \rbtyp {\tmcst s} {\tmcst s}
+  }{
+    % Axiom
+  }
+  \qquad
+  \infer{
+    \rbtyp {\dpi a B \rho} {\tppi V {V'}}
+  }{
+    \rbtyp a V
+    &
+    \evalexp B {\rho, \dreflect a {z_i}} b
+    &
+    \rbtyp[i+1] b {V'}
+  }
+\end{array}
+\]
+
+
+\subsubsection{Normalization} \hfill\\
+
+\noindent
+We first define initial environments as follows:
+\[
+\begin{array}{lcll}
+  \denvinit \_                 & : & \Ctx \to \Env \\
+  \denvinit \ctxempty          & = & \denvempty \\
+  \denvinit {\ctxext \Gamma A} & = & \denvext {\denvinit \Gamma} {\dreflect a {z_{|\Gamma|}}} & \text{where } \evalexp A {\denvinit \Gamma} a \\[8pt]
+\end{array}
+\]
+
+\noindent
+$\boxed{\nbeexp \Gamma M A V}$ -- Expression $M$ of type $A$ in context $\Gamma$ has normal form $V$.
+\[
+\infer{
+  \nbeexp \Gamma M A V
+}{
+  \evalexp A {\denvinit \Gamma} a
+  &
+  \evalexp M {\denvinit \Gamma} m
+  &
+  \rbnf[|\Gamma|] {\dreify a m} V
+}
+\]
+
+\subsubsection{Properties of evaluation relations}
+
+\begin{lemma}[Determinacy]
+  All evaluation, readback, and normalization judgments are deterministic.
+  Specifically:
+  \begin{enumerate}
+  \item If $\evalexp M \rho m$ and $\evalexp M \rho {m'}$, then $m = m'$.
+  \item If $\evalsub \sigma \rho {\rho_1}$ and $\evalsub \sigma \rho {\rho_2}$, then $\rho_1 = \rho_2$.
+  \item If $\evalapp {m_1} {m_2} {m_3}$ and $\evalapp {m_1} {m_2} {m_3'}$, then $m_3 = m_3'$.
+  \item If $\rbne e E$ and $\rbne e {E'}$, then $E = E'$.
+  \item If $\rbnf v V$ and $\rbnf v {V'}$, then $V = V'$.
+  \item If $\rbtyp a V$ and $\rbtyp a {V'}$, then $V = V'$.
+  \item If $\nbeexp \Gamma M A V$ and $\nbeexp \Gamma M A {V'}$, then $V = V'$.
+  \end{enumerate}
+\end{lemma}
+\begin{proof}
+  By induction on the first derivation.
+\end{proof}
+
+
+
+\subsection{PER model}
+
+\subsubsection{PERs for neutral and normal domain objects}
+
+\[
+\begin{array}{l@{~\iff~}l}
+  \perrel e {e'} \perne  & \forall i \in \Nat.\exists E \in \Ne.\ \rbne e E ~ \text{and} ~ \rbne {e'} E \\
+  \perrel v {v'} \pernf  & \forall i \in \Nat.\exists V \in \Nf.\ \rbnf v V ~ \text{and} ~ \rbnf {v'} V \\
+  \perrel a {a'} \pertyp & \forall i \in \Nat.\exists V \in \Nf.\ \rbtyp a V ~ \text{and} ~ \rbtyp {a'} V \\[12pt]
+  \perrel {\dreflect a e} {\dreflect {a'} {e'}} \perneu & \perrel e {e'} \perne
+\end{array}
+\]
+
+
+\subsubsection{PERs for sorts}
+
+\[
+\begin{array}{c}
+  \infer{
+    \tmcst s = \tmcst s \in \persort[\tmcst s'] \searrow R
+  }{
+    (\tmcst s : \tmcst s') \in \Ax
+    &
+    R \iff \persort
+  }
+  \qquad
+  \infer{
+    \dreflect {\tmcst s} e = \dreflect {\tmcst s} {e'} \in \persort \searrow R
+  }{
+    e = e' \in \perne
+    &
+    R \iff \perneu
+  }
+  \\[8pt]
+  \infer{
+    \dpi a B \rho = \dpi {a'} {B'} {\rho'} \in \persort[\tmcst s_3] \searrow R
+  }{
+    \begin{array}{c}
+      (\tmcst s_1, \tmcst s_2, \tmcst s_3) \in \Ru
+      \qquad
+      a = a' \in \persort[\tmcst s_1] \searrow R_I
+      \qquad
+      \mhighlight {R_I \text{ is PER}}
+      \\
+      \forall \DD :: n = n' \in R_I.\ \evalexpfunc B {\denvext \rho n} = \evalexpfunc {B'} {\denvext {\rho'} {n'}} \in \persort[\tmcst s_2] \searrow R_O(\DD)
+      \\
+      \forall m, m' \in \Dom.\ m = m' \in R \iff (\forall \DD :: n = n' \in R_I.\ \evalappfunc m n = \evalappfunc {m'} {n'} \in R_O(\DD))
+    \end{array}
+  }
+\end{array}
+\]
+
+
+\subsubsection{Least and greatest PERs}
+
+\[
+\begin{array}{r@{~\iff~}l}
+  \perrel {m_1} {m_2} {\permost a} & \forall a_1 = a_2 = a \in \persort.\ \perrel {\dreify {a_1} {m_1}} {\dreify {a_2} {m_2}} {\pernf} \\
+  \perrel {\dreflect {a_1} {e_1}} {\,\dreflect {a_2} {e_2}} {\perleast a} & \perrel {e_1} {e_2} \perne ~ \text{and} ~ a_1 = a_2 = a \in \persort
+\end{array}
+\]
+
+\AG{These will fit better in the completeness section}
+
+\subsubsection{PERs for contexts}
+
+\[
+\begin{array}{c}
+  \infer{
+    \ctxempty = \ctxempty \in \perctx \searrow R
+  }{
+    \forall \rho, \rho'. \rho = \rho' \in R \iff \rho = \rho' = \denvempty
+  }
+  \\[8pt]
+  \infer{
+    \ctxext \Gamma A = \ctxext \Delta B \in \perctx \searrow R
+  }{
+    \begin{array}{c}
+      \Gamma = \Delta \in \perctx \searrow R'
+      \qquad
+      \mhighlight{R' \text{ is PER}}
+      \\
+      \forall \DD :: \rho = \rho' \in R'.\ \evalexpfunc A \rho = \evalexpfunc {A'} {\rho'} \in \persort \searrow R''(\DD)
+      \\
+      \forall \rho, \rho', m, m'.\ \denvext \rho m = \denvext {\rho'} {m'} \in R \iff (\exists \DD :: \rho = \rho' \in R' ~ \text{and} ~ m = m' \in R''(\DD))
+    \end{array}
+  }
+\end{array}
+\]

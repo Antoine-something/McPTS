@@ -1,0 +1,16 @@
+# LaTeX
+*.aux
+*.bbl
+*.blg
+*.log
+*.out
+*.pdf
+# LaTeXMk
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+#
+*.sh
+notes.txt
+*~
+*\~
