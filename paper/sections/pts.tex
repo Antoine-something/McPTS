@@ -24,10 +24,10 @@ For the remainder of this section, we assume a fixed, arbitrary specification.
 We begin be looking at the syntactic side of \ac{PTS}.
 Objects in a \ac{PTS} consists of the following syntactic categories:
 \[
-\begin{array}{lrcl}
-  \mbox{Expressions}       & M,N,A,B,C      & ::=  & x_i \mid \tmcst s \mid \tppi A B \mid \tmlam M \mid \tmapp M N \mid \tmclo \sigma M \\
-  \mbox{Contexts}          & \Gamma, \Delta & ::=  & \ctxempty \mid \ctxext\Gamma A \\
-  \mbox{Substitutions}     & \sigma, \tau   & ::=  & \subempty \mid \subid \mid \subwk \mid \subext \sigma M \mid \subclo \sigma \tau
+\begin{array}{llcrcl}
+  \mbox{Expressions}       & \Exp & \ni & M,N,A,B,C      & ::=  & x_i \mid \tmcst s \mid \tppi A B \mid \tmlam M \mid \tmapp M N \mid \tmclo \sigma M \\
+  \mbox{Contexts}          & \Ctx & \ni & \Gamma, \Delta & ::=  & \ctxempty \mid \ctxext\Gamma A \\
+  \mbox{Substitutions}     & \Sub & \ni & \sigma, \tau   & ::=  & \subempty \mid \subid \mid \subwk \mid \subext \sigma M \mid \subclo \sigma \tau
 \end{array}
 \]
 Although terms and types are unified into a single category of expressions, we distinguish them by writing $M,N$ for terms and $A,B,C$ for types.
