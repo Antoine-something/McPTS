@@ -6,22 +6,17 @@ Under the propositions-as-types paradigm, commonly used in proof assistants,
 However, proving normalization can be difficult, and mechanizing these proofs even more so.
 One key challenge is that, although normalization proofs for different systems often follow a similar structure,
   they also closely related to the fine structure of the type theories at hand.
-
--- TODO: Finish the paragraph on normalization --
   
 There are two main approaches for proving normalization.
-The first uses the notion of reducibility candidates, introduced by \citet{G72} (following \citet{T67}).
+The first is syntactic uses the notion of reducibility candidates, introduced by \citet{G72} (following \citet{T67}).
 The idea of reducibility candidates is to define for each type $A$ a set of strongly normalizing terms, and prove that all terms of type $A$ are in this set.
 This approach has been used for a number of type theories, including -- EXAMPLES --.
-The second approach, known as \ac{NbE}, consists of constructing a semantic model of the language in which all terms are by default in normal form.
-\ac{NbE} was introduced by \citet{BS91}
-
-
-%% There are two forms normalization theorems.
-%% Strong normalization states that there are no infinite sequences of reductions.
-%% Strong normalization is usually proven using Tait's method of reducibility candidates \citep{Tait}.
-%% The method was also used by \citet{G72} to prove normalization for \sysf.
-
+The second approach, known as \ac{NbE}, was introduced by \citet{BS91}.
+\ac{NbE} consists of constructing a semantic model of the language in which all terms are by default in normal form.
+Then, we define an evaluation function to map syntactic terms to semantic objects, and its inverse, called readback, to turn semantic objects back into syntactic terms.
+\ac{NbE} has been developped significantly by Abel \citep{AAD07, ACD07, A10, A13}.
+More recently, \citet{mctt} adapted Abel's style to make it suitable for mechanization in \rocq.
+This is the approach that we will follow in this work.
   
 This work aims to develop a generic proof of normalization that can be instantiated and applied to a large class of type systems, the \acp{PTS}.
 \Acp{PTS}, introduced independently by Terlouw and Berardy and popularized by \citet{B91},
@@ -33,8 +28,8 @@ The \ac{PTS} framework has two key benefits for our purpose:
 Additionally, the framework is highly extendable \citep{B95, BCK03, C97, FP15, RD14, SP94, SV12, YO19, Z99}, which will allow us to extend our work to richer languages.
 
 We will use this general framework to develop a normalization proof in the \ac{NbE} style.
-The syntactic side, as well as the domain model and evaluation procedure, closely follow \citet{FP15}.
-In their work, the correctness of normalization is established for predicative type systems.
+\citet{FP15} have already adapted \acs{PTS} with explicit subsitutions and typed equality judgment, making it suitable for \ac{NbE}.
+In their work, equality is restricted to $\beta$ and the correctness of normalization is established only for predicative type systems.
 Our approach is closer in spirit to the work of \citet{MW96},
   who provide sufficient conditions for a \ac{PTS} to be (strongly) $\beta$-normalizing, following a reducibility candidate strategy.
 Our \ac{NbE} approach achieves $\beta\eta$-normal forms and offers the advantage of providing a concrete normalization procedure that can be highly efficient \citep{BES98}.
