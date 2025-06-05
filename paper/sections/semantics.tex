@@ -244,6 +244,14 @@ Intuitively, given a rule $(\tmcst s_1, \tmcst s_2, \tmcst s_3) \in \Ru$, two fu
 Formally, we can easily express this relation on domains, but not on co-domains, as there might be dependencies to take into account.
 To address this, we need to view the output relation, denoted $R_O$ in the rules, as a function from the input relation $R_I$ to \acp{PER}.
 
+To prove correctness of normalization, we need to reason by induction on derivations of $a = b \in \persort \searrow R$.
+This requires that the judgment definition is well-founded, which is not the case for impredicative \acp{PTS}.
+For example, consider the rule $(\square, \star, \star)$ for polymorphic function spaces in \sysf.
+Due to the axiom $\star : \square$, we can construct function spaces of the form $\dpi \star B \rho$.
+To verify $\dpi \star B \rho = \dpi \star {B'} {\rho'} \in \persort[\star] \searrow R$, we will have a premise $\star = \star \in \persort[\square] \searrow R_I$,
+  where $R_I \iff \persort[\star]$.
+But then, to relate the codomains, we need to quantify over objects related by $\persort[\star]$ in order to define $\persort[\star]$, so the definition is not well-founded.
+
 
 
 
@@ -279,6 +287,15 @@ Likewise, the \ac{PER} representing $\ctxext \Gamma A$ relates environments whos
 \end{proof}
 
 
+\begin{lemma}
+  All the \acp{PER} contain the suitably reflected neutrals.
+  Specifically, if $e = e' \in \perne$ and $a = a' \in \persort \searrow R$, then $\dreflect a e = \dreflect {a'} {e'} \in R$.
+\end{lemma}
+\begin{proof}
+  By induction on the second derivation.
+\end{proof}
+
+
 \begin{lemma}[Relational irrelevance]
   The relations produced from $\persort$ and $\perctx$ are unique up to propositional equivalence.
   Specifically:
@@ -294,6 +311,12 @@ Likewise, the \ac{PER} representing $\ctxext \Gamma A$ relates environments whos
   By induction on the first derivation, applying inversion on the second derivation in each case.
 \end{proof}
 
+\begin{lemma}
+  If $\Gamma = \Delta \in \perctx \searrow R$, then $|\Gamma| = |\Delta|$.
+\end{lemma}
+\begin{proof}
+  By straightforward induction on the given derivation.
+\end{proof}
 
 \begin{lemma}
   Initial environments are related by their context \ac{PER}.
