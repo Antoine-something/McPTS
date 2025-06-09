@@ -57,7 +57,11 @@
 \newcommand{\subclo}[2]{#1 \circ #2}
 
 
-%% Judgments
+%%%%%%%%%%%%%%%
+%% Judgments %%
+%%%%%%%%%%%%%%%
+
+%% Syntactic judgments
 \newcommand{\judg}{\vdash}
 
 \DeclareDocumentCommand{\wfctx}{m}{\judg #1}
@@ -69,6 +73,21 @@
 \DeclareDocumentCommand{\eqexp}{m m m m}{#1 \judg #2 \equiv #3 : #4}
 \DeclareDocumentCommand{\eqsub}{m m m m}{#1 \judg #2 \equiv #3 : #4}
 \DeclareDocumentCommand{\eqtyp}{m m m}{#1 \judg #2 \equiv #3}
+
+
+
+%% Semantic judgments for completeness
+\newcommand{\semjudg}{\vDash}
+
+\DeclareDocumentCommand{\wfctxsem}{m}{\semjudg #1}
+\DeclareDocumentCommand{\wfexpsem}{m m m}{#1 \semjudg #2 : #3}
+\DeclareDocumentCommand{\wfsubsem}{m m m}{#1 \semjudg #2 : #3}
+\DeclareDocumentCommand{\wftypsem}{m m}{#1 \semjudg #2}
+
+\DeclareDocumentCommand{\eqctxsem}{m m}{\semjudg #1 \equiv #2}
+\DeclareDocumentCommand{\eqexpsem}{m m m m}{#1 \semjudg #2 \equiv #3 : #4}
+\DeclareDocumentCommand{\eqsubsem}{m m m m}{#1 \semjudg #2 \equiv #3 : #4}
+\DeclareDocumentCommand{\eqtypsem}{m m m}{#1 \semjudg #2 \equiv #3}
 
 
 
@@ -119,6 +138,8 @@
 \DeclareDocumentCommand{\rbnffunc}{O{i} m}{\mathsf{R}_{#1}^{\Nf}(#2)}
 \DeclareDocumentCommand{\rbtypfunc}{O{i} m}{\mathsf{R}_{#1}^{\Typ}(#2)}
 \DeclareDocumentCommand{\rbenvfunc}{O{i} m}{\mathsf{R}_{#1}^{\Env}(#2)}
+
+
 
 
 %% Operations on environments

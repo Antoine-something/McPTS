@@ -5,6 +5,12 @@
   \[
   \begin{array}{c}
     \infer{
+      \rbnf {\dreify {\dreflect {a} {e}} {\dreflect b e'}} E
+    }{
+      \rbne {e'} E
+    }
+    \qquad
+    \infer{
       \rbnf {\dreify {\dcst s} a} V
     }{
       \rbtyp a V

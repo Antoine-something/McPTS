@@ -52,14 +52,14 @@ Finally, normal domain objects consist only of reified domain objects $\dreify a
 In this setting, reification is not an actual operation performing $\eta$-expansions, but rather a marker that can later guide an actual computation.
 
 
-\subsection{Normalization functions}
+
+
+
+\subsection{Evaluation}
 
 We now move on to defining the normalization procedure.
 Since not all terms of all \acp{PTS} are normalizing, we define the procedure using partial functions.
 We present them in relational style, as this better lends itself to mechanization.
-
-
-\subsubsection{Evaluation}
 
 \input{figures/semantics-eval.tex}
 
@@ -82,7 +82,7 @@ Intuitively, a substitution is a list of expressions, and evaluation simply eval
 
 
 
-\subsubsection{Readback}
+\subsection{Readback}
 
 \input{figures/semantics-readback.tex}
 
@@ -112,7 +112,7 @@ The case of a function space is essentially a congruence on the domain and co-do
 
 
 
-\subsubsection{Normalization}
+\subsection{Normalization}
 
 Given a derivation of $\wfexp \Gamma M A$, we want to compute the normal form of $M$.
 Since $M$ is well-formed in context $\Gamma$, it can contain free variables.
@@ -124,7 +124,6 @@ Intuitively, $\denvinit \Gamma$ is an identity environment, that is, it consists
 Formally, we define initial environments as follows:
 \[
 \begin{array}{lcll}
-%  \denvinit \_                 & : & \Ctx \to \Env \\
   \denvinit \ctxempty          & = & \denvempty \\
   \denvinit {\ctxext \Gamma A} & = & \denvext {\denvinit \Gamma} {\dreflect a {z_{|\Gamma|}}} & \text{where } \evalexp A {\denvinit \Gamma} a \\[8pt]
 \end{array}
@@ -146,6 +145,7 @@ This relation is define simply by composing the evaluation and readback relation
 
 
 
+
 \subsubsection{Properties of evaluation relations}
 
 \begin{lemma}[Determinacy]
@@ -163,165 +163,9 @@ This relation is define simply by composing the evaluation and readback relation
 \end{lemma}
 \begin{proof}
   By induction on the first derivation.
+  We can always apply inversion on the second derivation since all judgments are syntax-directed.
 \end{proof}
 
 This lemma tells us that we can view the judgments as partial functions.
 We denote the functional versions by omitting the $\searrow$ symbol and the output.
 For example, if $\evalexp M \rho m$, then we write $\evalexpfunc M \rho$ to mean $m$.
-
-
-\subsection{PER model}
-
-The last things we need to define are the semantic analogues to our syntactic judgments.
-This is achieved using a \ac{PER} model, i.e. symmetric and transitive relations that represent types.
-Given a \ac{PER} $\per A$, we denote the relation of objects as $\perrel m n {\per A}$, and interpret it as meaning that $m$ and $n$ are equal at type $\per A$.
-We write $m \in \per A$ as shorthand for $\perrel m m {\per A}$, and interpret this as meaning that $m$ has type $\per A$.
-While \acp{PER} are not reflexive over the entire domain, it follows from symmetry and transitivity that if $\perrel m n {\per A}$, then $m \in \per A$.
-
-The key idea behind defining a \ac{PER} model is that we want to represent the intensional syntactic judgments in an extensional style.
-For example, two functions are syntactically equal if their bodies are syntactically equal in an extended context, where the new variable is only equal to itself.
-In contrast, two functions are semantically equal if they map any semantically equal inputs to semantically equal outputs.
-
-The main challenge with defining the \ac{PER} model for a \ac{PTS} is providing a \ac{PER} for sorts.
-Due to the extensional nature of the judgment, relating two function spaces requires us to extract a \ac{PER} interpretation of their domains and co-domains,
-  so that we can meaningfully speak of related inputs and outputs.
-This means that a sort essentially needs to be represented as a \ac{PER} of \acp{PER}, while simultaneously being a relation over domain objects.
-A common approach to tackle this problem is to define an inductive relation over domain objects simultaneously with a recursive function mapping domain objects to \acp{PER}.
-However, this only works for predicative type systems, while our system should be general enough to deal with impredicativity.
-
-The only way to achieve a \ac{PER} model capable of representing impredicativity is to use impredicativity.
-We use the approach of \citet{mctt}, where induction-recursion was replaced by impredicativity to allow a mechanization in \rocq.
-The idea is to represent sorts (or universes in their setting) as a \ac{PER} on domain objects,
-  in such a way that the \ac{PER} representing related objects is produced by the proof that they are related.
-
-
-\subsubsection{PERs for neutral and normal domain objects}
-
-The main goal of the \ac{PER} model is to relate objects that have the same normal form.
-That is, we want to relate objects that readback to the same value when reified at related types.
-Since or readback functions are defined for neutral and normal domain objects (rather than just domain objects),
-  we cannot directly specify that two domain objects readback to the same normal form.
-We do have a readback that works on domain objects, but it is only defined for those objects that represent types.
-So, to properly define the \ac{PER} model, we first define relations on neutral and normal domain objects, as well as for types:
-\[
-\begin{array}{l@{~\iff~}l}
-  \perrel e {e'} \perne  & \forall i \in \Nat.\exists E \in \Ne.\ \rbne e E ~ \text{and} ~ \rbne {e'} E \\
-  \perrel v {v'} \pernf  & \forall i \in \Nat.\exists V \in \Nf.\ \rbnf v V ~ \text{and} ~ \rbnf {v'} V \\
-  \perrel a {a'} \pertyp & \forall i \in \Nat.\exists V \in \Nf.\ \rbtyp a V ~ \text{and} ~ \rbtyp {a'} V
-\end{array}
-\]
-Objects related by any of these \acp{PER} are, by definition (and determinacy of readbacks), guaranteed to readback to the same normal forms.
-
-In addition, we need a \ac{PER} relating reflected neutrals, which we define as follows:
-\[
-\begin{array}{l@{~\iff~}l}
-  \perrel {\dreflect a e} {\dreflect {a'} {e'}} \perneu & \perrel e {e'} \perne
-\end{array}
-\]
-\AG{Why not also require that $a = a' \in \pertyp$?}
-This relation simply checks that the two neutrals are related in $\perne$, and ignores the type annotation of the reflection.
-We need $\perneu$ when defining the \acp{PER} for sorts in order to produce a relation that represents types in neutral forms.
-
-
-\subsubsection{PERs for sorts}
-
-\input{figures/per-sorts.tex}
-
-Next, we discuss the \acp{PER} representing types and sorts, which are defined simultaneously.
-Instead of just a \ac{PER} membership, we define (in \Cref{fig:per-sorts}) a judgment $a = b \in \persort \searrow R$, indicating that $a$ and $b$ are related types of sort $\dcst s$,
-  and that $R$ is a \ac{PER} that models both $a$ and $b$.
-These relations $R$ are defined using propositional equivalence, which we denote as $R \iff R'$.
-This mainly for mechanization purposes, as this style allows us to avoid the use of a propositional extensionality axiom.
-
-Like our syntactic judgments, the definition of $\persort$ relies on the \ac{PTS} specification.
-If there is an axiom $(\tmcst s : \tmcst s') \in \Ax$, then $\persort[\tmcst s']$ relates $\tmcst s$ to itself,
-  and provides a relation $R$ equivalent to $\persort$ as its \ac{PER} interpretation.
-That is, to define $\persort[\tmcst s']$, we need to quantify over \acp{PER} that are equivalent to $\persort$, hence the need for impredicativity.
-
-The most interesting case is the one for function spaces.
-Intuitively, given a rule $(\tmcst s_1, \tmcst s_2, \tmcst s_3) \in \Ru$, two function spaces are related in $\persort[\tmcst s_3]$
-  if their domains are related in $\persort[\tmcst s_1]$ and their co-domains are related in $\persort[\tmcst s_2]$.
-Formally, we can easily express this relation on domains, but not on co-domains, as there might be dependencies to take into account.
-To address this, we need to view the output relation, denoted $R_O$ in the rules, as a function from the input relation $R_I$ to \acp{PER}.
-
-To prove correctness of normalization, we need to reason by induction on derivations of $a = b \in \persort \searrow R$.
-This requires that the judgment definition is well-founded, which is not the case for impredicative \acp{PTS}.
-For example, consider the rule $(\square, \star, \star)$ for polymorphic function spaces in \sysf.
-Due to the axiom $\star : \square$, we can construct function spaces of the form $\dpi \star B \rho$.
-To verify $\dpi \star B \rho = \dpi \star {B'} {\rho'} \in \persort[\star] \searrow R$, we will have a premise $\star = \star \in \persort[\square] \searrow R_I$,
-  where $R_I \iff \persort[\star]$.
-But then, to relate the codomains, we need to quantify over objects related by $\persort[\star]$ in order to define $\persort[\star]$, so the definition is not well-founded.
-
-
-
-
-\subsubsection{PERs for contexts}
-
-\input{figures/per-ctx.tex}
-
-Last, we need to define a \ac{PER} over contexts, denoted $\perctx$ and meant to represent the context equality judgment.
-Like the \acp{PER} for sorts, we want membership in $\perctx$ to generate a \ac{PER} representing the related contexts.
-These generated \acp{PER} are relations over environments whose domains are the related contexts.
-This provides a semantic interpretation of the substitution equality judgment.
-
-We can define $\perctx$ inductively on the shape of contexts.
-The rules are shown in \Cref{fig:per-ctx}.
-Intuitively, we are simply applying the \acp{PER} for sorts to each type in the context.
-The empty context is only related to itself, and the associated \ac{PER} of environments likewise only relates the empty environment to itself.
-For context extensions, we relate $\ctxext \Gamma A$ to $\ctxext \Delta B$ provided that $\Gamma$ and $\Delta$ are related,
-  and that $A$ and $B$ evaluate to related types in any related environments.
-Likewise, the \ac{PER} representing $\ctxext \Gamma A$ relates environments whose heads are related at (the evaluation of) $A$ and tails are related at $\Gamma$.
-
-  
-\subsubsection{Properties of PER model}
-
-
-\begin{lemma}
-  All the relations defined above really are \acp{PER}, i.e. symmetric and transitive.
-\end{lemma}
-\begin{proof}
-  The cases for $\perne$, $\pernf$, and $\pertyp$ follow from the fact that syntactic equality is an equivalence relation.
-  The case for $\perneu$ follows directly from the fact that $\perne$ is a \ac{PER}.
-  Once those are establish, we can prove by induction that $\persort$ is a \ac{PER} and that if $a = b \in \persort \searrow R$, then $R$ is a \ac{PER}.
-  Finally, we prove by induction that $\perctx$ is a \ac{PER} and that if $\Gamma = \Delta \in \perctx \searrow R$, then $R$ is a \ac{PER}.
-\end{proof}
-
-
-\begin{lemma}
-  All the \acp{PER} contain the suitably reflected neutrals.
-  Specifically, if $e = e' \in \perne$ and $a = a' \in \persort \searrow R$, then $\dreflect a e = \dreflect {a'} {e'} \in R$.
-\end{lemma}
-\begin{proof}
-  By induction on the second derivation.
-\end{proof}
-
-
-\begin{lemma}[Relational irrelevance]
-  The relations produced from $\persort$ and $\perctx$ are unique up to propositional equivalence.
-  Specifically:
-  \begin{enumerate}
-  \item If $a = b \in \persort \searrow R$ and $a = b' \in \persort \searrow R'$, then $R \iff R'$;
-  \item If $a = b \in \persort \searrow R$ and $a' = b \in \persort \searrow R'$, then $R \iff R'$;
-  \item If $a = b \in \persort \searrow R$ and $b' = a \in \persort \searrow R'$, then $R \iff R'$;
-  \item If $a = b \in \persort \searrow R$ and $b = a' \in \persort \searrow R'$, then $R \iff R'$.
-  \end{enumerate}
-  And similarly with $\perctx$.
-\end{lemma}
-\begin{proof}
-  By induction on the first derivation, applying inversion on the second derivation in each case.
-\end{proof}
-
-\begin{lemma}
-  If $\Gamma = \Delta \in \perctx \searrow R$, then $|\Gamma| = |\Delta|$.
-\end{lemma}
-\begin{proof}
-  By straightforward induction on the given derivation.
-\end{proof}
-
-\begin{lemma}
-  Initial environments are related by their context \ac{PER}.
-  That is, if $\Gamma = \Delta \in \perctx \searrow R$, then $\denvinit \Gamma = \denvinit \Delta \in R$.
-\end{lemma}
-\begin{proof}
-  By induction on the given derivation.
-\end{proof}
