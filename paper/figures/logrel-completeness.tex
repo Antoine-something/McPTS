@@ -1,0 +1,75 @@
+\begin{figure}
+  \[
+  \begin{array}{c}
+    \infer{
+      \eqctxsem \Gamma {\Gamma'}
+    }{
+      \Gamma = \Gamma' \in \perctx \searrow R_E
+    }
+    \qquad
+    \infer{
+      \wfctxsem \Gamma
+    }{
+      \eqctxsem \Gamma \Gamma
+    }
+    \qquad
+    \infer{
+      \wfexpsem \Gamma M A
+    }{
+      \eqexpsem \Gamma M M A
+    }
+    \\[8pt]
+    \infer{
+      \eqexpsem \Gamma M {M'} A
+    }{
+      \begin{array}{c}
+        \Gamma \in \perctx \searrow R_E
+        \\
+        \forall \DD :: \rho = \rho' \in R_E.\
+        \evalexpfunc A \rho = \evalexpfunc A {\rho'} \in \persort \searrow R
+        ~\text{and}~
+        \evalexpfunc M \rho = \evalexpfunc {M'} {\rho'} \in R
+      \end{array}
+    }
+    \\[8pt]
+    \infer{
+      \eqtypsem \Gamma {\tmcst s} {\tmcst s}
+    }{
+      \text{there is no axiom } (\tmcst s : \tmcst s') \in \Ax
+    }
+    \qquad
+    \infer{
+      \eqtypsem \Gamma A {A'}
+    }{
+      \eqexpsem \Gamma A {A'} {\tmcst s}
+    }
+    \qquad
+    \infer{
+      \wftypsem \Gamma A
+    }{
+      \eqtypsem \Gamma A A
+    }
+    \\[8pt]
+    \infer{
+      \eqsubsem \Gamma \sigma {\sigma'} \Delta
+    }{
+      \begin{array}{c}
+        \Gamma \in \perctx \searrow R_\Gamma
+        \qquad
+        \Delta \in \perctx \searrow R_\Delta
+        \\
+        \forall \DD :: \rho = \rho' \in R_\Gamma. \
+        \evalsubfubc \sigma \rho = \evalsubfunc {\sigma'} {\rho'} \in R_\Delta
+      \end{array}
+    }
+    \qquad
+    \infer{
+      \wfsubsem \Gamma \sigma \Delta
+    }{
+      \eqsubsem \Gamma \sigma \sigma \Delta
+    }
+  \end{array}
+  \]
+  \caption{Logical relations for completeness}
+  \label{fig:logrel-comp}
+\end{figure}

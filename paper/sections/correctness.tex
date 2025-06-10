@@ -164,6 +164,7 @@ Likewise, the \ac{PER} representing $\ctxext \Gamma A$ relates environments whos
 \end{proof}
 
 \begin{lemma}
+  \label{lem:initenv}
   Initial environments are related by their context \ac{PER}.
   That is, if $\Gamma = \Delta \in \perctx \searrow R$, then $\denvinit \Gamma = \denvinit \Delta \in R$.
 \end{lemma}
@@ -191,7 +192,57 @@ Likewise, the \ac{PER} representing $\ctxext \Gamma A$ relates environments whos
 
 \subsection{Completeness}
 
+\input{figures/logrel-completeness.tex}
 
+The first step to establish completeness is to define logical relations for each judgments,
+  which we distinguish from syntactic judgments by using $\semjudg$ instead of $\judg$, e.g. $\wfexpsem \Gamma M A$.
+We first define the equality judgments using the PER model, then define the well-formedness by requiring that an object is equal to itself.
+Intuitively, we validate equality by evaluating the syntactic objects and checking that they are suitably related in the PER model.
+For example, equality between terms is defined as follows:
+\[
+\infer{
+  \eqexpsem \Gamma M {M'} A
+}{
+  \begin{array}{c}
+    \Gamma \in \perctx \searrow R_E
+    \\
+    \forall \DD :: \rho = \rho' \in R_E.\
+    \evalexpfunc A \rho = \evalexpfunc A {\rho'} \in \persort \searrow R
+    ~\text{and}~
+    \evalexpfunc M \rho = \evalexpfunc {M'} {\rho'} \in R
+  \end{array}
+}
+\]
+Remaining judgments are shown in \Cref{fig:logrel-comp}
 
+\begin{theorem}[Fundamental theorem of completeness]
+  \label{lem:fundamental-comp}
+  If a syntactic judgment holds, then its logical analogue also holds.  Specifically:
+  \begin{enumerate}
+  \item If $\wfctx \Gamma$, then $\wfctxsem \Gamma$;
+  \item If $\eqctx \Gamma \Delta$, then $\eqctxsem \Gamma \Delta$;
+  \item If $\wfexp \Gamma M A$, then $\wfexpsem \Gamma M M A$;
+  \item If $\eqexp \Gamma M {M'} A$, then $\eqexpsem \Gamma M {M'} A$;
+  \item If $\wftyp \Gamma A$, then $\wftypsem \Gamma A$;
+  \item If $\eqtyp \Gamma A {A'}$, then $\eqtypsem \Gamma A {A'}$;
+  \item If $\wfsub \Gamma \sigma \Delta$, then $\wfsubsem \Gamma \sigma \Delta$;
+  \item If $\eqsub \Gamma \sigma {\sigma'} \Delta$, then $\eqsubsem \Gamma \sigma {\sigma'} \Delta$.
+  \end{enumerate}
+\end{theorem}
+\begin{proof}
+  By simultaneous induction on the syntactic derivation, using several of the lemmas about the PER model.
+\end{proof}
+
+\begin{lemma}[Completeness of \ac{NbE}]
+  If $\eqexp \Gamma M {M'} A$, then $\nbeexpfunc \Gamma M A = \nbeexpfunc \Gamma {M'} A$.
+\end{lemma}
+\begin{proof}
+  We have $\wfctx \Gamma$ by \Cref{lemma:pts-presupposition} on $\eqexp \Gamma M {M'} A$, and $\wfctxsem \Gamma$ by \Cref{lem:fundamental-comp}.
+  Then $\Gamma \in \perctx \searrow R_E$ by definition of $\wfctxsem \Gamma$, and $\denvinit \Gamma \in R_E$ by \Cref{lem:initenv}.
+  We have $\eqexpsem \Gamma M {M'} A$ by \Cref{lem:fundamental-comp}.
+  Then $\evalexpfunc A {\denvinit \Gamma} \in \persort \searrow R$ and $\evalexpfunc M {\denvinit \Gamma} = \evalexpfunc {M'} {\denvinit \Gamma} \in R$ by definition of $\eqexpsem \Gamma M {M'} A$.
+  Finally, we conclude that $\dreify {\evalexpfunc A {\denvinit \Gamma}} {\evalexpfunc M {\denvinit \Gamma}} = \dreify {\evalexpfunc A {\denvinit \Gamma}} {\evalexpfunc {M'} {\denvinit \Gamma}} \in \pernf$ by \Cref{thm:realizability}.
+  Then $\nbeexpfunc \Gamma M A = \rbnffunc[|\Gamma|] {\dreify {\evalexpfunc A {\denvinit \Gamma}} {\evalexpfunc M {\denvinit \Gamma}}} = \rbnffunc[|\Gamma|] {\dreify {\evalexpfunc A {\denvinit \Gamma}} {\evalexpfunc {M'} {\denvinit \Gamma}}} = \nbeexpfunc \Gamma M A$ by definition of $\pernf$.
+\end{proof}
 
 \subsection{Soundness}
