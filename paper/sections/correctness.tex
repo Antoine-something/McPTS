@@ -106,7 +106,10 @@ To verify $\dpi \star B \rho = \dpi \star {B'} {\rho'} \in \persort[\star] \sear
   where $R_I \iff \persort[\star]$.
 But then, to relate the codomains, we need to quantify over objects related by $\persort[\star]$ in order to define $\persort[\star]$, so the definition is not well-founded.
 
-
+With predicativity, we have a partial order $\leq$ over $\St$ that can be extended to derivations of PER relations.
+Namely, we say that $\persort[\tmcst s_1] < \persort[\tmcst s_2]$ provided that $\tmcst s_1 < \tmcst s_2$.
+Additionally, we extend the order to $\perneu$ by stating that $\perneu < \persort$ for any $\tmcst s$.
+Finally, we need that, if $R_1 \iff R_2$, then $R_1 \leq R$ if and only if $R_2 \leq R$.
 
 
 \subsubsection{PERs for contexts}
@@ -126,9 +129,22 @@ For context extensions, we relate $\ctxext \Gamma A$ to $\ctxext \Delta B$ provi
   and that $A$ and $B$ evaluate to related types in any related environments.
 Likewise, the \ac{PER} representing $\ctxext \Gamma A$ relates environments whose heads are related at (the evaluation of) $A$ and tails are related at $\Gamma$.
 
-  
+
 \subsubsection{Properties of PER model}
 
+The first important property states the our order on relations allows us to do induction on derivations of $a = b \in \persort \searrow R$.
+
+\begin{lemma}
+  If $a = b \in \persort \searrow R$, then $R < \persort$.
+\end{lemma}
+\begin{proof}
+  \AG{
+    This is problematic: we should be using induction on the derivation, but we can only do this provided that the lemma holds.
+    Moreover, we probably need a stronger order relation than just the one on PERs.
+    If we consider the rule $(\star, \star, \star)$ for simple function spaces, then the case for $\dpi a B \rho = \dpi {a'} {B'} {\rho'} \in \persort[\star] \searrow R$
+      requires induction on the premise $a = a' \in \persort[\star] \searrow R_I$, which can work since $a < \dpi a B \rho$
+  }
+\end{proof}
 
 \begin{lemma}
   All the relations defined above really are \acp{PER}, i.e. symmetric and transitive.
@@ -140,6 +156,21 @@ Likewise, the \ac{PER} representing $\ctxext \Gamma A$ relates environments whos
   Finally, we prove by induction that $\perctx$ is a \ac{PER} and that if $\Gamma = \Delta \in \perctx \searrow R$, then $R$ is a \ac{PER}.
 \end{proof}
 
+The next lemma is essentially a congruence rule for the PERs $\perne$ and $\pernf$.
+
+\begin{lemma}
+  If $e = e' \in \perne$ and $v = v' \in \pernf$, then $\dapp e v = \dapp {e'} {v'} \in \perne$.
+\end{lemma}
+\begin{proof}
+  We have $\rbnefunc {\dapp e v} = \tmapp {\rbnefunc e} {\rbnffunc v}$ by definition of readbacks.
+  We have $\rbnefunc e = \rbnefunc {e'}$ and $\rbnffunc v = \rbnffunc {v'}$ by definition of $\perne$ and $\pernf$, respectively.
+  Then $\rbnefunc {\dapp e v} = \rbnefunc {\dapp {e'} {v'}}$, so $\dapp e v = \dapp {e'} {v'} \in \perne$.
+\end{proof}
+
+\AG{We likely need more of these congruence lemmas}
+
+
+The next lemma states that we only need to know one of the related objects at a sort PER in order to determine what the output relation is, up to relational equivalence.
 
 \begin{lemma}[Relational irrelevance]
   The relations produced from $\persort$ and $\perctx$ are unique up to propositional equivalence.
@@ -153,8 +184,11 @@ Likewise, the \ac{PER} representing $\ctxext \Gamma A$ relates environments whos
   And similarly with $\perctx$.
 \end{lemma}
 \begin{proof}
-  By induction on the first derivation, applying inversion on the second derivation in each case.
+  By induction on the first derivation.
+  In each case, we can apply inversion on the second derivation since rules are syntax-directed
 \end{proof}
+
+Next, we have some basic properties for the context PERs.
 
 \begin{lemma}
   If $\Gamma = \Delta \in \perctx \searrow R$, then $|\Gamma| = |\Delta|$.
@@ -172,6 +206,8 @@ Likewise, the \ac{PER} representing $\ctxext \Gamma A$ relates environments whos
   By induction on the given derivation.
 \end{proof}
 
+Finally, the most important property of the PER model is realizability.
+Intuitively, realizability means that all of our PERs sit between $\perne$ and $\pernf$.
 
 \begin{theorem}[Realizability]
   \label{thm:realizability}
@@ -233,9 +269,9 @@ Remaining judgments are shown in \Cref{fig:logrel-comp}
   By simultaneous induction on the syntactic derivation, using several of the lemmas about the PER model.
 \end{proof}
 
-\begin{lemma}[Completeness of \ac{NbE}]
+\begin{theorem}[Completeness of \ac{NbE}]
   If $\eqexp \Gamma M {M'} A$, then $\nbeexpfunc \Gamma M A = \nbeexpfunc \Gamma {M'} A$.
-\end{lemma}
+\end{theorem}
 \begin{proof}
   We have $\wfctx \Gamma$ by \Cref{lemma:pts-presupposition} on $\eqexp \Gamma M {M'} A$, and $\wfctxsem \Gamma$ by \Cref{lem:fundamental-comp}.
   Then $\Gamma \in \perctx \searrow R_E$ by definition of $\wfctxsem \Gamma$, and $\denvinit \Gamma \in R_E$ by \Cref{lem:initenv}.
@@ -245,4 +281,11 @@ Remaining judgments are shown in \Cref{fig:logrel-comp}
   Then $\nbeexpfunc \Gamma M A = \rbnffunc[|\Gamma|] {\dreify {\evalexpfunc A {\denvinit \Gamma}} {\evalexpfunc M {\denvinit \Gamma}}} = \rbnffunc[|\Gamma|] {\dreify {\evalexpfunc A {\denvinit \Gamma}} {\evalexpfunc {M'} {\denvinit \Gamma}}} = \nbeexpfunc \Gamma M A$ by definition of $\pernf$.
 \end{proof}
 
+
+
+
 \subsection{Soundness}
+
+
+
+
