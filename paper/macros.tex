@@ -75,6 +75,8 @@
 \DeclareDocumentCommand{\eqtyp}{m m m}{#1 \judg #2 \equiv #3}
 
 
+\DeclareDocumentCommand{\wfwk}{m m m}{#1 \judg_{w} #2 : #3}
+
 
 %% Semantic judgments for completeness
 \newcommand{\semjudg}{\vDash}
@@ -171,6 +173,15 @@
 
 \DeclareDocumentCommand{\perrel}{m m m}{#1 = #2 \in #3}
 
+
+
+%% Gluing model
+\DeclareDocumentCommand{\gluneu}{m m}{{\normalfont\textit{Neu}}_{#1}^{#2}}
+
+\DeclareDocumentCommand{\glusort}{O{\tmcst s}}{\persort[#1]^*}
+
+
+\DeclareDocumentCommand{\glusortrel}{O{\tmcst s} m m m}{#2 \in \glusort[#1] \searrow \langle #3, #4\rangle}
 
 %% Candidate spaces
 \DeclareDocumentCommand{\perleast}{m}{\underline{#1}}
