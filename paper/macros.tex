@@ -176,12 +176,15 @@
 
 
 %% Gluing model
-\DeclareDocumentCommand{\gluneu}{m m}{{\normalfont\textit{Neu}}_{#1}^{#2}}
+\DeclareDocumentCommand{\gluneutp}{O{\tmcst s} m}{{\normalfont\textit{NeuTyp}}_{#1}^{#2}}
+\DeclareDocumentCommand{\gluneutm}{O{\tmcst s} m}{{\normalfont\textit{NeuTrm}}_{#1}^{#2}}
 
 \DeclareDocumentCommand{\glusort}{O{\tmcst s}}{\persort[#1]^*}
 
-
+\DeclareDocumentCommand{\glutpjudg}{m m m}{#1 \judg #2 ~\circledR~ #3}
+\DeclareDocumentCommand{\glutmjudg}{m m m m m}{#1 \judg #2 : #3 ~\circledR~ #4 \in #5}
 \DeclareDocumentCommand{\glusortrel}{O{\tmcst s} m m m}{#2 \in \glusort[#1] \searrow \langle #3, #4\rangle}
+
 
 %% Candidate spaces
 \DeclareDocumentCommand{\perleast}{m}{\underline{#1}}

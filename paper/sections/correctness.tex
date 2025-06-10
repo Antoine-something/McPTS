@@ -324,8 +324,42 @@ Specifically, a derivation $\glusortrel a P {El}$ outputs a unary predicate $P$ 
 For the PER $\persort$, the output relations where defined simultaneously as $\persort$ itself, with the exception of $\perneu$.
 This was necessary to obtain an inductive definition despite the impredicative quantification.
 For the gluing relation $\glusort$, we only need to quantify over the PER model, so we will instead define the gluing relations $P$ and $El$ in advance.
+We do this using two judgments:
+$\glutpjudg \Gamma A P$ states that $A$ is related in $P$,
+and $\glutmjudg \Gamma M A m {El}$ states that $M$ and $m$ are related by $El$.
 
+We start by defining two predicates classifying neutral types and terms.
+These are denoted $\gluneutp a$ and $\gluneutm a$, respectively, and they are analogous to our \ac{PER} $\perneu$.
+\[
+\begin{array}{c}
+  \infer{
+    \glutpjudg \Gamma A {\gluneutp a}
+  }{
+    \wfexp \Gamma A {\tmcst s}
+    &
+    \forall \Delta \in \Ctx. \forall \sigma \in \Sub. \wfwk \Delta \sigma \Gamma \implies \eqexp \Delta {\tmclo \sigma A} {\rbnefunc[|\Delta|] a} {\tmcst s}
+  }
+  \\[8pt]
+  \infer{
+    \glutmjudg \Gamma M A {\dreflect b e} {\gluneutm a}
+  }{
+    \begin{array}{c}
+      \glutpjudg \Gamma A {\gluneutp a}
+      \qquad
+      \wfexp \Gamma M A
+      \qquad
+      e \in \perne
+      \\
+      \forall \Delta \in \Ctx. \forall \sigma \in \Sub. \wfwk \Delta \sigma \Gamma \implies \eqexp \Delta {\tmclo \sigma M} {\rbnefunc[|\Delta|] e} A
+    \end{array}
+  }
+\end{array}
+\]
+Note that, for $\gluneutp a$, we use the neutral readback and not the type readback, which ensures that $a$ is indeed a neutral type.
+Note also that, for $\gluneutm a$, we reflect the neutral domain object at some type $b$, not necessarily $a$.
+This is similar to the \ac{PER} $\perneu$, where type annotations are ignored by the relation.
 
+Next, we define the relations for function spaces.
 
 
 \subsection{Soundness}
