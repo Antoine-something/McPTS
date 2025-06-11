@@ -210,10 +210,9 @@ Next, we have some basic properties for the context PERs.
 Finally, the most important property of the PER model is realizability.
 Intuitively, realizability means that all of our PERs sit between $\perne$ and $\pernf$.
 
-\begin{theorem}[Realizability]
+\begin{theorem}[Realizability of \ac{PER} model]
   \label{thm:realizability}
-  Assume that $a = a' \in \persort \searrow R$.
-  Then the followings hold:
+  Assume that $a = a' \in \persort \searrow R$.  Then:
   \begin{enumerate}
   \item If $e = e' \in \perne$, then $\dreflect a e = \dreflect {a'} {e'} \in R$;
   \item If $m = m' \in R$, then $\dreify a m = \dreify {a'} {m'} \in \pernf$;
@@ -313,6 +312,8 @@ We define a new judgment $\wfwk \Delta \sigma \Gamma$, meaning that $\sigma$ is 
 \]
 
 
+\subsubsection{Gluing relations for expressions}
+
 We now move on to define the gluing model.
 The gluing model is given by a series of relations, each analogous to one of the \acp{PER} defined earlier.
 The main relation, denoted $\glusort$, is analogous to our PER $\persort$, but differs from it in two main ways:
@@ -360,15 +361,294 @@ Note also that, for $\gluneutm a$, we reflect the neutral domain object at some 
 This is similar to the \ac{PER} $\perneu$, where type annotations are ignored by the relation.
 
 Next, we define the relations for function spaces.
+For gluing types, we have a relation $\glupitp {R_I} {P_I} {El_I} {P_O}$, where $\tmcst s$ is the sort of the whole function space, $R_I$ is the \ac{PER} representing the domain, $P_I$ is gluing relation representing equivalent domain types, $El_I$ is the gluing relation between inputs, and $P_O$ is a function from $R_I$ to gluing relations representing the output type.
+For gluing terms, we have a relation $\glupitm R {R_I} {P_I} {El_I} {El_O}$, where $R$ is the PER representing the whole function space, $El_O$ is the gluing relation between outputs, and the other components are like the relation for types.
+
+\[
+\begin{array}{c}
+  \infer{
+    \glutpjudg \Gamma A {\glupitp {R_I} {P_I} {El_I} {P_O}}
+  }{
+    \begin{array}{c}
+      \eqexp \Gamma A {\tppi {B_1} {B_2}} {\tmcst s}
+      \qquad
+      \forall \Delta \in \Ctx. \forall \sigma \in \Sub.\ \wfwk \Delta \sigma \Gamma \implies \glutpjudg \Delta {\tmclo \sigma {B_1}} {P_I}
+      \\
+      \forall \Delta \in \Ctx. \forall \sigma \in \Sub. \forall N \in \Exp. \forall n \in \Dom. (\wfwk \Delta \sigma \Gamma) \land (\glutmjudg \Delta N {\tmclo \sigma {B_1}} n {El_I})
+      \\
+      \implies \forall \EE :: n \in R_I. \glutpjudg \Delta {\tmclo {\subext \sigma N} {B_2}} {P_O(\EE)}
+    \end{array}
+  }
+  \\[8pt]
+  \infer{
+    \glutmjudg \Gamma M A m {\glupitm R {R_I} {P_I} {El_I} {El_O}}
+  }{
+    \begin{array}{c}
+      m \in R
+      \qquad
+      \eqexp \Gamma A {\tppi {B_1} {B_2} {\tmcst s}}
+      \qquad
+      \forall \Delta \in \Ctx. \forall \sigma \in \Sub.\ \wfwk \Delta \sigma \Gamma \implies \glutpjudg \Delta {\tmclo \sigma {B_1}} {P_I}
+      \\
+      \forall \Delta \in \Ctx. \forall \sigma \in \Sub. \forall N \in \Exp. \forall n \in \Dom. (\wfwk \Delta \sigma \Gamma) \land (\glutmjudg \Delta N {\tmclo \sigma {B_1}} n {El_I})
+      \\
+      \implies \forall \EE :: n \in R_I. \glutmjudg \Delta {\tmapp {\tmclo \sigma M} N} {\tmclo {\subext \sigma N} {B_2}} {\evalappfunc m n} {El_O(\EE)}
+    \end{array}
+  }
+\end{array}
+\]
+
+Now that we have defined concrete gluing relations for neutral types and function spaces, we can use them to define the gluing relations for sorts.
+
+\[
+\begin{array}{c}
+  \infer{
+    \glusortrel {\dreflect b a} P {El}
+  }{
+    P \iff \gluneutp a
+    &
+    El \iff \gluneutm a
+  }
+  \\[8pt]
+  \infer{
+    \glusortrel[\tmcst s'] {\tmcst s} P {El}
+  }{
+    \begin{array}{c}
+      (\tmcst s : \tmcst s') \in \Ax
+      \qquad
+      \forall \Gamma \in \Ctx. \forall A \in \Exp.\ \glutpjudg \Gamma A P \iff \eqexp \Gamma A {\tmcst s} {\tmcst s'}
+      \\
+      \forall \Gamma \in \Ctx. \forall M,A \in \Exp. \forall m \in \Dom. \glutmjudg \Gamma M A m {El}
+      \\
+      \iff (\wfexp \Gamma M A) \land (\glutpjudg \Gamma A P) \land (\glusortrel m {P'} {El'}) \land (\glutpjudg \Gamma M {P'})
+    \end{array}
+  }
+  \\[8pt]
+  \infer{
+    \glusortrel[\tmcst s_3] {\dpi a B \rho} P {El}
+  }{
+    \begin{array}{c}
+      (\tmcst s_1, \tmcst s_2, \tmcst s_3) \in \Ru
+      \qquad
+      \persortrel[\tmcst s_1] a a {R_I}
+      \qquad
+      \persortrel[\tmcst s_3] {\dpi a B \rho} {\dpi a B \rho} R
+      \\
+      \glusortrel[\tmcst s_1] a {P_I} {El_I}
+      \qquad
+      \forall \EE :: \perrel n n {R_I}. \glusortrel[\tmcst s_2] {\evalexpfunc B {\rho, n}} {P_O(\EE)} {El_O(\EE)}
+      \\
+      P \iff \glupitp[\tmcst s_3] {R_I} {P_I} {El_I} {P_O}
+      \qquad
+      El \iff \glupitm[\tmcst s_3] R {R_I} {P_I} {El_I} {El_O}
+    \end{array}
+  }
+\end{array}
+\]
+
+
+\subsubsection{Gluing relations for contexts}
+
+Next, we need to extend the gluing model to contexts and substitutions.
+Here, the main relation, denoted $\gluctx$, is analogous to the \ac{PER} $\perctx$, but differs from it in a similar way that $\glusort$ differs from $\persort$.
+Specifically, $\gluctx$ is a unary relation on contexts, whereas $\perctx$ is binary.
+While $\gluctx$ and $\perctx$ have in common that they both output only one relation,
+  the gluing relation is between substitutions and environments, whereas the \ac{PER} is between two environments.
+
+As for $\glusort$, we can define the output relations in advance.
+This is achieved similarly to the gluing relations for expressions, by defining a judgment $\glusubjudg \Gamma \sigma \Delta \rho {Sb}$, indicating that $\sigma$ and $\rho$ are related by $Sb$.  
+There are two forms of contexts, and accordingly two forms of output relations:
+The relation $\glunil$ characterizes substitutions whose domain is the empty context,
+  and the relation $\glucons \Gamma A {Sb}$ characterizes substitutions whose context is $\ctxext \Gamma A$, where $Sb$ is the relation for $\Gamma$.
+We define the relations as follows:
+\[
+\begin{array}{c}
+  \infer{
+    \glusubjudg \Gamma \sigma \ctxempty \denvempty \glunil
+  }{
+    \wfsub \Gamma \sigma \ctxempty
+  }
+  \qquad
+  \infer{
+    \glusubjudg \Gamma \sigma {\ctxext \Delta A} {\denvext \rho m} {\glucons \Delta A {Sb_T}}
+  }{
+    \begin{array}{c}
+      \wfsub \Gamma \sigma {\ctxext \Delta A}
+      \qquad
+      \glusortrel {\evalexpfunc A \rho} P {El}
+      \\
+      \glutmjudg \Gamma {\tmclo \sigma {x_0}} {\tmclo {\subclo \subwk \sigma} A} m {El}
+      \qquad
+      \glusubjudg \Gamma {\subclo \subwk \sigma} \Delta \rho {Sb_T}
+    \end{array}
+  }
+\end{array}
+\]
+For $\glunil$, we simply check that $\sigma$'s domain really is the empty context, and relate it only to the empty environment.
+For $\glucons \Delta A {Sb_T}$, we relate $\sigma$ to an extended environment $\rho, m$ by ensuring that $\sigma$'s interpretation of $x_0$ is related to $m$,
+  and that a weakened $\sigma$ is related to $\rho$.
+
+Now, we can use the two predicates to define the main gluing relation on contexts:
+\[
+\begin{array}{c}
+  \infer{
+    \gluctxrel \ctxempty {Sb}
+  }{
+    Sb \iff \glunil
+  }
+  \qquad
+  \infer{
+    \gluctxrel {\ctxext \Gamma A} {Sb}
+  }{
+    \begin{array}{c}
+      \gluctxrel \Gamma {Sb_T}
+      \qquad
+      \wfexp \Gamma A {\tmcst s}
+      \qquad
+      Sb \iff \glucons \Gamma A {Sb_T}
+      \\
+      \forall \Delta \in \Ctx. \forall \sigma \in \Sub. \forall \rho \in \Env. \exists P, El. \glusubjudg \Delta \sigma \Gamma \rho {Sb_T}
+      \\
+      \implies (\glusortrel {\evalexpfunc A \rho} P {El}) \land (\glutpjudg \Delta {\tmclo \sigma A} P)
+    \end{array}
+  }
+\end{array}
+\]
+
+
+\subsubsection{Gluing relations for neutral, normal, and types}
+
+The last relations tha we need are the analogues to $\perne$, $\pernf$, and $\pertyp$.
+Recall that these \acp{PER} were defined so as to ensure that the desired completeness property was trivially true, by relating only objects whose readbacks are identical.
+Likewise, we need to define gluing relations $\glune a$, $\glunf a$, and $\glutyp a$ so as to ensure that the desired soundness property holds trivially.
+This means that we want to use the syntactic equality judgment to glue a syntactic term to a domain object:
+\[
+\begin{array}{c}
+  \infer{
+    \glutmjudg \Gamma M A m {\glunf a}
+  }{
+    \begin{array}{c}
+      \wfexp \Gamma M A
+      \qquad
+      \glusortrel a P {El}
+      \qquad
+      \glutpjudg \Gamma A P
+      \qquad
+      \perrel {\dreify a m} {\dreify a m} \pernf
+      \\
+      \forall \Delta \in \Ctx. \forall \sigma \in \Sub. \wfwk \Delta \sigma \Gamma
+      \implies \eqexp \Delta {\tmclo \sigma M} {\rbnffunc[|\Delta|] {\dreify a m}} {\tmclo \sigma A}
+    \end{array}
+  }
+  \\[8pt]
+  \infer{
+    \glutmjudg \Gamma M A m {\glune a}
+  }{
+    \begin{array}{c}
+      \wfexp \Gamma M A
+      \qquad
+      \glusortrel a P {El}
+      \qquad
+      \glutpjudg \Gamma A P
+      \qquad
+      \perrel e e \perne
+      \\
+      \forall \Delta \in \Ctx. \forall \sigma \in \Sub. \wfwk \Delta \sigma \Gamma
+      \implies \eqexp \Delta {\tmclo \sigma M} {\rbnefunc[|\Delta|] e} {\tmclo \sigma A}
+    \end{array}
+  }
+  \\[8pt]
+  \infer{
+    \glutpjudg \Gamma A {\glutyp a}
+  }{
+    \begin{array}{c}
+      \wfexp \Gamma A {\tmcst s}
+      \qquad
+      \perrel a a \pertyp
+      \\
+      \forall \Delta \in \Ctx. \forall \sigma \in \Sub. \wfwk \Delta \sigma \Gamma
+      \implies \eqexp \Delta {\tmclo \sigma A} {\rbtypfunc[|\Delta|] a} {\tmcst s}
+    \end{array}
+  }
+\end{array}
+\]
+
+  
+\subsubsection{Properties of the gluing model}
+
+The first property states that our gluing model is indeed stable under weakenings:
+
+\begin{lemma}[Monotonicity]
+  \label{lemma:monotonicity}
+  Assume that $\glusortrel a P {El}$.  Then:
+  \begin{enumerate}
+  \item If $\glutpjudg \Gamma A P$ and $\wfwk \Delta \sigma \Gamma$, then $\glutpjudg \Delta {\tmclo \sigma A} P$;
+  \item If $\glutmjudg \Gamma M A m {El}$ and $\wfwk \Delta \sigma \Gamma$, then $\glutmjudg \Delta {\tmclo M} {\tmclo A} m {El}$
+  \end{enumerate}
+\end{lemma}
+\begin{proof}
+  By induction on the derivation of $\glusortrel a P {El}$.
+  The cases are straightforward since we have baked weakenings into the definitions of each predicate.
+\end{proof}
+
+Next, we need to prove that initial environments are properly related.
+
+\begin{lemma}
+  \label{lem:initenv-gluing}
+  If $\gluctxrel \Gamma {Sb}$, then $\glusubjudg \Gamma \subid \Gamma {\denvinit \Gamma} {Sb}$
+\end{lemma}
+\begin{proof}
+  By induction on the derivation of $\gluctxrel \Gamma {Sb}$.
+\end{proof}
+
+As for the \ac{PER} model, the crucial property of the gluing model is realizability, which intuitively states that all the gluing relations for terms sit in between $\glune a$ and $\glunf a$.
+
+\begin{theorem}[Realizability of gluing model]
+  \label{thm:realizability-gluing}
+  Assume that $\glusortrel a P {El}$.  Then:
+  \begin{itemize}
+  \item If $\glutmjudg \Gamma M A e {\glune a}$, then $\glutmjudg \Gamma M A {\dreflect a e} {El}$;
+  \item If $\glutmjudg \Gamma M A m {El}$, then $\glutmjudg \Gamma M A m {\glunf a}$;
+  \item If $\glutpjudg \Gamma A P$, then $\glutpjudg \Gamma A {\glutyp a}$.
+  \end{itemize}
+\end{theorem}
+\begin{proof}
+  By induction on the derivation of $\glusortrel a P {El}$.
+\end{proof}
+
+
 
 
 \subsection{Soundness}
 
+Finally, it remains only to show the soundness theorem itself.
+As for completeness, soundness is proven via a logical relation, which we differentiate from the usual judgment with the turnstile $\soundjudg$.
 
+\[
+\infer{
+  \wfexpsound \Gamma M A
+}{
+  \begin{array}{l}
+    \gluctxrel \Gamma {Sb}
+    \\
+    \forall \Delta \in \Ctx. \forall \sigma \in \Sub. \forall \rho \in \Env.\ \glusubjudg \Delta \sigma \Gamma \rho {Sb}
+    \\
+    \quad \implies \exists P,El. (\glusortrel {\evalexpfunc A \rho} P {El}) \land \glutmjudg \Delta {\tmclo \sigma M} {\tmclo \sigma A} {\evalexpfunc M \rho} {El}
+  \end{array}
+}
+\]
 
-
-
+\begin{theorem}[Fundamental theorem of soundness]
+  \label{thm:fundamental-soundness}
+  If $\wfexp \Gamma M A$, then $\wfexpsound \Gamma M A$.
+\end{theorem}
+\begin{proof}
+  By induction on the syntactic derivation.
+\end{proof}
 
 \begin{theorem}[Soundness of \ac{NbE}]
   If $\wfexp \Gamma M A$, then $\eqexp \Gamma M {\nbeexpfunc \Gamma M A} A$.
 \end{theorem}
+\begin{proof}
+  Similarly to completeness, soundness follows by applying \Cref{thm:fundamental-soundness} and \Cref{thm:realizability-gluing}, using \Cref{lem:initenv-gluing}.
+\end{proof}

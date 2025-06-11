@@ -92,6 +92,18 @@
 \DeclareDocumentCommand{\eqtypsem}{m m m}{#1 \semjudg #2 \equiv #3}
 
 
+%% Semantic judgments for soundness
+\newcommand{\soundjudg}{\Vdash}
+\DeclareDocumentCommand{\wfctxsound}{m}{\soundjudg #1}
+\DeclareDocumentCommand{\wfexpsound}{m m m}{#1 \soundjudg #2 : #3}
+\DeclareDocumentCommand{\wfsubsound}{m m m}{#1 \soundjudg #2 : #3}
+\DeclareDocumentCommand{\wftypsound}{m m}{#1 \soundjudg #2}
+
+\DeclareDocumentCommand{\eqctxsound}{m m}{\soundjudg #1 \equiv #2}
+\DeclareDocumentCommand{\eqexpsound}{m m m m}{#1 \soundjudg #2 \equiv #3 : #4}
+\DeclareDocumentCommand{\eqsubsound}{m m m m}{#1 \soundjudg #2 \equiv #3 : #4}
+\DeclareDocumentCommand{\eqtypsound}{m m m}{#1 \soundjudg #2 \equiv #3}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% PTS Semantics notation %%
@@ -171,6 +183,8 @@
 \newcommand{\perctx}{\mathcal{C}tx}
 
 
+\DeclareDocumentCommand{\persortrel}{O{\tmcst s} m m m}{#2 = #3 \in \persort[#1] \searrow #4}
+
 \DeclareDocumentCommand{\perrel}{m m m}{#1 = #2 \in #3}
 
 
@@ -179,12 +193,26 @@
 \DeclareDocumentCommand{\gluneutp}{O{\tmcst s} m}{{\normalfont\textit{NeuTyp}}_{#1}^{#2}}
 \DeclareDocumentCommand{\gluneutm}{O{\tmcst s} m}{{\normalfont\textit{NeuTrm}}_{#1}^{#2}}
 
+\DeclareDocumentCommand{\glupitp}{O{\tmcst s} m m m m}{\Pi_{#1}(#2, #3, #4, #5)}
+\DeclareDocumentCommand{\glupitm}{O{\tmcst s} m m m m m}{\Pi_{#1}(#2, #3, #4, #5, #6)}
+
 \DeclareDocumentCommand{\glusort}{O{\tmcst s}}{\persort[#1]^*}
 
 \DeclareDocumentCommand{\glutpjudg}{m m m}{#1 \judg #2 ~\circledR~ #3}
 \DeclareDocumentCommand{\glutmjudg}{m m m m m}{#1 \judg #2 : #3 ~\circledR~ #4 \in #5}
 \DeclareDocumentCommand{\glusortrel}{O{\tmcst s} m m m}{#2 \in \glusort[#1] \searrow \langle #3, #4\rangle}
 
+
+\DeclareDocumentCommand{\gluctx}{}{\perctx^*}
+\DeclareDocumentCommand{\gluctxrel}{m m}{#1 \in \gluctx \searrow #2}
+
+\DeclareDocumentCommand{\glunil}{}{{\normalfont\textit{Nil}}}
+\DeclareDocumentCommand{\glucons}{O{\tmcst s} m m m}{{\normalfont\textit{Cons}}_{#1}(#2, #3, #4)}
+\DeclareDocumentCommand{\glusubjudg}{m m m m m}{#1 \judg #2 : #3 ~\circledR~ #4 \in #5}
+
+\DeclareDocumentCommand{\glune}{O{\tmcst s} m}{\perne_{#1}^{#2}}
+\DeclareDocumentCommand{\glunf}{O{\tmcst s} m}{\pernf_{#1}^{\;#2}}
+\DeclareDocumentCommand{\glutyp}{O{\tmcst s} m}{\pertyp_{#1}^{#2}}
 
 %% Candidate spaces
 \DeclareDocumentCommand{\perleast}{m}{\underline{#1}}
