@@ -574,16 +574,41 @@ This means that we want to use the syntactic equality judgment to glue a syntact
 \]
 
   
-\subsubsection{Properties of the gluing model}
+\subsection{Properties of the gluing model}
 
-The first property states that our gluing model is indeed stable under weakenings:
+\subsubsection{Monotonicity}
+
+The first important property of the gluing model, monotonicity (\Cref{lemma:monotonicity}), states that our gluing model is stable under weakenings.
+To prove monotonicity, we first need to establish a number of lemmas.
+First, we need some basic properties about weakening substitutions.
+
+\begin{lemma}
+  If $\wfwk \Delta \sigma \Gamma$, then $\wfsub \Delta \sigma \Gamma$.
+\end{lemma}
+
+\begin{lemma}
+  If $\wfwk \Delta \sigma \Gamma$ and $\wfwk {\Delta'} {\sigma'} \Gamma$, then $\wfwk {\Delta'} {\subclo {\sigma'} \sigma} \Gamma$.
+\end{lemma}
+
+Then, we need to show that the gluing model respects the judgmental equality.
+
+\begin{lemma}
+  Assume that $\glusortrel a P {El}$.  Then:
+  \begin{enumerate}
+  \item If $\glutpjudg \Gamma A P$ and $\eqexp \Gamma A {A'} {\tmcst s}$, then $\glutpjudg \Gamma {A'} P$
+  \end{enumerate}
+\end{lemma}
+\begin{proof}
+  By case analysis on the derivation of $\glusortrel a P {El}$.
+  All the relations use the syntactic objects only in syntactic equality, so each case essentially follows from the transitivity of equality.
+\end{proof}
 
 \begin{lemma}[Monotonicity]
   \label{lemma:monotonicity}
   Assume that $\glusortrel a P {El}$.  Then:
   \begin{enumerate}
   \item If $\glutpjudg \Gamma A P$ and $\wfwk \Delta \sigma \Gamma$, then $\glutpjudg \Delta {\tmclo \sigma A} P$;
-  \item If $\glutmjudg \Gamma M A m {El}$ and $\wfwk \Delta \sigma \Gamma$, then $\glutmjudg \Delta {\tmclo M} {\tmclo A} m {El}$
+  \item If $\glutmjudg \Gamma M A m {El}$ and $\wfwk \Delta \sigma \Gamma$, then $\glutmjudg \Delta {\tmclo \sigma M} {\tmclo \sigma A} m {El}$
   \end{enumerate}
 \end{lemma}
 \begin{proof}

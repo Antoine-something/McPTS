@@ -285,7 +285,7 @@ Substitution propagation
   }
   \qquad
   \infer{
-    \eqexp \Gamma {\tmclo \sigma {\tppi A B}} {\tppi {\tmclo \sigma A} {\tmclo {\subclo \subwk \sigma} B}} {\tmcst s}
+    \eqexp \Gamma {\tmclo \sigma {\tppi A B}} {\tppi {\tmclo \sigma A} {\tmclo {\subext {\subclo \subwk \sigma} {x_0}} B}} {\tmcst s}
   }{
     \wfsub \Gamma \sigma \Delta
     &
