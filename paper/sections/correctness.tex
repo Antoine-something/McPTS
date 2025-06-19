@@ -351,7 +351,7 @@ These are denoted $\gluneutp a$ and $\gluneutm a$, respectively, and they are an
       \qquad
       e \in \perne
       \\
-      \forall \Delta \in \Ctx. \forall \sigma \in \Sub. \wfwk \Delta \sigma \Gamma \implies \eqexp \Delta {\tmclo \sigma M} {\rbnefunc[|\Delta|] e} A
+      \forall \Delta \in \Ctx. \forall \sigma \in \Sub. \wfwk \Delta \sigma \Gamma \implies \eqexp \Delta {\tmclo \sigma M} {\rbnefunc[|\Delta|] e} {\tmclo \sigma A}
     \end{array}
   }
 \end{array}
@@ -384,10 +384,12 @@ For gluing terms, we have a relation $\glupitm R {R_I} {P_I} {El_I} {El_O}$, whe
     \glutmjudg \Gamma M A m {\glupitm R {R_I} {P_I} {El_I} {El_O}}
   }{
     \begin{array}{c}
-      m \in R
+      m = m \in R
       \qquad
-      \eqexp \Gamma A {\tppi {B_1} {B_2} {\tmcst s}}
+      \wfexp \Gamma M A
       \qquad
+      \eqexp \Gamma A {\tppi {B_1} {B_2}} {\tmcst s}
+      \\
       \forall \Delta \in \Ctx. \forall \sigma \in \Sub.\ \wfwk \Delta \sigma \Gamma \implies \glutpjudg \Delta {\tmclo \sigma {B_1}} {P_I}
       \\
       \forall \Delta \in \Ctx. \forall \sigma \in \Sub. \forall N \in \Exp. \forall n \in \Dom. (\wfwk \Delta \sigma \Gamma) \land (\glutmjudg \Delta N {\tmclo \sigma {B_1}} n {El_I})
@@ -542,7 +544,7 @@ This means that we want to use the syntactic equality judgment to glue a syntact
   }
   \\[8pt]
   \infer{
-    \glutmjudg \Gamma M A m {\glune a}
+    \glutmjudg \Gamma M A e {\glune a}
   }{
     \begin{array}{c}
       \wfexp \Gamma M A
@@ -576,8 +578,6 @@ This means that we want to use the syntactic equality judgment to glue a syntact
   
 \subsection{Properties of the gluing model}
 
-\subsubsection{Monotonicity}
-
 The first important property of the gluing model, monotonicity (\Cref{lemma:monotonicity}), states that our gluing model is stable under weakenings.
 To prove monotonicity, we first need to establish a number of lemmas.
 First, we need some basic properties about weakening substitutions.
@@ -596,6 +596,8 @@ Then, we need to show that the gluing model respects the judgmental equality.
   Assume that $\glusortrel a P {El}$.  Then:
   \begin{enumerate}
   \item If $\glutpjudg \Gamma A P$ and $\eqexp \Gamma A {A'} {\tmcst s}$, then $\glutpjudg \Gamma {A'} P$
+  \item If $\glutmjudg \Gamma M A m {El}$ and $\eqexp \Gamma A {A'} {\tmcst s}$, then $\glutmjudg \Gamma M {A'} m El$
+  \item If $\glutmjudg \Gamma M A m {El}$ and $\eqexp \Gamma M {M'} A$, then $\glutmjudg \Gamma {M'} A m El$
   \end{enumerate}
 \end{lemma}
 \begin{proof}
@@ -616,6 +618,34 @@ Then, we need to show that the gluing model respects the judgmental equality.
   The cases are straightforward since we have baked weakenings into the definitions of each predicate.
 \end{proof}
 
+
+Next, we prove a congruence lemma for function applications in the gluing relations for neutral and normal objects:
+\begin{lemma}
+  \label{lem:glu-congruence}
+  Assume $\glusortrel[\tmcst s_3] {\dpi a B \rho} P {El}$.
+  If $\glutmjudg M {\tppi A B} e {\glune[\tmcst s_3] {\dpi a {B'} \rho}}$, and $\wfwk \Delta \sigma \Gamma$, and $\glutmjudg \Delta N {\tmclo \sigma A} n {\glunf[\tmcst s_1] a}$,
+  then $\glutmjudg \Delta {\tmapp {\tmclo \sigma M} N} {\tmclo {\subext \sigma N} B} {\dapp e {\dreify a n}} {\glune[\tmcst s_2] {\evalexpfunc {B'} {\denvext \rho n}}}$
+\end{lemma}
+
+Next, we prove that related terms always have related types.
+\begin{lemma}
+  \label{lem:reltm-implies-reltyp}
+  If $\glusortrel a P {El}$ and $\glutmjudg \Gamma M A m {El}$, then $\glutpjudg \Gamma A P$.
+\end{lemma}
+\begin{proof}
+  By a straightforward induction on the derivation of $\glusort a P {El}$.
+\end{proof}
+
+Next, we prove that related terms are always well-formed.
+This lemma is more for convenience than necessity.
+\begin{lemma}
+  \label{lem:reltm-implies-wf}
+  If $\glusortrel a P {El}$ and $\glutmjudg \Gamma M A m {El}$, then $\wfexp \Gamma M A$.
+\end{lemma}
+\begin{proof}
+  By a straightforward induction on the derivation of $\glusort a P {El}$.
+\end{proof}
+
 Next, we need to prove that initial environments are properly related.
 
 \begin{lemma}
@@ -626,16 +656,17 @@ Next, we need to prove that initial environments are properly related.
   By induction on the derivation of $\gluctxrel \Gamma {Sb}$.
 \end{proof}
 
+
 As for the \ac{PER} model, the crucial property of the gluing model is realizability, which intuitively states that all the gluing relations for terms sit in between $\glune a$ and $\glunf a$.
 
 \begin{theorem}[Realizability of gluing model]
   \label{thm:realizability-gluing}
   Assume that $\glusortrel a P {El}$.  Then:
-  \begin{itemize}
+  \begin{enumerate}
   \item If $\glutmjudg \Gamma M A e {\glune a}$, then $\glutmjudg \Gamma M A {\dreflect a e} {El}$;
   \item If $\glutmjudg \Gamma M A m {El}$, then $\glutmjudg \Gamma M A m {\glunf a}$;
   \item If $\glutpjudg \Gamma A P$, then $\glutpjudg \Gamma A {\glutyp a}$.
-  \end{itemize}
+  \end{enumerate}
 \end{theorem}
 \begin{proof}
   By induction on the derivation of $\glusortrel a P {El}$.
