@@ -1,0 +1,2408 @@
+DIGEST 628b5def7cfb2d6ba5830e099f9e075f
+FMcPTS.Core.Syntactic.System.Definitions
+R31:34 McPTS.Core.Base <> <> lib
+R81:89 McPTS.Core.PTSSignature.Signature <> <> lib
+R133:138 McPTS.Core.Syntactic.Syntax <> <> lib
+R161:166 McPTS.Core.PTSSignature.Signature PtsSig <> mod
+mod 149:154 <> System
+R186:198 McPTS.Core.Syntactic.Syntax SyntaxFunctor <> modtype
+R200:200 McPTS.Core.Syntactic.System.Definitions P <> modtype
+mod 179:181 <> System.Syn
+R212:212 McPTS.Core.Syntactic.System.Definitions P <> mod
+R224:226 McPTS.Core.Syntactic.System.Definitions System.Syn <> mod
+ind 1270:1279 System ctx_lookup
+constr 1322:1325 System here
+constr 1371:1375 System there
+R1286:1289 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1283:1285 Coq.Init.Datatypes <> nat ind
+R1293:1296 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1290:1292 McPTS.Core.Syntactic.System.Definitions System Typ abbrev
+R1299:1302 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1297:1298 McPTS.Core.Syntactic.System.Definitions P St defax
+R1306:1309 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1303:1305 McPTS.Core.Syntactic.System.Definitions System Ctx ind
+R1496:1505 McPTS.Core.Syntactic.System.Definitions <> ctx_lookup:2 ind
+R1331:1333 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R1362:1364 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R1334:1334 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'#'_x_':'_x_':'_x_'∈'_x not
+R1336:1338 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'#'_x_':'_x_':'_x_'∈'_x not
+R1344:1346 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'#'_x_':'_x_':'_x_'∈'_x not
+R1348:1352 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'#'_x_':'_x_':'_x_'∈'_x not
+R1339:1339 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R1342:1342 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R1340:1341 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Wk' not
+binder 1343:1343 <> A:3
+binder 1343:1343 <> A:4
+binder 1347:1347 <> s:5
+binder 1347:1347 <> s:6
+R1355:1356 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+R1358:1360 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+binder 1353:1354 <> Γ:7
+binder 1353:1354 <> Γ:8
+binder 1357:1357 <> A:9
+binder 1357:1357 <> A:10
+binder 1361:1361 <> s:11
+binder 1361:1361 <> s:12
+R1404:1421 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1381:1383 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R1401:1403 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R1384:1384 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'#'_x_':'_x_':'_x_'∈'_x not
+R1386:1388 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'#'_x_':'_x_':'_x_'∈'_x not
+R1390:1392 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'#'_x_':'_x_':'_x_'∈'_x not
+R1394:1398 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'#'_x_':'_x_':'_x_'∈'_x not
+binder 1389:1389 <> A:16
+binder 1389:1389 <> A:17
+binder 1393:1393 <> s:18
+binder 1393:1393 <> s:19
+binder 1399:1400 <> Γ:20
+binder 1399:1400 <> Γ:21
+R1422:1424 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R1457:1458 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R1425:1426 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'#'_x_':'_x_':'_x_'∈'_x not
+R1430:1433 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'#'_x_':'_x_':'_x_'∈'_x not
+R1439:1441 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'#'_x_':'_x_':'_x_'∈'_x not
+R1443:1447 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'#'_x_':'_x_':'_x_'∈'_x not
+R1427:1427 Coq.Init.Datatypes <> S constr
+R1434:1434 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R1437:1437 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R1435:1436 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Wk' not
+binder 1438:1438 <> A:22
+binder 1438:1438 <> A:23
+binder 1442:1442 <> s:24
+binder 1442:1442 <> s:25
+R1450:1451 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+R1453:1455 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+binder 1448:1449 <> Γ:26
+binder 1448:1449 <> Γ:27
+binder 1452:1452 <> B:28
+binder 1452:1452 <> B:29
+binder 1456:1456 <> s:30
+binder 1456:1456 <> s:31
+scheme 1270:1279 System ctx_lookup_ind
+scheme 1270:1279 System ctx_lookup_sind
+R1496:1505 McPTS.Core.Syntactic.System.Definitions System ctx_lookup ind
+not 1469:1469 System :judg:type_scope:'#'_x_':'_x_':'_x_'∈'_x
+ind 1595:1600 System wf_ctx
+constr 1623:1634 System wf_ctx_empty
+constr 1656:1668 System wf_ctx_extend
+ind 1871:1876 System wf_exp
+constr 1913:1921 System wf_exp_st
+constr 2010:2019 System wf_exp_var
+constr 2111:2119 System wf_exp_pi
+constr 2292:2301 System wf_exp_lam
+constr 2472:2481 System wf_exp_app
+constr 2676:2685 System wf_exp_clo
+constr 2789:2799 System wf_exp_conv
+ind 3010:3015 System wf_typ
+constr 3045:3053 System wf_typ_st
+constr 3118:3127 System wf_typ_exp
+ind 3319:3324 System wf_sub
+constr 3361:3369 System wf_sub_id
+constr 3436:3444 System wf_sub_wk
+constr 3521:3530 System wf_sub_ext
+constr 3668:3678 System wf_sub_comp
+constr 3793:3803 System wf_sub_conv
+ind 4027:4032 System eq_ctx
+constr 4062:4071 System eq_ctx_nil
+constr 4101:4111 System eq_ctx_cons
+ind 4353:4358 System eq_exp
+constr 4440:4450 System eq_exp_beta
+constr 4659:4668 System eq_exp_eta
+constr 4889:4904 System eq_exp_prop_sort
+constr 5024:5041 System eq_exp_prop_var_ze
+constr 5149:5166 System eq_exp_prop_var_su
+constr 5308:5321 System eq_exp_prop_pi
+constr 5547:5561 System eq_exp_prop_lam
+constr 5805:5819 System eq_exp_prop_app
+constr 6075:6088 System eq_exp_prop_id
+constr 6173:6188 System eq_exp_prop_comp
+constr 6390:6403 System eq_exp_cong_pi
+constr 6620:6634 System eq_exp_cong_lam
+constr 6834:6848 System eq_exp_cong_app
+constr 7082:7096 System eq_exp_cong_clo
+constr 7272:7282 System eq_exp_refl
+constr 7360:7369 System eq_exp_sym
+constr 7456:7467 System eq_exp_trans
+constr 7610:7620 System eq_exp_conv
+ind 7854:7859 System eq_typ
+constr 7896:7904 System eq_typ_st
+constr 7980:7989 System eq_typ_exp
+ind 8205:8210 System eq_sub
+constr 8292:8306 System eq_sub_beta_nil
+constr 8348:8363 System eq_sub_beta_cons
+constr 8472:8481 System eq_sub_eta
+constr 8625:8643 System eq_sub_prop_id_left
+constr 8743:8762 System eq_sub_prop_id_right
+constr 8863:8879 System eq_sub_prop_assoc
+constr 9069:9088 System eq_sub_prop_ext_left
+constr 9238:9258 System eq_sub_prop_ext_right
+constr 9505:9519 System eq_sub_cong_ext
+constr 9693:9708 System eq_sub_cong_comp
+constr 9900:9910 System eq_sub_refl
+constr 9995:10004 System eq_sub_sym
+constr 10099:10110 System eq_sub_trans
+constr 10265:10275 System eq_sub_conv
+R1607:1610 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1604:1606 McPTS.Core.Syntactic.System.Definitions System Ctx ind
+R1883:1886 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1880:1882 McPTS.Core.Syntactic.System.Definitions System Ctx ind
+R1890:1893 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1887:1889 McPTS.Core.Syntactic.System.Definitions System Exp ind
+R1897:1900 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1894:1896 McPTS.Core.Syntactic.System.Definitions System Typ abbrev
+R3022:3025 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R3019:3021 McPTS.Core.Syntactic.System.Definitions System Ctx ind
+R3029:3032 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R3026:3028 McPTS.Core.Syntactic.System.Definitions System Typ abbrev
+R3331:3334 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R3328:3330 McPTS.Core.Syntactic.System.Definitions System Ctx ind
+R3338:3341 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R3335:3337 McPTS.Core.Syntactic.System.Definitions System Sub ind
+R3345:3348 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R3342:3344 McPTS.Core.Syntactic.System.Definitions System Ctx ind
+R4039:4042 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R4036:4038 McPTS.Core.Syntactic.System.Definitions System Ctx ind
+R4046:4049 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R4043:4045 McPTS.Core.Syntactic.System.Definitions System Ctx ind
+R4365:4368 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R4362:4364 McPTS.Core.Syntactic.System.Definitions System Ctx ind
+R4372:4375 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R4369:4371 McPTS.Core.Syntactic.System.Definitions System Exp ind
+R4379:4382 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R4376:4378 McPTS.Core.Syntactic.System.Definitions System Exp ind
+R4386:4389 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R4383:4385 McPTS.Core.Syntactic.System.Definitions System Typ abbrev
+R7866:7869 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R7863:7865 McPTS.Core.Syntactic.System.Definitions System Ctx ind
+R7873:7876 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R7870:7872 McPTS.Core.Syntactic.System.Definitions System Typ abbrev
+R7880:7883 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R7877:7879 McPTS.Core.Syntactic.System.Definitions System Typ abbrev
+R8217:8220 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R8214:8216 McPTS.Core.Syntactic.System.Definitions System Ctx ind
+R8224:8227 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R8221:8223 McPTS.Core.Syntactic.System.Definitions System Sub ind
+R8231:8234 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R8228:8230 McPTS.Core.Syntactic.System.Definitions System Sub ind
+R8238:8241 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R8235:8237 McPTS.Core.Syntactic.System.Definitions System Ctx ind
+R1777:1782 McPTS.Core.Syntactic.System.Definitions <> wf_ctx:45 ind
+R2918:2923 McPTS.Core.Syntactic.System.Definitions <> wf_exp:46 ind
+R3218:3223 McPTS.Core.Syntactic.System.Definitions <> wf_typ:47 ind
+R3932:3937 McPTS.Core.Syntactic.System.Definitions <> wf_sub:48 ind
+R4252:4257 McPTS.Core.Syntactic.System.Definitions <> eq_ctx:49 ind
+R7761:7766 McPTS.Core.Syntactic.System.Definitions <> eq_exp:50 ind
+R8098:8103 McPTS.Core.Syntactic.System.Definitions <> eq_typ:51 ind
+R10431:10436 McPTS.Core.Syntactic.System.Definitions <> eq_sub:52 ind
+R1638:1640 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R1648:1650 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R1641:1644 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'⊢'_x not
+R1645:1647 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'⋅' not
+R1686:1689 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1674:1676 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R1683:1685 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R1677:1680 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'⊢'_x not
+binder 1681:1682 <> Γ:53
+binder 1681:1682 <> Γ:54
+R1712:1737 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1690:1692 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R1710:1711 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R1695:1699 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R1701:1703 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 1693:1694 <> Γ:55
+binder 1693:1694 <> Γ:56
+binder 1700:1700 <> A:57
+binder 1700:1700 <> A:58
+R1704:1708 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Sort'_'@'_x not
+R1738:1740 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R1752:1753 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R1741:1744 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'⊢'_x not
+R1747:1748 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+R1750:1750 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+binder 1745:1746 <> Γ:59
+binder 1745:1746 <> Γ:60
+binder 1749:1749 <> A:61
+binder 1749:1749 <> A:62
+binder 1751:1751 <> s:63
+binder 1751:1751 <> s:64
+R1935:1938 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1927:1928 McPTS.Core.Syntactic.System.Definitions P Ax defax
+R1951:1973 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R1939:1941 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R1948:1950 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R1942:1945 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'⊢'_x not
+binder 1946:1947 <> Γ:68
+binder 1946:1947 <> Γ:69
+R1974:1976 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2001:2003 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R1979:1983 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R1991:1993 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 1977:1978 <> Γ:70
+binder 1977:1978 <> Γ:71
+R1984:1988 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Sort'_'@'_x not
+R1994:1998 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Sort'_'@'_x not
+R2037:2040 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2025:2027 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2034:2036 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2028:2031 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'⊢'_x not
+binder 2032:2033 <> Γ:75
+binder 2032:2033 <> Γ:76
+R2064:2086 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2041:2043 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2061:2063 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2044:2044 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'#'_x_':'_x_':'_x_'∈'_x not
+R2046:2048 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'#'_x_':'_x_':'_x_'∈'_x not
+R2050:2052 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'#'_x_':'_x_':'_x_'∈'_x not
+R2054:2058 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'#'_x_':'_x_':'_x_'∈'_x not
+binder 2049:2049 <> A:77
+binder 2049:2049 <> A:78
+binder 2053:2053 <> s:79
+binder 2053:2053 <> s:80
+binder 2059:2060 <> Γ:81
+binder 2059:2060 <> Γ:82
+R2087:2089 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2103:2104 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2092:2096 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R2099:2101 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 2090:2091 <> Γ:83
+binder 2090:2091 <> Γ:84
+R2097:2097 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'#'_x not
+binder 2102:2102 <> A:85
+binder 2102:2102 <> A:86
+R2136:2137 McPTS.Core.Syntactic.System.Definitions P Ru defax
+binder 2132:2132 <> r:91
+R2195:2198 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2171:2173 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2192:2194 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2176:2180 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R2182:2184 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 2174:2175 <> Γ:92
+binder 2174:2175 <> Γ:93
+binder 2181:2181 <> A:94
+binder 2181:2181 <> A:95
+R2185:2189 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Sort'_'@'_x not
+R2229:2254 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2199:2201 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2226:2228 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2210:2214 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R2216:2218 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R2204:2205 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+R2207:2207 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+binder 2202:2203 <> Γ:96
+binder 2202:2203 <> Γ:97
+binder 2206:2206 <> A:98
+binder 2206:2206 <> A:99
+binder 2208:2209 <> s1:100
+binder 2208:2209 <> s1:101
+binder 2215:2215 <> B:102
+binder 2215:2215 <> B:103
+R2219:2223 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Sort'_'@'_x not
+R2255:2257 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2283:2285 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2260:2264 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R2273:2275 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 2258:2259 <> Γ:104
+binder 2258:2259 <> Γ:105
+R2265:2267 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R2269:2269 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R2271:2271 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R2268:2268 McPTS.Core.Syntactic.System.Definitions <> r:91 var
+binder 2270:2270 <> A:106
+binder 2270:2270 <> A:107
+binder 2272:2272 <> B:108
+binder 2272:2272 <> B:109
+R2276:2280 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Sort'_'@'_x not
+R2318:2319 McPTS.Core.Syntactic.System.Definitions P Ru defax
+binder 2314:2314 <> r:116
+R2385:2388 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2354:2356 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2382:2384 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2359:2363 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R2372:2374 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 2357:2358 <> Γ:117
+binder 2357:2358 <> Γ:118
+R2364:2366 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R2368:2368 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R2370:2370 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R2367:2367 McPTS.Core.Syntactic.System.Definitions <> r:116 var
+binder 2369:2369 <> A:119
+binder 2369:2369 <> A:120
+binder 2371:2371 <> B:121
+binder 2371:2371 <> B:122
+R2375:2379 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Sort'_'@'_x not
+R2412:2438 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2389:2391 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2409:2411 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2399:2403 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R2405:2407 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R2394:2395 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+R2397:2397 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+binder 2392:2393 <> Γ:123
+binder 2392:2393 <> Γ:124
+binder 2396:2396 <> A:125
+binder 2396:2396 <> A:126
+binder 2398:2398 <> s:127
+binder 2398:2398 <> s:128
+binder 2404:2404 <> M:129
+binder 2404:2404 <> M:130
+binder 2408:2408 <> B:131
+binder 2408:2408 <> B:132
+R2439:2441 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2463:2465 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2444:2448 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R2452:2454 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 2442:2443 <> Γ:133
+binder 2442:2443 <> Γ:134
+binder 2449:2451 <> λM:135
+binder 2449:2451 <> λM:136
+R2455:2457 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R2459:2459 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R2461:2461 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R2458:2458 McPTS.Core.Syntactic.System.Definitions <> r:116 var
+binder 2460:2460 <> A:137
+binder 2460:2460 <> A:138
+binder 2462:2462 <> B:139
+binder 2462:2462 <> B:140
+R2498:2499 McPTS.Core.Syntactic.System.Definitions P Ru defax
+binder 2494:2494 <> r:150
+R2565:2568 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2534:2536 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2562:2564 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2539:2543 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R2552:2554 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 2537:2538 <> Γ:151
+binder 2537:2538 <> Γ:152
+R2544:2546 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R2548:2548 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R2550:2550 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R2547:2547 McPTS.Core.Syntactic.System.Definitions <> r:150 var
+binder 2549:2549 <> A:153
+binder 2549:2549 <> A:154
+binder 2551:2551 <> B:155
+binder 2551:2551 <> B:156
+R2555:2559 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Sort'_'@'_x not
+R2594:2597 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2569:2571 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2591:2593 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2574:2578 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R2580:2582 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 2572:2573 <> Γ:157
+binder 2572:2573 <> Γ:158
+binder 2579:2579 <> M:159
+binder 2579:2579 <> M:160
+R2583:2585 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R2587:2587 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R2589:2589 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R2586:2586 McPTS.Core.Syntactic.System.Definitions <> r:150 var
+binder 2588:2588 <> A:161
+binder 2588:2588 <> A:162
+binder 2590:2590 <> B:163
+binder 2590:2590 <> B:164
+R2616:2642 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2598:2600 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2613:2615 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2603:2607 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R2609:2611 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 2601:2602 <> Γ:165
+binder 2601:2602 <> Γ:166
+binder 2608:2608 <> N:167
+binder 2608:2608 <> N:168
+binder 2612:2612 <> A:169
+binder 2612:2612 <> A:170
+R2643:2645 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2667:2669 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2648:2652 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R2656:2658 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 2646:2647 <> Γ:171
+binder 2646:2647 <> Γ:172
+R2654:2654 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_x_'..'_x not
+binder 2653:2653 <> M:173
+binder 2653:2653 <> M:174
+binder 2655:2655 <> N:175
+binder 2655:2655 <> N:176
+R2659:2659 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R2665:2665 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R2662:2663 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_',,'_x not
+R2660:2661 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Id' not
+binder 2664:2664 <> N:177
+binder 2664:2664 <> N:178
+binder 2666:2666 <> B:179
+binder 2666:2666 <> B:180
+R2712:2715 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2691:2693 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2709:2711 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2696:2701 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+R2704:2706 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+binder 2694:2695 <> Γ:189
+binder 2694:2695 <> Γ:190
+binder 2702:2703 <> σ:191
+binder 2702:2703 <> σ:192
+binder 2707:2708 <> Δ:193
+binder 2707:2708 <> Δ:194
+R2734:2756 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2716:2718 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2731:2733 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2721:2725 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R2727:2729 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 2719:2720 <> Δ:195
+binder 2719:2720 <> Δ:196
+binder 2726:2726 <> M:197
+binder 2726:2726 <> M:198
+binder 2730:2730 <> A:199
+binder 2730:2730 <> A:200
+R2757:2759 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2780:2782 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2762:2766 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R2772:2774 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 2760:2761 <> Γ:201
+binder 2760:2761 <> Γ:202
+R2767:2767 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R2770:2770 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+binder 2768:2769 <> σ:203
+binder 2768:2769 <> σ:204
+binder 2771:2771 <> M:205
+binder 2771:2771 <> M:206
+R2775:2775 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R2778:2778 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+binder 2776:2777 <> σ:207
+binder 2776:2777 <> σ:208
+binder 2779:2779 <> A:209
+binder 2779:2779 <> A:210
+R2823:2826 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2805:2807 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2820:2822 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2810:2814 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R2816:2818 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 2808:2809 <> Γ:216
+binder 2808:2809 <> Γ:217
+binder 2815:2815 <> M:218
+binder 2815:2815 <> M:219
+binder 2819:2819 <> A:220
+binder 2819:2819 <> A:221
+R2847:2870 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R2827:2829 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2844:2846 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2832:2836 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x not
+R2838:2842 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x not
+binder 2830:2831 <> Γ:222
+binder 2830:2831 <> Γ:223
+binder 2837:2837 <> A:224
+binder 2837:2837 <> A:225
+binder 2843:2843 <> B:226
+binder 2843:2843 <> B:227
+R2871:2873 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2886:2888 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R2876:2880 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R2882:2884 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 2874:2875 <> Γ:228
+binder 2874:2875 <> Γ:229
+binder 2881:2881 <> M:230
+binder 2881:2881 <> M:231
+binder 2885:2885 <> B:232
+binder 2885:2885 <> B:233
+R3071:3092 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R3059:3061 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3068:3070 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3062:3065 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'⊢'_x not
+binder 3066:3067 <> Γ:238
+binder 3066:3067 <> Γ:239
+R3093:3095 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3109:3111 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3098:3102 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x not
+binder 3096:3097 <> Γ:240
+binder 3096:3097 <> Γ:241
+R3103:3107 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Sort'_'@'_x not
+R3156:3178 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R3133:3135 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3153:3155 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3138:3142 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R3144:3146 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 3136:3137 <> Γ:244
+binder 3136:3137 <> Γ:245
+binder 3143:3143 <> A:246
+binder 3143:3143 <> A:247
+R3147:3151 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Sort'_'@'_x not
+R3179:3181 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3190:3192 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3184:3188 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x not
+binder 3182:3183 <> Γ:248
+binder 3182:3183 <> Γ:249
+binder 3189:3189 <> A:250
+binder 3189:3189 <> A:251
+R3387:3408 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R3375:3377 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3384:3386 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3378:3381 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'⊢'_x not
+binder 3382:3383 <> Γ:255
+binder 3382:3383 <> Γ:256
+R3409:3411 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3427:3429 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3414:3419 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+R3422:3424 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+binder 3412:3413 <> Γ:257
+binder 3412:3413 <> Γ:258
+R3420:3421 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Id' not
+binder 3425:3426 <> Γ:259
+binder 3425:3426 <> Γ:260
+R3467:3488 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R3450:3452 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3464:3466 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3453:3456 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'⊢'_x not
+R3459:3460 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+R3462:3462 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+binder 3457:3458 <> Γ:262
+binder 3457:3458 <> Γ:263
+binder 3461:3461 <> A:264
+binder 3461:3461 <> A:265
+binder 3463:3463 <> s:266
+binder 3463:3463 <> s:267
+R3489:3491 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3512:3514 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3499:3504 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+R3507:3509 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+R3494:3495 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+R3497:3497 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+binder 3492:3493 <> Γ:268
+binder 3492:3493 <> Γ:269
+binder 3496:3496 <> A:270
+binder 3496:3496 <> A:271
+binder 3498:3498 <> s:272
+binder 3498:3498 <> s:273
+R3505:3506 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Wk' not
+binder 3510:3511 <> Γ:274
+binder 3510:3511 <> Γ:275
+R3557:3560 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R3536:3538 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3554:3556 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3541:3546 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+R3549:3551 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+binder 3539:3540 <> Γ:279
+binder 3539:3540 <> Γ:280
+binder 3547:3548 <> σ:281
+binder 3547:3548 <> σ:282
+binder 3552:3553 <> Δ:283
+binder 3552:3553 <> Δ:284
+R3584:3587 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R3561:3563 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3581:3583 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3566:3570 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R3572:3574 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 3564:3565 <> Δ:285
+binder 3564:3565 <> Δ:286
+binder 3571:3571 <> A:287
+binder 3571:3571 <> A:288
+R3575:3579 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Sort'_'@'_x not
+R3610:3632 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R3588:3590 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3607:3609 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3593:3597 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R3599:3601 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 3591:3592 <> Γ:289
+binder 3591:3592 <> Γ:290
+binder 3598:3598 <> M:291
+binder 3598:3598 <> M:292
+R3602:3602 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R3605:3605 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+binder 3603:3604 <> σ:293
+binder 3603:3604 <> σ:294
+binder 3606:3606 <> A:295
+binder 3606:3606 <> A:296
+R3633:3635 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3659:3661 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3638:3643 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+R3649:3651 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+binder 3636:3637 <> Γ:297
+binder 3636:3637 <> Γ:298
+R3646:3647 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_',,'_x not
+binder 3644:3645 <> σ:299
+binder 3644:3645 <> σ:300
+binder 3648:3648 <> M:301
+binder 3648:3648 <> M:302
+R3654:3655 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+R3657:3657 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+binder 3652:3653 <> Δ:303
+binder 3652:3653 <> Δ:304
+binder 3656:3656 <> A:305
+binder 3656:3656 <> A:306
+binder 3658:3658 <> s:307
+binder 3658:3658 <> s:308
+R3707:3710 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R3684:3686 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3704:3706 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3690:3695 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+R3698:3700 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+binder 3687:3689 <> Γ1:315
+binder 3687:3689 <> Γ1:316
+binder 3696:3697 <> σ:317
+binder 3696:3697 <> σ:318
+binder 3701:3703 <> Γ2:319
+binder 3701:3703 <> Γ2:320
+R3733:3756 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R3711:3713 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3730:3732 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3717:3722 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+R3725:3726 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+binder 3714:3716 <> Γ2:321
+binder 3714:3716 <> Γ2:322
+binder 3723:3724 <> τ:323
+binder 3723:3724 <> τ:324
+binder 3727:3729 <> Γ3:325
+binder 3727:3729 <> Γ3:326
+R3757:3759 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3784:3786 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3763:3768 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+R3778:3780 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+binder 3760:3762 <> Γ1:327
+binder 3760:3762 <> Γ1:328
+R3771:3775 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_'∘'_x not
+binder 3769:3770 <> σ:329
+binder 3769:3770 <> σ:330
+binder 3776:3777 <> τ:331
+binder 3776:3777 <> τ:332
+binder 3781:3783 <> Γ3:333
+binder 3781:3783 <> Γ3:334
+R3830:3833 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R3809:3811 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3827:3829 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3814:3819 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+R3822:3824 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+binder 3812:3813 <> Γ:340
+binder 3812:3813 <> Γ:341
+binder 3820:3821 <> σ:342
+binder 3820:3821 <> σ:343
+binder 3825:3826 <> Δ:344
+binder 3825:3826 <> Δ:345
+R3854:3877 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R3834:3836 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3851:3853 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3837:3840 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'⊢'_x_'≡'_x not
+R3843:3847 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'⊢'_x_'≡'_x not
+binder 3841:3842 <> Δ:346
+binder 3841:3842 <> Δ:347
+binder 3848:3850 <> Δ':348
+binder 3848:3850 <> Δ':349
+R3878:3880 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3897:3899 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R3883:3888 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+R3891:3893 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+binder 3881:3882 <> Γ:350
+binder 3881:3882 <> Γ:351
+binder 3889:3890 <> σ:352
+binder 3889:3890 <> σ:353
+binder 3894:3896 <> Δ':354
+binder 3894:3896 <> Δ':355
+R4075:4077 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R4093:4095 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R4078:4081 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'⊢'_x_'≡'_x not
+R4085:4089 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'⊢'_x_'≡'_x not
+R4082:4084 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'⋅' not
+R4090:4092 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'⋅' not
+R4136:4139 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R4117:4119 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R4133:4135 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R4120:4123 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'⊢'_x_'≡'_x not
+R4126:4130 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'⊢'_x_'≡'_x not
+binder 4124:4125 <> Γ:360
+binder 4124:4125 <> Γ:361
+binder 4131:4132 <> Δ:362
+binder 4131:4132 <> Δ:363
+R4169:4192 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R4140:4142 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R4166:4168 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R4145:4149 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R4151:4155 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R4157:4159 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+binder 4143:4144 <> Γ:364
+binder 4143:4144 <> Γ:365
+binder 4150:4150 <> A:366
+binder 4150:4150 <> A:367
+binder 4156:4156 <> B:368
+binder 4156:4156 <> B:369
+R4160:4164 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Sort'_'@'_x not
+R4193:4195 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R4219:4221 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R4196:4199 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'⊢'_x_'≡'_x not
+R4207:4211 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'⊢'_x_'≡'_x not
+R4202:4203 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+R4205:4205 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+binder 4200:4201 <> Γ:370
+binder 4200:4201 <> Γ:371
+binder 4204:4204 <> A:372
+binder 4204:4204 <> A:373
+binder 4206:4206 <> s:374
+binder 4206:4206 <> s:375
+R4214:4215 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+R4217:4217 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+binder 4212:4213 <> Δ:376
+binder 4212:4213 <> Δ:377
+binder 4216:4216 <> B:378
+binder 4216:4216 <> B:379
+binder 4218:4218 <> s:380
+binder 4218:4218 <> s:381
+R4467:4468 McPTS.Core.Syntactic.System.Definitions P Ru defax
+binder 4463:4463 <> r:387
+R4535:4538 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R4504:4506 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R4532:4534 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R4509:4513 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R4522:4524 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 4507:4508 <> Γ:388
+binder 4507:4508 <> Γ:389
+R4514:4516 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R4518:4518 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R4520:4520 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R4517:4517 McPTS.Core.Syntactic.System.Definitions <> r:387 var
+binder 4519:4519 <> A:390
+binder 4519:4519 <> A:391
+binder 4521:4521 <> B:392
+binder 4521:4521 <> B:393
+R4525:4529 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Sort'_'@'_x not
+R4563:4566 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R4539:4541 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R4560:4562 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R4550:4554 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R4556:4558 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R4544:4545 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+R4547:4547 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+binder 4542:4543 <> Γ:394
+binder 4542:4543 <> Γ:395
+binder 4546:4546 <> A:396
+binder 4546:4546 <> A:397
+binder 4548:4549 <> s1:398
+binder 4548:4549 <> s1:399
+binder 4555:4555 <> M:400
+binder 4555:4555 <> M:401
+binder 4559:4559 <> B:402
+binder 4559:4559 <> B:403
+R4585:4612 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R4567:4569 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R4582:4584 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R4572:4576 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R4578:4580 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 4570:4571 <> Γ:404
+binder 4570:4571 <> Γ:405
+binder 4577:4577 <> N:406
+binder 4577:4577 <> N:407
+binder 4581:4581 <> A:408
+binder 4581:4581 <> A:409
+R4613:4615 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R4650:4652 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R4618:4622 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R4626:4630 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R4639:4641 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+binder 4616:4617 <> Γ:410
+binder 4616:4617 <> Γ:411
+R4624:4624 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_x_'..'_x not
+binder 4623:4623 <> M:412
+binder 4623:4623 <> M:413
+binder 4625:4625 <> N:414
+binder 4625:4625 <> N:415
+R4631:4631 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R4637:4637 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R4634:4635 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_',,'_x not
+R4632:4633 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Id' not
+binder 4636:4636 <> N:416
+binder 4636:4636 <> N:417
+binder 4638:4638 <> M:418
+binder 4638:4638 <> M:419
+R4642:4642 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R4648:4648 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R4645:4646 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_',,'_x not
+R4643:4644 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Id' not
+binder 4647:4647 <> N:420
+binder 4647:4647 <> N:421
+binder 4649:4649 <> B:422
+binder 4649:4649 <> B:423
+R4685:4686 McPTS.Core.Syntactic.System.Definitions P Ru defax
+binder 4681:4681 <> r:432
+R4752:4755 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R4721:4723 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R4749:4751 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R4726:4730 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R4739:4741 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 4724:4725 <> Γ:433
+binder 4724:4725 <> Γ:434
+R4731:4733 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R4735:4735 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R4737:4737 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R4734:4734 McPTS.Core.Syntactic.System.Definitions <> r:432 var
+binder 4736:4736 <> A:435
+binder 4736:4736 <> A:436
+binder 4738:4738 <> B:437
+binder 4738:4738 <> B:438
+R4742:4746 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Sort'_'@'_x not
+R4781:4807 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R4756:4758 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R4778:4780 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R4761:4765 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R4767:4769 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 4759:4760 <> Γ:439
+binder 4759:4760 <> Γ:440
+binder 4766:4766 <> M:441
+binder 4766:4766 <> M:442
+R4770:4772 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R4774:4774 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R4776:4776 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R4773:4773 McPTS.Core.Syntactic.System.Definitions <> r:432 var
+binder 4775:4775 <> A:443
+binder 4775:4775 <> A:444
+binder 4777:4777 <> B:445
+binder 4777:4777 <> B:446
+R4808:4810 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R4847:4849 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R4813:4817 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R4819:4823 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R4836:4838 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+binder 4811:4812 <> Γ:447
+binder 4811:4812 <> Γ:448
+binder 4818:4818 <> M:449
+binder 4818:4818 <> M:450
+R4824:4825 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'λ'_x not
+R4826:4826 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R4835:4835 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R4832:4832 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_x_'..'_x not
+R4827:4827 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R4830:4830 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R4828:4829 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Wk' not
+binder 4831:4831 <> M:451
+binder 4831:4831 <> M:452
+R4833:4833 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'#'_x not
+R4839:4841 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R4843:4843 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R4845:4845 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R4842:4842 McPTS.Core.Syntactic.System.Definitions <> r:432 var
+binder 4844:4844 <> A:453
+binder 4844:4844 <> A:454
+binder 4846:4846 <> B:455
+binder 4846:4846 <> B:456
+R4918:4921 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R4910:4911 McPTS.Core.Syntactic.System.Definitions P Ax defax
+R4943:4971 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R4922:4924 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R4940:4942 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R4927:4932 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+R4935:4937 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+binder 4925:4926 <> Γ:464
+binder 4925:4926 <> Γ:465
+binder 4933:4934 <> σ:466
+binder 4933:4934 <> σ:467
+binder 4938:4939 <> Δ:468
+binder 4938:4939 <> Δ:469
+R4972:4974 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5015:5017 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R4977:4981 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R4993:4997 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R5005:5007 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+binder 4975:4976 <> Γ:470
+binder 4975:4976 <> Γ:471
+R4982:4982 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R4985:4985 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+binder 4983:4984 <> σ:472
+binder 4983:4984 <> σ:473
+R4986:4990 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Sort'_'@'_x not
+R4998:5002 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Sort'_'@'_x not
+R5008:5012 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Sort'_'@'_x not
+R5076:5106 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5047:5049 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5073:5075 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5052:5057 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+R5063:5065 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+binder 5050:5051 <> Γ:479
+binder 5050:5051 <> Γ:480
+R5060:5061 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_',,'_x not
+binder 5058:5059 <> σ:481
+binder 5058:5059 <> σ:482
+binder 5062:5062 <> M:483
+binder 5062:5062 <> M:484
+R5068:5069 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+R5071:5071 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+binder 5066:5067 <> Δ:485
+binder 5066:5067 <> Δ:486
+binder 5070:5070 <> A:487
+binder 5070:5070 <> A:488
+binder 5072:5072 <> s:489
+binder 5072:5072 <> s:490
+R5107:5109 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5140:5142 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5112:5116 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R5126:5130 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R5132:5134 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+binder 5110:5111 <> Γ:491
+binder 5110:5111 <> Γ:492
+R5117:5117 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R5123:5123 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R5120:5121 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_',,'_x not
+binder 5118:5119 <> σ:493
+binder 5118:5119 <> σ:494
+binder 5122:5122 <> M:495
+binder 5122:5122 <> M:496
+R5124:5124 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'#'_x not
+binder 5131:5131 <> M:497
+binder 5131:5131 <> M:498
+R5135:5135 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R5138:5138 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+binder 5136:5137 <> σ:499
+binder 5136:5137 <> σ:500
+binder 5139:5139 <> A:501
+binder 5139:5139 <> A:502
+R5202:5205 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5172:5174 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5199:5201 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5177:5182 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+R5188:5190 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+binder 5175:5176 <> Γ:509
+binder 5175:5176 <> Γ:510
+R5185:5186 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_',,'_x not
+binder 5183:5184 <> σ:511
+binder 5183:5184 <> σ:512
+binder 5187:5187 <> M:513
+binder 5187:5187 <> M:514
+R5193:5194 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+R5196:5196 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+binder 5191:5192 <> Δ:515
+binder 5191:5192 <> Δ:516
+binder 5195:5195 <> A:517
+binder 5195:5195 <> A:518
+binder 5197:5198 <> s1:519
+binder 5197:5198 <> s1:520
+R5226:5256 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5206:5208 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5223:5225 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5209:5209 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'#'_x_':'_x_':'_x_'∈'_x not
+R5211:5211 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'#'_x_':'_x_':'_x_'∈'_x not
+R5213:5213 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'#'_x_':'_x_':'_x_'∈'_x not
+R5216:5220 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'#'_x_':'_x_':'_x_'∈'_x not
+binder 5212:5212 <> B:521
+binder 5212:5212 <> B:522
+binder 5214:5215 <> s2:523
+binder 5214:5215 <> s2:524
+binder 5221:5222 <> Δ:525
+binder 5221:5222 <> Δ:526
+R5257:5259 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5299:5301 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5262:5266 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R5280:5284 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R5291:5293 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+binder 5260:5261 <> Γ:527
+binder 5260:5261 <> Γ:528
+R5267:5267 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R5273:5273 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R5270:5271 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_',,'_x not
+binder 5268:5269 <> σ:529
+binder 5268:5269 <> σ:530
+binder 5272:5272 <> M:531
+binder 5272:5272 <> M:532
+R5274:5275 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'#'_x not
+R5279:5279 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'#'_x not
+R5276:5276 Coq.Init.Datatypes <> S constr
+R5285:5285 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R5288:5288 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+binder 5286:5287 <> σ:533
+binder 5286:5287 <> σ:534
+R5289:5289 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'#'_x not
+R5294:5294 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R5297:5297 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+binder 5295:5296 <> σ:535
+binder 5295:5296 <> σ:536
+binder 5298:5298 <> B:537
+binder 5298:5298 <> B:538
+R5338:5339 McPTS.Core.Syntactic.System.Definitions P Ru defax
+binder 5334:5334 <> r:548
+R5399:5402 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5378:5380 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5396:5398 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5383:5388 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+R5391:5393 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+binder 5381:5382 <> Γ:549
+binder 5381:5382 <> Γ:550
+binder 5389:5390 <> σ:551
+binder 5389:5390 <> σ:552
+binder 5394:5395 <> Δ:553
+binder 5394:5395 <> Δ:554
+R5434:5464 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5403:5405 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5431:5433 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5408:5412 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R5421:5423 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 5406:5407 <> Δ:555
+binder 5406:5407 <> Δ:556
+R5413:5415 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R5417:5417 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R5419:5419 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R5416:5416 McPTS.Core.Syntactic.System.Definitions <> r:548 var
+binder 5418:5418 <> A:557
+binder 5418:5418 <> A:558
+binder 5420:5420 <> B:559
+binder 5420:5420 <> B:560
+R5424:5428 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Sort'_'@'_x not
+R5465:5467 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5538:5540 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5470:5474 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R5489:5493 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R5528:5530 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+binder 5468:5469 <> Γ:561
+binder 5468:5469 <> Γ:562
+R5475:5475 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R5478:5478 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+binder 5476:5477 <> σ:563
+binder 5476:5477 <> σ:564
+R5479:5479 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R5488:5488 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R5480:5482 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R5484:5484 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R5486:5486 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R5483:5483 McPTS.Core.Syntactic.System.Definitions <> r:548 var
+binder 5485:5485 <> A:565
+binder 5485:5485 <> A:566
+binder 5487:5487 <> B:567
+binder 5487:5487 <> B:568
+R5494:5496 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R5498:5498 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R5507:5507 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R5497:5497 McPTS.Core.Syntactic.System.Definitions <> r:548 var
+R5499:5499 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R5506:5506 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R5500:5500 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R5503:5504 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+binder 5501:5502 <> σ:569
+binder 5501:5502 <> σ:570
+binder 5505:5505 <> A:571
+binder 5505:5505 <> A:572
+R5508:5508 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R5527:5527 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R5509:5509 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R5525:5525 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R5521:5522 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_',,'_x not
+R5510:5510 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R5520:5520 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R5513:5517 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_'∘'_x not
+R5511:5512 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Wk' not
+binder 5518:5519 <> σ:573
+binder 5518:5519 <> σ:574
+R5523:5523 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'#'_x not
+binder 5526:5526 <> B:575
+binder 5526:5526 <> B:576
+R5531:5535 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Sort'_'@'_x not
+R5578:5579 McPTS.Core.Syntactic.System.Definitions P Ru defax
+binder 5574:5574 <> r:585
+R5640:5643 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5619:5621 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5637:5639 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5624:5629 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+R5632:5634 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+binder 5622:5623 <> Γ:586
+binder 5622:5623 <> Γ:587
+binder 5630:5631 <> σ:588
+binder 5630:5631 <> σ:589
+binder 5635:5636 <> Δ:590
+binder 5635:5636 <> Δ:591
+R5675:5678 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5644:5646 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5672:5674 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5649:5653 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R5662:5664 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 5647:5648 <> Δ:592
+binder 5647:5648 <> Δ:593
+R5654:5656 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R5658:5658 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R5660:5660 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R5657:5657 McPTS.Core.Syntactic.System.Definitions <> r:585 var
+binder 5659:5659 <> A:594
+binder 5659:5659 <> A:595
+binder 5661:5661 <> B:596
+binder 5661:5661 <> B:597
+R5665:5669 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Sort'_'@'_x not
+R5703:5734 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5679:5681 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5700:5702 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5690:5694 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R5696:5698 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R5684:5685 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+R5687:5687 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+binder 5682:5683 <> Δ:598
+binder 5682:5683 <> Δ:599
+binder 5686:5686 <> A:600
+binder 5686:5686 <> A:601
+binder 5688:5689 <> s1:602
+binder 5688:5689 <> s1:603
+binder 5695:5695 <> M:604
+binder 5695:5695 <> M:605
+binder 5699:5699 <> B:606
+binder 5699:5699 <> B:607
+R5735:5737 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5796:5798 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5740:5744 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R5754:5758 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R5779:5781 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+binder 5738:5739 <> Γ:608
+binder 5738:5739 <> Γ:609
+R5745:5745 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R5748:5748 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+binder 5746:5747 <> σ:610
+binder 5746:5747 <> σ:611
+R5749:5749 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R5753:5753 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+binder 5750:5752 <> λM:612
+binder 5750:5752 <> λM:613
+R5759:5760 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'λ'_x not
+R5761:5761 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R5778:5778 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R5762:5762 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R5776:5776 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R5772:5773 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_',,'_x not
+R5763:5763 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R5771:5771 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R5766:5768 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_'∘'_x not
+R5764:5765 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Wk' not
+binder 5769:5770 <> σ:614
+binder 5769:5770 <> σ:615
+R5774:5774 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'#'_x not
+binder 5777:5777 <> M:616
+binder 5777:5777 <> M:617
+R5782:5782 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R5785:5785 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+binder 5783:5784 <> σ:618
+binder 5783:5784 <> σ:619
+R5786:5786 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R5795:5795 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R5787:5789 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R5791:5791 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R5793:5793 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R5790:5790 McPTS.Core.Syntactic.System.Definitions <> r:585 var
+binder 5792:5792 <> A:620
+binder 5792:5792 <> A:621
+binder 5794:5794 <> B:622
+binder 5794:5794 <> B:623
+R5836:5837 McPTS.Core.Syntactic.System.Definitions P Ru defax
+binder 5832:5832 <> r:634
+R5898:5901 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5877:5879 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5895:5897 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5882:5887 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+R5890:5892 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+binder 5880:5881 <> Γ:635
+binder 5880:5881 <> Γ:636
+binder 5888:5889 <> σ:637
+binder 5888:5889 <> σ:638
+binder 5893:5894 <> Δ:639
+binder 5893:5894 <> Δ:640
+R5933:5936 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5902:5904 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5930:5932 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5907:5911 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R5920:5922 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 5905:5906 <> Δ:641
+binder 5905:5906 <> Δ:642
+R5912:5914 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R5916:5916 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R5918:5918 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R5915:5915 McPTS.Core.Syntactic.System.Definitions <> r:634 var
+binder 5917:5917 <> A:643
+binder 5917:5917 <> A:644
+binder 5919:5919 <> B:645
+binder 5919:5919 <> B:646
+R5923:5927 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Sort'_'@'_x not
+R5962:5965 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5937:5939 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5959:5961 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5942:5946 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R5948:5950 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 5940:5941 <> Δ:647
+binder 5940:5941 <> Δ:648
+binder 5947:5947 <> M:649
+binder 5947:5947 <> M:650
+R5951:5953 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R5955:5955 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R5957:5957 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R5954:5954 McPTS.Core.Syntactic.System.Definitions <> r:634 var
+binder 5956:5956 <> A:651
+binder 5956:5956 <> A:652
+binder 5958:5958 <> B:653
+binder 5958:5958 <> B:654
+R5984:6015 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R5966:5968 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5981:5983 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R5971:5975 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R5977:5979 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 5969:5970 <> Δ:655
+binder 5969:5970 <> Δ:656
+binder 5976:5976 <> N:657
+binder 5976:5976 <> N:658
+binder 5980:5980 <> A:659
+binder 5980:5980 <> A:660
+R6016:6018 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R6066:6068 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R6021:6025 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R6035:6039 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R6051:6053 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+binder 6019:6020 <> Γ:661
+binder 6019:6020 <> Γ:662
+R6026:6026 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R6029:6029 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+binder 6027:6028 <> σ:663
+binder 6027:6028 <> σ:664
+R6030:6030 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R6034:6034 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R6032:6032 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_x_'..'_x not
+binder 6031:6031 <> M:665
+binder 6031:6031 <> M:666
+binder 6033:6033 <> N:667
+binder 6033:6033 <> N:668
+R6045:6045 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_x_'..'_x not
+R6040:6040 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R6043:6043 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+binder 6041:6042 <> σ:669
+binder 6041:6042 <> σ:670
+binder 6044:6044 <> M:671
+binder 6044:6044 <> M:672
+R6046:6046 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R6049:6049 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+binder 6047:6048 <> σ:673
+binder 6047:6048 <> σ:674
+binder 6050:6050 <> N:675
+binder 6050:6050 <> N:676
+R6054:6054 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R6064:6064 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R6057:6058 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_',,'_x not
+binder 6055:6056 <> σ:677
+binder 6055:6056 <> σ:678
+R6059:6059 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R6062:6062 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+binder 6060:6061 <> σ:679
+binder 6060:6061 <> σ:680
+binder 6063:6063 <> N:681
+binder 6063:6063 <> N:682
+binder 6065:6065 <> B:683
+binder 6065:6065 <> B:684
+R6112:6138 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R6094:6096 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R6109:6111 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R6099:6103 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R6105:6107 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 6097:6098 <> Γ:695
+binder 6097:6098 <> Γ:696
+binder 6104:6104 <> M:697
+binder 6104:6104 <> M:698
+binder 6108:6108 <> A:699
+binder 6108:6108 <> A:700
+R6139:6141 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R6164:6166 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R6144:6148 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R6154:6158 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R6160:6162 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+binder 6142:6143 <> Γ:701
+binder 6142:6143 <> Γ:702
+R6149:6149 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R6152:6152 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R6150:6151 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Id' not
+binder 6153:6153 <> M:703
+binder 6153:6153 <> M:704
+binder 6159:6159 <> M:705
+binder 6159:6159 <> M:706
+binder 6163:6163 <> A:707
+binder 6163:6163 <> A:708
+R6218:6221 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R6194:6196 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R6215:6217 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R6200:6205 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+R6209:6211 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+binder 6197:6199 <> Γ1:712
+binder 6197:6199 <> Γ1:713
+binder 6206:6208 <> σ1:714
+binder 6206:6208 <> σ1:715
+binder 6212:6214 <> Γ2:716
+binder 6212:6214 <> Γ2:717
+R6246:6249 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R6222:6224 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R6243:6245 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R6228:6233 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+R6237:6239 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+binder 6225:6227 <> Γ2:718
+binder 6225:6227 <> Γ2:719
+binder 6234:6236 <> σ2:720
+binder 6234:6236 <> σ2:721
+binder 6240:6242 <> Γ3:722
+binder 6240:6242 <> Γ3:723
+R6269:6297 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R6250:6252 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R6266:6268 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R6256:6260 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R6262:6264 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 6253:6255 <> Γ3:724
+binder 6253:6255 <> Γ3:725
+binder 6261:6261 <> M:726
+binder 6261:6261 <> M:727
+binder 6265:6265 <> A:728
+binder 6265:6265 <> A:729
+R6298:6300 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R6356:6358 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R6304:6308 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R6323:6327 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R6339:6341 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+binder 6301:6303 <> Γ1:730
+binder 6301:6303 <> Γ1:731
+R6309:6309 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R6321:6321 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R6313:6317 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_'∘'_x not
+binder 6310:6312 <> σ1:732
+binder 6310:6312 <> σ1:733
+binder 6318:6320 <> σ2:734
+binder 6318:6320 <> σ2:735
+binder 6322:6322 <> M:736
+binder 6322:6322 <> M:737
+R6328:6328 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R6332:6332 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+binder 6329:6331 <> σ1:738
+binder 6329:6331 <> σ1:739
+R6333:6333 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R6337:6337 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+binder 6334:6336 <> σ2:740
+binder 6334:6336 <> σ2:741
+binder 6338:6338 <> M:742
+binder 6338:6338 <> M:743
+R6342:6342 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R6354:6354 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R6346:6350 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_'∘'_x not
+binder 6343:6345 <> σ1:744
+binder 6343:6345 <> σ1:745
+binder 6351:6353 <> σ2:746
+binder 6351:6353 <> σ2:747
+binder 6355:6355 <> A:748
+binder 6355:6355 <> A:749
+R6420:6421 McPTS.Core.Syntactic.System.Definitions P Ru defax
+binder 6416:6416 <> r:757
+R6492:6495 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R6460:6462 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R6489:6491 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R6465:6469 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R6472:6476 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R6479:6481 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+binder 6463:6464 <> Γ:758
+binder 6463:6464 <> Γ:759
+binder 6470:6471 <> A1:760
+binder 6470:6471 <> A1:761
+binder 6477:6478 <> A2:762
+binder 6477:6478 <> A2:763
+R6482:6486 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Sort'_'@'_x not
+R6535:6565 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R6496:6498 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R6532:6534 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R6508:6512 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R6515:6519 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R6522:6524 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R6501:6502 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+R6505:6505 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+binder 6499:6500 <> Γ:764
+binder 6499:6500 <> Γ:765
+binder 6503:6504 <> A1:766
+binder 6503:6504 <> A1:767
+binder 6506:6507 <> s1:768
+binder 6506:6507 <> s1:769
+binder 6513:6514 <> B1:770
+binder 6513:6514 <> B1:771
+binder 6520:6521 <> B2:772
+binder 6520:6521 <> B2:773
+R6525:6529 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Sort'_'@'_x not
+R6566:6568 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R6611:6613 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R6571:6575 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R6586:6590 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R6601:6603 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+binder 6569:6570 <> Γ:774
+binder 6569:6570 <> Γ:775
+R6576:6578 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R6580:6580 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R6583:6583 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R6579:6579 McPTS.Core.Syntactic.System.Definitions <> r:757 var
+binder 6581:6582 <> A1:776
+binder 6581:6582 <> A1:777
+binder 6584:6585 <> B1:778
+binder 6584:6585 <> B1:779
+R6591:6593 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R6595:6595 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R6598:6598 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R6594:6594 McPTS.Core.Syntactic.System.Definitions <> r:757 var
+binder 6596:6597 <> A2:780
+binder 6596:6597 <> A2:781
+binder 6599:6600 <> B2:782
+binder 6599:6600 <> B2:783
+R6604:6608 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Sort'_'@'_x not
+R6651:6652 McPTS.Core.Syntactic.System.Definitions P Ru defax
+binder 6647:6647 <> r:792
+R6723:6726 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R6692:6694 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R6720:6722 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R6697:6701 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R6710:6712 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 6695:6696 <> Γ:793
+binder 6695:6696 <> Γ:794
+R6702:6704 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R6706:6706 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R6708:6708 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R6705:6705 McPTS.Core.Syntactic.System.Definitions <> r:792 var
+binder 6707:6707 <> A:795
+binder 6707:6707 <> A:796
+binder 6709:6709 <> B:797
+binder 6709:6709 <> B:798
+R6713:6717 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Sort'_'@'_x not
+R6759:6790 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R6727:6729 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R6756:6758 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R6738:6742 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R6745:6749 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R6752:6754 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R6732:6733 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+R6735:6735 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+binder 6730:6731 <> Γ:799
+binder 6730:6731 <> Γ:800
+binder 6734:6734 <> A:801
+binder 6734:6734 <> A:802
+binder 6736:6737 <> s1:803
+binder 6736:6737 <> s1:804
+binder 6743:6744 <> M1:805
+binder 6743:6744 <> M1:806
+binder 6750:6751 <> M2:807
+binder 6750:6751 <> M2:808
+binder 6755:6755 <> B:809
+binder 6755:6755 <> B:810
+R6791:6793 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R6825:6827 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R6796:6800 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R6805:6809 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R6814:6816 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+binder 6794:6795 <> Γ:811
+binder 6794:6795 <> Γ:812
+binder 6801:6804 <> λM1:813
+binder 6801:6804 <> λM1:814
+binder 6810:6813 <> λM2:815
+binder 6810:6813 <> λM2:816
+R6817:6819 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R6821:6821 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R6823:6823 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R6820:6820 McPTS.Core.Syntactic.System.Definitions <> r:792 var
+binder 6822:6822 <> A:817
+binder 6822:6822 <> A:818
+binder 6824:6824 <> B:819
+binder 6824:6824 <> B:820
+R6865:6866 McPTS.Core.Syntactic.System.Definitions P Ru defax
+binder 6861:6861 <> r:831
+R6937:6940 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R6906:6908 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R6934:6936 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R6911:6915 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R6924:6926 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 6909:6910 <> Γ:832
+binder 6909:6910 <> Γ:833
+R6916:6918 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R6920:6920 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R6922:6922 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R6919:6919 McPTS.Core.Syntactic.System.Definitions <> r:831 var
+binder 6921:6921 <> A:834
+binder 6921:6921 <> A:835
+binder 6923:6923 <> B:836
+binder 6923:6923 <> B:837
+R6927:6931 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Sort'_'@'_x not
+R6974:6977 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R6941:6943 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R6971:6973 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R6946:6950 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R6953:6957 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R6960:6962 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+binder 6944:6945 <> Γ:838
+binder 6944:6945 <> Γ:839
+binder 6951:6952 <> M1:840
+binder 6951:6952 <> M1:841
+binder 6958:6959 <> M2:842
+binder 6958:6959 <> M2:843
+R6963:6965 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R6967:6967 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R6969:6969 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Π'_x_x_x not
+R6966:6966 McPTS.Core.Syntactic.System.Definitions <> r:831 var
+binder 6968:6968 <> A:844
+binder 6968:6968 <> A:845
+binder 6970:6970 <> B:846
+binder 6970:6970 <> B:847
+R7004:7035 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R6978:6980 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7001:7003 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R6983:6987 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R6990:6994 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R6997:6999 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+binder 6981:6982 <> Γ:848
+binder 6981:6982 <> Γ:849
+binder 6988:6989 <> N1:850
+binder 6988:6989 <> N1:851
+binder 6995:6996 <> N2:852
+binder 6995:6996 <> N2:853
+binder 7000:7000 <> A:854
+binder 7000:7000 <> A:855
+R7036:7038 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7073:7075 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7041:7045 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R7051:7055 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R7061:7063 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+binder 7039:7040 <> Γ:856
+binder 7039:7040 <> Γ:857
+R7048:7048 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_x_'..'_x not
+binder 7046:7047 <> M1:858
+binder 7046:7047 <> M1:859
+binder 7049:7050 <> N1:860
+binder 7049:7050 <> N1:861
+R7058:7058 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_x_'..'_x not
+binder 7056:7057 <> M2:862
+binder 7056:7057 <> M2:863
+binder 7059:7060 <> N2:864
+binder 7059:7060 <> N2:865
+R7064:7064 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R7071:7071 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R7067:7068 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_',,'_x not
+R7065:7066 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Id' not
+binder 7069:7070 <> N1:866
+binder 7069:7070 <> N1:867
+binder 7072:7072 <> B:868
+binder 7072:7072 <> B:869
+R7132:7135 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R7102:7104 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7129:7131 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7107:7112 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R7116:7120 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R7124:7126 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+binder 7105:7106 <> Γ:880
+binder 7105:7106 <> Γ:881
+binder 7113:7115 <> σ1:882
+binder 7113:7115 <> σ1:883
+binder 7121:7123 <> σ2:884
+binder 7121:7123 <> σ2:885
+binder 7127:7128 <> Δ:886
+binder 7127:7128 <> Δ:887
+R7162:7189 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R7136:7138 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7159:7161 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7141:7145 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R7148:7152 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R7155:7157 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+binder 7139:7140 <> Δ:888
+binder 7139:7140 <> Δ:889
+binder 7146:7147 <> M1:890
+binder 7146:7147 <> M1:891
+binder 7153:7154 <> M2:892
+binder 7153:7154 <> M2:893
+binder 7158:7158 <> A:894
+binder 7158:7158 <> A:895
+R7190:7192 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7228:7230 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7195:7199 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R7207:7211 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R7219:7221 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+binder 7193:7194 <> Γ:896
+binder 7193:7194 <> Γ:897
+R7200:7200 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R7204:7204 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+binder 7201:7203 <> σ1:898
+binder 7201:7203 <> σ1:899
+binder 7205:7206 <> M1:900
+binder 7205:7206 <> M1:901
+R7212:7212 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R7216:7216 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+binder 7213:7215 <> σ2:902
+binder 7213:7215 <> σ2:903
+binder 7217:7218 <> M2:904
+binder 7217:7218 <> M2:905
+R7222:7222 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R7226:7226 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+binder 7223:7225 <> σ1:906
+binder 7223:7225 <> σ1:907
+binder 7227:7227 <> A:908
+binder 7227:7227 <> A:909
+R7306:7329 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R7288:7290 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7303:7305 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7293:7297 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R7299:7301 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 7291:7292 <> Γ:917
+binder 7291:7292 <> Γ:918
+binder 7298:7298 <> M:919
+binder 7298:7298 <> M:920
+binder 7302:7302 <> A:921
+binder 7302:7302 <> A:922
+R7330:7332 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7351:7353 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7335:7339 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R7341:7345 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R7347:7349 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+binder 7333:7334 <> Γ:923
+binder 7333:7334 <> Γ:924
+binder 7340:7340 <> M:925
+binder 7340:7340 <> M:926
+binder 7346:7346 <> M:927
+binder 7346:7346 <> M:928
+binder 7350:7350 <> A:929
+binder 7350:7350 <> A:930
+R7401:7423 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R7375:7377 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7398:7400 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7380:7384 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R7387:7391 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R7394:7396 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+binder 7378:7379 <> Γ:934
+binder 7378:7379 <> Γ:935
+binder 7385:7386 <> M1:936
+binder 7385:7386 <> M1:937
+binder 7392:7393 <> M2:938
+binder 7392:7393 <> M2:939
+binder 7397:7397 <> A:940
+binder 7397:7397 <> A:941
+R7424:7426 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7447:7449 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7429:7433 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R7436:7440 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R7443:7445 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+binder 7427:7428 <> Γ:942
+binder 7427:7428 <> Γ:943
+binder 7434:7435 <> M2:944
+binder 7434:7435 <> M2:945
+binder 7441:7442 <> M1:946
+binder 7441:7442 <> M1:947
+binder 7446:7446 <> A:948
+binder 7446:7446 <> A:949
+R7499:7502 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R7473:7475 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7496:7498 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7478:7482 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R7485:7489 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R7492:7494 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+binder 7476:7477 <> Γ:954
+binder 7476:7477 <> Γ:955
+binder 7483:7484 <> M1:956
+binder 7483:7484 <> M1:957
+binder 7490:7491 <> M2:958
+binder 7490:7491 <> M2:959
+binder 7495:7495 <> A:960
+binder 7495:7495 <> A:961
+R7529:7553 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R7503:7505 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7526:7528 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7508:7512 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R7515:7519 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R7522:7524 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+binder 7506:7507 <> Γ:962
+binder 7506:7507 <> Γ:963
+binder 7513:7514 <> M2:964
+binder 7513:7514 <> M2:965
+binder 7520:7521 <> M3:966
+binder 7520:7521 <> M3:967
+binder 7525:7525 <> A:968
+binder 7525:7525 <> A:969
+R7554:7556 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7577:7579 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7559:7563 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R7566:7570 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R7573:7575 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+binder 7557:7558 <> Γ:970
+binder 7557:7558 <> Γ:971
+binder 7564:7565 <> M1:972
+binder 7564:7565 <> M1:973
+binder 7571:7572 <> M3:974
+binder 7571:7572 <> M3:975
+binder 7576:7576 <> A:976
+binder 7576:7576 <> A:977
+R7652:7655 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R7626:7628 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7649:7651 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7631:7635 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R7638:7642 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R7645:7647 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+binder 7629:7630 <> Γ:983
+binder 7629:7630 <> Γ:984
+binder 7636:7637 <> M1:985
+binder 7636:7637 <> M1:986
+binder 7643:7644 <> M2:987
+binder 7643:7644 <> M2:988
+binder 7648:7648 <> A:989
+binder 7648:7648 <> A:990
+R7676:7699 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R7656:7658 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7673:7675 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7661:7665 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x not
+R7667:7671 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x not
+binder 7659:7660 <> Γ:991
+binder 7659:7660 <> Γ:992
+binder 7666:7666 <> A:993
+binder 7666:7666 <> A:994
+binder 7672:7672 <> B:995
+binder 7672:7672 <> B:996
+R7700:7702 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7723:7725 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7705:7709 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R7712:7716 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R7719:7721 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+binder 7703:7704 <> Γ:997
+binder 7703:7704 <> Γ:998
+binder 7710:7711 <> M1:999
+binder 7710:7711 <> M1:1000
+binder 7717:7718 <> M2:1001
+binder 7717:7718 <> M2:1002
+binder 7722:7722 <> B:1003
+binder 7722:7722 <> B:1004
+R7922:7943 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R7910:7912 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7919:7921 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7913:7916 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'⊢'_x not
+binder 7917:7918 <> Γ:1010
+binder 7917:7918 <> Γ:1011
+R7944:7946 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7971:7973 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R7949:7953 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x not
+R7960:7964 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x not
+binder 7947:7948 <> Γ:1012
+binder 7947:7948 <> Γ:1013
+R7954:7958 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Sort'_'@'_x not
+R7965:7969 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Sort'_'@'_x not
+R8024:8046 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R7995:7997 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R8021:8023 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R8000:8004 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R8006:8010 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R8012:8014 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+binder 7998:7999 <> Γ:1016
+binder 7998:7999 <> Γ:1017
+binder 8005:8005 <> A:1018
+binder 8005:8005 <> A:1019
+binder 8011:8011 <> B:1020
+binder 8011:8011 <> B:1021
+R8015:8019 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Sort'_'@'_x not
+R8047:8049 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R8064:8066 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R8052:8056 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x not
+R8058:8062 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x not
+binder 8050:8051 <> Γ:1022
+binder 8050:8051 <> Γ:1023
+binder 8057:8057 <> A:1024
+binder 8057:8057 <> A:1025
+binder 8063:8063 <> B:1026
+binder 8063:8063 <> B:1027
+R8312:8314 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R8339:8341 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R8318:8323 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R8326:8330 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R8333:8335 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R8315:8317 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'⋅' not
+R8324:8325 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Id' not
+R8331:8332 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'..' not
+R8336:8338 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'⋅' not
+R8386:8414 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R8369:8371 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R8383:8385 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R8372:8375 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'⊢'_x not
+R8378:8379 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+R8381:8381 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+binder 8376:8377 <> Γ:1032
+binder 8376:8377 <> Γ:1033
+binder 8380:8380 <> A:1034
+binder 8380:8380 <> A:1035
+binder 8382:8382 <> s:1036
+binder 8382:8382 <> s:1037
+R8415:8417 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R8463:8465 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R8425:8430 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R8433:8437 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R8453:8455 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R8420:8421 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+R8423:8423 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+binder 8418:8419 <> Γ:1038
+binder 8418:8419 <> Γ:1039
+binder 8422:8422 <> A:1040
+binder 8422:8422 <> A:1041
+binder 8424:8424 <> s:1042
+binder 8424:8424 <> s:1043
+R8431:8432 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Id' not
+R8449:8450 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_',,'_x not
+R8438:8438 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R8448:8448 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R8441:8445 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_'∘'_x not
+R8439:8440 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Wk' not
+R8446:8447 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Id' not
+R8451:8451 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'#'_x not
+R8458:8459 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+R8461:8461 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+binder 8456:8457 <> Γ:1044
+binder 8456:8457 <> Γ:1045
+binder 8460:8460 <> A:1046
+binder 8460:8460 <> A:1047
+binder 8462:8462 <> s:1048
+binder 8462:8462 <> s:1049
+R8513:8535 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R8487:8489 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R8510:8512 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R8492:8497 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+R8500:8502 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+binder 8490:8491 <> Γ:1053
+binder 8490:8491 <> Γ:1054
+binder 8498:8499 <> σ:1055
+binder 8498:8499 <> σ:1056
+R8505:8506 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+R8508:8508 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+binder 8503:8504 <> Δ:1057
+binder 8503:8504 <> Δ:1058
+binder 8507:8507 <> A:1059
+binder 8507:8507 <> A:1060
+binder 8509:8509 <> s:1061
+binder 8509:8509 <> s:1062
+R8536:8538 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R8583:8585 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R8541:8546 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R8549:8553 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R8573:8575 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+binder 8539:8540 <> Γ:1063
+binder 8539:8540 <> Γ:1064
+binder 8547:8548 <> σ:1065
+binder 8547:8548 <> σ:1066
+R8565:8566 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_',,'_x not
+R8554:8554 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R8564:8564 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R8557:8561 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_'∘'_x not
+binder 8555:8556 <> σ:1067
+binder 8555:8556 <> σ:1068
+R8562:8563 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Wk' not
+R8567:8567 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R8570:8570 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+binder 8568:8569 <> σ:1069
+binder 8568:8569 <> σ:1070
+R8571:8571 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'#'_x not
+R8578:8579 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+R8581:8581 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+binder 8576:8577 <> Δ:1071
+binder 8576:8577 <> Δ:1072
+binder 8580:8580 <> A:1073
+binder 8580:8580 <> A:1074
+binder 8582:8582 <> s:1075
+binder 8582:8582 <> s:1076
+R8670:8701 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R8649:8651 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R8667:8669 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R8654:8659 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+R8662:8664 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+binder 8652:8653 <> Γ:1082
+binder 8652:8653 <> Γ:1083
+binder 8660:8661 <> σ:1084
+binder 8660:8661 <> σ:1085
+binder 8665:8666 <> Δ:1086
+binder 8665:8666 <> Δ:1087
+R8702:8704 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R8734:8736 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R8707:8712 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R8722:8726 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R8729:8731 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+binder 8705:8706 <> Γ:1088
+binder 8705:8706 <> Γ:1089
+R8715:8719 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_'∘'_x not
+R8713:8714 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Id' not
+binder 8720:8721 <> σ:1090
+binder 8720:8721 <> σ:1091
+binder 8727:8728 <> σ:1092
+binder 8727:8728 <> σ:1093
+binder 8732:8733 <> Δ:1094
+binder 8732:8733 <> Δ:1095
+R8789:8821 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R8768:8770 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R8786:8788 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R8773:8778 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+R8781:8783 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+binder 8771:8772 <> Γ:1099
+binder 8771:8772 <> Γ:1100
+binder 8779:8780 <> σ:1101
+binder 8779:8780 <> σ:1102
+binder 8784:8785 <> Δ:1103
+binder 8784:8785 <> Δ:1104
+R8822:8824 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R8854:8856 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R8827:8832 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R8842:8846 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R8849:8851 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+binder 8825:8826 <> Γ:1105
+binder 8825:8826 <> Γ:1106
+R8835:8839 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_'∘'_x not
+binder 8833:8834 <> σ:1107
+binder 8833:8834 <> σ:1108
+R8840:8841 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Id' not
+binder 8847:8848 <> σ:1109
+binder 8847:8848 <> σ:1110
+binder 8852:8853 <> Δ:1111
+binder 8852:8853 <> Δ:1112
+R8909:8912 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R8885:8887 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R8906:8908 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R8891:8896 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+R8900:8902 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+binder 8888:8890 <> Γ1:1116
+binder 8888:8890 <> Γ1:1117
+binder 8897:8899 <> σ1:1118
+binder 8897:8899 <> σ1:1119
+binder 8903:8905 <> Γ2:1120
+binder 8903:8905 <> Γ2:1121
+R8937:8940 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R8913:8915 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R8934:8936 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R8919:8924 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+R8928:8930 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+binder 8916:8918 <> Γ2:1122
+binder 8916:8918 <> Γ2:1123
+binder 8925:8927 <> σ2:1124
+binder 8925:8927 <> σ2:1125
+binder 8931:8933 <> Γ3:1126
+binder 8931:8933 <> Γ3:1127
+R8965:8994 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R8941:8943 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R8962:8964 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R8947:8952 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+R8956:8958 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+binder 8944:8946 <> Γ3:1128
+binder 8944:8946 <> Γ3:1129
+binder 8953:8955 <> σ3:1130
+binder 8953:8955 <> σ3:1131
+binder 8959:8961 <> Γ4:1132
+binder 8959:8961 <> Γ4:1133
+R8995:8997 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9060:9062 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9001:9006 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R9028:9032 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R9054:9056 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+binder 8998:9000 <> Γ1:1134
+binder 8998:9000 <> Γ1:1135
+R9020:9024 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_'∘'_x not
+R9007:9007 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R9019:9019 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R9011:9015 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_'∘'_x not
+binder 9008:9010 <> σ1:1136
+binder 9008:9010 <> σ1:1137
+binder 9016:9018 <> σ2:1138
+binder 9016:9018 <> σ2:1139
+binder 9025:9027 <> σ3:1140
+binder 9025:9027 <> σ3:1141
+R9036:9040 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_'∘'_x not
+binder 9033:9035 <> σ1:1142
+binder 9033:9035 <> σ1:1143
+R9041:9041 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R9053:9053 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R9045:9049 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_'∘'_x not
+binder 9042:9044 <> σ2:1144
+binder 9042:9044 <> σ2:1145
+binder 9050:9052 <> σ3:1146
+binder 9050:9052 <> σ3:1147
+binder 9057:9059 <> Γ4:1148
+binder 9057:9059 <> Γ4:1149
+R9115:9118 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9094:9096 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9112:9114 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9099:9104 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+R9107:9109 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+binder 9097:9098 <> Γ:1157
+binder 9097:9098 <> Γ:1158
+binder 9105:9106 <> σ:1159
+binder 9105:9106 <> σ:1160
+binder 9110:9111 <> Δ:1161
+binder 9110:9111 <> Δ:1162
+R9133:9136 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9119:9121 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9130:9132 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9124:9128 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x not
+binder 9122:9123 <> Δ:1163
+binder 9122:9123 <> Δ:1164
+binder 9129:9129 <> A:1165
+binder 9129:9129 <> A:1166
+R9159:9191 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9137:9139 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9156:9158 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9142:9146 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R9148:9150 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 9140:9141 <> Γ:1167
+binder 9140:9141 <> Γ:1168
+binder 9147:9147 <> M:1169
+binder 9147:9147 <> M:1170
+R9151:9151 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R9154:9154 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+binder 9152:9153 <> σ:1171
+binder 9152:9153 <> σ:1172
+binder 9155:9155 <> A:1173
+binder 9155:9155 <> A:1174
+R9192:9194 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9229:9231 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9197:9202 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R9217:9221 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R9224:9226 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+binder 9195:9196 <> Γ:1175
+binder 9195:9196 <> Γ:1176
+R9210:9214 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_'∘'_x not
+R9203:9203 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R9209:9209 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R9206:9207 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_',,'_x not
+binder 9204:9205 <> σ:1177
+binder 9204:9205 <> σ:1178
+binder 9208:9208 <> M:1179
+binder 9208:9208 <> M:1180
+R9215:9216 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Wk' not
+binder 9222:9223 <> σ:1181
+binder 9222:9223 <> σ:1182
+binder 9227:9228 <> Δ:1183
+binder 9227:9228 <> Δ:1184
+R9288:9291 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9264:9266 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9285:9287 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9270:9275 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+R9279:9281 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+binder 9267:9269 <> Γ1:1190
+binder 9267:9269 <> Γ1:1191
+binder 9276:9278 <> σ1:1192
+binder 9276:9278 <> σ1:1193
+binder 9282:9284 <> Γ2:1194
+binder 9282:9284 <> Γ2:1195
+R9316:9319 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9292:9294 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9313:9315 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9298:9303 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+R9307:9309 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+binder 9295:9297 <> Γ2:1196
+binder 9295:9297 <> Γ2:1197
+binder 9304:9306 <> σ2:1198
+binder 9304:9306 <> σ2:1199
+binder 9310:9312 <> Γ3:1200
+binder 9310:9312 <> Γ3:1201
+R9344:9347 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9320:9322 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9341:9343 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9326:9330 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R9332:9334 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 9323:9325 <> Γ3:1202
+binder 9323:9325 <> Γ3:1203
+binder 9331:9331 <> A:1204
+binder 9331:9331 <> A:1205
+R9335:9339 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Sort'_'@'_x not
+R9372:9405 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9348:9350 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9369:9371 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9354:9358 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R9360:9362 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 9351:9353 <> Γ2:1206
+binder 9351:9353 <> Γ2:1207
+binder 9359:9359 <> M:1208
+binder 9359:9359 <> M:1209
+R9363:9363 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R9367:9367 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+binder 9364:9366 <> σ2:1210
+binder 9364:9366 <> σ2:1211
+binder 9368:9368 <> A:1212
+binder 9368:9368 <> A:1213
+R9406:9408 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9471:9473 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9412:9417 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R9434:9438 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R9460:9462 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+binder 9409:9411 <> Γ1:1214
+binder 9409:9411 <> Γ1:1215
+R9421:9425 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_'∘'_x not
+binder 9418:9420 <> σ1:1216
+binder 9418:9420 <> σ1:1217
+R9426:9426 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R9433:9433 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R9430:9431 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_',,'_x not
+binder 9427:9429 <> σ2:1218
+binder 9427:9429 <> σ2:1219
+binder 9432:9432 <> M:1220
+binder 9432:9432 <> M:1221
+R9452:9453 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_',,'_x not
+R9439:9439 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R9451:9451 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'('_x_')' not
+R9443:9447 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_'∘'_x not
+binder 9440:9442 <> σ1:1222
+binder 9440:9442 <> σ1:1223
+binder 9448:9450 <> σ2:1224
+binder 9448:9450 <> σ2:1225
+R9454:9454 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R9458:9458 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+binder 9455:9457 <> σ1:1226
+binder 9455:9457 <> σ1:1227
+binder 9459:9459 <> M:1228
+binder 9459:9459 <> M:1229
+R9466:9467 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+R9469:9469 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+binder 9463:9465 <> Γ3:1230
+binder 9463:9465 <> Γ3:1231
+binder 9468:9468 <> A:1232
+binder 9468:9468 <> A:1233
+binder 9470:9470 <> s:1234
+binder 9470:9470 <> s:1235
+R9555:9558 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9525:9527 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9552:9554 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9530:9535 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R9539:9543 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R9547:9549 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+binder 9528:9529 <> Γ:1244
+binder 9528:9529 <> Γ:1245
+binder 9536:9538 <> σ1:1246
+binder 9536:9538 <> σ1:1247
+binder 9544:9546 <> σ2:1248
+binder 9544:9546 <> σ2:1249
+binder 9550:9551 <> Δ:1250
+binder 9550:9551 <> Δ:1251
+R9582:9585 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9559:9561 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9579:9581 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9564:9568 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+R9570:9572 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_':'_x not
+binder 9562:9563 <> Δ:1252
+binder 9562:9563 <> Δ:1253
+binder 9569:9569 <> A:1254
+binder 9569:9569 <> A:1255
+R9573:9577 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'Sort'_'@'_x not
+R9616:9643 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9586:9588 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9613:9615 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9591:9595 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R9598:9602 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+R9605:9607 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x not
+binder 9589:9590 <> Γ:1256
+binder 9589:9590 <> Γ:1257
+binder 9596:9597 <> M1:1258
+binder 9596:9597 <> M1:1259
+binder 9603:9604 <> M2:1260
+binder 9603:9604 <> M2:1261
+R9608:9608 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+R9611:9611 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:'['_x_']'_x not
+binder 9609:9610 <> σ:1262
+binder 9609:9610 <> σ:1263
+binder 9612:9612 <> A:1264
+binder 9612:9612 <> A:1265
+R9644:9646 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9684:9686 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9649:9654 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R9662:9666 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R9674:9676 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+binder 9647:9648 <> Γ:1266
+binder 9647:9648 <> Γ:1267
+R9658:9659 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_',,'_x not
+binder 9655:9657 <> σ1:1268
+binder 9655:9657 <> σ1:1269
+binder 9660:9661 <> M1:1270
+binder 9660:9661 <> M1:1271
+R9670:9671 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_',,'_x not
+binder 9667:9669 <> σ2:1272
+binder 9667:9669 <> σ2:1273
+binder 9672:9673 <> M2:1274
+binder 9672:9673 <> M2:1275
+R9679:9680 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+R9682:9682 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_','_x_':'_x not
+binder 9677:9678 <> Δ:1276
+binder 9677:9678 <> Δ:1277
+binder 9681:9681 <> A:1278
+binder 9681:9681 <> A:1279
+binder 9683:9683 <> s:1280
+binder 9683:9683 <> s:1281
+R9746:9749 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9714:9716 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9743:9745 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9720:9725 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R9729:9733 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R9737:9739 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+binder 9717:9719 <> Γ1:1291
+binder 9717:9719 <> Γ1:1292
+binder 9726:9728 <> σ1:1293
+binder 9726:9728 <> σ1:1294
+binder 9734:9736 <> σ2:1295
+binder 9734:9736 <> σ2:1296
+binder 9740:9742 <> Γ2:1297
+binder 9740:9742 <> Γ2:1298
+R9782:9810 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9750:9752 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9779:9781 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9756:9761 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R9765:9769 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R9773:9775 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+binder 9753:9755 <> Γ2:1299
+binder 9753:9755 <> Γ2:1300
+binder 9762:9764 <> τ1:1301
+binder 9762:9764 <> τ1:1302
+binder 9770:9772 <> τ2:1303
+binder 9770:9772 <> τ2:1304
+binder 9776:9778 <> Γ3:1305
+binder 9776:9778 <> Γ3:1306
+R9811:9813 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9856:9858 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9817:9822 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R9834:9838 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R9850:9852 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+binder 9814:9816 <> Γ1:1307
+binder 9814:9816 <> Γ1:1308
+R9826:9830 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_'∘'_x not
+binder 9823:9825 <> σ1:1309
+binder 9823:9825 <> σ1:1310
+binder 9831:9833 <> τ1:1311
+binder 9831:9833 <> τ1:1312
+R9842:9846 McPTS.Core.Syntactic.Syntax SyntaxFunctor :Exp:mctt_scope:x_'∘'_x not
+binder 9839:9841 <> σ2:1313
+binder 9839:9841 <> σ2:1314
+binder 9847:9849 <> τ2:1315
+binder 9847:9849 <> τ2:1316
+binder 9853:9855 <> Γ3:1317
+binder 9853:9855 <> Γ3:1318
+R9937:9960 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R9916:9918 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9934:9936 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9921:9926 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+R9929:9931 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_':'_x not
+binder 9919:9920 <> Γ:1326
+binder 9919:9920 <> Γ:1327
+binder 9927:9928 <> σ:1328
+binder 9927:9928 <> σ:1329
+binder 9932:9933 <> Δ:1330
+binder 9932:9933 <> Δ:1331
+R9961:9963 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9986:9988 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R9966:9971 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R9974:9978 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R9981:9983 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+binder 9964:9965 <> Γ:1332
+binder 9964:9965 <> Γ:1333
+binder 9972:9973 <> σ:1334
+binder 9972:9973 <> σ:1335
+binder 9979:9980 <> σ:1336
+binder 9979:9980 <> σ:1337
+binder 9984:9985 <> Δ:1338
+binder 9984:9985 <> Δ:1339
+R10040:10062 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R10010:10012 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R10037:10039 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R10015:10020 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R10024:10028 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R10032:10034 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+binder 10013:10014 <> Γ:1343
+binder 10013:10014 <> Γ:1344
+binder 10021:10023 <> σ1:1345
+binder 10021:10023 <> σ1:1346
+binder 10029:10031 <> σ2:1347
+binder 10029:10031 <> σ2:1348
+binder 10035:10036 <> Δ:1349
+binder 10035:10036 <> Δ:1350
+R10063:10065 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R10090:10092 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R10068:10073 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R10077:10081 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R10085:10087 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+binder 10066:10067 <> Γ:1351
+binder 10066:10067 <> Γ:1352
+binder 10074:10076 <> σ2:1353
+binder 10074:10076 <> σ2:1354
+binder 10082:10084 <> σ1:1355
+binder 10082:10084 <> σ1:1356
+binder 10088:10089 <> Δ:1357
+binder 10088:10089 <> Δ:1358
+R10146:10149 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R10116:10118 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R10143:10145 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R10121:10126 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R10130:10134 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R10138:10140 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+binder 10119:10120 <> Γ:1363
+binder 10119:10120 <> Γ:1364
+binder 10127:10129 <> σ1:1365
+binder 10127:10129 <> σ1:1366
+binder 10135:10137 <> σ2:1367
+binder 10135:10137 <> σ2:1368
+binder 10141:10142 <> Δ:1369
+binder 10141:10142 <> Δ:1370
+R10180:10204 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R10150:10152 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R10177:10179 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R10155:10160 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R10164:10168 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R10172:10174 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+binder 10153:10154 <> Γ:1371
+binder 10153:10154 <> Γ:1372
+binder 10161:10163 <> σ2:1373
+binder 10161:10163 <> σ2:1374
+binder 10169:10171 <> σ3:1375
+binder 10169:10171 <> σ3:1376
+binder 10175:10176 <> Δ:1377
+binder 10175:10176 <> Δ:1378
+R10205:10207 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R10232:10234 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R10210:10215 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R10219:10223 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R10227:10229 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+binder 10208:10209 <> Γ:1379
+binder 10208:10209 <> Γ:1380
+binder 10216:10218 <> σ1:1381
+binder 10216:10218 <> σ1:1382
+binder 10224:10226 <> σ3:1383
+binder 10224:10226 <> σ3:1384
+binder 10230:10231 <> Δ:1385
+binder 10230:10231 <> Δ:1386
+R10312:10315 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R10281:10283 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R10309:10311 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R10286:10291 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R10295:10299 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R10303:10305 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+binder 10284:10285 <> Γ:1392
+binder 10284:10285 <> Γ:1393
+binder 10292:10294 <> σ1:1394
+binder 10292:10294 <> σ1:1395
+binder 10300:10302 <> σ2:1396
+binder 10300:10302 <> σ2:1397
+binder 10306:10308 <> Δ1:1398
+binder 10306:10308 <> Δ1:1399
+R10337:10360 Coq.Init.Logic <> ::type_scope:x_'->'_x not
+R10316:10318 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R10334:10336 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R10319:10322 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'⊢'_x_'≡'_x not
+R10326:10330 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:'⊢'_x_'≡'_x not
+binder 10323:10325 <> Δ1:1400
+binder 10323:10325 <> Δ1:1401
+binder 10331:10333 <> Δ2:1402
+binder 10331:10333 <> Δ2:1403
+R10361:10363 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R10389:10391 McPTS.Core.Base <> :::'{{'_x_'}}' not
+R10366:10371 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R10375:10379 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+R10383:10385 McPTS.Core.Syntactic.System.Definitions System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x not
+binder 10364:10365 <> Γ:1404
+binder 10364:10365 <> Γ:1405
+binder 10372:10374 <> σ1:1406
+binder 10372:10374 <> σ1:1407
+binder 10380:10382 <> σ2:1408
+binder 10380:10382 <> σ2:1409
+binder 10386:10388 <> Δ2:1410
+binder 10386:10388 <> Δ2:1411
+scheme 1595:1600 System wf_ctx_ind
+scheme 1595:1600 System wf_ctx_sind
+scheme 1871:1876 System wf_exp_ind
+scheme 1871:1876 System wf_exp_sind
+scheme 3010:3015 System wf_typ_ind
+scheme 3010:3015 System wf_typ_sind
+scheme 3319:3324 System wf_sub_ind
+scheme 3319:3324 System wf_sub_sind
+scheme 4027:4032 System eq_ctx_ind
+scheme 4027:4032 System eq_ctx_sind
+scheme 4353:4358 System eq_exp_ind
+scheme 4353:4358 System eq_exp_sind
+scheme 7854:7859 System eq_typ_ind
+scheme 7854:7859 System eq_typ_sind
+scheme 8205:8210 System eq_sub_ind
+scheme 8205:8210 System eq_sub_sind
+R1777:1782 McPTS.Core.Syntactic.System.Definitions System wf_ctx ind
+not 1764:1764 System :judg:type_scope:'⊢'_x
+R2918:2923 McPTS.Core.Syntactic.System.Definitions System wf_exp ind
+not 2899:2899 System :judg:type_scope:x_'⊢'_x_':'_x
+R3218:3223 McPTS.Core.Syntactic.System.Definitions System wf_typ ind
+not 3203:3203 System :judg:type_scope:x_'⊢'_x
+R3932:3937 McPTS.Core.Syntactic.System.Definitions System wf_sub ind
+not 3910:3910 System :judg:type_scope:x_'⊢s'_x_':'_x
+R4252:4257 McPTS.Core.Syntactic.System.Definitions System eq_ctx ind
+not 4232:4232 System :judg:type_scope:'⊢'_x_'≡'_x
+R7761:7766 McPTS.Core.Syntactic.System.Definitions System eq_exp ind
+not 7736:7736 System :judg:type_scope:x_'⊢'_x_'≡'_x_':'_x
+R8098:8103 McPTS.Core.Syntactic.System.Definitions System eq_typ ind
+not 8077:8077 System :judg:type_scope:x_'⊢'_x_'≡'_x
+R10431:10436 McPTS.Core.Syntactic.System.Definitions System eq_sub ind
+not 10402:10402 System :judg:type_scope:x_'⊢s'_x_'≡'_x_':'_x
+R10488:10493 McPTS.Core.Syntactic.System.Definitions System <> mod
