@@ -1,3 +1,5 @@
+.vscode/
+
 # LaTeX
 *.aux
 *.bbl
@@ -20,3 +22,7 @@ notes.txt
 *.vok
 *.vos
 *.glob
+
+.CoqMakefile.mk.d
+CoqMakefile.mk.conf
+CoqMakefile.mk
