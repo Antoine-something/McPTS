@@ -14,3 +14,9 @@
 notes.txt
 *~
 *\~
+
+.*.aux
+*.vo
+*.vok
+*.vos
+*.glob
