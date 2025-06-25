@@ -34,6 +34,11 @@ Module SyntaxFunctor (P : PtsSig).
   | a_nil : Ctx
   | a_cons : Ctx -> Exp -> St -> Ctx.
 
+  Fixpoint length (Γ : Ctx) : nat :=
+    match Γ with
+    | a_nil => 0
+    | a_cons Γ _ _ => S (length Γ)
+    end.
 
   (* Notation Ctx := (list (Typ * St)). *)
   

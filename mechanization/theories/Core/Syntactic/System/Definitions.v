@@ -1,8 +1,8 @@
 From McPTS.Core Require Import Base.
 From McPTS.Core.PTSSignature Require Import Signature.
-From McPTS.Core.Syntactic Require Export Syntax.
+From McPTS.Core.Syntactic Require Import Syntax.
 
-Module System (P : PtsSig).
+Module SystemFunctor (P : PtsSig).
   Module Syn := SyntaxFunctor P.
   Import P.
   Import Syn.
@@ -178,4 +178,4 @@ Module System (P : PtsSig).
   | eq_sub_conv : `({{ Γ ⊢s σ1 ≡ σ2 : Δ1 }} -> {{ ⊢ Δ1 ≡ Δ2 }} ->
                     {{ Γ ⊢s σ1 ≡ σ2 : Δ2 }})
   where "Γ ⊢s σ ≡ τ : Δ" := (eq_sub Γ σ τ Δ) (in custom judg) : type_scope.  
-End System.
+End SystemFunctor.
