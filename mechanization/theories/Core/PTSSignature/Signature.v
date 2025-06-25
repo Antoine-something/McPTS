@@ -1,5 +1,6 @@
-Module Type PtsSig.
-Parameter St : Type.
-Parameter Ax : St -> St -> Type.
-Parameter Ru : St -> St -> St -> Type.
-End PtsSig.
+Record PtsSig : Type :=
+  mkPtsSig{
+      St : Set;
+      Ax : St -> St -> Set;
+      Ru : St -> St -> St -> Set;
+    }.
