@@ -112,7 +112,7 @@ Notation "σ ,, e" := (a_ext σ e) (in custom Exp at level 50, left associativit
 
 (* Notation for contexts *)
 Notation "⋅" := (nil) (in custom Exp at level 0) : mcpts_scope.
-Notation "Γ , A : s" := (cons (A, s) Γ) (in custom Exp at level 50, left associativity, format "Γ ,  A : s") : mcpts_scope.
+Notation "Γ , A :: 'Sort@' s" := (cons (A, s) Γ) (in custom Exp at level 50, left associativity, format "Γ ,  A :: 'Sort@' s") : mcpts_scope.
 
 
 (* Notation for normal and neutral forms *)
