@@ -1,2 +1,11 @@
 -R theories McPTS
-theories
+
+-arg -w -arg -cast-in-pattern,-notation-overridden
+
+theories/PtsSignature.v
+theories/LibTactics.v
+
+theories/Core/Base.v
+
+theories/Core/Syntactic/Syntax.v
+theories/Core/Syntactic/System/Definitions.v
