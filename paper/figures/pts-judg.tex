@@ -33,7 +33,7 @@
       &
       \wfexp {\ctxext \Gamma A} B {\tmcst s_2}
       &
-      (\tmcst s_1, \tmcst s_2, \tmcst s_3) \in \Ru
+      r = (\tmcst s_1, \tmcst s_2, \tmcst s_3) \in \Ru
     }
     \qquad
     \infer{
@@ -48,6 +48,7 @@
       \wfexp \Gamma {\tmapp M N} {\tmclo {\subext \subid N} B}
     }{
       \wftyp \Gamma {\tppi A B}
+      &
       \wfexp \Gamma M {\tppi A B}
       &
       \wfexp \Gamma N A
@@ -72,33 +73,23 @@
     }{
       \wfctx \Gamma
       &
-      \text{there is no axiom } \tmcst s : \tmcst s' \in \Ax
+      \tmcst s \in \St
     }
     \qquad
     \infer{
       \wftyp \Gamma A
     }{
       \wfexp \Gamma A {\tmcst s}
-    }
-  \end{array}
-  \]
-  %
-  \noindent
-  $\boxed{\eqexp \Gamma M N A}$ -- $M$ and $N$ are equivalent expressions of type $A$ in context $\Gamma$.
-  \[
-  \begin{array}{c}
-    \infer{
-      \eqexp \Gamma {\tmapp {(\tmlam M)} N} {\tmclo {\subext \subid N} M} {\tmclo {\subext \subid N} B}
-    }{
-      \wfexp {\ctxext \Gamma A} M B
       &
-      \wfexp \Gamma N A
+      \tmcst s \in \St
     }
     \qquad
     \infer{
-      \eqexp \Gamma M {\tmlam {(\tmapp {\tmclo \subwk M} {x_0})}} {\tppi A B}
+      \wftyp \Gamma {\tmclo \sigma {\tmcst s}}
     }{
-      \wfexp \Gamma M {\tppi A B}
+      \wfsub \Gamma \sigma \Delta
+      &
+      \tmcst s \in \St
     }
   \end{array}
   \]
@@ -149,6 +140,55 @@
       \wfsub \Gamma \sigma \Delta
       &
       \eqctx \Delta {\Delta'}
+    }
+  \end{array}
+  \]
+  %
+  \noindent
+  $\boxed{\eqexp \Gamma M N A}$ -- $M$ and $N$ are equivalent expressions of type $A$ in context $\Gamma$.
+  \[
+  \begin{array}{c}
+    \infer{
+      \eqexp \Gamma {\tmapp {(\tmlam M)} N} {\tmclo {\subext \subid N} M} {\tmclo {\subext \subid N} B}
+    }{
+      \wfexp {\ctxext \Gamma A} M B
+      &
+      \wfexp \Gamma N A
+    }
+    \qquad
+    \infer{
+      \eqexp \Gamma M {\tmlam {(\tmapp {\tmclo \subwk M} {x_0})}} {\tppi A B}
+    }{
+      \wfexp \Gamma M {\tppi A B}
+    }
+  \end{array}
+  \]
+  %
+  $\boxed{\eqtyp \Gamma A B}$ -- $A$ and $B$ are equal types in context $\Gamma$.
+  \[
+  \begin{array}{c}
+    \infer{
+      \eqtyp \Gamma {\tmcst s} {\tmcst s}
+    }{
+      \wfctx \Gamma
+      &
+      \tmcst s \in \St
+    }
+    \qquad
+    \infer{
+      \eqtyp \Gamma A B
+    }{
+      \eqexp \Gamma A B {\tmcst s}
+      &
+      \tmcst s \in \St
+    }
+    \qquad
+    \infer{
+      \eqtyp \Gamma {\tmclo \sigma {\tmcst s}} {\tmcst s}
+    }{
+      \wfsub \Gamma \sigma \Delta
+      &
+      \tmcst s \in \St
     }
   \end{array}
   \]

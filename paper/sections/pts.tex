@@ -32,7 +32,7 @@ Objects in a \ac{PTS} consists of the following syntactic categories:
 \]
 Although terms and types are unified into a single category of expressions, we distinguish them by writing $M,N$ for terms and $A,B,C$ for types.
 The base cases of expressions are variables $x_i$, represented with de Bruijn indices, and sorts $\tmcst s \in \St$.
-Function spaces $\tppi A B$ is the only type constructor, and can represent simple, dependent, or polymorphic functions.
+Function spaces $\tppi A B$ is the only type constructor, and can represent simple, dependent, or polymorphic functions, depending on the rule $r \in \Ru$ used in its construction.
 The associated introduction form is the usual $\tmlam M$, which introduces a new variable allowed to occur in the body $M$ by shifting all de Bruijn indices up by one.
 Likewise, the elimination form is the usual function application $\tmapp M N$ of a function $M$ to an argument $N$.
 Last, $\tmclo \sigma M$ denotes the application of a substitution $\sigma$ to a term $M$.
@@ -50,6 +50,7 @@ Finally, substitutions can be compose with the form $\subclo \sigma \tau$, where
 
 
 
+
 \subsection{Judgments}
 
 \input{figures/pts-judg.tex}
@@ -58,6 +59,7 @@ Next, we discuss the judgments of \ac{PTS}.
 Selected rules are shown in \Cref{fig:pts-judg}, a complete definition is given in \Cref{app:pts-syntax}.
 
 Each syntactic category has two associated judgments: well-formedness (or typing) and equality judgments.
+We use typed equivalence, similar to \citet{A06}.
 We write $\wfexp \Gamma M A$ to mean that $M$ is a well-formed term of type $A$ in context $\Gamma$,
   and $\eqexp \Gamma M {M'} A$ to mean that $M$ and $M'$ are equal terms of type $A$ in context $\Gamma$.
 For substitution, the judgment $\wfsub \Gamma \sigma \Delta$ states that $\sigma$ is a well-formed substitution with domain $\Delta$ and co-domain $\Gamma$.
@@ -67,7 +69,10 @@ In addition the the well-formedness and equality judgments for the three syntact
 The judgment $\wftyp \Gamma A$ states that $A$ is a well-formed type, which means that it either has a sort, or is itself a sort, and similarly for the type equality $\eqtyp \Gamma A B$.
 We need those judgments because there can be sorts that do not themselves have a sort.
 For example, in the systems of the $\lambda$-cube, the sort $\square$ is a well-formed sort that does not itself have a sort.
-Moreover, we use a context lookup judgment, denoted $\ctxlookup \Gamma {x_i} A$.
+With these judgments, we take a step away from the judgmental equality proposed by \citet{A06}, where no separate notion of type equality is considered.
+This is necessary because we use explicit substitutions, so we need a way to validate that $\tmclo \sigma {\tmcst s} \equiv \tmcst s$ even when $\tmcst s$ does not have a sort.
+
+Last, we use a context lookup judgment, denoted $\ctxlookup \Gamma {x_i} A$.
 
 The characteristic rules of \acp{PTS} are those parameterized by the specification:
 \[
@@ -94,12 +99,11 @@ The characteristic rules of \acp{PTS} are those parameterized by the specificati
   &
   \wfexp {\ctxext \Gamma A} B {\tmcst s_2}
   &
-  (\tmcst s_1, \tmcst s_2, \tmcst s_3) \in \Ru
+  r = (\tmcst s_1, \tmcst s_2, \tmcst s_3) \in \Ru
 }
 \]
 In the \ac{PTS} setting, ``types'' consists of sorts and any expression that has a sort.
 The above rules specify precisely those expressions that can have a sort and ensure that contexts really do consist exclusively of well-sorted types.
-
 
 Typing rules for functions and function application are typical of systems based on natural deductions.
 We take extra care to ensure that types are well-formed via the additional premise that the function space is a well-formed type.
@@ -108,6 +112,11 @@ These premises are needed to ensure that the presupposition lemma (see \Cref{lem
 The notion of equality for expressions stems from $\beta$-reductions and $\eta$-expansions.
 Because we use explicit substitutions, the equality judgment must also specify how substitutions are propagated into expressions.
 In addition, equality includes the usual congruence rules, as well as rules stating reflexivity, symmetry, and transitivity, i.e. that equality is an equivalence relation.
+
+For equality of types, the main challenge is propagating substitutions in sorts.
+Since sorts contain no variables, we really only need to forget about said substitutions.
+
+
 
 
 

@@ -34,12 +34,12 @@
 \newcommand{\Nf}{\mathsf{Nf}}
 
 %% For types
-\newcommand{\tppi}[2]{\Pi #1.#2}
+\DeclareDocumentCommand{\tppi}{O{r} m m}{\Pi_{#1} #2.#3}
 
 %% For terms
 \newcommand{\tmcst}[1]{\textbf{#1}}
 \newcommand{\tmclo}[2]{[#1]#2}
-\newcommand{\tmlam}[1]{\lambda #1}
+\DeclareDocumentCommand{\tmlam}{O{r} m}{\lambda_{#1} #2}
 \newcommand{\tmapp}[2]{#1~#2}
 
 %% For contexts
