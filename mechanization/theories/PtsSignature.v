@@ -1,5 +1,11 @@
 From Coq Require Import Relation_Definitions RelationClasses.
-From McPTS.Core.PTSSignature Require Import Signature.
+
+Record PtsSig : Type :=
+  mkPtsSig{
+      St : Set;
+      Ax : St -> St -> Set;
+      Ru : St -> St -> St -> Set;
+    }.
 
 
 Record PredicativeSig (S : PtsSig) : Prop :=

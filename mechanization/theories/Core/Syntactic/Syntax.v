@@ -1,24 +1,25 @@
 From Coq Require Import List.
+
+From McPTS Require Import PtsSignature.
 From McPTS.Core Require Import Base.
-From McPTS.Core.PTSSignature Require Import Signature.
 
 
 (* Expressions M,N,A,B *)
-Inductive Exp (S : PtsSig) : Type :=
-| a_st : St S -> Exp S                                                  (* s *)
-| a_var : nat -> Exp S                                                   (* x_i *)
-| a_pi : forall (s1 s2 s3 : St S), Ru S s1 s2 s3 -> Exp S -> Exp S -> Exp S   (* Π_r A.B *)
-| a_lam : Exp S -> Exp S                                                (* λM *)
-| a_app : Exp S -> Exp S -> Exp S                                       (* M N *)
-| a_clo : Sub S -> Exp S -> Exp S                                       (* [σ]M *)
+Inductive Exp (P : PtsSig) : Type :=
+| a_st : St P -> Exp P                                                  (* s *)
+| a_var : nat -> Exp P                                                   (* x_i *)
+| a_pi : forall (s1 s2 s3 : St P), Ru P s1 s2 s3 -> Exp P -> Exp P -> Exp P   (* Π_r A.B *)
+| a_lam : forall (s1 s2 s3 : St P), Ru P s1 s2 s3 -> Exp P -> Exp P           (* λM *)
+| a_app : Exp P -> Exp P -> Exp P                                       (* M N *)
+| a_clo : Sub P -> Exp P -> Exp P                                       (* [σ]M *)
 
 (* Substitutions σ,τ*)
-with Sub (S : PtsSig) : Type :=
-| a_id : Sub S                                                        (* id *)
-| a_wk : Sub S                                                        (* wk *)
-| a_empty : Sub S                                                     (* .. *)
-| a_ext : Sub S -> Exp S -> Sub S                                     (* σ, M *)
-| a_comp : Sub S -> Sub S -> Sub S                                    (* σ ∘ τ *) 
+with Sub (P : PtsSig) : Type :=
+| a_id : Sub P                                                        (* id *)
+| a_wk : Sub P                                                        (* wk *)
+| a_empty : Sub P                                                     (* .. *)
+| a_ext : Sub P -> Exp P -> Sub P                                     (* σ, M *)
+| a_comp : Sub P -> Sub P -> Sub P                                    (* σ ∘ τ *) 
 .
 
 (* The signature needs to be passed as an extra argument to each constructor, but is inferrable *)
@@ -36,21 +37,22 @@ Arguments a_ext {_}.
 Arguments a_comp {_}.
 
 
-Definition Typ (S : PtsSig) := Exp S.
-Definition Ctx (S : PtsSig) := list (Exp S * St S)%type.
+Definition Typ (P : PtsSig) := Exp P.
+Definition Knd (P : PtsSig) := Exp P.
+Definition Ctx (P : PtsSig) := list (Typ P * Knd P)%type.
 
 
 (* Neutral forms E *)
-Inductive Ne (S : PtsSig) : Type :=
-| ne_var : nat -> Ne S                                                      (* x_i *) 
-| ne_app : Ne S -> Nf S -> Ne S                                            (* E V *)
+Inductive Ne (P : PtsSig) : Type :=
+| ne_var : nat -> Ne P                                                      (* x_i *) 
+| ne_app : Ne P -> Nf P -> Ne P                                            (* E V *)
                        
 (* Normal forms V *)
-with Nf (S : PtsSig) : Type :=
-| nf_ne : Ne S -> Nf S                                                     (* E *)
-| nf_st : St S -> Nf S                                                     (* s *)
-| nf_pi : forall (s1 s2 s3 : St S), Ru S s1 s2 s3 -> Nf S -> Nf S -> Nf S       (* Π_r V1.V2 *)
-| nf_lam : Nf S -> Nf S                                                  (* λV *)
+with Nf (P : PtsSig) : Type :=
+| nf_ne : Ne P -> Nf P                                                     (* E *)
+| nf_st : St P -> Nf P                                                     (* s *)
+| nf_pi : forall (s1 s2 s3 : St P), Ru P s1 s2 s3 -> Nf P -> Nf P -> Nf P       (* Π_r V1.V2 *)
+| nf_lam : forall (s1 s2 s3 : St P), Ru P s1 s2 s3 -> Nf P -> Nf P              (* λV *)
 .
 
 Arguments ne_var {_}.
@@ -63,17 +65,17 @@ Arguments nf_lam {_}.
 
 
 (* Coercion of neutral and normal forms into expressions.  Basically identity functions *)
-Fixpoint Ne_to_Exp (S : PtsSig) (E : Ne S) : Exp S :=
+Fixpoint Ne_to_Exp (P : PtsSig) (E : Ne P) : Exp P :=
   match E with
   | ne_var i => a_var i
-  | ne_app E' V => a_app (Ne_to_Exp S E') (Nf_to_Exp S V)
+  | ne_app E' V => a_app (Ne_to_Exp P E') (Nf_to_Exp P V)
   end
-with Nf_to_Exp (S : PtsSig) (V : Nf S) : Exp S :=
+with Nf_to_Exp (P : PtsSig) (V : Nf P) : Exp P :=
        match V with
-       | nf_ne E => Ne_to_Exp S E
+       | nf_ne E => Ne_to_Exp P E
        | nf_st s => a_st s
-       | nf_pi s1 s2 s3 r V1 V2 => a_pi s1 s2 s3 r (Nf_to_Exp S V1) (Nf_to_Exp S V2)
-       | nf_lam V => a_lam (Nf_to_Exp S V)
+       | nf_pi s1 s2 s3 r V1 V2 => a_pi s1 s2 s3 r (Nf_to_Exp P V1) (Nf_to_Exp P V2)
+       | nf_lam s1 s2 s3 r V => a_lam s1 s2 s3 r (Nf_to_Exp P V)
        end.
 
 Coercion Nf_to_Exp : Nf >-> Exp.
@@ -100,7 +102,7 @@ Notation "x" := x (in custom Exp at level 0, x ident) : mcpts_scope.
 Notation "'Sort' @ s" := (a_st s) (in custom Exp at level 0, s constr at level 0, format "'Sort' @ s") : mcpts_scope.
 Notation "'#' i" := (a_var i) (in custom Exp at level 0, i constr at level 0, format "'#' i") : mcpts_scope.  
 Notation "'Π' r A B" := (a_pi _ _ _ r A B) (in custom Exp at level 1, r constr at level 0, A custom Exp at level 0, B custom Exp at level 60) : mcpts_scope.
-Notation "'λ' M" := (a_lam M) (in custom Exp at level 1, M custom Exp at level 60) : mcpts_scope.
+Notation "'λ' r M" := (a_lam _ _ _ r M) (in custom Exp at level 1, r constr at level 0, M custom Exp at level 60) : mcpts_scope.
 Notation "f x .. y" := (a_app .. (a_app f x) .. y) (in custom Exp at level 40, f custom Exp, x custom Exp at next level, y custom Exp at next level) : mcpts_scope.
 
 (* Notation for substitutions *)
@@ -112,7 +114,7 @@ Notation "σ ,, e" := (a_ext σ e) (in custom Exp at level 50, left associativit
 
 (* Notation for contexts *)
 Notation "⋅" := (nil) (in custom Exp at level 0) : mcpts_scope.
-Notation "Γ , A :: 'Sort@' s" := (cons (A, s) Γ) (in custom Exp at level 50, left associativity, format "Γ ,  A :: 'Sort@' s") : mcpts_scope.
+Notation "Γ , A :: K" := (cons (A, K) Γ) (in custom Exp at level 50, left associativity, format "Γ ,  A :: K") : mcpts_scope.
 
 
 (* Notation for normal and neutral forms *)
@@ -122,8 +124,8 @@ Notation "'^' x" := x (in custom Nf at level 0, x constr at level 0) : mcpts_sco
 Notation "x" := x (in custom Nf at level 0, x ident) : mcpts_scope.
 
 Notation "'Sort' @ s" := (nf_st s) (in custom Nf at level 0, s constr at level 0, format "'Sort' @ s") : mcpts_scope.
-Notation "'Π' r V1 V2" := (nf_pi _ _ _ r V1 V2) (in custom Nf at level 2, V1 custom Nf at level 1, V2 custom Nf at level 60) : mcpts_scope.
-Notation "'λ' V" := (nf_lam V) (in custom Nf at level 2, V custom Nf at level 60) : mcpts_scope.
+Notation "'Π' r V1 V2" := (nf_pi _ _ _ r V1 V2) (in custom Nf at level 2, r constr at level 0, V1 custom Nf at level 1, V2 custom Nf at level 60) : mcpts_scope.
+Notation "'λ' r V" := (nf_lam _ _ _ r V) (in custom Nf at level 2, r constr at level 0, V custom Nf at level 60) : mcpts_scope.
 Notation "f x .. y" := (ne_app .. (ne_app f x) .. y) (in custom Nf at level 40, f custom Nf, x custom Nf at next level, y custom Nf at next level) : mcpts_scope.
 Notation "'#' i" := (ne_var i) (in custom Nf at level 0, i constr at level 0, format "'#' i") : mcpts_scope.
 Notation "'⇑' E" := (nf_ne E) (in custom Nf at level 0, E custom Nf at level 99, format "'⇑'  E") : mcpts_scope.
