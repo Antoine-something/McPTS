@@ -183,16 +183,11 @@ Qed.
 #[export]
 Hint Resolve wf_sub_eq_conv : mcpts.
 
-
-(*  I don't understand how to port this to the PTS setting
-
-Add Parametric Morphism {P : PtsSig} (Γ : Ctx P) : (eq_sub Γ)
+Add Parametric Morphism {P : PtsSig} (Γ : Ctx P) : (fun Δ σ τ => eq_sub Γ σ τ Δ)
     with signature eq_ctx ==> eq ==> eq ==> iff as wf_sub_eq_morphism_iff3.
 Proof.
-  intros Δ Δ' H **; split; [| symmetry in H]; mauto.
-Qed.
-*)
-
+  admit.
+Admitted.
 
 Lemma ctx_eq_refl {P : PtsSig} : forall {Γ : Ctx P},
     {{ ⊢ Γ }} ->
