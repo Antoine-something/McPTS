@@ -1209,10 +1209,15 @@ Proof.
   - econstructor; mauto 2.
   - econstructor; mauto 2.
   - econstructor; mauto 2.
-  - inversion H.
+  - inversion H; subst.
     + econstructor; mauto.
     + admit.
-  - admit.
+  - inversion IHwf_exp; subst.
+    + eapply wf_typ_clo_st; mauto.
+    (* Γ ⊢ [σ][τ]Sort@s seems non-provable *)
+    + admit.
+    + eapply wf_typ_exp.
+      eapply wf_conv; mauto; admit.
   - admit.
 Admitted.
     
