@@ -24,18 +24,16 @@ Proof with mautosolve.
     intuition.
 Qed.
 
-
 Lemma functional_ctx_lookup_st {P : PtsSig} : forall {Γ : Ctx P} {A A' x s s'},
     {{ #x : A :: Sort@s ∈ Γ }} ->
     {{ #x : A' :: Sort@s' ∈ Γ }} ->
     s = s'.
 Proof with mautosolve.
-  intros * Hx Hx'; gen s' A'.
-  induction Hx as [|* ? IHHx]; intros; inversion_clear Hx'.  
-  - admit.
-  - eapply IHHx; mauto.
-Admitted.
-
+  intros * Hx Hx'; gen s' A'. dependent induction Hx; intros.
+  - inversion_clear Hx'. auto. 
+  - inversion_clear Hx'; auto.
+    eapply IHHx; mauto.
+Qed.
 
 Lemma functional_ctx_lookup {P : PtsSig} : forall {Γ : Ctx P} {A A' x s s'},
     {{ #x : A :: Sort@s ∈ Γ }} ->
@@ -46,8 +44,6 @@ Proof.
   - eapply functional_ctx_lookup_typ; mauto.
   - eapply functional_ctx_lookup_st; mauto.
 Qed.
-
-
 
 Lemma ctx_decomp {P : PtsSig} : forall {Γ : Ctx P} {A s}, {{ ⊢ Γ, A :: Sort@s }} -> {{ ⊢ Γ }} /\ {{ Γ ⊢ A : Sort@s }}.
 Proof with now eauto.

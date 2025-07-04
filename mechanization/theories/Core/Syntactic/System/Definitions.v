@@ -19,8 +19,8 @@ Generalizable All Variables.
 (* Context lookup: #x : A :: Sort@s ∈ Γ *)
 Inductive ctx_lookup {P : PtsSig} : nat -> Typ P -> Knd P -> Ctx P -> Prop :=
 | here : `({{ #0 : [Wk]A :: Sort@s ∈ Γ, A :: Sort@s }})
-| there : `({{ #i : A :: Sort@s1 ∈ Γ }} ->
-            {{ #(S i) : [Wk]A :: Sort@s1 ∈ Γ, B :: Sort@s2 }})
+| there : `({{ #i : A :: Sort@s ∈ Γ }} ->
+            {{ #(S i) : [Wk]A :: Sort@s ∈ Γ, B :: Sort@s'}})
 where "'#' x : A :: K ∈ Γ" := (ctx_lookup x A K Γ) (in custom judg) : type_scope.
 
 (* Context formation: ⊢ Γ *)
