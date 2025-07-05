@@ -1,6 +1,6 @@
 From McPTS Require Import LibTactics.
 From McPTS.Core Require Import Base.
-From McPTS.Core.Syntactic.System Require Export Definitions Lemmas.
+From McPTS.Core.Syntactic.System Require Import Definitions Lemmas.
 
 (* #[global] *)
 (* Ltac pi_univ_level_tac := *)

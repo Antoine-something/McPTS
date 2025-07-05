@@ -9,7 +9,7 @@ Inductive Exp (P : PtsSig) : Type :=
 | a_st : St P -> Exp P                                                  (* s *)
 | a_var : nat -> Exp P                                                   (* x_i *)
 | a_pi : forall (s1 s2 s3 : St P), Ru P s1 s2 s3 -> Exp P -> Exp P -> Exp P   (* Π_r A.B *)
-| a_lam : forall (s1 s2 s3 : St P), Ru P s1 s2 s3 -> Exp P -> Exp P           (* λM *)
+| a_lam : forall (s1 s2 s3 : St P), Ru P s1 s2 s3 -> Exp P ->Exp P -> Exp P   (* λ_r A M *)
 | a_app : Exp P -> Exp P -> Exp P                                       (* M N *)
 | a_clo : Sub P -> Exp P -> Exp P                                       (* [σ]M *)
 
@@ -52,7 +52,7 @@ with Nf (P : PtsSig) : Type :=
 | nf_ne : Ne P -> Nf P                                                     (* E *)
 | nf_st : St P -> Nf P                                                     (* s *)
 | nf_pi : forall (s1 s2 s3 : St P), Ru P s1 s2 s3 -> Nf P -> Nf P -> Nf P       (* Π_r V1.V2 *)
-| nf_lam : forall (s1 s2 s3 : St P), Ru P s1 s2 s3 -> Nf P -> Nf P              (* λV *)
+| nf_lam : forall (s1 s2 s3 : St P), Ru P s1 s2 s3 -> Nf P -> Nf P -> Nf P      (* λ_r V_A V_M *)
 .
 
 Arguments ne_var {_}.
@@ -75,7 +75,7 @@ with Nf_to_Exp (P : PtsSig) (V : Nf P) : Exp P :=
        | nf_ne E => Ne_to_Exp P E
        | nf_st s => a_st s
        | nf_pi s1 s2 s3 r V1 V2 => a_pi s1 s2 s3 r (Nf_to_Exp P V1) (Nf_to_Exp P V2)
-       | nf_lam s1 s2 s3 r V => a_lam s1 s2 s3 r (Nf_to_Exp P V)
+       | nf_lam s1 s2 s3 r VA VM => a_lam s1 s2 s3 r (Nf_to_Exp P VA) (Nf_to_Exp P VM)
        end.
 
 Coercion Nf_to_Exp : Nf >-> Exp.
@@ -102,7 +102,7 @@ Notation "x" := x (in custom Exp at level 0, x ident) : mcpts_scope.
 Notation "'Sort' @ s" := (a_st s) (in custom Exp at level 0, s constr at level 0, format "'Sort' @ s") : mcpts_scope.
 Notation "'#' i" := (a_var i) (in custom Exp at level 0, i constr at level 0, format "'#' i") : mcpts_scope.  
 Notation "'Π' r A B" := (a_pi _ _ _ r A B) (in custom Exp at level 1, r constr at level 0, A custom Exp at level 0, B custom Exp at level 60) : mcpts_scope.
-Notation "'λ' r M" := (a_lam _ _ _ r M) (in custom Exp at level 1, r constr at level 0, M custom Exp at level 60) : mcpts_scope.
+Notation "'λ' r A M" := (a_lam _ _ _ r A M) (in custom Exp at level 1, r constr at level 0, A custom Exp at level 1, M custom Exp at level 60) : mcpts_scope.
 Notation "f x .. y" := (a_app .. (a_app f x) .. y) (in custom Exp at level 40, f custom Exp, x custom Exp at next level, y custom Exp at next level) : mcpts_scope.
 
 (* Notation for substitutions *)
@@ -125,7 +125,7 @@ Notation "x" := x (in custom Nf at level 0, x ident) : mcpts_scope.
 
 Notation "'Sort' @ s" := (nf_st s) (in custom Nf at level 0, s constr at level 0, format "'Sort' @ s") : mcpts_scope.
 Notation "'Π' r V1 V2" := (nf_pi _ _ _ r V1 V2) (in custom Nf at level 2, r constr at level 0, V1 custom Nf at level 1, V2 custom Nf at level 60) : mcpts_scope.
-Notation "'λ' r V" := (nf_lam _ _ _ r V) (in custom Nf at level 2, r constr at level 0, V custom Nf at level 60) : mcpts_scope.
+Notation "'λ' r VA VM" := (nf_lam _ _ _ r VA VM) (in custom Nf at level 2, r constr at level 0, VA custom Nf at level 1, VM custom Exp at level 60) : mcpts_scope.
 Notation "f x .. y" := (ne_app .. (ne_app f x) .. y) (in custom Nf at level 40, f custom Nf, x custom Nf at next level, y custom Nf at next level) : mcpts_scope.
 Notation "'#' i" := (ne_var i) (in custom Nf at level 0, i constr at level 0, format "'#' i") : mcpts_scope.
 Notation "'⇑' E" := (nf_ne E) (in custom Nf at level 0, E custom Nf at level 99, format "'⇑'  E") : mcpts_scope.

@@ -41,7 +41,7 @@ with wf_exp {P : PtsSig} : Ctx P -> Typ P -> Exp P -> Prop :=
                     {{ Γ ⊢ Π r A B : Sort@s3 }})
 | wf_exp_lam : `(forall r : Ru P s1 s2 s3,
                      {{ Γ ⊢ Π r A B : Sort@s3 }} -> {{ Γ, A :: Sort@s ⊢ M : B }} ->
-                     {{ Γ ⊢ λ r M : Π r A B }})
+                     {{ Γ ⊢ λ r A M : Π r A B }})
 | wf_exp_app : `(forall r : Ru P s1 s2 s3,
                      {{ Γ ⊢ Π r A B : Sort@s3 }} -> {{ Γ ⊢ M : Π r A B }} -> {{ Γ ⊢ N : A }} ->
                      {{ Γ ⊢ M N : [Id,,N]B }})
@@ -93,7 +93,7 @@ with eq_exp {P : PtsSig} : Ctx P -> Typ P -> Exp P -> Exp P -> Prop :=
                       {{ Γ ⊢ M N ≈ [Id,,N]M : [Id,,N]B }})
 | eq_exp_eta : `(forall r : Ru P s1 s2 s3,
                      {{ Γ ⊢ Π r A B : Sort@s3 }} -> {{ Γ ⊢ M : Π r A B }} ->
-                     {{ Γ ⊢ M ≈ λ r ([Wk]M #0) : Π r A B }})
+                     {{ Γ ⊢ M ≈ λ r A ([Wk]M #0) : Π r A B }})
 (* Substitution propagation *)
 | eq_exp_prop_sort : `(Ax P s1 s2 -> {{ Γ ⊢s σ : Δ }} ->
                        {{ Γ ⊢ [σ]Sort@s1 ≈ Sort@s1 : Sort@s2 }})
@@ -106,7 +106,7 @@ with eq_exp {P : PtsSig} : Ctx P -> Typ P -> Exp P -> Exp P -> Prop :=
                          {{ Γ ⊢ [σ](Π r A B) ≈ Π r ([σ] A) ([(Wk ∘ σ),,#0]B) : Sort@s3 }})
 | eq_exp_prop_lam : `(forall r : Ru P s1 s2 s3,
                           {{ Γ ⊢s σ : Δ }} -> {{ Δ ⊢ Π r A B : Sort@s3 }} -> {{ Δ, A :: Sort@s1 ⊢ M : B }} ->
-                          {{ Γ ⊢ [σ](λ r M) ≈ λ r ([(Wk∘σ),,#0]M) : [σ](Π r A B) }})
+                          {{ Γ ⊢ [σ](λ r A M) ≈ λ r [σ]A ([(Wk∘σ),,#0]M) : [σ](Π r A B) }})
 | eq_exp_prop_app : `(forall r : Ru P s1 s2 s3,
                           {{ Γ ⊢s σ : Δ }} -> {{ Δ ⊢ Π r A B : Sort@s3 }} -> {{ Δ ⊢ M : Π r A B }} -> {{ Δ ⊢ N : A }} ->
                           {{ Γ ⊢ [σ](M N) ≈ [σ]M [σ]N : [σ,,[σ]N]B }})

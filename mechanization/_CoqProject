@@ -7,4 +7,5 @@ theories/Core/Syntactic/Syntax.v
 theories/Core/Syntactic/System/Definitions.v
 theories/Core/Syntactic/System/Lemmas.v
 theories/Core/Syntactic/System/Tactics.v
+theories/Core/Syntactic/System.v
 theories/Core/Syntactic/CtxEq.v
