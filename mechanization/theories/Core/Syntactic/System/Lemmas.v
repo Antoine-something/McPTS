@@ -355,7 +355,6 @@ Qed.
 Hint Resolve exp_eq_sub_compose_weaken_id_extend_typ : mcpts.
 
 
-(* I suspect the lemmas with double weaken are only used for equality types *)
 Lemma exp_eq_sub_compose_double_weaken_double_extend_typ {P : PtsSig} : forall {Γ : Ctx P} {σ Δ s1 A s2 B M s3 C N},
     {{ Γ ⊢s σ : Δ }} ->
     {{ Δ ⊢ A : Sort@s1 }} ->
