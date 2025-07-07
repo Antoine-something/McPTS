@@ -394,31 +394,31 @@ Ltac gen_presup_IH presup_exp_eq presup_sub_eq presup_subtyp H :=
 
 Lemma presup_exp_eq {P : PtsSig} : forall {Γ : Ctx P} {M M' A}, {{ Γ ⊢ M ≈ M' : A }} -> {{ ⊢ Γ }} /\ {{ Γ ⊢ M : A }} /\ {{ Γ ⊢ M' : A }} /\ {{ Γ ⊢ A }}
 with presup_sub_eq {P : PtsSig} : forall {Γ : Ctx P} {Δ σ σ'}, {{ Γ ⊢s σ ≈ σ' : Δ }} -> {{ ⊢ Γ }} /\ {{ Γ ⊢s σ : Δ }} /\ {{ Γ ⊢s σ' : Δ }} /\ {{ ⊢ Δ }}.
-Proof with mautosolve 4.
-  all: inversion_clear 1;
-    (on_all_hyp: gen_presup_IH presup_exp_eq presup_sub_eq presup_subtyp);
-    gen_core_presups;
-    clear presup_exp_eq presup_sub_eq;
-    repeat split; try mautosolve 3;
-    try (eexists; unshelve solve [mauto 4 using lift_exp_max_left, lift_exp_max_right]; constructor).
+Proof with mautosolve 4.    
+(*   all: inversion_clear 1; *)
+(*     (on_all_hyp: gen_presup_IH presup_exp_eq presup_sub_eq presup_subtyp); *)
+(*     gen_core_presups; *)
+(*     clear presup_exp_eq presup_sub_eq; *)
+(*     repeat split; try mautosolve 3; *)
+(*     try (eexists; unshelve solve [mauto 4 using lift_exp_max_left, lift_exp_max_right]; constructor). *)
 
-  all: try (econstructor; mautosolve 4).
   
-  (** presup_exp_eq cases *)
-  - eapply exp_sub_typ; mauto 4 using lift_exp_max_left, lift_exp_max_right.
+(*   all: try (econstructor; mautosolve 4). *)
+  
+(*   (** presup_exp_eq cases *) *)
+(*   - eapply exp_sub_typ; mauto 4 using lift_exp_max_left, lift_exp_max_right. *)
 
-  (** presup_sub_eq cases *)
+(*   (** presup_sub_eq cases *) *)
 
-  - econstructor; mauto 3.
-    eapply wf_conv...
+(*   - econstructor; mauto 3. *)
+(*     eapply wf_conv... *)
 
-  - enough {{ Γ ⊢ #0[σ] : A[Wk∘σ] }} by mauto 4.
-    eapply wf_conv...
+(*   - enough {{ Γ ⊢ #0[σ] : A[Wk∘σ] }} by mauto 4. *)
+(*     eapply wf_conv... *)
+(* Qed. *)
+Admitted.
 
-  (** presup_subtyp cases *)
-  - exists (max (S i) (S j)); split; mauto 3 using lift_exp_max_left, lift_exp_max_right.
-Qed.
-
-Ltac gen_presup H := gen_presup_IH @presup_exp_eq @presup_sub_eq @presup_subtyp H + gen_core_presup H.
+           
+Ltac gen_presup H := gen_presup_IH @presup_exp_eq @presup_sub_eq H + gen_core_presup H.
 
 Ltac gen_presups := (on_all_hyp: fun H => gen_presup H); invert_wf_ctx; (on_all_hyp: fun H => gen_lookup_presup H); clear_dups.

@@ -124,9 +124,8 @@ Hint Resolve presup_exp_ctx : mcpts.
 
 Lemma presup_sub_eq_ctx {P : PtsSig} : forall {Γ Δ : Ctx P} {σ σ'}, {{ Γ ⊢s σ ≈ σ' : Δ }} -> {{ ⊢ Γ }} /\ {{ ⊢ Δ }}.
 Proof with mautosolve.
-  induction 1; split; destruct_pairs; mauto; try econstructor; mauto.
-  admit.
-Admitted.
+  induction 1; split; destruct_pairs; mauto 2; econstructor; mauto 2.
+Qed.
 
 Corollary presup_sub_eq_ctx_left {P : PtsSig} : forall {Γ Δ : Ctx P} {σ σ'}, {{ Γ ⊢s σ ≈ σ' : Δ }} -> {{ ⊢ Γ }}.
 Proof with easy.
@@ -485,6 +484,11 @@ Lemma exp_eq_var_1_sub_typ {P : PtsSig} : forall {Γ : Ctx P} {σ Δ A s1 M s2 s
     {{ #0 : [Wk]Sort@s2 :: Sort@s3 ∈ Δ }} ->
     {{ Γ ⊢ [σ,,M]#1 ≈ [σ]#0 : Sort@s2 }}.
 Proof with mautosolve 4.
+  intros.
+  eapply eq_exp_conv; mauto 2.
+  econstructor; mauto 2.
+  econstructor; mauto 2.
+  (* I am not sure this is provable *)
 Admitted.
 
 #[export]
@@ -658,9 +662,9 @@ Proof with mautosolve 4.
   assert {{ Γ ⊢ [τ'∘σ']M ≈ [τ'][σ']M : [τ'∘σ']A }} by (econstructor; mauto).
   assert {{ Γ ⊢ [τ'∘σ']M ≈ [τ'][σ']M : [τ∘σ]A }}.
   {
-    eapply eq_exp_conv; mauto.
-    econstructor; mauto.
-    econstructor; mauto.
+    eapply eq_exp_conv; mauto; econstructor; mauto.
+    symmetry; mauto 2.
+    eapply eq_typ_refl; econstructor; mauto 2.
   }
   eapply eq_exp_trans; mauto.
   eapply eq_exp_trans; mauto.
@@ -809,7 +813,7 @@ Proof with mautosolve 3.
   econstructor; mauto.
   eapply wf_exp_conv; mauto.
   eapply eq_typ_sym.
-  econstructor; mauto.
+  eapply eq_typ_exp.
   eapply eq_exp_conv; mauto.
   eapply eq_exp_prop_comp; mauto.
   econstructor; mauto.
@@ -853,6 +857,9 @@ Proof with mautosolve 4.
   {
     eapply wf_exp_conv; mauto.
     eapply eq_typ_sym; econstructor; mauto.
+    econstructor; mauto.
+    econstructor; mauto.
+    econstructor; mauto.
     econstructor; mauto.
   }
   assert {{ Γ ⊢ [σ]M ≈ [σ]M : [σ∘Id]A }} by (eapply eq_exp_refl; mauto).
@@ -915,6 +922,8 @@ Proof with mautosolve 4.
   assert {{ Γ, [σ]A::Sort@s ⊢ #0 : [Wk∘σ]A }}.
   {
     eapply wf_exp_conv; mauto.
+    eapply eq_typ_exp.
+    econstructor; mauto.
     econstructor; mauto.
   }
   assert {{ Γ ⊢s (Id,,M)∘((Wk∘σ),,#0) ≈ ((Id,,M)∘(Wk∘Id)),,[Id,,M]#0 : Δ, A::Sort@s }}.
@@ -927,7 +936,7 @@ Proof with mautosolve 4.
   assert {{ Γ ⊢ [Id,,M]#0 ≈ M : [σ]A }}.
   {
     eapply eq_exp_conv; mauto.
-    econstructor; mauto.
+    eapply eq_typ_exp.
     econstructor; mauto.
   }
   enough {{ Γ ⊢ [Id,,M]#0 ≈ M : [(Id,,M)∘(Wk∘σ)]A }}.
@@ -1033,7 +1042,10 @@ Proof.
     mauto 4.
   econstructor; mauto.
   eapply wf_exp_conv; mauto.
-  eapply eq_typ_sym; econstructor; mauto.
+  eapply eq_typ_sym.
+  eapply eq_typ_exp.
+  econstructor; mauto.
+  econstructor; mauto.
 Qed.
 
 Lemma id_sub_lookup_var0 {P : PtsSig} : forall (Γ : Ctx P) M1 M2 A s,
@@ -1076,8 +1088,8 @@ Proof.
       mauto 4;
       econstructor; mauto.
     eapply wf_exp_conv; mauto.
+    eapply eq_typ_exp.
     econstructor; mauto.
-    econstructor; mauto. 
   - eapply wf_exp_eq_conv;
     [eapply eq_exp_prop_var_ze | |];
     mauto 2.
@@ -1132,7 +1144,7 @@ Proof with mautosolve 4.
   assert {{ Γ, [σ]B::Sort@s2, [(Wk∘σ),,#0]A::Sort@s1 ⊢ #0 : [Wk∘((Wk∘σ),,#0)]A }}.
   {
     eapply wf_exp_conv; mauto 3.
-    econstructor; mauto 3.
+    eapply eq_typ_exp.
     econstructor; mauto 3.
   }
   assert {{ Γ ⊢ [σ]B : Sort@s2 }} by mauto 2.
@@ -1167,7 +1179,9 @@ Proof with mautosolve 4.
     eapply wf_exp_conv; mauto 3.
     econstructor; mauto 3.
     econstructor; mauto 3.
+    eapply eq_typ_exp.
     econstructor; mauto 3.
+    econstructor; mauto 2.
   }
   assert {{ Γ, [σ]B::Sort@s2 ⊢ [(Wk∘σ),,#0]#0 ≈ #0 : [Wk∘σ]B }}.
   {
@@ -1209,14 +1223,10 @@ Proof.
   - econstructor; mauto 2.
   - econstructor; mauto 2.
   - inversion H; subst.
-    + econstructor; mauto.
+    + econstructor; mauto 2.
+      econstructor; mauto 2.      
     + admit.
-  - inversion IHwf_exp; subst.
-    + eapply wf_typ_clo_st; mauto.
-    (* Γ ⊢ [σ][τ]Sort@s seems non-provable *)
-    + admit.
-    + eapply wf_typ_exp.
-      eapply wf_conv; mauto; admit.
+  - inversion IHwf_exp; subst; eapply wf_typ_clo; mauto 2.
   - admit.
 Admitted.
     

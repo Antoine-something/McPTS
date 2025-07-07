@@ -55,8 +55,8 @@ where "Γ ⊢ M : A" := (wf_exp Γ A M) (in custom judg) : type_scope
 with wf_typ {P : PtsSig} : Ctx P -> Typ P -> Prop :=
 | wf_typ_st : `({{ ⊢ Γ }} ->
                 {{ Γ ⊢ Sort@s }})
-| wf_typ_clo_st : `({{ Γ ⊢s σ : Δ }} ->
-                    {{ Γ ⊢ [σ]Sort@s }})
+| wf_typ_clo : `({{ Γ ⊢s σ : Δ }} -> {{ Δ ⊢ A }} ->
+                    {{ Γ ⊢ [σ]A }})
 | wf_typ_exp : `({{ Γ ⊢ A : Sort@s }} ->
                  {{ Γ ⊢ A }})
 where "Γ ⊢ A" := (wf_typ Γ A) (in custom judg) : type_scope
@@ -90,7 +90,7 @@ with eq_exp {P : PtsSig} : Ctx P -> Typ P -> Exp P -> Exp P -> Prop :=
 (* β-reduction and η-expansion *)
 | eq_exp_beta : `(forall r : Ru P s1 s2 s3,
                       {{ Γ ⊢ Π r A B : Sort@s3 }} -> {{ Γ, A :: Sort@s1 ⊢ M : B }} -> {{ Γ ⊢ N : A }} ->
-                      {{ Γ ⊢ M N ≈ [Id,,N]M : [Id,,N]B }})
+                      {{ Γ ⊢ (λ r A M) N ≈ [Id,,N]M : [Id,,N]B }})
 | eq_exp_eta : `(forall r : Ru P s1 s2 s3,
                      {{ Γ ⊢ Π r A B : Sort@s3 }} -> {{ Γ ⊢ M : Π r A B }} ->
                      {{ Γ ⊢ M ≈ λ r A ([Wk]M #0) : Π r A B }})
@@ -139,13 +139,21 @@ with eq_exp {P : PtsSig} : Ctx P -> Typ P -> Exp P -> Exp P -> Prop :=
 where "Γ ⊢ M ≈ N : A" := (eq_exp Γ A M N) (in custom judg) : type_scope
 
 (* Type equality: Γ ⊢ A ≈ B *)
+(* 
+ * This judgment is probably missing some rules.
+ * In particular, we cannot properly propagate substitutions into (maximal) sorts
+*)
 with eq_typ {P : PtsSig} : Ctx P -> Typ P -> Typ P -> Prop :=
 | eq_typ_st : `({{ ⊢ Γ }} ->
                 {{ Γ ⊢ Sort@s ≈ Sort@s }})
 | eq_typ_clo_st : `({{ Γ ⊢s σ : Δ }} ->
                     {{ Γ ⊢ [σ]Sort@s ≈ Sort@s }})
+| eq_typ_clo_cong : `({{ Γ ⊢s σ ≈ τ : Δ }} -> {{ Δ ⊢ A ≈ B }} ->
+                      {{ Γ ⊢ [σ]A ≈ [τ]B }})
 | eq_typ_exp : `({{ Γ ⊢ A ≈ B : Sort@s }} ->
                  {{ Γ ⊢ A ≈ B }})
+| eq_typ_refl : `({{ Γ ⊢ A }} ->
+                  {{ Γ ⊢ A ≈ A }})
 | eq_typ_sym : `({{ Γ ⊢ A ≈ B }} ->
                  {{ Γ ⊢ B ≈ A }})
 | eq_typ_trans : `({{ Γ ⊢ A1 ≈ A2 }} -> {{ Γ ⊢ A2 ≈ A3 }} ->
@@ -170,7 +178,7 @@ with eq_sub {P : PtsSig} : Ctx P -> Ctx P -> Sub P -> Sub P -> Prop :=
 | eq_sub_prop_ext_left : `({{ Γ ⊢s σ : Δ }} -> {{ Δ ⊢ A }} -> {{ Γ ⊢ M : [σ]A }} ->
                            {{ Γ ⊢s (σ,,M) ∘ Wk ≈ σ : Δ }})
 | eq_sub_prop_ext_right : `({{ Γ1 ⊢s σ1 : Γ2 }} -> {{ Γ2 ⊢s σ2 : Γ3 }} -> {{ Γ3 ⊢ A : Sort@s }} -> {{ Γ2 ⊢ M : [σ2]A }} ->
-                            {{ Γ1 ⊢s σ1 ∘ (σ2,,M) ≈ (σ1 ∘ σ2),,[σ1]M : Γ3, A :: Sort@xs }})
+                            {{ Γ1 ⊢s σ1 ∘ (σ2,,M) ≈ (σ1 ∘ σ2),,[σ1]M : Γ3, A :: Sort@s }})
 (* Congruence rules *)
 | eq_sub_cong_ext : `({{ Γ ⊢s σ1 ≈ σ2 : Δ }} -> {{ Δ ⊢ A : Sort@s }} -> {{ Γ ⊢ M1 ≈ M2 : [σ]A }} ->
                       {{ Γ ⊢s σ1,,M1 ≈ σ2,,M2 : Δ, A :: Sort@s }})
@@ -227,6 +235,14 @@ Proof.
   split.
   - eauto using eq_exp_sym.
   - eauto using eq_exp_trans.
+Qed.
+
+#[export]
+  Instance eq_typ_PER {P : PtsSig} (Γ : Ctx P) : PER (eq_typ Γ).
+Proof.
+  split.
+  - eauto using eq_typ_sym.
+  - eauto using eq_typ_trans.
 Qed.
 
 #[export]
