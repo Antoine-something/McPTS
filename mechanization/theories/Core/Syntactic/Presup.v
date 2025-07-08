@@ -1,7 +1,7 @@
 From McPTS Require Import PtsSignature LibTactics.
 From McPTS.Core Require Import Base.
-From McPTS.Core.Syntactic Require Export CtxEq.
-From McPTS.Core.Syntactic.System Require Export Definitions Lemmas Tactics.
+From McPTS.Core.Syntactic Require Import CtxEq.
+From McPTS.Core.Syntactic Require Import System.
 
 
 Lemma presup_exp_eq_fn_cong_right {P : PtsSig} : forall {Γ : Ctx P} {s1 A A' s2 B M' s3} {r : Ru P s1 s2 s3},

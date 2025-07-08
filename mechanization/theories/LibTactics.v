@@ -7,7 +7,7 @@ Create HintDb mcpts discriminated.
 
 (* Transparency setting for generalized rewriting *)
 #[export]
-  Typeclasses Transparent arrows.
+Typeclasses Transparent arrows.
 
 
 (* Destruct existential quantification but keeps the name *)
