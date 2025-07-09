@@ -53,13 +53,16 @@ Lemma wf_app_inversion {P : PtsSig} : forall {Γ : Ctx P} {M N C},
     {{ Γ ⊢ M N : C }} ->
     exists A B s1 s2 s3 (r : Ru P s1 s2 s3), {{ Γ ⊢ M : Π r A B }} /\ {{ Γ ⊢ N : A }} /\ {{ Γ ⊢ [Id,,N]B ≈ C }}.
 Proof with mautosolve 4.
-  (* Again, this does not make sense *)
-  
-  (* intros * H. *)
-  (* dependent induction H; *)
-  (*   try specialize (IHwf_exp1 _ _ eq_refl); *)
-  (*   destruct_conjs; *)
-  (*   do 2 eexists; repeat split. *)
+  intros * H.
+  dependent induction H.
+  - destruct_conjs; 
+      do 6 eexists; repeat split; eauto.
+      (* reflexivity. *)
+      admit.
+  - specialize (IHwf_exp _ _ eq_refl); 
+      destruct_conjs;
+        do 6 eexists; repeat split; eauto.
+        rewrite <- H0; auto.
 Admitted.
 
 #[export]
