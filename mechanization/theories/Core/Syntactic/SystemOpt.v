@@ -105,6 +105,7 @@ Corollary wf_app' {P : PtsSig} : forall {Γ : Ctx P} {M N A B s1 s2 s3} {r : Ru 
     {{ Γ ⊢ M N : [Id,,N]B }}.
 Proof.
   intros.
+  gen_presups.
   assert {{ Γ ⊢ Π r A B }}.
   {
     eapply presup_exp_wf; mauto 2.

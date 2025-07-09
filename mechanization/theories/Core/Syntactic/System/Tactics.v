@@ -2,16 +2,6 @@ From McPTS Require Import LibTactics.
 From McPTS.Core Require Import Base.
 From McPTS.Core.Syntactic.System Require Import Definitions Lemmas.
 
-(* #[global] *)
-(* Ltac pi_univ_level_tac := *)
-(*   match goal with *)
-(*   | |- {{ ^_ ⊢s ^_ : ^_ }} => mauto 4 *)
-(*   | H : {{ ^?Δ ⊢ ^?A : Sort@?j }} |- {{ ^?Δ , ^?A :: ^?s ⊢ ^?B : Sort@?i }} => *)
-(*       eapply lift_exp_max_right; mauto 4 *)
-(*   | |- {{ ^?Δ ⊢ ^?A : Sort@?j }} => *)
-(*       eapply lift_exp_max_left; mauto 4 *)
-(*   end. *)
-
 (* #[export] *)
 (* Hint Rewrite -> wf_exp_eq_pi_sub using pi_univ_level_tac : mctt. *)
 
@@ -47,11 +37,11 @@ Ltac gen_core_presup H :=
   | {{ ^?Γ ⊢ ^?M : ^?A }} =>
       let HΓ := fresh "HΓ" in
       let HAwf := fresh "HAwf" in
-      pose proof presup_exp H as [HΓ HA];
+      pose proof presup_exp H as [HΓ HAwf];
       match goal with
-      | _: {{ Γ ⊢ A }} |- _ => clear HAwf
+      | _: {{ Γ ⊢ A }} |- _ => idtac
       | _: __mark__ _ {{ Γ ⊢ A }} |- _ => clear HAwf
-      | _: {{ Γ ⊢ A : Sort@_ }} |- _ => clear HAwf
+      | _: {{ Γ ⊢ A : Sort@_ }} |- _ => idtac
       | _: __mark__ _ {{ Γ ⊢ A : Sort@_ }} |- _ => clear HAwf
       | _ =>
           let HA := fresh "HA" in
