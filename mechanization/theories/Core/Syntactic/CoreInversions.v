@@ -37,9 +37,10 @@ Hint Resolve wf_pi_inversion' : mcpts.
 Corollary wf_fn_inversion {P : PtsSig} : forall {Γ : Ctx P} {A M C s1 s2 s3} {r : Ru P s1 s2 s3},
     {{ Γ ⊢ λ r A M : C }} ->
     exists B, {{ Γ, A::Sort@s1 ⊢ M : B }} /\ {{ Γ ⊢ Π r A B ≈ C }}.
-Proof with mautosolve.
+Proof with solve [mauto].
   (* There is something wrong here because the IH does not make sense *)
-  
+  intros * H.
+  dependent induction H.
   (* dependent induction H; *)
   (*   try specialize (IHwf_exp1 _ _ eq_refl); *)
   (*   destruct_conjs; gen_core_presups; *)
@@ -57,13 +58,20 @@ Proof with mautosolve 4.
   dependent induction H.
   - destruct_conjs; 
       do 6 eexists; repeat split; eauto.
-      (* reflexivity. *)
-      admit.
+    (* reflexivity. *)
+    eapply eq_typ_refl.
+    assert ({{ Γ ⊢ A : Sort@s1 }} /\ {{ Γ, A::Sort@s1 ⊢ B : Sort@s2 }}).
+    {
+      eapply wf_pi_inversion'; mauto 2.
+    }
+    destruct_conjs.
+    econstructor; mauto 2.    
+    econstructor; mauto 2.
   - specialize (IHwf_exp _ _ eq_refl); 
       destruct_conjs;
         do 6 eexists; repeat split; eauto.
         rewrite <- H0; auto.
-Admitted.
+Qed.
 
 #[export]
 Hint Resolve wf_app_inversion : mcpts.
@@ -78,7 +86,10 @@ Proof with mautosolve 4.
     destruct_conjs; gen_core_presups; eexists; eexists; split.
   mauto 2.
   econstructor; mauto 2.
-  eapply eq_exp_refl; mauto 2.
+  eapply eq_exp_refl.
+  eapply presup_ctx_lookup_typ; mauto 2.
+  
+
 Admitted.
 
 #[export]
@@ -94,7 +105,8 @@ Proof with mautosolve 3.
     destruct_conjs;
     do 2 eexists; repeat split; mauto 3.
   assert ({{ Δ ⊢ A }}) as [] by mauto 2 using presup_exp_typ.
-  eapply eq_typ_refl; econstructor; mauto 2.
+
+  
 Admitted.  
 
 

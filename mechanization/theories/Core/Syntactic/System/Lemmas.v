@@ -562,8 +562,8 @@ Proof with mautosolve 3.
   {
     econstructor; mauto 2.
     econstructor; mauto 2.
-  }  
-  eapply wf_exp_eq_conv; mauto 2.
+  }
+  eapply eq_exp_conv; mauto 2.
   
 Admitted.
 
@@ -1005,7 +1005,10 @@ Proof with mautosolve 4.
   }
   enough {{ Γ ⊢ [Id,,M]#0 ≈ M : [(Id,,M)∘(Wk∘σ)]A }}.
   {
-    admit.
+    transitivity {{{ ((Id,,M)∘(Wk∘σ)),,[Id,,M]#0 }}}.
+    eapply eq_sub_prop_ext_right; mauto 2.
+    econstructor; mauto 2.
+    eapply eq_sub_cong_ext; mauto 2.
   }
   eapply wf_exp_eq_conv; mauto 3.
   eapply wf_exp_conv; mauto 3.
@@ -1228,6 +1231,7 @@ Proof with mautosolve 4.
   }
   assert {{ Γ, [σ]B::Sort@s2, [(Wk∘σ),,#0]A::Sort@s1 ⊢ [(Wk∘((Wk∘σ),,#0)),,#0]#1 ≈ [Wk∘((Wk∘σ),,#0)]#0 : [Wk][Wk][σ]B }}.
   {
+    
     admit.
   }
   assert {{ Γ, [σ]B::Sort@s2, [(Wk∘σ),,#0]A::Sort@s1 ⊢ [Wk∘((Wk∘σ),,#0)]#0 ≈ [Wk][(Wk∘σ),,#0]#0 : [Wk][Wk][σ]B }}.

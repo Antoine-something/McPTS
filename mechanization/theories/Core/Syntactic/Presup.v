@@ -220,75 +220,6 @@ Qed.
 #[local]
 Hint Resolve presup_exp_eq_pi_eta_right : mcpts.
 
-(* I think those next few lemmas are only for equality types  *)
-
-(* Lemma presup_exp_eq_prop_eq_var0 {P : PtsSig} : forall {Γ : Ctx P} {s A}, *)
-(*     {{ Γ ⊢ A : Sort@s }} -> *)
-(*     {{ Γ, A, A[Wk] ⊢ #0 : A[Wk∘Wk] }}. *)
-(* Proof. *)
-(*   intros. *)
-(*   assert {{ ⊢ Γ, A }} by mauto 3. *)
-(*   assert {{ Γ, A ⊢s Wk : Γ }} by mauto 2. *)
-(*   assert {{ ⊢ Γ, A, A[Wk] }} by mauto 3. *)
-(*   mauto 3. *)
-(* Qed. *)
-
-(* #[export] *)
-(* Hint Resolve presup_exp_eq_prop_eq_var0 : mcpts. *)
-
-(* Lemma presup_exp_eq_prop_eq_var1 : forall {Γ i A}, *)
-(*     {{ Γ ⊢ A : Type@i }} -> *)
-(*     {{ Γ, A, A[Wk] ⊢ #1 : A[Wk∘Wk] }}. *)
-(* Proof. *)
-(*   intros. *)
-(*   assert {{ ⊢ Γ, A }} by mauto 3. *)
-(*   assert {{ Γ, A ⊢s Wk : Γ }} by mauto 2. *)
-(*   assert {{ ⊢ Γ, A, A[Wk] }} by mauto 3. *)
-(*   eapply var_compose_subs; mauto 2. *)
-(* Qed. *)
-
-(* #[export] *)
-(* Hint Resolve presup_exp_eq_prop_eq_var1 : mcpts. *)
-
-(* Lemma presup_exp_eq_prop_eq_wf : forall {Γ i A}, *)
-(*     {{ Γ ⊢ A : Type@i }} -> *)
-(*     {{ Γ, A, A[Wk] ⊢ Eq A[Wk∘Wk] #1 #0 : Type@i }}. *)
-(* Proof. *)
-(*   intros. *)
-(*   assert {{ ⊢ Γ, A }} by mauto 3. *)
-(*   assert {{ Γ, A ⊢s Wk : Γ }} by mauto 2. *)
-(*   assert {{ ⊢ Γ, A, A[Wk] }} by mauto 3. *)
-(*   assert {{ Γ, A, A[Wk] ⊢s Wk∘Wk : Γ }} by mauto 3. *)
-(*   assert {{ Γ, A, A[Wk] ⊢ A[Wk∘Wk] : Type@i }} by mauto 3. *)
-(*   econstructor; mauto 2. *)
-(* Qed. *)
-
-(* #[export] *)
-(* Hint Resolve presup_exp_eq_prop_eq_wf : mcpts. *)
-
-(* Lemma presup_exp_eq_prop_eq_sub_helper2 : forall {Γ σ Δ i A M1 M2}, *)
-(*     {{ Γ ⊢s σ : Δ }} -> *)
-(*     {{ Δ ⊢ A : Type@i }} -> *)
-(*     {{ Δ ⊢ M1 : A }} -> *)
-(*     {{ Δ ⊢ M2 : A }} -> *)
-(*     {{ Γ ⊢s σ,,M1[σ],,M2[σ] : Δ, A, A[Wk] }}. *)
-(* Proof. *)
-(*   intros. *)
-(*   assert {{ ⊢ Δ, A }} by mauto 3. *)
-(*   assert {{ Δ, A ⊢s Wk : Δ }} by mauto 2. *)
-(*   assert {{ Γ ⊢s σ,,M1[σ] : Δ, A }} by mauto 3. *)
-(*   assert {{ Γ ⊢ A[Wk][σ,,M1[σ]] ≈ A[σ] : Type@i }} by mauto 3. *)
-(*   assert {{ Γ ⊢ M2[σ] : A[σ] }} by mauto 2. *)
-(*   assert {{ Γ ⊢ A[Wk][σ,,M1[σ]] : Type@i }} by mauto 3. *)
-(*   assert {{ Γ ⊢ M2[σ] : A[Wk][σ,,M1[σ]] }} by mauto 3. *)
-(*   econstructor; mauto 2. *)
-(* Qed. *)
-
-(* #[export] *)
-(* Hint Resolve presup_exp_eq_prop_eq_sub_helper2 : mcpts. *)
-
-
-
 Lemma presup_exp_eq_var_0_sub_left {P : PtsSig} : forall {Γ : Ctx P} {σ Δ s A M},
     {{ ⊢ Γ }} ->
     {{ ⊢ Δ }} ->
@@ -377,20 +308,28 @@ Hint Resolve presup_exp_eq_sub_compose_right : mcpts.
 #[local]
 Ltac gen_presup_IH presup_exp_eq presup_sub_eq presup_subtyp H :=
   match type of H with
+  | {{ ^?Γ ⊢ ^?M : ^?A }} =>
+      let HΓ := fresh "HΓ" in
+      let HA := fresh "HA" in
+      pose proof presup_exp _ _ _ _ H as [HΓ HA]
+  | {{ ^?Γ ⊢s ^?σ : ^?Δ }} =>
+      let HΓ := fresh "HΓ" in
+      let HΔ := fresh "HΔ" in
+      pose proof presup_sub _ _ _ _ H as [HΓ HΔ]
   | {{ ^?Γ ⊢ ^?M ≈ ^?N : ^?A }} =>
       let HΓ := fresh "HΓ" in
-      let i := fresh "i" in
       let HM := fresh "HM" in
-      let HN := fresh "HN" in
-      let HAi := fresh "HAi" in
-      pose proof presup_exp_eq _ _ _ _ H as [HΓ [HM [HN [i HAi]]]]
+      let HM' := fresh "HM'" in
+      let HA := fresh "HA" in
+      pose proof presup_exp_eq _ _ _ _ _ H as [HΓ [HM [HM' HA]]]
   | {{ ^?Γ ⊢s ^?σ ≈ ^?τ : ^?Δ }} =>
       let HΓ := fresh "HΓ" in
       let Hσ := fresh "Hσ" in
-      let Hτ := fresh "Hτ" in
+      let Hσ' := fresh "Hσ'" in
       let HΔ := fresh "HΔ" in
-      pose proof presup_sub_eq _ _ _ _ H as [HΓ [Hσ [Hτ HΔ]]]
+      pose proof presup_sub_eq _ _ _ _ _ H as [HΓ [Hσ [Hσ' HΔ]]]
   end.
+
 
 Lemma presup_exp_eq {P : PtsSig} : forall {Γ : Ctx P} {M M' A}, {{ Γ ⊢ M ≈ M' : A }} -> {{ ⊢ Γ }} /\ {{ Γ ⊢ M : A }} /\ {{ Γ ⊢ M' : A }} /\ {{ Γ ⊢ A }}
 with presup_sub_eq {P : PtsSig} : forall {Γ : Ctx P} {Δ σ σ'}, {{ Γ ⊢s σ ≈ σ' : Δ }} -> {{ ⊢ Γ }} /\ {{ Γ ⊢s σ : Δ }} /\ {{ Γ ⊢s σ' : Δ }} /\ {{ ⊢ Δ }}.

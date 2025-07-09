@@ -20,15 +20,17 @@ Ltac invert_wf_ctx1 H :=
   match type of H with
   | {{ ⊢ ^?Γ, ^?A :: ^?K }} =>
       let HΓ := fresh "HΓ" in
-      let HAi := fresh "HAi" in
-      pose proof ctx_decomp H as [HΓ HAi];
+      let HAs := fresh "HAs" in
+      pose proof ctx_decomp H as [HΓ HAs];
       match goal with
-      | _: {{ Γ ⊢ A : Sort@_ }} |- _ => clear HAi
-      | _: __mark__ _ {{ Γ ⊢ A : Sort@_ }} |- _ => clear HAi
+      | _: {{ Γ ⊢ A }} |- _ => clear HAs
+      | _: __mark__ _ {{ Γ ⊢ A }} |- _ => clear HAs
+      | _: {{ Γ ⊢ A : Sort@_ }} |- _ => clear HAs
+      | _: __mark__ _ {{ Γ ⊢ A : Sort@_ }} |- _ => clear HAs
       | _ =>
-          let i := fresh "i" in
+          let s := fresh "s" in
           let HA := fresh "HA" in
-          destruct HAi as [i HA]
+          destruct HAs as [s HA]
       end
   end.
 
@@ -44,15 +46,16 @@ Ltac gen_core_presup H :=
       pose proof presup_ctx_eq H as [HΓ HΔ]
   | {{ ^?Γ ⊢ ^?M : ^?A }} =>
       let HΓ := fresh "HΓ" in
-      let HAi := fresh "HAi" in
-      pose proof presup_exp H as [HΓ HAi];
+      let HAwf := fresh "HAwf" in
+      pose proof presup_exp H as [HΓ HA];
       match goal with
-      | _: {{ Γ ⊢ A : Sort@_ }} |- _ => clear HAi
-      | _: __mark__ _ {{ Γ ⊢ A : Sort@_ }} |- _ => clear HAi
+      | _: {{ Γ ⊢ A }} |- _ => clear HAwf
+      | _: __mark__ _ {{ Γ ⊢ A }} |- _ => clear HAwf
+      | _: {{ Γ ⊢ A : Sort@_ }} |- _ => clear HAwf
+      | _: __mark__ _ {{ Γ ⊢ A : Sort@_ }} |- _ => clear HAwf
       | _ =>
-          let i := fresh "i" in
           let HA := fresh "HA" in
-          destruct HAi as [i HA]
+          destruct HAwf as [s HA]
       end
   | {{ ^?Γ ⊢s ^?σ : ^?Δ }} =>
       let HΓ := fresh "HΓ" in
@@ -64,12 +67,14 @@ Ltac gen_lookup_presup H :=
   match type of H with
   | {{ #?x : ^?A :: ^?K ∈ ^?Γ }} =>
       match goal with
+      | _: {{ Γ ⊢ A }} |- _ => fail
+      | _: __mark__ _ {{ Γ ⊢ A }} |- _ => fail
       | _: {{ Γ ⊢ A : Sort@_ }} |- _ => fail
       | _: __mark__ _ {{ Γ ⊢ A : Sort@_ }} |- _ => fail
       | _ =>
-          let i := fresh "i" in
+          let s := fresh "s" in
           let HA := fresh "HA" in
-          pose proof presup_ctx_lookup_typ ltac:(eassumption) H as [i HA]
+          pose proof presup_ctx_lookup_typ ltac:(eassumption) H as [s HA]
       end
   end.
 
