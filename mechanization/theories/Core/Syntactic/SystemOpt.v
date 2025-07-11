@@ -65,9 +65,12 @@ Corollary wf_ctx_eq_extend' {P : PtsSig} : forall {Γ : Ctx P} {Δ A A' s},
 Proof.
   intros.
   assert {{ Δ ⊢ A ≈ A' : Sort@s }} by (eapply ctxeq_exp_eq; mauto).
-  gen_presups.
-  (* mautosolve 4. *)
-Admitted.
+  (* gen_presups should be able to give use these two asserts *)
+  assert ({{ ⊢ Γ }} /\ {{ Γ ⊢ A : Sort@s }} /\ {{ Γ ⊢ A' : Sort@s }} /\ {{ Γ ⊢ Sort@s }}) by (eapply presup_exp_eq; mauto 2).
+  assert ({{ ⊢ Δ }} /\ {{ Δ ⊢ A : Sort@s }} /\ {{ Δ ⊢ A' : Sort@s }} /\ {{ Δ ⊢ Sort@s }}) by (eapply presup_exp_eq; mauto 2).
+  destruct_conjs.
+  econstructor; mauto 2.
+Qed.
 
 #[export]
 Hint Resolve wf_ctx_eq_extend' : mcpts.
@@ -89,10 +92,15 @@ Hint Resolve wf_pi_max : mcpts.
 
 Corollary wf_fn' {P : PtsSig} : forall {Γ : Ctx P} {A M B s1 s2 s3} {r : Ru P s1 s2 s3},
     {{ Γ, A::Sort@s1 ⊢ M : B }} ->
+    {{ Γ, A::Sort@s1 ⊢ B : Sort@s2 }} ->
     {{ Γ ⊢ λ r A M : Π r A B }}.
 Proof.
-  (* impl_opt_constructor. *)
-Admitted.
+  intros.
+  gen_presups.
+  econstructor; mauto 2.
+  econstructor; mauto 2.
+  eapply ctx_decomp_right; mauto 2.
+Qed.
 
 #[export]
 Hint Resolve wf_fn' : mcpts.
@@ -106,11 +114,7 @@ Corollary wf_app' {P : PtsSig} : forall {Γ : Ctx P} {M N A B s1 s2 s3} {r : Ru 
 Proof.
   intros.
   gen_presups.
-  assert {{ Γ ⊢ Π r A B }}.
-  {
-    eapply presup_exp_wf; mauto 2.
-  }
-  inversion_clear H1.
+  inversion_clear HAwf0.
   assert ({{ Γ ⊢ A : Sort@s1 }} /\ {{ Γ, A::Sort@s1 ⊢ B : Sort@s2 }} /\ {{ Γ ⊢ Sort@s3 ≈ Sort@s }}) as [].
   {
     eapply wf_pi_inversion; mauto 2.
@@ -122,145 +126,159 @@ Qed.
 #[export]
 Hint Resolve wf_app' : mcpts.
 #[export]
-Remove Hints wf_app : mcpts.
+Remove Hints wf_exp_app : mcpts.
 
-Lemma wf_exp_eq_typ_sub' : forall Γ σ Δ i j,
+Lemma wf_exp_eq_typ_sub' {P : PtsSig} : forall (Γ : Ctx P) σ Δ s1 s2,
     {{ Γ ⊢s σ : Δ }} ->
-    i < j ->
-    {{ Γ ⊢ Type@i[σ] ≈ Type@i : Type@j }}.
-Proof. mauto 3. Qed.
+    Ax P s1 s2 ->
+    {{ Γ ⊢ [σ]Sort@s1 ≈ Sort@s1 : Sort@s2 }}.
+Proof.
+  intros.
+  econstructor; mauto 2.
+Qed.
 
 #[export]
 Hint Resolve wf_exp_eq_typ_sub' : mcpts.
 
 #[export]
-Hint Rewrite -> wf_exp_eq_typ_sub' using solve [lia | mauto 3] : mcpts.
+Hint Rewrite -> @wf_exp_eq_typ_sub' using solve [lia | mauto 3] : mcpts.
 
 
-Corollary wf_exp_eq_pi_sub_max : forall {Γ σ Δ A i B j},
-    {{ Γ ⊢s σ : Δ }} ->
-    {{ Δ ⊢ A : Type@i }} ->
-    {{ Δ, A ⊢ B : Type@j }} ->
-    {{ Γ ⊢ (Π A B)[σ] ≈ Π (A[σ]) (B[q σ]) : Type@(max i j) }}.
+(* These results don't really make sense in our setting *)
+
+(* Corollary wf_exp_eq_pi_sub_max : forall {Γ σ Δ A i B j}, *)
+(*     {{ Γ ⊢s σ : Δ }} -> *)
+(*     {{ Δ ⊢ A : Type@i }} -> *)
+(*     {{ Δ, A ⊢ B : Type@j }} -> *)
+(*     {{ Γ ⊢ (Π A B)[σ] ≈ Π (A[σ]) (B[q σ]) : Type@(max i j) }}. *)
+(* Proof. *)
+(*   intros. *)
+(*   assert {{ Δ ⊢ A : Type@(max i j) }} by mauto using lift_exp_max_left. *)
+(*   assert {{ Δ, A ⊢ B : Type@(max i j) }} by mauto using lift_exp_max_right. *)
+(*   mauto. *)
+(* Qed. *)
+
+(* #[export] *)
+(* Hint Resolve wf_exp_eq_pi_sub_max : mcpts. *)
+
+(* Corollary wf_exp_eq_pi_cong' : forall {Γ A A' B B' i}, *)
+(*     {{ Γ ⊢ A ≈ A' : Type@i }} -> *)
+(*     {{ Γ, A ⊢ B ≈ B' : Type@i }} -> *)
+(*     {{ Γ ⊢ Π A B ≈ Π A' B' : Type@i }}. *)
+(* Proof. *)
+(*   impl_opt_constructor. *)
+(* Qed. *)
+
+(* #[export] *)
+(* Hint Resolve wf_exp_eq_pi_cong' : mcpts. *)
+(* #[export] *)
+(* Remove Hints wf_exp_eq_pi_cong : mcpts. *)
+
+(* Corollary wf_exp_eq_pi_cong_max : forall {Γ A A' i B B' j}, *)
+(*     {{ Γ ⊢ A ≈ A' : Type@i }} -> *)
+(*     {{ Γ, A ⊢ B ≈ B' : Type@j }} -> *)
+(*     {{ Γ ⊢ Π A B ≈ Π A' B' : Type@(max i j) }}. *)
+(* Proof. *)
+(*   intros. *)
+(*   assert {{ Γ ⊢ A ≈ A' : Type@(max i j) }} by eauto using lift_exp_eq_max_left. *)
+(*   assert {{ Γ, A ⊢ B ≈ B' : Type@(max i j) }} by eauto using lift_exp_eq_max_right. *)
+(*   mauto. *)
+(* Qed. *)
+
+(* #[export] *)
+(* Hint Resolve wf_exp_eq_pi_cong_max : mcpts. *)
+
+Corollary wf_exp_eq_fn_cong' {P : PtsSig} : forall {Γ : Ctx P} {A A' s1 s2 s3 B M M'} {r : Ru P s1 s2 s3},
+    {{ Γ ⊢ A ≈ A' : Sort@s1 }} ->
+    {{ Γ, A::Sort@s1 ⊢ M ≈ M' : B }} ->
+    {{ Γ, A::Sort@s1 ⊢ B :Sort@s2 }} ->
+    {{ Γ ⊢ λ r A M ≈ λ r A' M' : Π r A B }}.
 Proof.
   intros.
-  assert {{ Δ ⊢ A : Type@(max i j) }} by mauto using lift_exp_max_left.
-  assert {{ Δ, A ⊢ B : Type@(max i j) }} by mauto using lift_exp_max_right.
-  mauto.
-Qed.
-
-#[export]
-Hint Resolve wf_exp_eq_pi_sub_max : mcpts.
-
-Corollary wf_exp_eq_pi_cong' : forall {Γ A A' B B' i},
-    {{ Γ ⊢ A ≈ A' : Type@i }} ->
-    {{ Γ, A ⊢ B ≈ B' : Type@i }} ->
-    {{ Γ ⊢ Π A B ≈ Π A' B' : Type@i }}.
-Proof.
-  impl_opt_constructor.
-Qed.
-
-#[export]
-Hint Resolve wf_exp_eq_pi_cong' : mcpts.
-#[export]
-Remove Hints wf_exp_eq_pi_cong : mcpts.
-
-Corollary wf_exp_eq_pi_cong_max : forall {Γ A A' i B B' j},
-    {{ Γ ⊢ A ≈ A' : Type@i }} ->
-    {{ Γ, A ⊢ B ≈ B' : Type@j }} ->
-    {{ Γ ⊢ Π A B ≈ Π A' B' : Type@(max i j) }}.
-Proof.
-  intros.
-  assert {{ Γ ⊢ A ≈ A' : Type@(max i j) }} by eauto using lift_exp_eq_max_left.
-  assert {{ Γ, A ⊢ B ≈ B' : Type@(max i j) }} by eauto using lift_exp_eq_max_right.
-  mauto.
-Qed.
-
-#[export]
-Hint Resolve wf_exp_eq_pi_cong_max : mcpts.
-
-Corollary wf_exp_eq_fn_cong' : forall {Γ A A' i B M M'},
-    {{ Γ ⊢ A ≈ A' : Type@i }} ->
-    {{ Γ, A ⊢ M ≈ M' : B }} ->
-    {{ Γ ⊢ λ A M ≈ λ A' M' : Π A B }}.
-Proof.
-  impl_opt_constructor.
+  econstructor; mauto 2.
+  assert ({{ ⊢ Γ }} /\ {{ Γ ⊢ A : Sort@s1 }} /\ {{ Γ ⊢ A' : Sort@s1 }} /\ {{ Γ ⊢ Sort@s1 }}) by (eapply presup_exp_eq; mauto 2).
+  destruct_conjs.
+  econstructor; mauto 2.
 Qed.
 
 #[export]
 Hint Resolve wf_exp_eq_fn_cong' : mcpts.
 #[export]
-Remove Hints wf_exp_eq_fn_cong : mcpts.
+Remove Hints eq_exp_cong_lam : mcpts.
 
-Corollary wf_exp_eq_fn_sub' : forall {Γ σ Δ A M B},
+Corollary wf_exp_eq_fn_sub' {P : PtsSig} : forall {Γ : Ctx P} {σ Δ A M B s1 s2 s3} {r : Ru P s1 s2 s3},
     {{ Γ ⊢s σ : Δ }} ->
-    {{ Δ, A ⊢ M : B }} ->
-    {{ Γ ⊢ (λ A M)[σ] ≈ λ A[σ] M[q σ] : (Π A B)[σ] }}.
+    {{ Δ, A::Sort@s1 ⊢ M : B }} ->
+    {{ Δ, A::Sort@s1 ⊢ B : Sort@s2 }} ->
+    {{ Γ ⊢ [σ](λ r A M) ≈ λ r [σ]A [(Wk∘σ),,#0]M : [σ](Π r A B) }}.
 Proof.
-  impl_opt_constructor.
+  intros.
+  gen_presups.
+  econstructor; mauto 2.
+  econstructor; mauto 2.
+  eapply ctx_decomp_right; mauto 2.
 Qed.
 
 #[export]
 Hint Resolve wf_exp_eq_fn_sub' : mcpts.
 #[export]
-Remove Hints wf_exp_eq_fn_sub : mcpts.
+Remove Hints eq_exp_prop_lam : mcpts.
 
-Corollary wf_exp_eq_app_cong' : forall {Γ A B M M' N N'},
-    {{ Γ ⊢ M ≈ M' : Π A B }} ->
+Corollary wf_exp_eq_app_cong' {P : PtsSig} : forall {Γ : Ctx P} {A B M M' N N' s1 s2 s3} {r : Ru P s1 s2 s3},
+    {{ Γ ⊢ M ≈ M' : Π r A B }} ->
     {{ Γ ⊢ N ≈ N' : A }} ->
-    {{ Γ ⊢ M N ≈ M' N' : B[Id,,N] }}.
+    {{ Γ ⊢ M N ≈ M' N' : [Id,,N]B }}.
 Proof.
   intros.
-  gen_presups.
-  exvar nat ltac:(fun i => assert ({{ Γ ⊢ A : Type@i }} /\ {{ Γ, A ⊢ B : Type@i }}) as [] by eauto using wf_pi_inversion').
-  mautosolve 3.
-Qed.
+  econstructor; mauto 2.
+  assert {{ Γ ⊢ Π r A B }} by (eapply presup_exp_eq; mauto 2).
+  eapply wf_typ_pi_inversion; mauto 2.
+Qed.  
 
 #[export]
 Hint Resolve wf_exp_eq_app_cong' : mcpts.
 #[export]
-Remove Hints wf_exp_eq_app_cong : mcpts.
+Remove Hints eq_exp_cong_app : mcpts.
 
-Corollary wf_exp_eq_app_sub' : forall {Γ σ Δ A B M N},
+Corollary wf_exp_eq_app_sub' {P : PtsSig} : forall {Γ : Ctx P} {σ Δ A B M N s1 s2 s3} {r : Ru P s1 s2 s3},
     {{ Γ ⊢s σ : Δ }} ->
-    {{ Δ ⊢ M : Π A B }} ->
+    {{ Δ ⊢ M : Π r A B }} ->
     {{ Δ ⊢ N : A }} ->
-    {{ Γ ⊢ (M N)[σ] ≈ M[σ] N[σ] : B[σ,,N[σ]] }}.
+    {{ Γ ⊢ [σ](M N) ≈ [σ]M [σ]N : [σ,,[σ]N]B }}.
 Proof.
   intros.
   gen_presups.
-  exvar nat ltac:(fun i => assert ({{ Δ ⊢ A : Type@i }} /\ {{ Δ, A ⊢ B : Type@i }}) as [] by eauto using wf_pi_inversion').
-  mautosolve 3.
+  econstructor; mauto 2.
 Qed.
 
 #[export]
 Hint Resolve wf_exp_eq_app_sub' : mcpts.
 #[export]
-Remove Hints wf_exp_eq_app_sub : mcpts.
+Remove Hints eq_exp_prop_app : mcpts.
 
-Corollary wf_exp_eq_pi_beta' : forall {Γ A B M N},
-    {{ Γ, A ⊢ M : B }} ->
+Corollary wf_exp_eq_pi_beta' {P : PtsSig} : forall {Γ : Ctx P} {A B M N s1 s2 s3} {r : Ru P s1 s2 s3},
+    {{ Γ, A::Sort@s1 ⊢ M : B }} ->
+    {{ Γ, A::Sort@s1 ⊢ B : Sort@s2 }} ->
     {{ Γ ⊢ N : A }} ->
-    {{ Γ ⊢ (λ A M) N ≈ M[Id,,N] : B[Id,,N] }}.
+    {{ Γ ⊢ (λ r A M) N ≈ [Id,,N]M : [Id,,N]B }}.
 Proof.
   intros.
   gen_presups.
-  exvar nat ltac:(fun i => assert {{ Γ ⊢ A : Type@i }} by (eapply lift_exp_max_left; mauto 3)).
-  exvar nat ltac:(fun i => assert {{ Γ, A ⊢ B : Type@i }} by (eapply lift_exp_max_right; mauto 3)).
-  mautosolve 3.
+  econstructor; mauto 2.
+  econstructor; mauto 2.
+  eapply ctx_decomp_right; mauto 2.
 Qed.
 
 #[export]
 Hint Resolve wf_exp_eq_pi_beta' : mcpts.
 #[export]
-Remove Hints wf_exp_eq_pi_beta : mcpts.
+Remove Hints eq_exp_beta : mcpts.
 
-Corollary wf_exp_eq_pi_eta' : forall {Γ A B M},
-    {{ Γ ⊢ M : Π A B }} ->
-    {{ Γ ⊢ M ≈ λ A (M[Wk] #0) : Π A B }}.
+Corollary wf_exp_eq_pi_eta' {P : PtsSig} : forall {Γ : Ctx P} {A B M s1 s2 s3} {r : Ru P s1 s2 s3},
+    {{ Γ ⊢ M : Π r A B }} ->
+    {{ Γ ⊢ M ≈ λ r A ([Wk]M #0) : Π r A B }}.
 Proof.
   intros.
   gen_presups.
-  exvar nat ltac:(fun i => assert ({{ Γ ⊢ A : Type@i }} /\ {{ Γ, A ⊢ B : Type@i }}) as [] by eauto using wf_pi_inversion').
-  mautosolve 3.
+  econstructor; mauto 2.
 Qed.

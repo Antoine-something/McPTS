@@ -31,8 +31,20 @@ Proof with mautosolve 4.
   split; assumption.
 Qed.
 
+Corollary wf_typ_pi_inversion {P : PtsSig} : forall {Γ : Ctx P} {A B s1 s2 s3} {r : Ru P s1 s2 s3},
+    {{ Γ ⊢ Π r A B }} ->
+    {{ Γ ⊢ Π r A B : Sort@s3 }}.
+Proof.
+  intros.
+  inversion_clear H.
+  assert ({{ Γ ⊢ A : Sort@s1 }} /\ {{ Γ, A::Sort@s1 ⊢ B : Sort@s2 }} /\ {{ Γ ⊢ Sort@s3 ≈ Sort@s }}).
+  eapply wf_pi_inversion; mauto 2.
+  destruct_conjs.
+  econstructor; mauto 2.
+Qed. 
+
 #[export]
-Hint Resolve wf_pi_inversion' : mcpts.
+Hint Resolve wf_pi_inversion' wf_typ_pi_inversion : mcpts.
 
 Corollary wf_fn_inversion {P : PtsSig} : forall {Γ : Ctx P} {A M C s1 s2 s3} {r : Ru P s1 s2 s3},
     {{ Γ ⊢ λ r A M : C }} ->

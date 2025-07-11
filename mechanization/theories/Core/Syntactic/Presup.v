@@ -308,21 +308,13 @@ Hint Resolve presup_exp_eq_sub_compose_right : mcpts.
 #[local]
 Ltac gen_presup_IH presup_exp_eq presup_sub_eq presup_subtyp H :=
   match type of H with
-  | {{ ^?Γ ⊢ ^?M : ^?A }} =>
-      let HΓ := fresh "HΓ" in
-      let HA := fresh "HA" in
-      pose proof presup_exp _ _ _ _ H as [HΓ HA]
-  | {{ ^?Γ ⊢s ^?σ : ^?Δ }} =>
-      let HΓ := fresh "HΓ" in
-      let HΔ := fresh "HΔ" in
-      pose proof presup_sub _ _ _ _ H as [HΓ HΔ]
-  | {{ ^?Γ ⊢ ^?M ≈ ^?N : ^?A }} =>
+  | {{ ^?Γ ⊢ ^?M ≈ ^?M' : ^?A }} =>
       let HΓ := fresh "HΓ" in
       let HM := fresh "HM" in
       let HM' := fresh "HM'" in
       let HA := fresh "HA" in
       pose proof presup_exp_eq _ _ _ _ _ H as [HΓ [HM [HM' HA]]]
-  | {{ ^?Γ ⊢s ^?σ ≈ ^?τ : ^?Δ }} =>
+  | {{ ^?Γ ⊢s ^?σ ≈ ^?σ' : ^?Δ }} =>
       let HΓ := fresh "HΓ" in
       let Hσ := fresh "Hσ" in
       let Hσ' := fresh "Hσ'" in

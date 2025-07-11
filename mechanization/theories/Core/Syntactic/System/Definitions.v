@@ -119,8 +119,8 @@ with eq_exp {P : PtsSig} : Ctx P -> Typ P -> Exp P -> Exp P -> Prop :=
                          {{ Γ ⊢ A1 ≈ A2 : Sort@s1 }} -> {{ Γ, A1 :: Sort@s1 ⊢ B1 ≈ B2 : Sort@s2 }} ->
                          {{ Γ ⊢ Π r A1 B1 ≈ Π r A2 B2 : Sort@s3 }})
 | eq_exp_cong_lam : `(forall r : Ru P s1 s2 s3,
-                          {{ Γ ⊢ Π r A B : Sort@s3 }} -> {{ Γ, A :: Sort@s1 ⊢ M1 ≈ M2 : B }} ->
-                          {{ Γ ⊢ λM1 ≈ λM2 : Π r A B }})
+                          {{ Γ ⊢ Π r A1 B : Sort@s3 }} -> {{ Γ ⊢ A1 ≈ A2 : Sort@s1 }} -> {{ Γ, A :: Sort@s1 ⊢ M1 ≈ M2 : B }} ->
+                          {{ Γ ⊢ λ r A1 M1 ≈ λ r A2 M2 : Π r A B }})
 | eq_exp_cong_app : `(forall r : Ru P s1 s2 s3,
                           {{ Γ ⊢ Π r A B : Sort@s3 }} -> {{ Γ ⊢ M1 ≈ M2 : Π r A B }} -> {{ Γ ⊢ N1 ≈ N2 : A }} ->
                           {{ Γ ⊢ M1 N1 ≈ M2 N2 : [Id,,N1]B }})
