@@ -325,16 +325,15 @@ Ltac gen_presup_IH presup_exp_eq presup_sub_eq presup_subtyp H :=
 
 Lemma presup_exp_eq {P : PtsSig} : forall {Γ : Ctx P} {M M' A}, {{ Γ ⊢ M ≈ M' : A }} -> {{ ⊢ Γ }} /\ {{ Γ ⊢ M : A }} /\ {{ Γ ⊢ M' : A }} /\ {{ Γ ⊢ A }}
 with presup_sub_eq {P : PtsSig} : forall {Γ : Ctx P} {Δ σ σ'}, {{ Γ ⊢s σ ≈ σ' : Δ }} -> {{ ⊢ Γ }} /\ {{ Γ ⊢s σ : Δ }} /\ {{ Γ ⊢s σ' : Δ }} /\ {{ ⊢ Δ }}.
-Proof with mautosolve 4.    
-(*   all: inversion_clear 1; *)
-(*     (on_all_hyp: gen_presup_IH presup_exp_eq presup_sub_eq presup_subtyp); *)
-(*     gen_core_presups; *)
-(*     clear presup_exp_eq presup_sub_eq; *)
-(*     repeat split; try mautosolve 3; *)
-(*     try (eexists; unshelve solve [mauto 4 using lift_exp_max_left, lift_exp_max_right]; constructor). *)
-
+Proof with mautosolve 4.
+  (* all: inversion_clear 1; *)
+  (*   (on_all_hyp: gen_presup_IH presup_exp_eq presup_sub_eq presup_subtyp); *)
+  (*   gen_core_presups; *)
+  (*   clear presup_exp_eq presup_sub_eq; *)
+  (*   repeat split; try mautosolve 3; *)
+  (*   try (eexists; unshelve solve [mauto 4 using lift_exp_max_left, lift_exp_max_right]; constructor). *)
   
-(*   all: try (econstructor; mautosolve 4). *)
+  (*  all: try (econstructor; mautosolve 4). *)
   
 (*   (** presup_exp_eq cases *) *)
 (*   - eapply exp_sub_typ; mauto 4 using lift_exp_max_left, lift_exp_max_right. *)

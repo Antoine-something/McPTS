@@ -56,7 +56,7 @@ Proof with solve [mauto].
   (* dependent induction H; *)
   (*   try specialize (IHwf_exp1 _ _ eq_refl); *)
   (*   destruct_conjs; gen_core_presups; *)
-  (*   eexists; split. *)
+  (*   eexists; split. *)  
 Admitted.  
 
 #[export]
@@ -93,16 +93,18 @@ Lemma wf_vlookup_inversion {P : PtsSig} : forall {Γ : Ctx P} {x A},
     exists A' s, {{ #x : A' :: Sort@s ∈ Γ }} /\ {{ Γ ⊢ A' ≈ A }}.
 Proof with mautosolve 4.
   intros * H.
-  dependent induction H;
-    try (specialize (IHwf_exp1 _ eq_refl));
-    destruct_conjs; gen_core_presups; eexists; eexists; split.
-  mauto 2.
-  econstructor; mauto 2.
-  eapply eq_exp_refl.
-  eapply presup_ctx_lookup_typ; mauto 2.
-  
-
-Admitted.
+  dependent induction H.
+  - exists A; exists s.
+    split; mauto 2.
+    eapply eq_typ_refl.
+    econstructor; mauto 2.
+  - specialize (IHwf_exp _ eq_refl).
+    destruct IHwf_exp as [A' HA'].
+    destruct HA' as [s [H1 H2]].
+    exists A'; exists s.
+    split; mauto 2.
+    transitivity A; mauto 2.
+Qed.
 
 #[export]
 Hint Resolve wf_vlookup_inversion : mcpts.
@@ -112,14 +114,19 @@ Lemma wf_exp_sub_inversion {P : PtsSig} : forall {Γ : Ctx P} {M σ A},
     exists Δ A', {{ Γ ⊢s σ : Δ }} /\ {{ Δ ⊢ M : A' }} /\ {{ Γ ⊢ [σ]A' ≈ A }}.
 Proof with mautosolve 3.
   intros * H.
-  dependent induction H;
-    try (specialize (IHwf_exp1 _ _ eq_refl));
-    destruct_conjs;
-    do 2 eexists; repeat split; mauto 3.
-  assert ({{ Δ ⊢ A }}) as [] by mauto 2 using presup_exp_typ.
-
-  
-Admitted.  
+  dependent induction H.
+  - exists Δ; exists A.
+    split; mauto 2.
+    split; mauto 2.
+    eapply eq_typ_refl; mauto 2.
+    econstructor; mauto 2.
+    eapply presup_exp_typ; mauto 2.
+  - specialize (IHwf_exp _ _ eq_refl).
+    destruct IHwf_exp as [Δ [A' [Hσ [HM HA]]]].
+    exists Δ; exists A'; split; mauto 2.
+    split; mauto 2.
+    transitivity A; mauto 2.
+Qed.
 
 
 #[export]
