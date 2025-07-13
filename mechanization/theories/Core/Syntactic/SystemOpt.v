@@ -58,16 +58,14 @@ Hint Resolve wf_exp_eq_conv' : mcpts.
 #[export]
 Remove Hints wf_exp_eq_conv : mcpts.
 
+
 Corollary wf_ctx_eq_extend' {P : PtsSig} : forall {Γ : Ctx P} {Δ A A' s},
     {{ ⊢ Γ ≈ Δ }} ->
     {{ Γ ⊢ A ≈ A' : Sort@s }} ->
     {{ ⊢ Γ, A::Sort@s ≈ Δ, A'::Sort@s }}.
 Proof.
   intros.
-  assert {{ Δ ⊢ A ≈ A' : Sort@s }} by (eapply ctxeq_exp_eq; mauto).
-  (* gen_presups should be able to give use these two asserts *)
-  assert ({{ ⊢ Γ }} /\ {{ Γ ⊢ A : Sort@s }} /\ {{ Γ ⊢ A' : Sort@s }} /\ {{ Γ ⊢ Sort@s }}) by (eapply presup_exp_eq; mauto 2).
-  assert ({{ ⊢ Δ }} /\ {{ Δ ⊢ A : Sort@s }} /\ {{ Δ ⊢ A' : Sort@s }} /\ {{ Δ ⊢ Sort@s }}) by (eapply presup_exp_eq; mauto 2).
+  gen_presups.
   destruct_conjs.
   econstructor; mauto 2.
 Qed.

@@ -305,24 +305,6 @@ Qed.
 #[local]
 Hint Resolve presup_exp_eq_sub_compose_right : mcpts.
 
-#[local]
-Ltac gen_presup_IH presup_exp_eq presup_sub_eq presup_subtyp H :=
-  match type of H with
-  | {{ ^?Γ ⊢ ^?M ≈ ^?M' : ^?A }} =>
-      let HΓ := fresh "HΓ" in
-      let HM := fresh "HM" in
-      let HM' := fresh "HM'" in
-      let HA := fresh "HA" in
-      pose proof presup_exp_eq _ _ _ _ _ H as [HΓ [HM [HM' HA]]]
-  | {{ ^?Γ ⊢s ^?σ ≈ ^?σ' : ^?Δ }} =>
-      let HΓ := fresh "HΓ" in
-      let Hσ := fresh "Hσ" in
-      let Hσ' := fresh "Hσ'" in
-      let HΔ := fresh "HΔ" in
-      pose proof presup_sub_eq _ _ _ _ _ H as [HΓ [Hσ [Hσ' HΔ]]]
-  end.
-
-
 Lemma presup_exp_eq {P : PtsSig} : forall {Γ : Ctx P} {M M' A}, {{ Γ ⊢ M ≈ M' : A }} -> {{ ⊢ Γ }} /\ {{ Γ ⊢ M : A }} /\ {{ Γ ⊢ M' : A }} /\ {{ Γ ⊢ A }}
 with presup_sub_eq {P : PtsSig} : forall {Γ : Ctx P} {Δ σ σ'}, {{ Γ ⊢s σ ≈ σ' : Δ }} -> {{ ⊢ Γ }} /\ {{ Γ ⊢s σ : Δ }} /\ {{ Γ ⊢s σ' : Δ }} /\ {{ ⊢ Δ }}.
 Proof with mautosolve 4.
@@ -348,7 +330,24 @@ Proof with mautosolve 4.
 (* Qed. *)
 Admitted.
 
+
+#[local]
+Ltac gen_presup_IH H :=
+  match type of H with
+  | {{ ^?Γ ⊢ ^?M ≈ ^?M' : ^?A }} =>
+      let HΓ := fresh "HΓ" in
+      let HM := fresh "HM" in
+      let HM' := fresh "HM'" in
+      let HA := fresh "HA" in
+      pose proof presup_exp_eq H as [HΓ [HM [HM' HA]]]
+  | {{ ^?Γ ⊢s ^?σ ≈ ^?σ' : ^?Δ }} =>
+      let HΓ := fresh "HΓ" in
+      let Hσ := fresh "Hσ" in
+      let Hσ' := fresh "Hσ'" in
+      let HΔ := fresh "HΔ" in
+      pose proof presup_sub_eq H as [HΓ [Hσ [Hσ' HΔ]]]
+  end.
            
-Ltac gen_presup H := gen_presup_IH @presup_exp_eq @presup_sub_eq H + gen_core_presup H.
+Ltac gen_presup H := gen_presup_IH H + gen_core_presup H.
 
 Ltac gen_presups := (on_all_hyp: fun H => gen_presup H); invert_wf_ctx; (on_all_hyp: fun H => gen_lookup_presup H); clear_dups.

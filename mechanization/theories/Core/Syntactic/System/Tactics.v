@@ -40,9 +40,9 @@ Ltac gen_core_presup H :=
       pose proof presup_exp H as [HΓ HAwf];
       match goal with
       | _: {{ Γ ⊢ A }} |- _ => idtac
-      | _: __mark__ _ {{ Γ ⊢ A }} |- _ => clear HAwf
+      (* | _: __mark__ _ {{ Γ ⊢ A }} |- _ => clear HAwf *)
       | _: {{ Γ ⊢ A : Sort@_ }} |- _ => idtac
-      | _: __mark__ _ {{ Γ ⊢ A : Sort@_ }} |- _ => clear HAwf
+      (* | _: __mark__ _ {{ Γ ⊢ A : Sort@_ }} |- _ => clear HAwf *)
       | _ =>
           let HA := fresh "HA" in
           destruct HAwf as [s HA]
@@ -58,9 +58,9 @@ Ltac gen_lookup_presup H :=
   | {{ #?x : ^?A :: ^?K ∈ ^?Γ }} =>
       match goal with
       | _: {{ Γ ⊢ A }} |- _ => fail
-      | _: __mark__ _ {{ Γ ⊢ A }} |- _ => fail
+      (* | _: __mark__ _ {{ Γ ⊢ A }} |- _ => fail *)
       | _: {{ Γ ⊢ A : Sort@_ }} |- _ => fail
-      | _: __mark__ _ {{ Γ ⊢ A : Sort@_ }} |- _ => fail
+      (* | _: __mark__ _ {{ Γ ⊢ A : Sort@_ }} |- _ => fail *)
       | _ =>
           let s := fresh "s" in
           let HA := fresh "HA" in
