@@ -150,8 +150,8 @@ with eq_typ {P : PtsSig} : Ctx P -> Typ P -> Typ P -> Prop :=
                     {{ Γ ⊢ [σ]Sort@s ≈ Sort@s }})
 | eq_typ_clo_cong : `({{ Γ ⊢s σ ≈ τ : Δ }} -> {{ Δ ⊢ A ≈ B }} ->
                       {{ Γ ⊢ [σ]A ≈ [τ]B }})
-| eq_typ_prop_comp : `({{ Γ1 ⊢s σ : Γ2 }} -> {{ Γ2 ⊢s τ : Γ3 }} -> {{ Γ3 ⊢ A }} ->
-                       {{ Γ1 ⊢ [σ∘τ]A ≈ [σ][τ]A }})
+| eq_typ_prop_comp : `({{ Γ1 ⊢s σ : Γ2 }} -> {{ Γ2 ⊢s τ : Γ3 }} -> {{ Γ3 ⊢ A ≈ B }} ->
+                       {{ Γ1 ⊢ [σ∘τ]A ≈ [σ][τ]B }})
 | eq_typ_exp : `({{ Γ ⊢ A ≈ B : Sort@s }} ->
                  {{ Γ ⊢ A ≈ B }})
 | eq_typ_refl : `({{ Γ ⊢ A }} ->
@@ -228,7 +228,7 @@ Combined Scheme syntactic_wf_mut_ind' from
 
 
 #[export]
-Hint Constructors wf_ctx eq_ctx wf_exp eq_exp wf_typ eq_typ wf_sub eq_sub ctx_lookup : mctt.
+Hint Constructors wf_ctx eq_ctx wf_exp eq_exp wf_typ eq_typ wf_sub eq_sub ctx_lookup : mcpts.
 
 
 #[export]
@@ -266,35 +266,27 @@ Add Parametric Morphism {P : PtsSig} (Γ : Ctx P) T : (eq_exp Γ T)
     with signature eq_exp Γ T ==> eq ==> iff as eq_exp_morphism_iff1.
 Proof.
   split; mauto; intros; eapply eq_exp_trans; mauto.
-  eapply eq_exp_sym; mauto.
 Qed.
-
-
 
 Add Parametric Morphism {P : PtsSig} (Γ : Ctx P) T : (eq_exp Γ T)
     with signature eq ==> eq_exp Γ T ==> iff as eq_exp_morphism_iff2.
 Proof.
   split; mauto; intros; eapply eq_exp_trans; mauto.
-  eapply eq_exp_sym; mauto.
 Qed.
 
 Add Parametric Morphism {P : PtsSig} (Γ Δ : Ctx P) : (eq_sub Γ Δ)
     with signature eq_sub Γ Δ ==> eq ==> iff as eq_sub_morphism_iff1.
 Proof.
   split; mauto; intros; eapply eq_sub_trans; mauto.
-  eapply eq_sub_sym; mauto.
 Qed.
 
 Add Parametric Morphism {P : PtsSig} (Γ Δ : Ctx P) : (eq_sub Γ Δ)
     with signature eq ==> eq_sub Γ Δ ==> iff as eq_sub_morphism_iff2.
 Proof.
   split; mauto; intros; eapply eq_sub_trans; mauto.
-  eapply eq_sub_sym; mauto.
 Qed.
 
 
-(* There doesn't seem to be an alternative to using @ on every constructor *)
-(* Will this cause problem since now the PTS signature is assumed to be explicit? *)
 #[export]
 Hint Rewrite -> @eq_exp_prop_sort using mauto 3 : mcpts.
 

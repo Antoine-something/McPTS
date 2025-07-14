@@ -77,7 +77,6 @@ Proof with mautosolve 4.
       eapply wf_pi_inversion'; mauto 2.
     }
     destruct_conjs.
-    econstructor; mauto 2.    
     econstructor; mauto 2.
   - specialize (IHwf_exp _ _ eq_refl); 
       destruct_conjs;
@@ -103,7 +102,6 @@ Proof with mautosolve 4.
     destruct HA' as [s [H1 H2]].
     exists A'; exists s.
     split; mauto 2.
-    transitivity A; mauto 2.
 Qed.
 
 #[export]
@@ -125,7 +123,6 @@ Proof with mautosolve 3.
     destruct IHwf_exp as [Δ [A' [Hσ [HM HA]]]].
     exists Δ; exists A'; split; mauto 2.
     split; mauto 2.
-    transitivity A; mauto 2.
 Qed.
 
 

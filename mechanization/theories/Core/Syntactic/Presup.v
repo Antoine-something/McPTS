@@ -18,7 +18,6 @@ Proof.
   assert {{ Γ ⊢ Π r A B ≈ Π r A' B : Sort@s3 }}.
   {
     econstructor; mauto 3.
-    eapply eq_exp_refl; mauto.
   }
   enough {{ Γ ⊢ λ r A' M' : Π r A' B }}.
   {
@@ -54,14 +53,7 @@ Proof.
   assert {{ Γ ⊢ Π r [σ]A [(Wk∘σ),,#0]B ≈ Π r [σ]A [(Wk∘σ),,#0]B : Sort@s3 }} by (econstructor; mauto 2).
   assert {{ Γ, [σ]A::Sort@s1 ⊢ [(Wk∘σ),,#0]M : [(Wk∘σ),,#0]B }} by (econstructor; mauto 3).
   assert {{ Γ ⊢ λ r [σ]A [(Wk∘σ),,#0]M : Π r [σ]A [(Wk∘σ),,#0]B }} by (econstructor; mauto 3).
-  eapply wf_conv; mauto 3.
-  eapply wf_exp_conv; mauto 2.
-  eapply wf_exp_clo; mauto 2.
-  econstructor; mauto 2.
-  econstructor; mauto 2.
-  eapply eq_exp_sym.
-  eapply eq_exp_conv; mauto 2; econstructor; mauto 2.
-  econstructor; mauto 2.
+  eapply wf_conv; mauto.
 Qed.
 
 #[local]
@@ -85,14 +77,6 @@ Proof.
   assert {{ Γ ⊢s Id,,N ≈ Id,,N' : Γ, A::Sort@s1 }} by mauto 2.
   assert {{ Γ ⊢ [Id,,N]B ≈ [Id,,N']B : Sort@s2 }} by mauto 3.
   eapply wf_conv; mauto 3.
-  econstructor; mauto 2.
-  econstructor; mauto 2.
-  eapply eq_exp_conv; mauto 2.
-  eapply eq_exp_cong_clo; mauto 2.
-  econstructor; mauto 2.
-  eapply eq_exp_sym; mauto.
-  eapply eq_exp_refl; mauto 2.
-  econstructor; mauto 2.
 Qed.
 
 #[local]
@@ -118,12 +102,10 @@ Proof.
     eapply wf_exp_conv; mauto 2.
     econstructor; mauto 2.
     econstructor; mauto 2.
-    econstructor; mauto 2.
   }
   assert {{ Δ ⊢ N : [Id]A }} by mauto 2.
   assert {{ Γ ⊢s σ∘(Id,,N) ≈ σ∘Id,,[σ]N : Δ, A::Sort@s1 }}.
   {
-    econstructor; mauto 2.
     econstructor; mauto 2.
   }
   assert {{ Γ ⊢s σ∘(Id,,N) ≈ σ,,[σ]N : Δ, A::Sort@s1 }} by mauto 3.
@@ -133,12 +115,10 @@ Proof.
   assert {{ Γ ⊢s σ,,[σ]N : Δ, A::Sort@s1 }}.
   {
     econstructor; mauto 2.
-    econstructor; mauto 2.
   }
   assert {{ Γ ⊢ [σ,,[σ]N]B : Sort@s2 }} by mauto 2.
   assert {{ Γ ⊢ [σ][Id,,N]B ≈ [σ,,[σ]N]B : Sort@s2 }} by (econstructor; mauto 2).
   eapply wf_conv; mauto 3.
-  econstructor; mauto 2.
   econstructor; mauto 2.
   econstructor; mauto 2.
 Qed.
@@ -164,7 +144,6 @@ Proof.
   assert {{ Γ ⊢ [σ]M : Π r [σ]A [(Wk∘σ),,#0]B }}.
   {
     eapply wf_conv; mauto 2; econstructor; mauto 2.
-    econstructor; mauto 2.    
   }
   assert {{ Γ ⊢ [σ]N : [σ]A }} by (econstructor; mauto 2).
   assert {{ Γ ⊢s (Id,,[σ]N)∘((Wk∘σ),,#0) ≈ σ,,[σ]N : Δ, A::Sort@s1 }} by mauto 2.
@@ -199,11 +178,6 @@ Proof.
   assert {{ Γ, A::Sort@s1 ⊢ [Id,,#0][(Wk∘Wk),,#0]B ≈ [Id]B : Sort@s2 }}.
   {
     transitivity {{{ [(Id,,#0)∘((Wk∘Wk),,#0)]B }}}; mauto 3.
-    eapply eq_exp_conv; mauto 2.
-    eapply eq_exp_cong_clo; mauto 2.
-    eapply eq_exp_refl; mauto 2.
-    econstructor; mauto 2.
-    econstructor; mauto 2.
   }
   econstructor; eauto.
   eapply wf_exp_pi; mauto 2.
@@ -212,8 +186,6 @@ Proof.
   econstructor; mauto 2.
   eapply eq_exp_conv; mauto 2.
   transitivity {{{ [Id]B }}}; mauto 2.
-  econstructor; mauto 2.
-  econstructor; mauto 2.
 Qed.
 
 
@@ -232,7 +204,6 @@ Proof.
   assert {{ ⊢ Δ, A::Sort@s }} by (econstructor; mauto 2).
   assert {{ Δ, A::Sort@s ⊢ #0 : [Wk]A }} by (econstructor; mauto 2; econstructor; mauto 2).
   eapply wf_conv; mauto 3; econstructor; mauto 2.
-  econstructor; mauto 2.
 Qed.
 
 #[local]
@@ -252,7 +223,6 @@ Proof.
   assert {{ Δ ⊢ B : Sort@s' }} by mauto 2.
   assert {{ Δ, A::Sort@s ⊢ #(S x) : [Wk]B }} by (econstructor; mauto 2; econstructor; mauto 2).
   eapply wf_conv; mauto 2; econstructor; mauto 2.
-  econstructor; mauto 2.
 Qed.
 
 #[local]
@@ -271,13 +241,10 @@ Lemma presup_exp_eq_sub_cong_right {P : PtsSig} : forall {Γ : Ctx P} {σ σ' Δ
     {{ Γ ⊢ [σ']M' : [σ]A }}.
 Proof.
   intros.
-  eapply wf_conv; mauto 2.
+  eapply wf_conv.
   eapply wf_exp_clo; mauto 2.
-  eapply eq_exp_conv; mauto 2.
-  eapply eq_exp_cong_clo; mauto 2.
-  eapply eq_sub_sym; mauto 2.
-  eapply eq_exp_refl; mauto 2.
-  econstructor; mauto 2.
+  eapply wf_exp_conv; mauto.
+  eapply eq_exp_conv; mauto.
 Qed.
 
 #[local]
@@ -295,11 +262,6 @@ Lemma presup_exp_eq_sub_compose_right {P : PtsSig} : forall {Γ : Ctx P} {τ Γ'
 Proof.
   intros.
   eapply wf_conv; mauto 3; econstructor; mauto 2.
-  eapply wf_exp_clo; mauto 2.
-  eapply wf_exp_clo; mauto 2.
-  econstructor; mauto 2.
-  econstructor; mauto 2.
-  econstructor; mauto 2.
 Qed.
 
 #[local]

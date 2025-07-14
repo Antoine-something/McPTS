@@ -1,6 +1,6 @@
 From McPTS Require Import LibTactics PtsSignature.
 From McPTS.Core Require Import Base.
-From McPTS.Core.Syntactic.System Require Import Definitions.
+From McPTS.Core.Syntactic Require Import System.
 
 Lemma ctx_eq_refl {P : PtsSig} : forall {Γ : Ctx P}, {{ ⊢ Γ }} -> {{ ⊢ Γ ≈ Γ }}.
 Proof with mautosolve.

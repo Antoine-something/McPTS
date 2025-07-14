@@ -10,7 +10,6 @@ Proof with mautosolve.
   split; intros; gen_presups;
     eapply wf_exp_conv; mauto 2.
   econstructor; mauto 2.
-  symmetry; econstructor; mauto 2.
 Qed.
 
 Add Parametric Morphism {P : PtsSig} (s : St P) Γ : (eq_exp Γ)
@@ -19,7 +18,6 @@ Proof with mautosolve.
   split; intros; gen_presups;
     eapply eq_exp_conv; mauto 2.
   econstructor; mauto 2.
-  symmetry; econstructor; mauto 2.
 Qed.
 
 #[local]
@@ -35,7 +33,6 @@ Corollary wf_conv' {P : PtsSig} : forall (Γ : Ctx P) M A s A',
 Proof.
   intros.
   eapply wf_exp_conv; mauto 2.
-  econstructor; mauto 2.
 Qed.
 
 #[export]
@@ -50,7 +47,6 @@ Corollary wf_exp_eq_conv' {P : PtsSig} : forall (Γ : Ctx P) M M' A A' s,
 Proof.
   intros.
   eapply eq_exp_conv; mauto 2.
-  econstructor; mauto 2.
 Qed.
 
 #[export]
@@ -97,7 +93,6 @@ Proof.
   gen_presups.
   econstructor; mauto 2.
   econstructor; mauto 2.
-  eapply ctx_decomp_right; mauto 2.
 Qed.
 
 #[export]
@@ -214,7 +209,6 @@ Proof.
   gen_presups.
   econstructor; mauto 2.
   econstructor; mauto 2.
-  eapply ctx_decomp_right; mauto 2.
 Qed.
 
 #[export]
@@ -264,7 +258,6 @@ Proof.
   gen_presups.
   econstructor; mauto 2.
   econstructor; mauto 2.
-  eapply ctx_decomp_right; mauto 2.
 Qed.
 
 #[export]

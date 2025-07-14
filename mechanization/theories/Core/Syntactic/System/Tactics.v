@@ -2,9 +2,6 @@ From McPTS Require Import LibTactics.
 From McPTS.Core Require Import Base.
 From McPTS.Core.Syntactic.System Require Import Definitions Lemmas.
 
-(* #[export] *)
-(* Hint Rewrite -> wf_exp_eq_pi_sub using pi_univ_level_tac : mctt. *)
-
 #[local]
 Ltac invert_wf_ctx1 H :=
   match type of H with
