@@ -92,40 +92,43 @@ Coercion Ne_to_Exp : Ne >-> Exp.
 #[global] Bind Scope mcpts_scope with Ne.
 Open Scope mcpts_scope.
 
-(* We need to define substitution notation first to assert [left associativity] of level 0. *)
-Notation "[ σ ] e" := (a_clo σ e) (in custom Exp at level 0, e custom Exp, σ custom Exp at level 60, left associativity, format "[ σ ] e") : mcpts_scope.
-Notation "{{{ x }}}" := x (at level 0, x custom Exp at level 99, format "'{{{'  x  '}}}'") : mcpts_scope.
-Notation "( x )" := x (in custom Exp at level 0, x custom Exp at level 60) : mcpts_scope.
-Notation "'^' x" := x (in custom Exp at level 0, x constr at level 0) : mcpts_scope.
-Notation "x" := x (in custom Exp at level 0, x ident) : mcpts_scope.
+(** Syntactic notation *)
+Module Syntax_Notations.
+  (* We need to define substitution notation first to assert [left associativity] of level 0. *)
+  Notation "[ σ ] e" := (a_clo σ e) (in custom Exp at level 0, e custom Exp, σ custom Exp at level 60, left associativity, format "[ σ ] e") : mcpts_scope.
+  Notation "{{{ x }}}" := x (at level 0, x custom Exp at level 99, format "'{{{'  x  '}}}'") : mcpts_scope.
+  Notation "( x )" := x (in custom Exp at level 0, x custom Exp at level 60) : mcpts_scope.
+  Notation "'^' x" := x (in custom Exp at level 0, x constr at level 0) : mcpts_scope.
+  Notation "x" := x (in custom Exp at level 0, x ident) : mcpts_scope.
 
-Notation "'Sort' @ s" := (a_st s) (in custom Exp at level 0, s constr at level 0, format "'Sort' @ s") : mcpts_scope.
-Notation "'#' i" := (a_var i) (in custom Exp at level 0, i constr at level 0, format "'#' i") : mcpts_scope.  
-Notation "'Π' r A B" := (a_pi _ _ _ r A B) (in custom Exp at level 1, r constr at level 0, A custom Exp at level 0, B custom Exp at level 60) : mcpts_scope.
-Notation "'λ' r A M" := (a_lam _ _ _ r A M) (in custom Exp at level 1, r constr at level 0, A custom Exp at level 1, M custom Exp at level 60) : mcpts_scope.
-Notation "f x .. y" := (a_app .. (a_app f x) .. y) (in custom Exp at level 40, f custom Exp, x custom Exp at next level, y custom Exp at next level) : mcpts_scope.
+  Notation "'Sort' @ s" := (a_st s) (in custom Exp at level 0, s constr at level 0, format "'Sort' @ s") : mcpts_scope.
+  Notation "'#' i" := (a_var i) (in custom Exp at level 0, i constr at level 0, format "'#' i") : mcpts_scope.  
+  Notation "'Π' r A B" := (a_pi _ _ _ r A B) (in custom Exp at level 1, r constr at level 0, A custom Exp at level 0, B custom Exp at level 60) : mcpts_scope.
+  Notation "'λ' r A M" := (a_lam _ _ _ r A M) (in custom Exp at level 1, r constr at level 0, A custom Exp at level 1, M custom Exp at level 60) : mcpts_scope.
+  Notation "f x .. y" := (a_app .. (a_app f x) .. y) (in custom Exp at level 40, f custom Exp, x custom Exp at next level, y custom Exp at next level) : mcpts_scope.
 
-(* Notation for substitutions *)
-Notation "'Id'" := a_id (in custom Exp at level 0) : mcpts_scope.
-Notation "'Wk'" := a_wk (in custom Exp at level 0) : mcpts_scope.
-Notation "'..'" := a_empty (in custom Exp at level 0) : mcpts_scope.
-Notation "σ ∘ τ" := (a_comp σ τ) (in custom Exp at level 40, right associativity, format "σ ∘ τ") : mcpts_scope.
-Notation "σ ,, e" := (a_ext σ e) (in custom Exp at level 50, left associativity, format "σ ,, e") : mcpts_scope.
+  (* Notation for substitutions *)
+  Notation "'Id'" := a_id (in custom Exp at level 0) : mcpts_scope.
+  Notation "'Wk'" := a_wk (in custom Exp at level 0) : mcpts_scope.
+  Notation "'..'" := a_empty (in custom Exp at level 0) : mcpts_scope.
+  Notation "σ ∘ τ" := (a_comp σ τ) (in custom Exp at level 40, right associativity, format "σ ∘ τ") : mcpts_scope.
+  Notation "σ ,, e" := (a_ext σ e) (in custom Exp at level 50, left associativity, format "σ ,, e") : mcpts_scope.
 
-(* Notation for contexts *)
-Notation "⋅" := (nil) (in custom Exp at level 0) : mcpts_scope.
-Notation "Γ , A :: K" := (cons (A, K) Γ) (in custom Exp at level 50, left associativity, format "Γ ,  A :: K") : mcpts_scope.
+  (* Notation for contexts *)
+  Notation "⋅" := (nil) (in custom Exp at level 0) : mcpts_scope.
+  Notation "Γ , A :: K" := (cons (A, K) Γ) (in custom Exp at level 50, left associativity, format "Γ ,  A :: K") : mcpts_scope.
 
 
-(* Notation for normal and neutral forms *)
-Notation "n{{{ x }}}" := x (at level 0, x custom Nf at level 99, format "'n{{{'  x  '}}}'") : mcpts_scope.
-Notation "( x )" := x (in custom Nf at level 0, x custom Nf at level 60) : mcpts_scope.
-Notation "'^' x" := x (in custom Nf at level 0, x constr at level 0) : mcpts_scope.
-Notation "x" := x (in custom Nf at level 0, x ident) : mcpts_scope.
+  (* Notation for normal and neutral forms *)
+  Notation "n{{{ x }}}" := x (at level 0, x custom Nf at level 99, format "'n{{{'  x  '}}}'") : mcpts_scope.
+  Notation "( x )" := x (in custom Nf at level 0, x custom Nf at level 60) : mcpts_scope.
+  Notation "'^' x" := x (in custom Nf at level 0, x constr at level 0) : mcpts_scope.
+  Notation "x" := x (in custom Nf at level 0, x ident) : mcpts_scope.
 
-Notation "'Sort' @ s" := (nf_st s) (in custom Nf at level 0, s constr at level 0, format "'Sort' @ s") : mcpts_scope.
-Notation "'Π' r V1 V2" := (nf_pi _ _ _ r V1 V2) (in custom Nf at level 2, r constr at level 0, V1 custom Nf at level 1, V2 custom Nf at level 60) : mcpts_scope.
-Notation "'λ' r VA VM" := (nf_lam _ _ _ r VA VM) (in custom Nf at level 2, r constr at level 0, VA custom Nf at level 1, VM custom Exp at level 60) : mcpts_scope.
-Notation "f x .. y" := (ne_app .. (ne_app f x) .. y) (in custom Nf at level 40, f custom Nf, x custom Nf at next level, y custom Nf at next level) : mcpts_scope.
-Notation "'#' i" := (ne_var i) (in custom Nf at level 0, i constr at level 0, format "'#' i") : mcpts_scope.
-Notation "'⇑' E" := (nf_ne E) (in custom Nf at level 0, E custom Nf at level 99, format "'⇑'  E") : mcpts_scope.
+  Notation "'Sort' @ s" := (nf_st s) (in custom Nf at level 0, s constr at level 0, format "'Sort' @ s") : mcpts_scope.
+  Notation "'Π' r V1 V2" := (nf_pi _ _ _ r V1 V2) (in custom Nf at level 2, r constr at level 0, V1 custom Nf at level 1, V2 custom Nf at level 60) : mcpts_scope.
+  Notation "'λ' r VA VM" := (nf_lam _ _ _ r VA VM) (in custom Nf at level 2, r constr at level 0, VA custom Nf at level 1, VM custom Exp at level 60) : mcpts_scope.
+  Notation "f x .. y" := (ne_app .. (ne_app f x) .. y) (in custom Nf at level 40, f custom Nf, x custom Nf at next level, y custom Nf at next level) : mcpts_scope.
+  Notation "'#' i" := (ne_var i) (in custom Nf at level 0, i constr at level 0, format "'#' i") : mcpts_scope.
+  Notation "'⇑' E" := (nf_ne E) (in custom Nf at level 0, E custom Nf at level 99, format "'⇑'  E") : mcpts_scope.
+End Syntax_Notations.

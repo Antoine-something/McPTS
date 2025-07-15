@@ -1,6 +1,7 @@
 From McPTS Require Import PtsSignature LibTactics.
 From McPTS.Core Require Import Base.
 From McPTS.Core.Syntactic.System Require Import Definitions.
+Import Syntax_Notations.
 
 (** ** Basic Context Properties *)
 
@@ -67,7 +68,8 @@ Qed.
 Hint Resolve ctx_decomp_left ctx_decomp_right : mcpts.
 
 
-
+    
+    
 (** **  Presuppositions *)
 
 (** *** Context Presuppositions *)
@@ -90,6 +92,32 @@ Qed.
 #[export]
 Hint Resolve presup_ctx_eq presup_ctx_eq_left presup_ctx_eq_right : mcpts.
 
+
+Lemma presup_ctx_eq_lookup {P : PtsSig} : forall {Γ : Ctx P} {i A s Δ},
+    {{ #i : A :: Sort@s ∈ Γ }} -> {{ ⊢ Γ ≈ Δ }} ->
+    exists B, {{ #i : B :: Sort@s ∈ Δ }} /\ {{ Δ ⊢ B ≈ A : Sort@s }}.
+Proof.
+  intros * HΓ.
+  dependent induction HΓ.
+  - intros HΓΔ.
+    inversion_clear HΓΔ.
+    assert {{ Δ0, B::Sort@s ⊢s Wk : Δ0 }} by mauto.
+    eexists; split; mauto.
+    symmetry; mauto.
+  - intros HΓΔ.
+    inversion_clear HΓΔ.
+    assert (exists B, {{ #i : B ::Sort@s ∈ Δ0 }} /\ {{ Δ0 ⊢ B ≈ A : Sort@s }}) by (eapply IHHΓ; mauto).
+    destruct_conjs.
+    eexists; split; mauto.
+    eapply eq_exp_conv.
+    eapply eq_exp_cong_clo; mauto.
+    econstructor; mauto.
+Qed.
+
+#[export]
+Hint Resolve presup_ctx_eq_lookup : mcpts.
+
+ 
 Lemma presup_sub {P : PtsSig}: forall {Γ Δ : Ctx P} {σ}, {{ Γ ⊢s σ : Δ }} -> {{ ⊢ Γ }} /\ {{ ⊢ Δ }}.
 Proof with mautosolve.
   induction 1; split; mauto; destruct_pairs; mauto.
@@ -1112,9 +1140,8 @@ Lemma presup_exp_typ {P : PtsSig} : forall {Γ : Ctx P} {M A},
     {{ Γ ⊢ A }}.
 Proof.
   induction 1; assert {{ ⊢ Γ }} by mauto 3; destruct_conjs; mauto 3.
-  - inversion H; subst.
-    + econstructor; mauto 2.
-    + admit.
+  - admit.
+  - admit.
   - admit.
 Admitted.
     

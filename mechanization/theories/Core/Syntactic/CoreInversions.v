@@ -1,7 +1,8 @@
 From Coq Require Import Setoid.
 From McPTS Require Import PtsSignature LibTactics.
 From McPTS.Core Require Import Base.
-From McPTS.Core.Syntactic Require Import System CtxEq.
+From McPTS.Core.Syntactic Require Export CtxEq.
+Import Syntax_Notations.
 
 Lemma wf_pi_inversion {P : PtsSig} : forall {Γ : Ctx P} {A B C s1 s2 s3} {r : Ru P s1 s2 s3},
     {{ Γ ⊢ Π r A B : C }} ->

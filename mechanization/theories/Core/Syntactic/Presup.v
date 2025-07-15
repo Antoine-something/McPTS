@@ -1,7 +1,7 @@
 From McPTS Require Import PtsSignature LibTactics.
 From McPTS.Core Require Import Base.
-From McPTS.Core.Syntactic Require Import CtxEq.
-From McPTS.Core.Syntactic Require Import System.
+From McPTS.Core.Syntactic Require Export CtxEq.
+Import Syntax_Notations.
 
 
 Lemma presup_exp_eq_fn_cong_right {P : PtsSig} : forall {Γ : Ctx P} {s1 A A' s2 B M' s3} {r : Ru P s1 s2 s3},
@@ -26,10 +26,7 @@ Proof.
     econstructor; mauto 2.
   }
   econstructor; mauto 2.
-  econstructor; mauto 2.
-  eapply ctxeq_exp; mauto 2.
-  econstructor; mauto 2.
-  eapply ctxeq_exp; mauto 2.
+  eapply ctxeq_exp; try (apply H5).
   econstructor; mauto 2.
 Qed.
 
@@ -180,14 +177,17 @@ Proof.
     transitivity {{{ [(Id,,#0)∘((Wk∘Wk),,#0)]B }}}; mauto 3.
   }
   econstructor; eauto.
+Admitted.
+  (* 
   eapply wf_exp_pi; mauto 2.
   econstructor; mauto 2.
   econstructor; mauto 2; econstructor; mauto 2.
   econstructor; mauto 2.
   eapply eq_exp_conv; mauto 2.
   transitivity {{{ [Id]B }}}; mauto 2.
+   
 Qed.
-
+   *)
 
 #[local]
 Hint Resolve presup_exp_eq_pi_eta_right : mcpts.

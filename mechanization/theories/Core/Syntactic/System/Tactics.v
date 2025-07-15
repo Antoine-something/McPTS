@@ -1,6 +1,7 @@
 From McPTS Require Import LibTactics.
 From McPTS.Core Require Import Base.
-From McPTS.Core.Syntactic.System Require Import Definitions Lemmas.
+From McPTS.Core.Syntactic.System Require Export Definitions Lemmas.
+Import Syntax_Notations.
 
 #[local]
 Ltac invert_wf_ctx1 H :=

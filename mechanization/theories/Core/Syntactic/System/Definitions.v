@@ -3,6 +3,7 @@ From Coq Require Import List Classes.RelationClasses Setoid Morphisms.
 From McPTS Require Import PtsSignature LibTactics.
 From McPTS.Core Require Import Base.
 From McPTS.Core.Syntactic Require Export Syntax.
+Import Syntax_Notations.
 
 Reserved Notation "⊢ Γ" (in custom judg at level 80, Γ custom Exp).
 Reserved Notation "⊢ Γ ≈ Δ" (in custom judg at level 80, Γ custom Exp, Δ custom Exp).
@@ -40,7 +41,7 @@ with wf_exp {P : PtsSig} : Ctx P -> Typ P -> Exp P -> Prop :=
                     {{ Γ ⊢ A : Sort@s1 }} -> {{ Γ, A :: Sort@s1 ⊢ B : Sort@s2 }} ->
                     {{ Γ ⊢ Π r A B : Sort@s3 }})
 | wf_exp_lam : `(forall r : Ru P s1 s2 s3,
-                     {{ Γ ⊢ Π r A B : Sort@s3 }} -> {{ Γ, A :: Sort@s ⊢ M : B }} ->
+                     {{ Γ ⊢ A : Sort@s1 }} -> {{ Γ, A :: Sort@s1 ⊢ M : B }} ->
                      {{ Γ ⊢ λ r A M : Π r A B }})
 | wf_exp_app : `(forall r : Ru P s1 s2 s3,
                      {{ Γ ⊢ Π r A B : Sort@s3 }} -> {{ Γ ⊢ M : Π r A B }} -> {{ Γ ⊢ N : A }} ->
@@ -89,7 +90,7 @@ where "⊢ Γ ≈ Δ" := (eq_ctx Γ Δ) (in custom judg) : type_scope
 with eq_exp {P : PtsSig} : Ctx P -> Typ P -> Exp P -> Exp P -> Prop :=
 (* β-reduction and η-expansion *)
 | eq_exp_beta : `(forall r : Ru P s1 s2 s3,
-                      {{ Γ ⊢ Π r A B : Sort@s3 }} -> {{ Γ, A :: Sort@s1 ⊢ M : B }} -> {{ Γ ⊢ N : A }} ->
+                      {{ Γ ⊢ A : Sort@s1 }} -> {{ Γ, A :: Sort@s1 ⊢ M : B }} -> {{ Γ ⊢ N : A }} ->
                       {{ Γ ⊢ (λ r A M) N ≈ [Id,,N]M : [Id,,N]B }})
 | eq_exp_eta : `(forall r : Ru P s1 s2 s3,
                      {{ Γ ⊢ Π r A B : Sort@s3 }} -> {{ Γ ⊢ M : Π r A B }} ->
@@ -116,10 +117,10 @@ with eq_exp {P : PtsSig} : Ctx P -> Typ P -> Exp P -> Exp P -> Prop :=
                        {{ Γ1 ⊢ [σ1 ∘ σ2]M ≈ [σ1][σ2]M : [σ1 ∘ σ2]A }})
 (* Congruence rules *)
 | eq_exp_cong_pi : `(forall r : Ru P s1 s2 s3,
-                         {{ Γ ⊢ A1 ≈ A2 : Sort@s1 }} -> {{ Γ, A1 :: Sort@s1 ⊢ B1 ≈ B2 : Sort@s2 }} ->
+                         {{ Γ ⊢ A1 : Sort@s1 }} -> {{ Γ ⊢ A1 ≈ A2 : Sort@s1 }} -> {{ Γ, A1 :: Sort@s1 ⊢ B1 ≈ B2 : Sort@s2 }} ->
                          {{ Γ ⊢ Π r A1 B1 ≈ Π r A2 B2 : Sort@s3 }})
 | eq_exp_cong_lam : `(forall r : Ru P s1 s2 s3,
-                          {{ Γ ⊢ Π r A1 B : Sort@s3 }} -> {{ Γ ⊢ A1 ≈ A2 : Sort@s1 }} -> {{ Γ, A :: Sort@s1 ⊢ M1 ≈ M2 : B }} ->
+                          {{ Γ ⊢ A1 : Sort@s1 }} -> {{ Γ ⊢ A1 ≈ A2 : Sort@s1 }} -> {{ Γ, A1 :: Sort@s1 ⊢ M1 ≈ M2 : B }} ->
                           {{ Γ ⊢ λ r A1 M1 ≈ λ r A2 M2 : Π r A B }})
 | eq_exp_cong_app : `(forall r : Ru P s1 s2 s3,
                           {{ Γ ⊢ Π r A B : Sort@s3 }} -> {{ Γ ⊢ M1 ≈ M2 : Π r A B }} -> {{ Γ ⊢ N1 ≈ N2 : A }} ->

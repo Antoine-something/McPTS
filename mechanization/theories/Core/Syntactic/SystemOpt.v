@@ -1,7 +1,8 @@
 From Coq Require Import Setoid.
 From McPTS Require Import PtsSignature LibTactics.
 From McPTS.Core Require Import Base.
-From McPTS.Core.Syntactic Require Import System CtxEq CoreInversions Presup.
+From McPTS.Core.Syntactic Require Export CoreInversions Presup.
+Import Syntax_Notations.
 
 
 Add Parametric Morphism {P : PtsSig} (s : St P) Γ : (wf_exp Γ)
@@ -91,7 +92,6 @@ Corollary wf_fn' {P : PtsSig} : forall {Γ : Ctx P} {A M B s1 s2 s3} {r : Ru P s
 Proof.
   intros.
   gen_presups.
-  econstructor; mauto 2.
   econstructor; mauto 2.
 Qed.
 
@@ -256,7 +256,6 @@ Corollary wf_exp_eq_pi_beta' {P : PtsSig} : forall {Γ : Ctx P} {A B M N s1 s2 s
 Proof.
   intros.
   gen_presups.
-  econstructor; mauto 2.
   econstructor; mauto 2.
 Qed.
 
