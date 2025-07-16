@@ -176,18 +176,8 @@ Proof.
   {
     transitivity {{{ [(Id,,#0)∘((Wk∘Wk),,#0)]B }}}; mauto 3.
   }
-  econstructor; eauto.
-Admitted.
-  (* 
-  eapply wf_exp_pi; mauto 2.
-  econstructor; mauto 2.
-  econstructor; mauto 2; econstructor; mauto 2.
-  econstructor; mauto 2.
-  eapply eq_exp_conv; mauto 2.
-  transitivity {{{ [Id]B }}}; mauto 2.
-   
+  econstructor; mauto.
 Qed.
-   *)
 
 #[local]
 Hint Resolve presup_exp_eq_pi_eta_right : mcpts.
