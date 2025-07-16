@@ -60,14 +60,26 @@ Proof with mautosolve.
   (** Variable case *)
   - assert (exists B, {{ #i : B :: Sort@s ∈ Δ }} /\ {{ Δ ⊢ B ≈ A : Sort@s }}) by mauto.
     destruct_conjs.
-    eapply wf_exp_conv; econstructor; mauto.
+    eapply wf_exp_conv.
+    mauto 2.
+    admit.
+    econstructor; mauto.
+    
 
   (** Function application case *)  
   - assert {{ Δ ⊢ N : B }} by mauto.
     assert {{ Δ ⊢ M0 : Π r B C }} by mauto.
+    assert {{ Δ ⊢ B : Sort@s1 }} by mauto.
+    assert {{ Δ, B::Sort@s1 ⊢ C : Sort@s2 }} by mauto.    
     assert {{ Δ ⊢ Π r B C : Sort@s3 }} by mauto.
     mauto 2.
 
+  (** Conversion case *)
+  - assert {{ Δ ⊢ B ≈ A }} by mauto.
+    assert {{ Δ ⊢ A }} by mauto.
+    assert {{ Δ ⊢ M : B }} by mauto.
+    mauto 2.
+    
   (** Exp equality cases *)
   (** β case *)
   - assert {{ Δ ⊢ N : B }} by mauto.
@@ -102,8 +114,8 @@ Proof with mautosolve.
     mauto.
 
   - inversion_clear HΓΔ.
-    eapply eq_sub_conv; mauto.
-Qed.
+    eapply eq_sub_conv; mauto.    
+Admitted.
 
 
 Corollary ctxeq_exp {P : PtsSig} : forall {Γ : Ctx P} {Δ M A}, {{ ⊢ Γ ≈ Δ }} -> {{ Γ ⊢ M : A }} -> {{ Δ ⊢ M : A }}.

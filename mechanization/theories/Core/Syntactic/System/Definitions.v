@@ -41,14 +41,14 @@ with wf_exp {P : PtsSig} : Ctx P -> Typ P -> Exp P -> Prop :=
                     {{ Γ ⊢ A : Sort@s1 }} -> {{ Γ, A :: Sort@s1 ⊢ B : Sort@s2 }} ->
                     {{ Γ ⊢ Π r A B : Sort@s3 }})
 | wf_exp_lam : `(forall r : Ru P s1 s2 s3,
-                     {{ Γ ⊢ A : Sort@s1 }} -> {{ Γ, A :: Sort@s1 ⊢ M : B }} ->
+                     {{ Γ ⊢ A : Sort@s1 }} -> {{ Γ, A::Sort@s1 ⊢ B : Sort@s2 }} -> {{ Γ, A :: Sort@s1 ⊢ M : B }} ->
                      {{ Γ ⊢ λ r A M : Π r A B }})
 | wf_exp_app : `(forall r : Ru P s1 s2 s3,
-                     {{ Γ ⊢ Π r A B : Sort@s3 }} -> {{ Γ ⊢ M : Π r A B }} -> {{ Γ ⊢ N : A }} ->
+                     {{ Γ ⊢ A : Sort@s1 }} -> {{ Γ, A::Sort@s1 ⊢ B : Sort@s2 }} -> {{ Γ ⊢ M : Π r A B }} -> {{ Γ ⊢ N : A }} ->
                      {{ Γ ⊢ M N : [Id,,N]B }})
 | wf_exp_clo : `({{ Γ ⊢s σ : Δ }} -> {{ Δ ⊢ M : A }} ->
                  {{ Γ ⊢ [σ]M : [σ]A }})
-| wf_exp_conv : `({{ Γ ⊢ M : A }} -> {{ Γ ⊢ A ≈ B }} ->
+| wf_exp_conv : `({{ Γ ⊢ M : A }} -> {{ Γ ⊢ B }} -> {{ Γ ⊢ A ≈ B }} ->
                   {{ Γ ⊢ M : B }})
 where "Γ ⊢ M : A" := (wf_exp Γ A M) (in custom judg) : type_scope
 

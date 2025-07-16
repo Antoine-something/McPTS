@@ -32,7 +32,8 @@ Corollary wf_conv' {P : PtsSig} : forall (Γ : Ctx P) M A s A',
     {{ Γ ⊢ A ≈ A' : Sort@s }} ->
     {{ Γ ⊢ M : A' }}.
 Proof.
-  intros.
+  intros;
+  gen_presups;
   eapply wf_exp_conv; mauto 2.
 Qed.
 

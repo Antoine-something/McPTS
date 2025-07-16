@@ -344,6 +344,10 @@ Proof with mautosolve 4.
   assert {{ Γ ⊢ [Id,,M][Wk]A ≈ [Id]A : Sort@s1 }}.
   {
     eapply exp_eq_sub_compose_weaken_extend_typ; mauto.
+    eapply wf_exp_conv.
+    mauto.
+    mauto.
+    mauto.
   }
   assert {{ Γ ⊢ [Id]A ≈ A : Sort@s1}}.
   {
@@ -539,6 +543,8 @@ Proof with mautosolve 3.
     econstructor; mauto 2.
     eapply wf_exp_conv.
     econstructor; mauto 2; econstructor; mauto 2.
+    econstructor; mauto 2.
+    econstructor; mauto 2.    
     eapply eq_typ_clo_cong.
     symmetry; econstructor; mauto 2.
     eapply eq_typ_refl; econstructor; mauto 2.
@@ -1140,10 +1146,12 @@ Lemma presup_exp_typ {P : PtsSig} : forall {Γ : Ctx P} {M A},
     {{ Γ ⊢ A }}.
 Proof.
   induction 1; assert {{ ⊢ Γ }} by mauto 3; destruct_conjs; mauto 3.
-  - admit.
-  - admit.
-  - admit.
-Admitted.
+  eapply wf_typ_exp.
+  eapply wf_exp_conv.
+  eapply wf_exp_clo; mauto 2.
+  econstructor; mauto 2.
+  econstructor; mauto 2.
+Qed.
     
 
 Lemma presup_exp {P : PtsSig} : forall {Γ : Ctx P} {M A},
@@ -1151,6 +1159,14 @@ Lemma presup_exp {P : PtsSig} : forall {Γ : Ctx P} {M A},
     {{ ⊢ Γ }} /\ {{ Γ ⊢ A }}.
 Proof.
   mauto 4 using presup_exp_typ.
+Qed.
+
+Lemma presup_typ {P : PtsSig} : forall {Γ : Ctx P} {A},
+    {{ Γ ⊢ A }} ->
+    {{ ⊢ Γ }}.
+Proof.
+  intros *.
+  inversion_clear 1; mauto.
 Qed.
 
 (** *** Consistency Helper *)

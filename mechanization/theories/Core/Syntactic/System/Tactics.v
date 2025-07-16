@@ -45,6 +45,9 @@ Ltac gen_core_presup H :=
           let HA := fresh "HA" in
           destruct HAwf as [s HA]
       end
+  | {{ ^?Γ ⊢ ^?A }} =>
+      let HΓ := fresh "HΓ" in
+      pose proof presup_typ H as HΓ
   | {{ ^?Γ ⊢s ^?σ : ^?Δ }} =>
       let HΓ := fresh "HΓ" in
       let HΔ := fresh "HΔ" in

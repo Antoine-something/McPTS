@@ -53,11 +53,20 @@ Corollary wf_fn_inversion {P : PtsSig} : forall {Γ : Ctx P} {A M C s1 s2 s3} {r
 Proof with solve [mauto].
   (* There is something wrong here because the IH does not make sense *)
   intros * H.
-  dependent induction H.
-  (* dependent induction H; *)
-  (*   try specialize (IHwf_exp1 _ _ eq_refl); *)
-  (*   destruct_conjs; gen_core_presups; *)
-  (*   eexists; split. *)  
+  dependent induction H;
+    try specialize (IHwf_exp1 _ _ eq_refl);
+    try specialize (IHwf_exp2 _ _ eq_refl);
+    try specialize (IHwf_exp3 _ _ eq_refl);
+    destruct_conjs; gen_core_presups;
+    eexists; split; mauto 2.
+    
+  - assert {{ Γ ⊢ Π r A B : Sort@s3 }} by mauto.
+    eapply eq_typ_refl; mauto.
+
+    (* I don't understand why I can't use the IH for these cases *)
+  - admit.
+  - admit.
+
 Admitted.  
 
 #[export]
@@ -73,6 +82,7 @@ Proof with mautosolve 4.
       do 6 eexists; repeat split; eauto.
     (* reflexivity. *)
     eapply eq_typ_refl.
+    assert {{ Γ ⊢ Π r A B : Sort@s3 }} by mauto.
     assert ({{ Γ ⊢ A : Sort@s1 }} /\ {{ Γ, A::Sort@s1 ⊢ B : Sort@s2 }}).
     {
       eapply wf_pi_inversion'; mauto 2.
@@ -81,8 +91,8 @@ Proof with mautosolve 4.
     econstructor; mauto 2.
   - specialize (IHwf_exp _ _ eq_refl); 
       destruct_conjs;
-        do 6 eexists; repeat split; eauto.
-        rewrite <- H0; auto.
+      do 6 eexists; repeat split; eauto.
+    transitivity {{{ A }}}; mauto 2.
 Qed.
 
 #[export]
@@ -100,7 +110,7 @@ Proof with mautosolve 4.
     econstructor; mauto 2.
   - specialize (IHwf_exp _ eq_refl).
     destruct IHwf_exp as [A' HA'].
-    destruct HA' as [s [H1 H2]].
+    destruct HA' as [s [HA'1 HA'2]].
     exists A'; exists s.
     split; mauto 2.
 Qed.
