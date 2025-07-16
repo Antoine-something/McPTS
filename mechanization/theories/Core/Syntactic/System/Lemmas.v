@@ -95,7 +95,7 @@ Hint Resolve presup_ctx_eq presup_ctx_eq_left presup_ctx_eq_right : mcpts.
 
 Lemma presup_ctx_eq_lookup {P : PtsSig} : forall {Γ : Ctx P} {i A s Δ},
     {{ #i : A :: Sort@s ∈ Γ }} -> {{ ⊢ Γ ≈ Δ }} ->
-    exists B, {{ #i : B :: Sort@s ∈ Δ }} /\ {{ Δ ⊢ B ≈ A : Sort@s }}.
+    exists B, {{ #i : B :: Sort@s ∈ Δ }} /\ {{ Δ ⊢ B ≈ A : Sort@s }} /\ {{ Δ ⊢ A : Sort@s }}.
 Proof.
   intros * HΓ.
   dependent induction HΓ.
@@ -103,15 +103,19 @@ Proof.
     inversion_clear HΓΔ.
     assert {{ Δ0, B::Sort@s ⊢s Wk : Δ0 }} by mauto.
     eexists; split; mauto.
+    split; mauto.
     symmetry; mauto.
+    eapply wf_exp_conv; mauto.
   - intros HΓΔ.
     inversion_clear HΓΔ.
-    assert (exists B, {{ #i : B ::Sort@s ∈ Δ0 }} /\ {{ Δ0 ⊢ B ≈ A : Sort@s }}) by (eapply IHHΓ; mauto).
+    assert (exists B, {{ #i : B ::Sort@s ∈ Δ0 }} /\ {{ Δ0 ⊢ B ≈ A : Sort@s }} /\ {{ Δ0 ⊢ A : Sort@s }}) by (eapply IHHΓ; mauto).
     destruct_conjs.
     eexists; split; mauto.
+    split; mauto.
     eapply eq_exp_conv.
     eapply eq_exp_cong_clo; mauto.
     econstructor; mauto.
+    eapply wf_exp_conv; mauto.
 Qed.
 
 #[export]
@@ -564,8 +568,54 @@ Proof with mautosolve 3.
   econstructor; mauto 2.
 Qed.
 
+
+Lemma exp_eq_var_0_weaken {P : PtsSig} : forall {Γ : Ctx P} {A B s1 s2},
+    {{ ⊢ Γ, A :: Sort@s1 }} ->
+    {{ #0 : [Wk]B :: Sort@s2 ∈ Γ }} ->
+    {{ Γ, A :: Sort@s1 ⊢ [Wk]#0 ≈ #1 : [Wk][Wk]B }}.
+Proof with mautosolve 3.
+  inversion_clear 1.
+  inversion 1 as [? ? Γ'|]; subst.
+  assert {{ ⊢ Γ' }} by mauto.
+  assert {{ Γ', B::Sort@s2 ⊢s Wk : Γ' }} by mauto.
+  assert {{ Γ', B::Sort@s2, A::Sort@s1 ⊢s Wk : Γ', B::Sort@s2 }} by mauto.
+  assert {{ Γ', B::Sort@s2, A::Sort@s1 ⊢ #1 : [Wk][Wk]B }} by mauto.
+  assert {{ Γ', B::Sort@s2, A::Sort@s1 ⊢ [Id]#1 ≈ #1 : [Wk][Wk]B }} by mauto.
+  assert {{ Γ', B::Sort@s2, A::Sort@s1 ⊢ [(Wk∘Id),,#0]#1 ≈ [Id]#1 : [(Wk∘Id),,#0][Wk][Wk]B }} by (eapply eq_exp_cong_clo; mauto).
+  assert {{ Γ', B::Sort@s2, A::Sort@s1 ⊢ [(Wk∘Id),,#0]#1 ≈ [Id]#1 : [Id][Wk][Wk]B }}.
+  {
+    eapply eq_exp_conv; mauto.
+    econstructor; mauto.
+  }
+  assert {{ Γ', B::Sort@s2, A::Sort@s1 ⊢ [(Wk∘Id),,#0]#1 ≈ [Id]#1 : [Wk][Wk]B }}.
+  {
+    eapply eq_exp_conv; mauto.
+  }
+
+  assert {{ #0 : [Wk]B :: Sort@s2 ∈ Γ', B::Sort@s2 }} by mauto.
+  assert {{ Γ', B::Sort@s2, A::Sort@s1 ⊢ [(Wk∘Id),,#0]#1 ≈ [Wk∘Id]#0 : [Wk∘Id][Wk]B }}.
+  {
+    eapply eq_exp_prop_var_su; mauto.
+    econstructor; mauto 2.
+    econstructor; mauto 2.
+    eapply wf_exp_conv; mauto.
+  }
+  assert {{ Γ', B::Sort@s2, A::Sort@s1 ⊢ [(Wk∘Id),,#0]#1 ≈ [Wk∘Id]#0 : [Wk][Wk]B }}.
+  {
+    eapply eq_exp_conv; mauto.
+    econstructor; mauto.
+  }
+  assert {{ Γ', B::Sort@s2, A::Sort@s1 ⊢ [Wk∘Id]#0 ≈ [Wk]#0 : [Wk∘Id][Wk]B }} by mauto.
+  assert {{ Γ', B::Sort@s2, A::Sort@s1 ⊢ [Wk∘Id]#0 ≈ [Wk]#0 : [Wk][Wk]B }}.
+  {
+    eapply eq_exp_conv; mauto.
+    econstructor; mauto.
+  }
+  do 4 etransitivity; mauto.
+Qed.
+  
 #[export]
-Hint Resolve exp_eq_var_0_weaken_typ : mcpts.
+Hint Resolve exp_eq_var_0_weaken_typ exp_eq_var_0_weaken : mcpts.
 
 Lemma sub_extend_typ {P : PtsSig} : forall {Γ : Ctx P} {σ Δ M s1 s2},
     Ax P s1 s2 ->
@@ -886,38 +936,18 @@ Proof with mautosolve 4.
   assert {{ Γ ⊢ [σ]A : Sort@s }} by mauto.
   assert {{ Γ ⊢ M : [σ]A }} by mauto.
   assert {{ Γ ⊢s Id,,M : Γ, [σ]A::Sort@s }} by mauto.
-  assert {{ Γ, [σ]A::Sort@s ⊢s Wk : Γ }} by (econstructor; mauto).
-  assert {{ Γ, [σ]A::Sort@s ⊢ #0 : [Wk][σ]A }}.
-  {
-    econstructor; mauto.
-  }
-  assert {{ Γ, [σ]A::Sort@s ⊢ #0 : [Wk∘σ]A }}.
-  {
-    eapply wf_exp_conv; mauto.
-  }
-  assert {{ Γ ⊢s (Id,,M)∘((Wk∘σ),,#0) ≈ ((Id,,M)∘(Wk∘Id)),,[Id,,M]#0 : Δ, A::Sort@s }}.
-  {
-    admit.
-  }
+  assert {{ Γ, [σ]A::Sort@s ⊢s Wk : Γ }} by mauto.
+  assert {{ Γ, [σ]A::Sort@s ⊢ #0 : [Wk][σ]A }} by mauto.
+  assert {{ Γ, [σ]A::Sort@s ⊢ #0 : [Wk∘σ]A }} by (eapply wf_conv; mauto).
+  assert {{ Γ ⊢s (Id,,M)∘((Wk∘σ),,#0) ≈ ((Id,,M)∘(Wk∘σ)),,[Id,,M]#0 : Δ, A::Sort@s }} by mauto.
   assert {{ Γ ⊢s (Id,,M)∘(Wk∘σ) ≈ σ : Δ }} by mauto.
   assert {{ Γ ⊢ M : [Id][σ]A }} by mauto 4.
-  assert {{ Γ ⊢ [Id,,M]#0 ≈ M : [Id][σ]A }} by (econstructor; mauto 3).
-  assert {{ Γ ⊢ [Id,,M]#0 ≈ M : [σ]A }}.
-  {
-    eapply eq_exp_conv; mauto.
-  }
-  enough {{ Γ ⊢ [Id,,M]#0 ≈ M : [(Id,,M)∘(Wk∘σ)]A }}.
-  {
-    transitivity {{{ ((Id,,M)∘(Wk∘σ)),,[Id,,M]#0 }}}.
-    eapply eq_sub_prop_ext_right; mauto 2.
-    econstructor; mauto 2.
-  }
-  eapply wf_exp_eq_conv; mauto 3.
-  eapply wf_exp_conv.
-  eapply wf_exp_clo; mauto.
-  econstructor; mauto.
-Admitted.
-
+  assert {{ Γ ⊢ [Id,,M]#0 ≈ M : [Id][σ]A }} by mauto 3.
+  assert {{ Γ ⊢ [Id,,M]#0 ≈ M : [σ]A }} by mauto.
+  enough {{ Γ ⊢ [Id,,M]#0 ≈ M : [(Id,,M)∘(Wk∘σ)]A }} by mauto.
+  eapply wf_exp_eq_conv...
+Qed.
+    
 #[export]
 Hint Resolve sub_eq_wk_ext_sigma_id_extend : mcpts.
 #[export]
@@ -1052,92 +1082,32 @@ Proof with mautosolve 4.
   assert {{ Γ, [σ]B::Sort@s2 ⊢s (Wk∘σ),,#0 : Δ, B::Sort@s2 }} by mauto 2.
   assert {{ ⊢ Γ, [σ]B::Sort@s2 }} by mauto 3.
   assert {{ ⊢ Γ, [σ]B::Sort@s2, [(Wk∘σ),,#0]A::Sort@s1 }} by mauto 3.
-  assert {{ Δ, B::Sort@s2 ⊢ [Wk]B : Sort@s2 }}.
-  {
-    eapply presup_ctx_lookup_typ; mauto 3.
-  }
-  assert {{ Δ, B::Sort@s2 ⊢ #0 : [Wk]B }} by (econstructor; mauto 3; econstructor; mauto 3).
-  assert {{ Γ, [σ]B::Sort@s2, [(Wk∘σ),,#0]A::Sort@s1 ⊢ #0 : [Wk][(Wk∘σ),,#0]A }} by (econstructor; mauto 2; econstructor; mauto 2).
-  assert {{ Γ, [σ]B::Sort@s2, [(Wk∘σ),,#0]A::Sort@s1 ⊢ [Wk∘((Wk∘σ),,#0)]A ≈ [Wk][(Wk∘σ),,#0]A : Sort@s1 }}.
-  {
-    
-    eapply eq_exp_conv; mauto 3.
-    econstructor; mauto 3.
-  }
-  assert {{ Γ, [σ]B::Sort@s2, [(Wk∘σ),,#0]A::Sort@s1 ⊢s Wk∘((Wk∘σ),,#0) : Δ, B::Sort@s2 }}.
-  {
-    econstructor; mauto 3.
-  }
-  assert {{ Γ, [σ]B::Sort@s2, [(Wk∘σ),,#0]A::Sort@s1 ⊢ #0 : [Wk∘((Wk∘σ),,#0)]A }}.
-  {
-    eapply wf_exp_conv; mauto 3.
-  }
+  assert {{ Δ, B::Sort@s2 ⊢ [Wk]B : Sort@s2 }} by mauto 4.
+  assert {{ Δ, B::Sort@s2 ⊢ #0 : [Wk]B }} by mauto 3.
+  assert {{ Γ, [σ]B::Sort@s2, [(Wk∘σ),,#0]A::Sort@s1 ⊢ #0 : [Wk][(Wk∘σ),,#0]A }} by mauto 2.
+  assert {{ Γ, [σ]B::Sort@s2, [(Wk∘σ),,#0]A::Sort@s1 ⊢ [Wk∘((Wk∘σ),,#0)]A ≈ [Wk][(Wk∘σ),,#0]A : Sort@s1 }} by mauto 4.
+  assert {{ Γ, [σ]B::Sort@s2, [(Wk∘σ),,#0]A::Sort@s1 ⊢s Wk∘((Wk∘σ),,#0) : Δ, B::Sort@s2 }} by mauto 3.
+  assert {{ Γ, [σ]B::Sort@s2, [(Wk∘σ),,#0]A::Sort@s1 ⊢ #0 : [Wk∘((Wk∘σ),,#0)]A }} by mauto 3.
   assert {{ Γ ⊢ [σ]B : Sort@s2 }} by mauto 2.
-  assert {{ Γ, [σ]B::Sort@s2 ⊢s Wk : Γ }} by (econstructor; mauto 2).
-  assert {{ Γ, [σ]B::Sort@s2, [(Wk∘σ),,#0]A::Sort@s1 ⊢s Wk : Γ, [σ]B::Sort@s2 }} by (econstructor; mauto 2).
+  assert {{ Γ, [σ]B::Sort@s2 ⊢s Wk : Γ }} by mauto 2.
+  assert {{ Γ, [σ]B::Sort@s2, [(Wk∘σ),,#0]A::Sort@s1 ⊢s Wk : Γ, [σ]B::Sort@s2 }} by mauto 2.
   assert {{ Γ, [σ]B::Sort@s2 ⊢ [Wk][σ]B : Sort@s2 }} by mauto 2.
   assert {{ Γ, [σ]B::Sort@s2, [(Wk∘σ),,#0]A::Sort@s1 ⊢ [Wk][Wk][σ]B : Sort@s2 }} by mauto 2.
-  assert {{ Γ, [σ]B::Sort@s2 ⊢ [(Wk∘σ),,#0][Wk]B ≈ [Wk][σ]B : Sort@s2 }}.
-  {
-    eapply exp_eq_sub_sub_compose_cong_typ; mauto 3.
-  }
-  assert {{ Γ, [σ]B::Sort@s2, [(Wk∘σ),,#0]A::Sort@s1 ⊢ [Wk∘((Wk∘σ),,#0)][Wk]B ≈ [Wk][Wk][σ]B : Sort@s2 }}.
-  {
-    transitivity {{{ [Wk][(Wk∘σ),,#0][Wk]B }}}; mauto 3.
-  }
-  assert {{ Γ, [σ]B::Sort@s2, [(Wk∘σ),,#0]A::Sort@s1 ⊢ [(Wk∘((Wk∘σ),,#0)),,#0]#1 ≈ [Wk∘((Wk∘σ),,#0)]#0 : [Wk][Wk][σ]B }}.
-  {
-    
-    admit.
-  }
-  assert {{ Γ, [σ]B::Sort@s2, [(Wk∘σ),,#0]A::Sort@s1 ⊢ [Wk∘((Wk∘σ),,#0)]#0 ≈ [Wk][(Wk∘σ),,#0]#0 : [Wk][Wk][σ]B }}.
-  {
-    admit.
-  }
-  assert {{ Γ, [σ]B::Sort@s2 ⊢s Wk∘σ : Δ }}.
-  {
-    econstructor; mauto.
-  }
-  assert {{ Γ, [σ]B::Sort@s2 ⊢ #0 : [Wk∘σ]B }}.
-  {
-    eapply wf_exp_conv; mauto 3.
-    transitivity {{{ [Id∘Wk][σ]B }}}.
-    symmetry; eapply eq_typ_prop_comp.
-    econstructor; mauto 2.
-    econstructor; mauto 2.
-    eapply eq_typ_refl; mauto 2.
-    transitivity {{{ [Wk][σ]B }}}.
-    econstructor; mauto 2.
-    eapply eq_typ_refl; mauto 2.
-    symmetry; eapply eq_typ_prop_comp; mauto 2.
-    eapply eq_typ_refl; mauto 2.
-  }
-  assert {{ Γ, [σ]B::Sort@s2 ⊢ [(Wk∘σ),,#0]#0 ≈ #0 : [Wk∘σ]B }}.
-  {
-    econstructor; mauto.
-  }
-  assert {{ Γ, [σ]B::Sort@s2, [(Wk∘σ),,#0]A::Sort@s1 ⊢ [Wk][(Wk∘σ),,#0]#0 ≈ [Wk]#0 : [Wk][Wk∘σ]B }}.
-  {
-    econstructor; mauto 3.
-  }
-  assert {{ Γ, [σ]B::Sort@s2, [(Wk∘σ),,#0]A::Sort@s1 ⊢ [Wk][Wk∘σ]B ≈ [Wk][Wk][σ]B : Sort@s2 }}.
-  {
-    econstructor; mauto 3.
-  }
+  assert {{ Γ, [σ]B::Sort@s2 ⊢ [(Wk∘σ),,#0][Wk]B ≈ [Wk][σ]B : Sort@s2 }} by (eapply exp_eq_sub_sub_compose_cong_typ; mauto 3).
+  assert {{ Γ, [σ]B::Sort@s2, [(Wk∘σ),,#0]A::Sort@s1 ⊢ [Wk∘((Wk∘σ),,#0)][Wk]B ≈ [Wk][Wk][σ]B : Sort@s2 }} by (transitivity {{{ [Wk][(Wk∘σ),,#0][Wk]B }}}; mauto 3).
+  assert {{ Γ, [σ]B::Sort@s2, [(Wk∘σ),,#0]A::Sort@s1 ⊢ [(Wk∘((Wk∘σ),,#0)),,#0]#1 ≈ [Wk∘((Wk∘σ),,#0)]#0 : [Wk][Wk][σ]B }} by mauto 4.
+  assert {{ Γ, [σ]B::Sort@s2, [(Wk∘σ),,#0]A::Sort@s1 ⊢ [Wk∘((Wk∘σ),,#0)]#0 ≈ [Wk][(Wk∘σ),,#0]#0 : [Wk][Wk][σ]B }} by mauto 3.
+  assert {{ Γ, [σ]B::Sort@s2 ⊢s Wk∘σ : Δ }} by mauto 2.
+  assert {{ Γ, [σ]B::Sort@s2 ⊢ #0 : [Wk∘σ]B }} by mauto 2.
+  assert {{ Γ, [σ]B::Sort@s2 ⊢ [(Wk∘σ),,#0]#0 ≈ #0 : [Wk∘σ]B }} by mauto 2.
+  assert {{ Γ, [σ]B::Sort@s2, [(Wk∘σ),,#0]A::Sort@s1 ⊢ [Wk][(Wk∘σ),,#0]#0 ≈ [Wk]#0 : [Wk][Wk∘σ]B }} by mauto 3.
+  assert {{ Γ, [σ]B::Sort@s2, [(Wk∘σ),,#0]A::Sort@s1 ⊢ [Wk][Wk∘σ]B ≈ [Wk][Wk][σ]B : Sort@s2 }} by mauto 4.
   assert {{ Γ, [σ]B::Sort@s2, [(Wk∘σ),,#0]A::Sort@s1 ⊢ [Wk][(Wk∘σ),,#0]#0 ≈ [Wk]#0 : [Wk][Wk][σ]B }} by mauto 2.
-  assert {{ Γ, [σ]B::Sort@s2, [(Wk∘σ),,#0]A::Sort@s1 ⊢ [(Wk∘((Wk∘σ),,#0)),,#0]#1 ≈ #1 : [Wk][Wk][σ]B }}.
-  {
-    etransitivity; mauto 2.
-    etransitivity; mauto 2.
-    admit.
-  }
-  assert {{ Γ, [σ]B::Sort@s2, [(Wk∘σ),,#0]A::Sort@s1 ⊢s Wk∘Wk : Γ }}.
-  {
-    econstructor; mauto 2.
-  }
+  assert {{ Γ, [σ]B::Sort@s2, [(Wk∘σ),,#0]A::Sort@s1 ⊢ [(Wk∘((Wk∘σ),,#0)),,#0]#1 ≈ #1 : [Wk][Wk][σ]B }} by (do 2 etransitivity; mauto 2).
+  assert {{ Γ, [σ]B::Sort@s2, [(Wk∘σ),,#0]A::Sort@s1 ⊢s Wk∘Wk : Γ }} by mauto 2.
   assert {{ Γ, [σ]B::Sort@s2, [(Wk∘σ),,#0]A::Sort@s1 ⊢ [Wk∘Wk][σ]B : Sort@s2 }} by mauto 2.
   eapply wf_exp_eq_conv; mauto 2.
-Admitted.
+Qed.
 
 (** *** Type Presuppositions *)
     

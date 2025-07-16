@@ -51,23 +51,20 @@ Corollary wf_fn_inversion {P : PtsSig} : forall {Γ : Ctx P} {A M C s1 s2 s3} {r
     {{ Γ ⊢ λ r A M : C }} ->
     exists B, {{ Γ, A::Sort@s1 ⊢ M : B }} /\ {{ Γ ⊢ Π r A B ≈ C }}.
 Proof with solve [mauto].
-  (* There is something wrong here because the IH does not make sense *)
   intros * H.
   dependent induction H;
     try specialize (IHwf_exp1 _ _ eq_refl);
     try specialize (IHwf_exp2 _ _ eq_refl);
     try specialize (IHwf_exp3 _ _ eq_refl);
-    destruct_conjs; gen_core_presups;
-    eexists; split; mauto 2.
-    
-  - assert {{ Γ ⊢ Π r A B : Sort@s3 }} by mauto.
-    eapply eq_typ_refl; mauto.
+    destruct_conjs; gen_core_presups.
+  - exists B.
+    split; mauto.
 
-    (* I don't understand why I can't use the IH for these cases *)
-  - admit.
-  - admit.
+  - assert (exists B, {{ Γ, A::Sort@s1 ⊢ M : B }} /\ {{ Γ ⊢ Π r A B ≈ A0 }}) by (eapply IHwf_exp; mauto).
+    destruct_conjs.
+    mauto.
+Qed.
 
-Admitted.  
 
 #[export]
 Hint Resolve wf_fn_inversion : mcpts.
