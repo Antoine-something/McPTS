@@ -153,6 +153,8 @@ with eq_typ {P : PtsSig} : Ctx P -> Typ P -> Typ P -> Prop :=
                       {{ Γ ⊢ [σ]A ≈ [τ]B }})
 | eq_typ_prop_comp : `({{ Γ1 ⊢s σ : Γ2 }} -> {{ Γ2 ⊢s τ : Γ3 }} -> {{ Γ3 ⊢ A ≈ B }} ->
                        {{ Γ1 ⊢ [σ∘τ]A ≈ [σ][τ]B }})
+| eq_typ_prop_id : `({{ ⊢ Γ }} -> {{ Γ ⊢ A }} ->
+                     {{ Γ ⊢ [Id]A ≈ A }})
 | eq_typ_exp : `({{ Γ ⊢ A ≈ B : Sort@s }} ->
                  {{ Γ ⊢ A ≈ B }})
 | eq_typ_refl : `({{ Γ ⊢ A }} ->

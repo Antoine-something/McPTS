@@ -27,9 +27,9 @@ Ltac impl_opt_constructor :=
   gen_presups;
   mautosolve 4.
 
-Corollary wf_conv' {P : PtsSig} : forall (Γ : Ctx P) M A s A',
+Corollary wf_conv' {P : PtsSig} : forall (Γ : Ctx P) M A A',
     {{ Γ ⊢ M : A }} ->
-    {{ Γ ⊢ A ≈ A' : Sort@s }} ->
+    {{ Γ ⊢ A ≈ A' }} ->
     {{ Γ ⊢ M : A' }}.
 Proof.
   intros;
