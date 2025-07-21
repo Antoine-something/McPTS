@@ -292,18 +292,7 @@ Proof with mautosolve 4.
     try (eexists; unshelve solve [mauto 4 using lift_exp_max_left, lift_exp_max_right]; constructor).
   
    all: try (econstructor; mautosolve 4).
-  
-(*   (** presup_exp_eq cases *) *)
-(*   - eapply exp_sub_typ; mauto 4 using lift_exp_max_left, lift_exp_max_right. *)
-
-(*   (** presup_sub_eq cases *) *)
-
-(*   - econstructor; mauto 3. *)
-(*     eapply wf_conv... *)
-
-(*   - enough {{ Γ ⊢ #0[σ] : A[Wk∘σ] }} by mauto 4. *)
-(*     eapply wf_conv... *)
-(* Qed. *)
+   - (* needs {{ Γ, A0::Sort@s1 ⊢ B : Sort@s2 }} in eq_exp_beta *) 
 Admitted.
 
            
