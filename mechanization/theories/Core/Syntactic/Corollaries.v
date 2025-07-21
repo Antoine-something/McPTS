@@ -212,24 +212,18 @@ Proof.
   transitivity {{{ ((τ∘σ),,M)∘Wk }}}.
   eapply eq_sub_cong_comp; mauto 3.
   
-  (*; [| autorewrite with mcpts; mauto 3]. *)
-  (* eapply eq_sub_cong_comp; [| mauto 3]. *)
   transitivity {{{ ((τ,,M)∘(Wk∘σ)),,[τ,,M]#0 }}}.
   {
-    eapply eq_sub_prop_ext_right; mauto 2.
-    mauto.
-    mauto.
+    eapply eq_sub_prop_ext_right; mauto 5.
   }
   transitivity {{{ (((τ,,M)∘Wk)∘σ),,M }}}.
   {
-    eapply eq_sub_cong_ext; mauto 2.
-    mauto.
-    mauto.
+    eapply eq_sub_cong_ext; mauto 5.
   }
-  eapply eq_sub_cong_ext; mauto.
-  eapply eq_sub_cong_comp; mauto.
+  eapply eq_sub_cong_ext; mauto 4.
+  eapply eq_sub_cong_comp; mauto 4.
   econstructor; mauto 2.
-  eapply wf_exp_conv; mauto.
+  eapply wf_exp_conv; mauto 4.
 Qed.
 
 #[export]
@@ -283,10 +277,12 @@ Proof with mautosolve 3.
   gen_presups.
   mauto 3.
 Qed.
+
 #[export]
 Hint Resolve exp_eq_sub_cong_typ2 : mcpts.
 #[export]
 Remove Hints exp_eq_sub_cong_typ2' : mcpts.
+
 Lemma exp_pi_sub_lhs {P : PtsSig} : forall {Γ : Ctx P} {σ Δ A B s1 s2 s3} {r : Ru P s1 s2 s3},
     {{ Γ ⊢s σ : Δ }} ->
     {{ Δ ⊢ A : Sort@s1 }} ->
@@ -296,6 +292,7 @@ Proof.
   intros.
   mauto 4.
 Qed.
+
 #[export]
 Hint Resolve exp_pi_sub_lhs : mcpts.
 
@@ -308,6 +305,7 @@ Proof.
   intros.
   econstructor; mauto 3.
 Qed.
+
 #[export]
 Hint Resolve exp_pi_sub_rhs : mcpts.
 
