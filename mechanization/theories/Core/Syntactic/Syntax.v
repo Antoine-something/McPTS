@@ -82,7 +82,6 @@ Coercion Nf_to_Exp : Nf >-> Exp.
 Coercion Ne_to_Exp : Ne >-> Exp.
 
 
-(* Convenient notation for writing expressions *)
 #[global] Declare Custom Entry Exp.
 #[global] Declare Custom Entry Nf.
 
