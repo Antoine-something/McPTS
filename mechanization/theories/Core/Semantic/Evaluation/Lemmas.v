@@ -18,7 +18,7 @@ Section functional_eval.
   Qed.
   
   Lemma functional_eval {P : PtsSig} :
-    (forall (M : Exp P) ρ m1,
+    (forall (M : exp P) ρ m1,
         {{ ⟦ M ⟧ ρ ↘ m1 }} ->
         forall m2,
           {{ ⟦ M ⟧ ρ ↘ m2 }} ->
@@ -28,7 +28,7 @@ Section functional_eval.
           forall e2,
             {{ $| m & n |↘ e2 }} ->
             e1 = e2) /\
-      (forall (σ : Sub P) ρ ρσ1,
+      (forall (σ : sub P) ρ ρσ1,
           {{ ⟦ σ ⟧s ρ ↘ ρσ1 }} ->
           forall ρσ2,
             {{ ⟦ σ ⟧s ρ ↘ ρσ2 }} ->
@@ -48,7 +48,7 @@ Section functional_eval.
     - admit.
   Admitted.
 
-  Corollary functional_eval_exp {P : PtsSig} : forall (M : Exp P) ρ m1 m2,
+  Corollary functional_eval_exp {P : PtsSig} : forall (M : exp P) ρ m1 m2,
       {{ ⟦ M ⟧ ρ ↘ m1 }} ->
       {{ ⟦ M ⟧ ρ ↘ m2 }} ->
       m1 = m2.
@@ -64,7 +64,7 @@ Section functional_eval.
     pose proof @functional_eval P; intuition.
   Qed.
   
-  Corollary functional_eval_sub {P : PtsSig} : forall (σ : Sub P) ρ ρσ1 ρσ2,
+  Corollary functional_eval_sub {P : PtsSig} : forall (σ : sub P) ρ ρσ1 ρσ2,
       {{ ⟦ σ ⟧s ρ ↘ ρσ1 }} ->
       {{ ⟦ σ ⟧s ρ ↘ ρσ2 }} ->
       ρσ1 = ρσ2.

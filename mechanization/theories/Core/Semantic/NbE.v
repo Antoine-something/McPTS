@@ -6,7 +6,7 @@ Import Domain_Notations.
 
 Generalizable All Variables.
 
-Inductive initial_env {P : PtsSig} : Ctx P -> env P -> Prop :=
+Inductive initial_env {P : PtsSig} : ctx P -> env P -> Prop :=
 | initial_env_nil : initial_env nil empty_env
 | initial_env_cons :
   `( initial_env Γ ρ ->
@@ -16,7 +16,7 @@ Inductive initial_env {P : PtsSig} : Ctx P -> env P -> Prop :=
 #[export]
 Hint Constructors initial_env : mcpts.
 
-Lemma functional_initial_env {P : PtsSig} : forall (Γ : Ctx P) ρ,
+Lemma functional_initial_env {P : PtsSig} : forall (Γ : ctx P) ρ,
     initial_env Γ ρ ->
     forall ρ',
       initial_env Γ ρ' ->
@@ -35,7 +35,7 @@ Hint Resolve functional_initial_env : mcpts.
     whether [a] is the evaluation result of A or not.
     If we want to specify that as well, we need a generalized
     version of [drop_env] that can drop [x] elements. *)
-Lemma initial_env_spec {P : PtsSig} : forall x (Γ : Ctx P) ρ A s,
+Lemma initial_env_spec {P : PtsSig} : forall x (Γ : ctx P) ρ A s,
     initial_env Γ ρ ->
     {{ #x : A :: Sort@s ∈ Γ }} ->
     exists m a, {{ ρ[x] ↘ m }} /\ m = d{{{ ⇑! a (length Γ - x - 1) }}}.
@@ -56,7 +56,7 @@ Ltac functional_initial_env_rewrite_clear1 :=
   end.
 Ltac functional_initial_env_rewrite_clear := repeat functional_initial_env_rewrite_clear1.
 
-Inductive nbe {P : PtsSig} : Ctx P -> Exp P -> Typ P -> Nf P -> Prop :=
+Inductive nbe {P : PtsSig} : ctx P -> exp P -> typ P -> nf P -> Prop :=
 | nbe_run :
   `( initial_env Γ ρ ->
      {{ ⟦ A ⟧ ρ ↘ a }} ->
@@ -67,7 +67,7 @@ Inductive nbe {P : PtsSig} : Ctx P -> Exp P -> Typ P -> Nf P -> Prop :=
 #[export]
 Hint Constructors nbe : mcpts.
 
-Lemma functional_nbe {P : PtsSig} : forall (Γ : Ctx P) M A w w',
+Lemma functional_nbe {P : PtsSig} : forall (Γ : ctx P) M A w w',
     nbe Γ M A w ->
     nbe Γ M A w' ->
     w = w'.
@@ -83,7 +83,7 @@ Qed.
 #[export]
 Hint Resolve functional_nbe : mcpts.
 
-Inductive nbe_ty {P : PtsSig} : Ctx P -> Typ P -> Nf P -> Prop :=
+Inductive nbe_ty {P : PtsSig} : ctx P -> typ P -> nf P -> Prop :=
 | nbe_ty_run :
   `( initial_env Γ ρ ->
      {{ ⟦ M ⟧ ρ ↘ m }} ->
@@ -93,7 +93,7 @@ Inductive nbe_ty {P : PtsSig} : Ctx P -> Typ P -> Nf P -> Prop :=
 #[export]
 Hint Constructors nbe_ty : mcpts.
 
-Lemma functional_nbe_ty {P : PtsSig} : forall (Γ : Ctx P) M w w',
+Lemma functional_nbe_ty {P : PtsSig} : forall (Γ : ctx P) M w w',
     nbe_ty Γ M w ->
     nbe_ty Γ M w' ->
     w = w'.
@@ -106,7 +106,7 @@ Proof.
   reflexivity.
 Qed.
 
-Lemma nbe_type_to_nbe_ty {P : PtsSig} : forall (Γ : Ctx P) M s w,
+Lemma nbe_type_to_nbe_ty {P : PtsSig} : forall (Γ : ctx P) M s w,
     nbe Γ M {{{ Sort@s }}} w ->
     nbe_ty Γ M w.
 Proof.

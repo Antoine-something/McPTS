@@ -3,9 +3,9 @@ From McPTS.Core Require Import Base.
 From McPTS.Core.Semantic Require Export Domain.
 Import Domain_Notations.
 
-Reserved Notation "'⟦' M '⟧' ρ '↘' r" (in custom judg at level 80, M custom Exp at level 99, ρ custom domain at level 99, r custom domain at level 99).
+Reserved Notation "'⟦' M '⟧' ρ '↘' r" (in custom judg at level 80, M custom exp at level 99, ρ custom domain at level 99, r custom domain at level 99).
 Reserved Notation "'$|' m '&' n '|↘' r" (in custom judg at level 80, m custom domain at level 99, n custom domain at level 99, r custom domain at level 99).
-Reserved Notation "'⟦' σ '⟧s' ρ '↘' ρσ" (in custom judg at level 80, σ custom Exp at level 99, ρ custom domain at level 99, ρσ custom domain at level 99).
+Reserved Notation "'⟦' σ '⟧s' ρ '↘' ρσ" (in custom judg at level 80, σ custom exp at level 99, ρ custom domain at level 99, ρσ custom domain at level 99).
 (* Since environments are lists and not functions, we need to explicitly define lookups *)
 Reserved Notation "ρ '[' n ']' ↘ m" (in custom judg at level 80, ρ custom domain at level 99, n constr at level 0, m custom domain at level 99). 
 
@@ -18,7 +18,7 @@ Inductive env_lookup {P : PtsSig} : env P -> nat -> domain P -> Prop :=
                {{ (ρ ↦ n)[S i] ↘ m }})
 where "ρ '[' n ']' ↘ m" := (env_lookup ρ n m) (in custom judg).
 
-Inductive eval_exp {P : PtsSig} : Exp P -> env P -> domain P -> Prop :=
+Inductive eval_exp {P : PtsSig} : exp P -> env P -> domain P -> Prop :=
 | eval_exp_typ :
   `( {{ ⟦ Sort@s ⟧ ρ ↘ Sort@s }} )
 | eval_exp_var :
@@ -39,7 +39,7 @@ Inductive eval_exp {P : PtsSig} : Exp P -> env P -> domain P -> Prop :=
 | eval_exp_sub :
   `( {{ ⟦ σ ⟧s ρ ↘ ρ' }} ->
      {{ ⟦ M ⟧ ρ' ↘ m }} ->
-     {{ ⟦ [σ]M ⟧ ρ ↘ m }} )
+     {{ ⟦ M[σ] ⟧ ρ ↘ m }} )
 where "'⟦' M '⟧' ρ '↘' m" := (eval_exp M ρ m) (in custom judg)
 with eval_app {P : PtsSig} : domain P -> domain P -> domain P -> Prop :=
 | eval_app_fn :
@@ -51,7 +51,7 @@ with eval_app {P : PtsSig} : domain P -> domain P -> domain P -> Prop :=
       {{ ⟦ B ⟧ ρ ↦ n ↘ b }} ->
       {{ $| ⇑ (Π r a ρ B) m & n |↘ ⇑ b (m (⇓ a n)) }} )
 where "'$|' m '&' n '|↘' m'" := (eval_app m n m') (in custom judg)
-with eval_sub {P : PtsSig} : Sub P -> env P -> env P -> Prop :=
+with eval_sub {P : PtsSig} : sub P -> env P -> env P -> Prop :=
 | eval_sub_id :
   `( {{ ⟦ Id ⟧s ρ ↘ ρ }} )
 | eval_sub_weaken :

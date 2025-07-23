@@ -8,8 +8,8 @@ Reserved Notation "'env'".
 
 Inductive domain (P : PtsSig) : Set :=
 | d_sort : St P -> domain P
-| d_pi : forall (s1 s2 s3 : St P), Ru P s1 s2 s3 -> domain P -> env P -> Exp P -> domain P
-| d_fn : forall (s1 s2 s3 : St P), Ru P s1 s2 s3 ->  env P -> Exp P -> domain P
+| d_pi : forall (s1 s2 s3 : St P), Ru P s1 s2 s3 -> domain P -> env P -> exp P -> domain P
+| d_fn : forall (s1 s2 s3 : St P), Ru P s1 s2 s3 ->  env P -> exp P -> domain P
 | d_neut : domain P -> domain_ne P -> domain P
 with domain_ne (P : PtsSig) : Set :=
 (** Notice that the number x here is not a de Bruijn index but an absolute
@@ -60,8 +60,8 @@ Module Domain_Notations.
   Notation "'^' x" := x (in custom domain at level 0, x constr at level 0) : mcpts_scope.
   Notation "x" := x (in custom domain at level 0, x ident) : mcpts_scope.
   Notation "'Sort' @ s" := (d_sort s) (in custom domain at level 0, s constr at level 0) : mcpts_scope.
-  Notation "'Π' r a ρ B" := (d_pi r a ρ B) (in custom domain at level 0, r constr at level 0, a custom domain at level 30, ρ custom domain at level 0, B custom Exp at level 30) : mcpts_scope.
-  Notation "'λ' r ρ M" := (d_fn r ρ M) (in custom domain at level 0, r constr at level 0, ρ custom domain at level 30, M custom Exp at level 30) : mcpts_scope.
+  Notation "'Π' r a ρ B" := (d_pi r a ρ B) (in custom domain at level 0, r constr at level 0, a custom domain at level 30, ρ custom domain at level 0, B custom exp at level 30) : mcpts_scope.
+  Notation "'λ' r ρ M" := (d_fn r ρ M) (in custom domain at level 0, r constr at level 0, ρ custom domain at level 30, M custom exp at level 30) : mcpts_scope.
   Notation "f x .. y" := (d_app .. (d_app f x) .. y) (in custom domain at level 40, f custom domain, x custom domain at next level, y custom domain at next level) : mcpts_scope.
   Notation "'!' n" := (d_var n) (in custom domain at level 0, n constr at level 0) : mcpts_scope.
   Notation "'⇑' a m" := (d_neut a m) (in custom domain at level 0, a custom domain at level 30, m custom domain at level 30) : mcpts_scope.

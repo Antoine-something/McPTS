@@ -3,6 +3,7 @@ From McPTS.Core Require Import Base.
 From McPTS.Core.Syntactic.System Require Export Definitions Lemmas.
 Import Syntax_Notations.
 
+
 #[local]
 Ltac invert_wf_ctx1 H :=
   match type of H with

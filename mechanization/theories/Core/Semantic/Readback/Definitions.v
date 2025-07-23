@@ -4,13 +4,13 @@ From McPTS.Core.Semantic Require Import Evaluation.
 From McPTS.Core.Semantic Require Export Domain.
 Import Domain_Notations.
 
-Reserved Notation "'Rnf' m 'in' s ↘ M" (in custom judg at level 80, m custom domain, s constr, M custom Nf).
-Reserved Notation "'Rne' m 'in' s ↘ M" (in custom judg at level 80, m custom domain, s constr, M custom Nf).
-Reserved Notation "'Rtyp' a 'in' s ↘ A" (in custom judg at level 80, a custom domain, s constr, A custom Nf).
+Reserved Notation "'Rnf' m 'in' s ↘ M" (in custom judg at level 80, m custom domain, s constr, M custom nf).
+Reserved Notation "'Rne' m 'in' s ↘ M" (in custom judg at level 80, m custom domain, s constr, M custom nf).
+Reserved Notation "'Rtyp' a 'in' s ↘ A" (in custom judg at level 80, a custom domain, s constr, A custom nf).
 
 Generalizable All Variables.
 
-Inductive read_nf {P : PtsSig} : nat -> domain_nf P -> Nf P -> Prop :=
+Inductive read_nf {P : PtsSig} : nat -> domain_nf P -> nf P -> Prop :=
 | read_nf_type :
   `( {{ Rtyp a in i ↘ A }} ->
      {{ Rnf ⇓ Sort@s a in i ↘ A }} )
@@ -28,7 +28,7 @@ Inductive read_nf {P : PtsSig} : nat -> domain_nf P -> Nf P -> Prop :=
   `( {{ Rne m in i ↘ M }} ->
      {{ Rnf ⇓ (⇑ a b) (⇑ c m) in i ↘ ⇑ M }} )
 where "'Rnf' m 'in' i ↘ M" := (read_nf i m M) (in custom judg) : type_scope
-with read_ne {P : PtsSig} : nat -> domain_ne P -> Ne P -> Prop :=
+with read_ne {P : PtsSig} : nat -> domain_ne P -> ne P -> Prop :=
 | read_ne_var :
   `( {{ Rne !x in i ↘ #(i - x - 1) }} )
 | read_ne_app :
@@ -36,7 +36,7 @@ with read_ne {P : PtsSig} : nat -> domain_ne P -> Ne P -> Prop :=
      {{ Rnf n in i ↘ N }} ->
      {{ Rne m n in i ↘ M N }} )
 where "'Rne' m 'in' i ↘ M" := (read_ne i m M) (in custom judg) : type_scope
-with read_typ {P : PtsSig} : nat -> domain P -> Nf P -> Prop :=
+with read_typ {P : PtsSig} : nat -> domain P -> nf P -> Prop :=
 | read_typ_univ :
   `( {{ Rtyp Sort@s in i ↘ Sort@s }} )
 | read_typ_pi :
