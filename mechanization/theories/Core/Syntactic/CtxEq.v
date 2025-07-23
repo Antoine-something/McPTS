@@ -67,9 +67,6 @@ Proof with mautosolve.
     assert {{ Δ ⊢ A }} by mauto.
     assert {{ Δ ⊢ M : B }} by mauto.
     mauto 2.
-
-
-
     
   (** Exp equality cases *)
   (** Π congruence case *)
