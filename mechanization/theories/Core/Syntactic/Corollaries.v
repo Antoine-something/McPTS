@@ -248,6 +248,7 @@ Proof with mautosolve 3.
   gen_presups.
   mauto.
 Qed.
+
 #[export]
 Hint Resolve exp_eq_sub_cong_typ2 : mcpts.
 #[export]
@@ -262,6 +263,7 @@ Proof.
   intros.
   mauto 4.
 Qed.
+
 #[export]
 Hint Resolve exp_pi_sub_lhs : mcpts.
 
@@ -274,6 +276,7 @@ Proof.
   intros.
   econstructor; mauto 3.
 Qed.
+
 #[export]
 Hint Resolve exp_pi_sub_rhs : mcpts.
 
