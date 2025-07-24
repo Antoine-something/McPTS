@@ -23,6 +23,8 @@ notes.txt
 *.vos
 *.glob
 
+*.cache
+
 .CoqMakefile.mk.d
 CoqMakefile.mk.conf
 CoqMakefile.mk
