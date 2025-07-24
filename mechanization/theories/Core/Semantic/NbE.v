@@ -41,9 +41,21 @@ Lemma initial_env_spec {P : PtsSig} : forall x (Γ : ctx P) ρ A s,
     exists m a, {{ ρ[x] ↘ m }} /\ m = d{{{ ⇑! a (length Γ - x - 1) }}}.
 Proof.
   induction x; intros * Hinit Hlookup;
-    dependent destruction Hlookup; dependent destruction Hinit; simpl; mauto 3.
-  eexists; eexists; repeat f_equal; split.
-Admitted.
+    dependent destruction Hlookup; dependent destruction Hinit; simpl; mauto.
+  - eexists; eexists; repeat f_equal; split; mauto.
+    assert (length Γ0 - 0 = length Γ0) by lia.
+    rewrite -> H0.
+    econstructor; mauto.
+  - 
+    assert (exists m a, {{ ρ0[x] ↘ m}} /\ (m = d{{{ ⇑! a (length Γ0 - x - 1) }}})) by mauto.
+    destruct_conjs.
+    subst.
+    assert (length Γ0 - x - 1 = length Γ0 - (S x)) by lia.
+    rewrite -> H0.
+    rewrite -> H0 in H2.
+    eexists; eexists; repeat f_equal; split; mauto.
+    econstructor; mauto.
+Qed.
 
 #[export]
 Hint Resolve initial_env_spec : mcpts.

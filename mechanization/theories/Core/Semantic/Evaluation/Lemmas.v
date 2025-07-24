@@ -41,12 +41,21 @@ Section functional_eval.
     - progressive_inversion.
       eapply env_lookup_functional; mauto 2.
 
-    (* progressive_inversion does not work (or at least it is overwhelmingly slow) for other cases *)
-    - admit.
-    - admit.
-    - admit.
-    - admit.
-  Admitted.
+    (* 'progressive_inversion' does not work well with functions because of the rule annotations
+       use 'progressive_invert' on the relevant assumption instead *)
+    - progressive_invert H0.
+      assert (a = a0) by mauto.
+      subst.
+      reflexivity.
+    - progressive_invert H.
+      reflexivity.
+    - progressive_invert H0.
+      mauto.
+    - progressive_invert H0.
+      assert (b = b0) by mauto.
+      subst.
+      reflexivity.
+  Qed.
 
   Corollary functional_eval_exp {P : PtsSig} : forall (M : exp P) ρ m1 m2,
       {{ ⟦ M ⟧ ρ ↘ m1 }} ->
