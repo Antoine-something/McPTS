@@ -324,8 +324,8 @@ Ltac gen_presup_IH presup_exp_eq presup_sub_eq presup_typ_eq H :=
       pose proof presup_sub_eq _ _ _ _ _ H as [HΓ [Hσ [Hτ HΔ]]]
   | {{ ^?Γ ⊢ ^?A ≈ ^?B }} =>
       let HΓ := fresh "HΓ" in
-      let HM := fresh "HA" in
-      let HN := fresh "HB" in
+      let HA := fresh "HA" in
+      let HB := fresh "HB" in
       pose proof presup_typ_eq _ _ _ _ H as [HΓ [HA HB]]
   end.
 
@@ -341,21 +341,16 @@ Proof with mautosolve 4.
     try (eexists; unshelve solve [mauto 4]; constructor).
 
   all: try (econstructor; mautosolve 4).
-
-  (* (** presup_exp_eq cases *) *)
-  (* - eexists; eapply exp_sub_typ; mauto 4. *)
-
-  (* (** presup_sub_eq cases *) *)
-
-  (* - econstructor; mauto 3. *)
-  (*   eapply wf_conv... *)
-
-  (* - enough {{ Γ ⊢ #0[σ] : A[Wk∘σ] }} by mauto 4. *)
-  (*   eapply wf_conv... *)
-
-  (* (** presup_subtyp cases *) *)
-  (* - exists (max (S i) (S j)); split; mauto 3 using lift_exp_max_left, lift_exp_max_right. *)
-Admitted.
+  - econstructor; mauto 3. 
+    eapply wf_conv; mauto 5.
+  - econstructor; mauto 3.
+    eapply wf_conv; mauto 5.
+  - econstructor; mauto 3.
+    eapply wf_conv; mauto 5.
+    dependent destruction HΔ.
+    econstructor; mauto 3.
+    eapply wf_conv; mauto 5.
+Qed.
 
 Ltac gen_presup H := gen_presup_IH @presup_exp_eq @presup_sub_eq @presup_typ_eq H + gen_core_presup H.
 
