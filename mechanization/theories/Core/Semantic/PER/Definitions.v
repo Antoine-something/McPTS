@@ -8,11 +8,9 @@ Import Domain_Notations.
 
 Notation "'Dom' a ≈ b ∈ R" := ((R a b : Prop) : Prop) (in custom judg at level 90, a custom domain, b custom domain, R constr).
 Notation "'DF' a ≈ b ∈ R ↘ R'" := ((R R' a b : Prop) : Prop) (in custom judg at level 90, a custom domain, b custom domain, R constr, R' constr).
-Notation "'Exp' a ≈ b ∈ R" := (R a b : (Prop : Type)) (in custom judg at level 90, a custom Exp, b custom Exp, R constr).
+Notation "'Exp' a ≈ b ∈ R" := (R a b : (Prop : Type)) (in custom judg at level 90, a custom exp, b custom exp, R constr).
+Notation "'EF' a ≈ b ∈ R ↘ R'" := (R R' a b : (Prop : Type)) (in custom judg at level 90, a custom exp, b custom exp, R constr, R' constr).
 
-(*  There is no good reason for this notation to not work, yet it doesn't
-Notation "'EF' a ≈ b ∈ R ↘ R'" := (R R' a b : (Prop : Type)) (in custom judg at level 90, a custom Exp, b custom Exp, R constr, R' constr).
-*)
 
 (** Precedences of the next notations follow the ones in the standard library.
     However, we do not use the ones in the standard library so that we can change
@@ -26,14 +24,14 @@ Generalizable All Variables.
 (** Related modulo evaluation *)
 Variant rel_mod_eval {P : PtsSig} (R : relation (domain P) -> domain P -> domain P -> Prop) A ρ A' ρ' R' : Prop := mk_rel_mod_eval : forall a a', {{ ⟦ A ⟧ ρ ↘ a }} -> {{ ⟦ A' ⟧ ρ' ↘ a' }} -> {{ DF a ≈ a' ∈ R ↘ R' }} -> rel_mod_eval R A ρ A' ρ' R'.
 #[global]
-Arguments mk_rel_mod_eval {_ _ _ _ _ _}.
+Arguments mk_rel_mod_eval {_ _ _ _ _ _ _}.
 #[export]
 Hint Constructors rel_mod_eval : mcpts.
 
 (** Related modulo application *)
 Variant rel_mod_app {P : PtsSig} f a f' a' (R : relation (domain P)) : Prop := mk_rel_mod_app : forall fa f'a', {{ $| f & a |↘ fa }} -> {{ $| f' & a' |↘ f'a' }} -> {{ Dom fa ≈ f'a' ∈ R }} -> rel_mod_app f a f' a' R.
 #[global]
-Arguments mk_rel_mod_app {_ _ _ _ _}.
+Arguments mk_rel_mod_app {_ _ _ _ _ _}.
 #[export]
 Hint Constructors rel_mod_app : mcpts.
 
@@ -65,84 +63,98 @@ Hint Unfold per_top_typ : mcpts.
 
 Variant per_ne {P : PtsSig} : relation (domain P) :=
 | per_ne_neut :
-  `{ {{ Dom m ≈ m' ∈ per_bot }} ->
+  `{ {{ Dom m ≈ m' ∈ @per_bot P }} ->
      {{ Dom ⇑ a m ≈ ⇑ a' m' ∈ per_ne }} }
 .
 #[export]
 Hint Constructors per_ne : mcpts.
 
-(** * Universe/Element PER *)
-(** ** Universe/Element PER Definition *)
+(** * Sort/Element PER *)
+(** ** Sort/Element PER Definition *)
 
-Section Per_univ_elem_core_def.
+Section Per_sort_elem_core_def.
   Variable
     (P : PtsSig)
-    (s : St P)
-      (per_univ_rec : forall {s'}, Ax P s' s -> relation (domain P)).
+      (pred_P : PredicativeSig P)
+      (per_sort_rec : forall {s1 s2}, Ax P s1 s2 -> relation (domain P)).
 
-  Inductive per_univ_elem_core : relation (domain P) -> domain P -> domain P -> Prop :=
+  (** Defines 'a = b ∈ Sort_s ↘ R' in the paper *)
+  Inductive per_sort_elem_core : St P -> relation (domain P) -> domain P -> domain P -> Prop :=
   | per_sort_elem_core_sort :
     `{ forall (elem_rel : relation (domain P))
-         (ax_s1_s : Ax P s1 s),
-          s1 = s2 ->
-          (elem_rel <~> per_univ_rec ax_s1_s2) ->
-          {{ DF Sort@s1 ≈ Sort@s2 ∈ per_univ_elem_core ↘ elem_rel }} }
-  | per_univ_elem_core_pi :
-    `{ forall (in_rel : relation (domain P))
-         (out_rel : forall {c c'} (equiv_c_c' : {{ Dom c ≈ c' ∈ in_rel }}), relation (domain P))
+         (ax_s1_s2 : Ax P s1 s2),
+          s1 = s1' ->
+          (elem_rel <~> per_sort_rec ax_s1_s2) ->
+          {{ DF Sort@s1 ≈ Sort@s1' ∈ per_sort_elem_core s2 ↘ elem_rel }} }
+  | per_sort_elem_core_pi : 
+    `{ forall (s_in s_out s_elem : St P) (r : Ru P s_in s_out s_elem)
+         (in_rel : relation (domain P))
+         (out_rel : forall {n n'} (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}), relation (domain P))
          (elem_rel : relation (domain P))
-         (r : Ru P s_in s_out s)
-         (equiv_a_a' : {{ DF a ≈ a' ∈ per_univ_elem_core ↘ in_rel }}),
+         (equiv_a_a'  : {{ DF a ≈ a' ∈ (per_sort_elem_core s_in) ↘ in_rel }}),
           PER in_rel ->
-          (forall {c c'} (equiv_c_c' : {{ Dom c ≈ c' ∈ in_rel }}),
-              rel_mod_eval per_univ_elem_core B d{{{ ρ ↦ c }}} B' d{{{ ρ' ↦ c' }}} (out_rel equiv_c_c')) ->
-          (elem_rel <~> fun f f' => forall c c' (equiv_c_c' : {{ Dom c ≈ c' ∈ in_rel }}), rel_mod_app f c f' c' (out_rel equiv_c_c')) ->
-          {{ DF Π r a ρ B ≈ Π r a' ρ' B' ∈ per_univ_elem_core ↘ elem_rel }} }
-  | per_univ_elem_core_neut :
+          (forall {n n'} (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}),
+              rel_mod_eval (per_sort_elem_core s_out) B d{{{ ρ ↦ n }}} B' d{{{ ρ' ↦ n' }}} (out_rel equiv_n_n')) ->
+          (elem_rel <~> fun f f' => forall n n' (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}), rel_mod_app f n f' n' (out_rel equiv_n_n')) ->
+          {{ DF Π r a ρ B ≈ Π r a' ρ' B' ∈ (per_sort_elem_core s_elem) ↘ elem_rel }} }
+  | per_sort_elem_core_neut :
     `{ forall (elem_rel : relation (domain P)),
-          {{ Dom b ≈ b' ∈ per_bot }} ->
-          (elem_rel <~> per_ne) ->
-          {{ DF ⇑ a b ≈ ⇑ a' b' ∈ per_univ_elem_core ↘ elem_rel }} }
+         {{ Dom e ≈ e' ∈ @per_bot P }} ->
+         (elem_rel <~> @per_ne P) ->
+         {{ DF ⇑ a e ≈ ⇑ a' e' ∈ (per_sort_elem_core s) ↘ elem_rel }} }
   .
 
   Hypothesis
-    (motive : relation domain -> domain -> domain -> Prop)
-      (case_U : forall {j j' elem_rel} (lt_j_i : j < i),
-          j = j' ->
-          (elem_rel <~> per_univ_rec lt_j_i) ->
-          motive elem_rel d{{{ 𝕌@j }}} d{{{ 𝕌@j' }}})
+    (motive : forall {P : PtsSig}, St P -> relation (domain P) -> domain P -> domain P -> Prop)
+      (case_sort :
+        forall {s1 s1' s2 elem_rel} (ax_s1_s2 : Ax P s1 s2),
+          s1 = s1' ->
+          (elem_rel <~> per_sort_rec ax_s1_s2) ->
+          motive s2 elem_rel d{{{ Sort@s1 }}} d{{{ Sort@s1' }}})
       (case_Pi :
-        forall {a ρ B a' ρ' B' in_rel}
-           (out_rel : forall {c c'} (equiv_c_c' : {{ Dom c ≈ c' ∈ in_rel }}), relation domain)
-           {elem_rel},
-          {{ DF a ≈ a' ∈ per_univ_elem_core ↘ in_rel }} ->
-          motive in_rel a a' ->
+        forall (s_in s_out s_elem : St P) (r : Ru P s_in s_out s_elem)
+          {a ρ B a' ρ' B' in_rel}
+          (out_rel : forall {n n'} (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}), relation (domain P))
+          {elem_rel},
+          {{ DF a ≈ a' ∈ per_sort_elem_core s_in ↘ in_rel }} ->
+          motive s_in in_rel a a' ->
           PER in_rel ->
-          (forall {c c'} (equiv_c_c' : {{ Dom c ≈ c' ∈ in_rel }}),
-              rel_mod_eval (fun R x y => {{ DF x ≈ y ∈ per_univ_elem_core ↘ R }} /\ motive R x y) B d{{{ ρ ↦ c }}} B' d{{{ ρ' ↦ c' }}} (out_rel equiv_c_c')) ->
-          (elem_rel <~> fun f f' => forall c c' (equiv_c_c' : {{ Dom c ≈ c' ∈ in_rel }}), rel_mod_app f c f' c' (out_rel equiv_c_c')) ->
-          motive elem_rel d{{{ Π a ρ B }}} d{{{ Π a' ρ' B' }}})
-      (case_ne : forall {a b a' b' elem_rel},
-          {{ Dom b ≈ b' ∈ per_bot }} ->
+          (forall {n n'} (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}),
+              rel_mod_eval (fun R x y => {{DF x ≈ y ∈ per_sort_elem_core s_out ↘ R }} /\ motive s_out R x y) B d{{{ ρ ↦ n }}} B' d{{{ ρ' ↦ n' }}} (out_rel equiv_n_n')) ->
+          (elem_rel <~> fun f f' => forall n n' (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}), rel_mod_app f n f' n' (out_rel equiv_n_n')) ->
+          motive s_elem elem_rel d{{{ Π r a ρ B }}} d{{{ Π r a' ρ' B' }}})
+      (case_ne :
+        forall {s a b a' b' elem_rel},
+          {{ Dom b ≈ b' ∈ @per_bot P }} ->
           (elem_rel <~> per_ne) ->
-          motive elem_rel d{{{ ⇑ a b }}} d{{{ ⇑ a' b' }}}).
+          motive s elem_rel d{{{ ⇑ a b }}} d{{{ ⇑ a' b' }}})
+  .
 
   #[derive(equations=no, eliminator=no)]
-  Equations per_univ_elem_core_strong_ind R a b (H : {{ DF a ≈ b ∈ per_univ_elem_core ↘ R }}) : {{ DF a ≈ b ∈ motive ↘ R }} :=
-  | R, a, b, (per_univ_elem_core_univ _ lt_j_i HE eq)                 => case_U lt_j_i HE eq;
-  | R, a, b, (per_univ_elem_core_pi _ out_rel _ equiv_a_a' per HT HE) =>
-      case_Pi out_rel equiv_a_a' (per_univ_elem_core_strong_ind _ _ _ equiv_a_a') per
-        (fun _ _ equiv_c_c' => match HT _ _ equiv_c_c' with
-                              | mk_rel_mod_eval b b' evb evb' Rel =>
-                                  mk_rel_mod_eval b b' evb evb' (conj _ (per_univ_elem_core_strong_ind _ _ _ Rel))
-                              end)
+  Equations per_sort_elem_core_strong_ind (s : St P) R a b (H : {{ DF a ≈ b ∈ per_sort_elem_core s ↘ R }}) : {{ DF a ≈ b ∈ motive s ↘ R }} :=
+  | s, R, a, b, (per_sort_elem_core_sort _ ax_s1_s2 HE eq)               => case_sort ax_s1_s2 HE eq
+  | s_elem, R, a, b, (per_sort_elem_core_pi s_in s_out s_elem r _ out_rel _ equiv_a_a' per HT HE) =>
+      case_Pi s_in s_out s_elem r out_rel equiv_a_a' (per_sort_elem_core_strong_ind s_in _ _ _ equiv_a_a') per
+        (fun _ _ equiv_n_n' => match HT _ _ equiv_n_n' with
+                            | mk_rel_mod_eval b b' evb evb' Rel =>
+                                mk_rel_mod_eval b b' evb evb' (conj _ (per_sort_elem_core_strong_ind s_out _ _ _ Rel))
+                            end)
         HE;
-  | R, a, b, (per_univ_elem_core_neut _ equiv_b_b' HE)                => case_ne equiv_b_b' HE.
+  | s, R, a, b, (per_sort_elem_core_neut _ equiv_b_b' HE)                 => case_ne equiv_b_b' HE.
 
-End Per_univ_elem_core_def.
-
+  Definition wf_rel_P := (wf_rel P pred_P).
+  
+  Equations per_sort_elem (s : St P) : relation (domain P) -> domain P -> domain P -> Prop by wf s :=
+| s => per_sort_elem_core P (fun s1 s2 ax_s1_s2 a a' => exists R', {{ DF a ≈ a' ∈ per_sort_elem s1 ↘ R' }}) s.
+End Per_sort_elem_core_def.
+  
 #[export]
-Hint Constructors per_univ_elem_core : mcpts.
+Hint Constructors per_sort_elem_core : mcpts.
+
+
+Equations per_sort_elem {P : PtsSig} {pred_P : PredicativeSig P} (s : St P) : relation (domain P) -> domain P -> domain P -> Prop by wf s (pred_rel P pred_P) :=
+| s => per_sort_elem_core P (fun s1 s2 ax_s1_s2 a a' => exists R', {{ DF a ≈ a' ∈ per_sort_elem s1 ↘ R' }}) s.
+
 
 Equations per_univ_elem (i : nat) : relation domain -> domain -> domain -> Prop by wf i :=
 | i => per_univ_elem_core i (fun j lt_j_i a a' => exists R', {{ DF a ≈ a' ∈ per_univ_elem j ↘ R' }}).

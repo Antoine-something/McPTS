@@ -157,7 +157,7 @@ Corollary ctxeq_sub_eq {P : PtsSig} : forall {Γ : ctx P} {Δ σ σ' Γ'}, {{ �
 Proof. intros; eapply ctxeq_sub_eq_helper; mauto. Qed.
 
 #[export]
-Hint Resolve ctxeq_exp ctxeq_exp_eq ctxeq_sub ctxeq_sub_eq : mcpts.
+Hint Resolve ctxeq_exp ctxeq_exp_eq ctxeq_typ ctxeq_typ_eq ctxeq_sub ctxeq_sub_eq : mcpts.
 
 
 Lemma ctx_eq_trans {P : PtsSig} : forall {Γ0 Γ1 Γ2 : ctx P}, {{ ⊢ Γ0 ≈ Γ1 }} -> {{ ⊢ Γ1 ≈ Γ2 }} -> {{ ⊢ Γ0 ≈ Γ2 }}.
