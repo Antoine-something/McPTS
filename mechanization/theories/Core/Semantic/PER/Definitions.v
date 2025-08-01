@@ -271,7 +271,7 @@ End Per_sort_elem_ind_def.
 
 
 
-Definition rel_typ {P : PtsSig} {pred_P : PredicativeSig P} s A ρ A' ρ' R' := rel_mod_eval (per_sort_elem P pred_P s) A ρ A' ρ' R'.
+Definition rel_typ {P : PtsSig} (pred_P : PredicativeSig P) s A ρ A' ρ' R' := rel_mod_eval (per_sort_elem P pred_P s) A ρ A' ρ' R'.
 Arguments rel_typ _ _ _ _ _ _ /.
 #[export]
 Hint Transparent rel_typ : mcpts.
@@ -285,60 +285,38 @@ Hint Unfold rel_typ : mcpts.
 
 (** * Context/Environment PER *)
 
-Variant cons_per_ctx_env tail_rel (head_rel : forall {ρ ρ'} (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ tail_rel }}), relation domain) : relation env :=
+Variant cons_per_ctx_env {P : PtsSig} tail_rel (head_rel : forall {ρ ρ'} (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ tail_rel }}), relation (domain P)) : relation (env P) :=
 | mk_cons_per_ctx_env :
   `{ forall (equiv_ρ_drop_ρ'_drop : {{ Dom ρ ↯ ≈ ρ' ↯ ∈ tail_rel }}),
-        {{ Dom ^(ρ 0) ≈ ^(ρ' 0) ∈ head_rel equiv_ρ_drop_ρ'_drop }} ->
+        {{ ρ[0] ↘ n }} -> {{ ρ'[0] ↘ n' }} ->
+        {{ Dom n ≈ n' ∈ head_rel equiv_ρ_drop_ρ'_drop }} ->
         {{ Dom ρ ≈ ρ' ∈ cons_per_ctx_env tail_rel (@head_rel) }} }.
 #[export]
 Hint Constructors cons_per_ctx_env : mcpts.
 
-Inductive per_ctx_env : relation env -> ctx -> ctx -> Prop :=
+Inductive per_ctx_env {P : PtsSig} {pred_P : PredicativeSig P} : relation (env P) -> ctx P -> ctx P -> Prop :=
 | per_ctx_env_nil :
   `{ forall env_rel,
         (env_rel <~> fun ρ ρ' => True) ->
         {{ EF ⋅ ≈ ⋅ ∈ per_ctx_env ↘ env_rel }} }
 | per_ctx_env_cons :
   `{ forall tail_rel
-        (head_rel : forall {ρ ρ'} (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ tail_rel }}), relation domain)
+        (head_rel : forall {ρ ρ'} (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ tail_rel }}), relation (domain P))
         env_rel
         (equiv_Γ_Γ' : {{ EF Γ ≈ Γ' ∈ per_ctx_env ↘ tail_rel }}),
         PER tail_rel ->
         (forall {ρ ρ'} (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ tail_rel }}),
-            rel_typ i A ρ A' ρ' (head_rel equiv_ρ_ρ')) ->
+            rel_typ pred_P s A ρ A' ρ' (head_rel equiv_ρ_ρ')) ->
         (env_rel <~> cons_per_ctx_env tail_rel (@head_rel)) ->
-        {{ EF Γ, A ≈ Γ', A' ∈ per_ctx_env ↘ env_rel }} }
+        {{ EF Γ, A::Sort@s ≈ Γ', A'::Sort@s ∈ per_ctx_env ↘ env_rel }} }
 .
 #[export]
 Hint Constructors per_ctx_env : mcpts.
 
-Definition per_ctx : relation ctx := fun Γ Γ' => exists R', per_ctx_env R' Γ Γ'.
-Definition valid_ctx : ctx -> Prop := fun Γ => per_ctx Γ Γ.
+Definition per_ctx {P : PtsSig} {pred_P : PredicativeSig P} : relation (ctx P) := fun Γ Γ' => exists R', @per_ctx_env P pred_P R' Γ Γ'.
+Definition valid_ctx {P : PtsSig} {pred_P : PredicativeSig P} : ctx P -> Prop := fun Γ => @per_ctx P pred_P Γ Γ.
 #[export]
 Hint Transparent valid_ctx : mcpts.
 #[export]
 Hint Unfold valid_ctx : mcpts.
 
-Reserved Notation "'SubE' Γ <: Δ" (in custom judg at level 90, Γ custom exp, Δ custom exp).
-
-(** * Context Subtyping *)
-
-Inductive per_ctx_subtyp : ctx -> ctx -> Prop :=
-| per_ctx_subtyp_nil :
-  {{ SubE ⋅ <: ⋅ }}
-| per_ctx_subtyp_cons :
-  `{ forall tail_rel env_rel env_rel',
-        {{ SubE Γ <: Γ' }} ->
-        {{ EF Γ ≈ Γ ∈ per_ctx_env ↘ tail_rel }} ->
-        (forall ρ ρ' a a'
-           (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ tail_rel }}),
-            {{ ⟦ A ⟧ ρ ↘ a }} ->
-            {{ ⟦ A' ⟧ ρ' ↘ a' }} ->
-            {{ Sub a <: a' at i }}) ->
-        {{ EF Γ , A ≈ Γ , A ∈ per_ctx_env ↘ env_rel }} ->
-        {{ EF Γ' , A' ≈ Γ' , A' ∈ per_ctx_env ↘ env_rel' }} ->
-        {{ SubE Γ, A <: Γ', A' }} }
-where "'SubE' Γ <: Δ" := (per_ctx_subtyp Γ Δ) (in custom judg) : type_scope.
-
-#[export]
-Hint Constructors per_ctx_subtyp : mcpts.
