@@ -125,7 +125,7 @@ Section Per_sort_elem_core_def.
           (elem_rel <~> fun f f' => forall n n' (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}), rel_mod_app f n f' n' (out_rel equiv_n_n')) ->
           motive s elem_rel d{{{ Π r a ρ B }}} d{{{ Π r a' ρ' B' }}})
       (case_ne :
-        forall {s a b a' b' elem_rel},
+        forall {a b a' b' elem_rel},
           {{ Dom b ≈ b' ∈ @per_bot P }} ->
           (elem_rel <~> per_ne) ->
           motive s elem_rel d{{{ ⇑ a b }}} d{{{ ⇑ a' b' }}})
@@ -158,6 +158,7 @@ End Per_sort_elem_core_def.
 
 #[export]
 Hint Constructors per_sort_elem_core : mcpts.
+
 
 Section Per_sort_elem_def.
   Variable
@@ -194,8 +195,15 @@ Proof.
   econstructor; mauto 3.
 Qed.
 
+Lemma per_sort_elem_core_lowering {P : PtsSig} {pred_P : PredicativeSig P} : forall (s1 s2 : St P) R a b,
+    per_sort_elem_core P s1 (fun s' ax_s'_s a a' => exists R', {{ DF a ≈ a' ∈ per_sort_elem P pred_P s' ↘ R' }}) s2 R a b -> per_sort_elem_core P s2 (fun s' ax_s'_s a a' => exists R', {{ DF a ≈ a' ∈ per_sort_elem P pred_P s' ↘ R' }}) s2 R a b.
+Proof.
+  intros * Helem.
+  dependent induction Helem; mauto.
+Qed.
+
 #[export]
-Hint Resolve per_sort_elem_core_sort' : mcpts.
+Hint Resolve per_sort_elem_core_sort' per_sort_elem_core_lowering : mcpts.
 
 (** ** Sort/Element PER Induction Principle *)
 
@@ -221,7 +229,7 @@ Section Per_sort_elem_ind_def.
           motive s_in in_rel a a' ->
           PER in_rel ->
           (forall {n n'} (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}),
-              rel_mod_eval (fun R x y => {{ DF x ≈ y ∈ per_sort_elem P pred_P s_in ↘ R }} /\ motive s_in R x y) B d{{{ ρ ↦ n' }}} B' d{{{ ρ' ↦ n' }}} (out_rel equiv_n_n')) ->
+              rel_mod_eval (fun R x y => {{ DF x ≈ y ∈ per_sort_elem P pred_P s_out ↘ R }} /\ motive s_out R x y) B d{{{ ρ ↦ n }}} B' d{{{ ρ' ↦ n' }}} (out_rel equiv_n_n')) ->
           (elem_rel <~> fun f f' => forall n n' (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}), rel_mod_app f n f' n' (out_rel equiv_n_n')) ->
           motive s elem_rel d{{{ Π r a ρ B }}} d{{{ Π r a' ρ' B' }}})
       (case_ne :
@@ -231,7 +239,7 @@ Section Per_sort_elem_ind_def.
           motive s elem_rel d{{{ ⇑ a b }}} d{{{ ⇑ a' b' }}}).
 
   #[local]
-  Ltac def_simp := simp per_sort_elem in *; mauto 3.
+  Ltac def_simp := simp per_sort_elem in *; mauto.
 
   Instance Per_sort_elem_ind_def_wf : WellFounded (pred_rel P pred_P) := (wf_rel P pred_P).
   
@@ -242,74 +250,38 @@ Section Per_sort_elem_ind_def.
       per_sort_elem_core_strong_ind P s _ motive
         (fun _ _ _ ax_s1_s eq HE => case_sort s ax_s1_s eq HE (fun A B R' H' => per_sort_elem_ind' _ R' A B _))
         (fun s_in s_out r _ _ _ _ _ _ _ out_rel _ _ IHA per _ => case_Pi s_in s_out s r out_rel _ IHA per _)
-        (fun s' _ _ _ _ _ => case_ne s')
+        (fun _ _ _ _ _ => case_ne s)
         s R a b H.
   Proof.
     - eapply ord_ax; mauto.
-    - admit.
-    - admit.
-  Abort.
+    - intros.
+      assert (rel_mod_eval
+      (fun (R : relation (domain P)) (x y : domain P) =>
+       per_sort_elem_core P s (fun (H : St P) (_ : Ax P H s) => per_sort pred_P H) s_out R x y /\
+         motive s_out R x y) e d{{{ l ↦ n }}} e0 d{{{ l0 ↦ n' }}} (out_rel n n' equiv_n_n')) by (eapply r1; mauto).
+      destruct H0.
+      destruct_conjs.
+      eapply mk_rel_mod_eval; mauto.
+  Qed.
+  
+  #[derive(equations=no, eliminator=no), tactic="def_simp"]
+  Equations per_sort_elem_ind s a b R (H : per_sort_elem P pred_P s a b R) : motive s a b R :=
+  | s, a, b, R, H := per_sort_elem_ind' s a b R _.
 End Per_sort_elem_ind_def.
 
 
-Section Per_univ_elem_ind_def.
-  #[derive(equations=no, eliminator=no), tactic="def_simp"]
-  Equations per_univ_elem_ind' (i : nat) (R : relation domain) (a b : domain)
-    (H : {{ DF a ≈ b ∈ per_univ_elem_core i (fun j lt_j_i a a' => exists R', {{ DF a ≈ a' ∈ per_univ_elem j ↘ R' }}) ↘ R }}) : {{ DF a ≈ b ∈ motive i ↘ R }} by wf i :=
-  | i, R, a, b, H =>
-      per_univ_elem_core_strong_ind i _ (motive i)
-        (fun _ _ _ j_lt_i eq HE => case_U i j_lt_i eq HE (fun A B R' H' => per_univ_elem_ind' _ R' A B _))
-        (fun _ => case_N i)
-        (fun _ _ _ _ _ _ _ out_rel _ _ IHA per _ => case_Pi i out_rel _ IHA per _)
-        (fun _ _ _ _ _ _ _ _ _ IHA per _ _ _ => case_Eq i _ IHA per _ _ _)
-        (fun _ _ _ _ _ => case_ne i)
-        R a b H.
 
-  #[derive(equations=no, eliminator=no), tactic="def_simp"]
-  Equations per_univ_elem_ind i a b R (H : per_univ_elem i a b R) : motive i a b R :=
-  | i, a, b, R, H := per_univ_elem_ind' i a b R _.
-End Per_univ_elem_ind_def.
-
-Reserved Notation "'Sub' a <: b 'at' i" (in custom judg at level 90, a custom domain, b custom domain, i constr).
-
-(** * Universe Subtyping *)
-
-Inductive per_subtyp : nat -> domain -> domain -> Prop :=
-| per_subtyp_univ :
-  `( i <= j ->
-     j < k ->
-     {{ Sub 𝕌@i <: 𝕌@j at k }} )
-| per_subtyp_nat :
-  `( {{ Sub ℕ <: ℕ at i }} )
-| per_subtyp_pi :
-  `( forall (in_rel : relation domain) elem_rel elem_rel',
-        {{ DF a ≈ a' ∈ per_univ_elem i ↘ in_rel }} ->
-        (forall c c' b b',
-            {{ Dom c ≈ c' ∈ in_rel }} ->
-            {{ ⟦ B ⟧ ρ ↦ c ↘ b }} ->
-            {{ ⟦ B' ⟧ ρ' ↦ c' ↘ b' }} ->
-            {{ Sub b <: b' at i }}) ->
-        {{ DF Π a ρ B ≈ Π a ρ B ∈ per_univ_elem i ↘ elem_rel }} ->
-        {{ DF Π a' ρ' B' ≈ Π a' ρ' B' ∈ per_univ_elem i ↘ elem_rel' }} ->
-        {{ Sub Π a ρ B <: Π a' ρ' B' at i }} )
-| per_subtyp_eq :
-  `( forall elem_rel,
-        {{ DF Eq a m1 m2 ≈ Eq a' m1' m2' ∈ per_univ_elem i ↘ elem_rel }} ->
-        {{ Sub Eq a m1 m2 <: Eq a' m1' m2' at i }} )
-| per_subtyp_neut :
-  `( {{ Dom b ≈ b' ∈ per_bot }} ->
-     {{ Sub ⇑ a b <: ⇑ a' b' at i }} )
-where "'Sub' a <: b 'at' i" := (per_subtyp i a b) (in custom judg) : type_scope.
-
-#[export]
- Hint Constructors per_subtyp : mcpts.
-
-Definition rel_typ i A ρ A' ρ' R' := rel_mod_eval (per_univ_elem i) A ρ A' ρ' R'.
+Definition rel_typ {P : PtsSig} {pred_P : PredicativeSig P} s A ρ A' ρ' R' := rel_mod_eval (per_sort_elem P pred_P s) A ρ A' ρ' R'.
 Arguments rel_typ _ _ _ _ _ _ /.
 #[export]
 Hint Transparent rel_typ : mcpts.
 #[export]
 Hint Unfold rel_typ : mcpts.
+
+
+
+(* Untranslated McTT code below *)
+
 
 (** * Context/Environment PER *)
 
