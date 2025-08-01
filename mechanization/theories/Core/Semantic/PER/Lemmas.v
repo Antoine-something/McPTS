@@ -184,12 +184,26 @@ Proof with mautosolve.
   simpl.
   intros R R' HRR'.
 
-(*   split; intros Horig; [gen R' | gen R]; *)
-(*     induction Horig using per_sort_elem_ind; basic_per_sort_elem_econstructor; eauto; *)
-(*     try (etransitivity; [symmetry + idtac|]; eassumption); *)
-(*     intros; *)
-(*     destruct_rel_mod_eval; *)
-(*     econstructor... *)
+  split; intros Horig; [gen R' | gen R];
+    induction Horig using per_sort_elem_ind; basic_per_sort_elem_econstructor; eauto;
+    try (etransitivity; [symmetry + idtac|]; eassumption);
+    intros;
+    destruct_rel_mod_eval.
+
+  - (* sort mismatch here *)
+    simp per_sort_elem in H.
+    admit. 
+  - econstructor; mauto 3.
+    (* sort mismatch here *)
+    simp per_sort_elem in H5.
+    admit.
+  - (* sort mismatch here *)
+    simp per_sort_elem in H.
+    admit.
+  - econstructor; mauto 3.
+    (* sort mismatch here *)
+    simp per_sort_elem in H5.
+    admit.
 Admitted.
 
 Add Parametric Morphism {P : PtsSig} {pred_P : PredicativeSig P} s : (per_sort_elem P pred_P s)
@@ -434,7 +448,7 @@ Proof with (basic_per_sort_elem_econstructor; mautosolve 4).
     [> split;
      [ intros * HT2; basic_invert_per_sort_elem HT2
      | intros * HTR1 HTR2; apply_relation_equivalence ] ..]; mauto.
-  - admit.
+  - subst. mauto.
   - (* sort case *)
     subst.
     destruct HTR1, HTR2.
