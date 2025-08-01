@@ -106,7 +106,7 @@ Section Per_sort_elem_core_def.
   .
 
   Hypothesis
-    (motive : forall {P : PtsSig}, St P -> relation (domain P) -> domain P -> domain P -> Prop)
+    (motive : St P -> relation (domain P) -> domain P -> domain P -> Prop)
       (case_sort :
         forall {s1 s2 elem_rel} (ax_s1_s : Ax P s1 s),
           s1 = s2 ->
@@ -132,8 +132,8 @@ Section Per_sort_elem_core_def.
   .
 
   #[derive(equations=no, eliminator=no)]
-  Equations per_sort_elem_core_strong_ind (s : St P) R a b (H : {{ DF a ≈ b ∈ per_sort_elem_core s ↘ R }}) : {{ DF a ≈ b ∈ motive s ↘ R }} :=
-  | s, R, a, b, (per_sort_elem_core_sort _ ax_s1_s HE eq)               => case_sort ax_s1_s HE eq
+  Equations per_sort_elem_core_strong_ind (s' : St P) R a b (H : {{ DF a ≈ b ∈ per_sort_elem_core s' ↘ R }}) : {{ DF a ≈ b ∈ motive s' ↘ R }} :=
+  | s, R, a, b, (per_sort_elem_core_sort _ ax_s1_s HE eq)               => case_sort ax_s1_s HE eq;
   | s_elem, R, a, b, (per_sort_elem_core_pi s_in s_out r _ out_rel _ equiv_a_a' per HT HE) =>
       case_Pi s_in s_out r out_rel equiv_a_a' (per_sort_elem_core_strong_ind s_in _ _ _ equiv_a_a') per
         (fun _ _ equiv_n_n' => match HT _ _ equiv_n_n' with
@@ -142,15 +142,29 @@ Section Per_sort_elem_core_def.
                             end)
         HE;
   | s, R, a, b, (per_sort_elem_core_neut _ equiv_b_b' HE)                 => case_ne equiv_b_b' HE.
+  
+  (* #[derive(equations=no, eliminator=no)] *)
+  (* Equations per_sort_elem_core_strong_ind (s' : St P) R a b (H : {{ DF a ≈ b ∈ per_sort_elem_core s' ↘ R }}) : {{ DF a ≈ b ∈ motive s ↘ R }} := *)
+  (* | s, R, a, b, (per_sort_elem_core_sort _ ax_s1_s HE eq)               => case_sort ax_s1_s HE eq *)
+  (* | s_elem, R, a, b, (per_sort_elem_core_pi s_in s_out r _ out_rel _ equiv_a_a' per HT HE) => *)
+  (*     case_Pi s_in s_out r out_rel equiv_a_a' (per_sort_elem_core_strong_ind s_in _ _ _ equiv_a_a') per *)
+  (*       (fun _ _ equiv_n_n' => match HT _ _ equiv_n_n' with *)
+  (*                           | mk_rel_mod_eval b b' evb evb' Rel => *)
+  (*                               mk_rel_mod_eval b b' evb evb' (conj _ (per_sort_elem_core_strong_ind s_out _ _ _ Rel)) *)
+  (*                           end) *)
+  (*       HE; *)
+  (* | s, R, a, b, (per_sort_elem_core_neut _ equiv_b_b' HE)                 => case_ne equiv_b_b' HE. *)
 End Per_sort_elem_core_def.
 
+#[export]
+Hint Constructors per_sort_elem_core : mcpts.
 
 Section Per_sort_elem_def.
   Variable
     (P : PtsSig)
       (pred_P : PredicativeSig P).
 
-Instance wfR : WellFounded (pred_rel P pred_P) := (wf_rel P pred_P).
+  Instance Per_sort_elem_def_wf : WellFounded (pred_rel P pred_P) := (wf_rel P pred_P).
 
 Equations? per_sort_elem (s : St P) : relation (domain P) -> domain P -> domain P -> Prop by wf s :=
 | s => per_sort_elem_core P s (fun s' ax_s'_s a a' => exists R', {{ DF a ≈ a' ∈ per_sort_elem s' ↘ R' }}) s.
@@ -183,46 +197,62 @@ Qed.
 #[export]
 Hint Resolve per_sort_elem_core_sort' : mcpts.
 
-(** ** Universe/Element PER Induction Principle *)
+(** ** Sort/Element PER Induction Principle *)
 
-Section Per_univ_elem_ind_def.
+Section Per_sort_elem_ind_def.
+  Variable
+    (P : PtsSig)
+      (pred_P : PredicativeSig P).
+
   Hypothesis
-    (motive : nat -> relation domain -> domain -> domain -> Prop)
-      (case_U : forall i {j j' elem_rel},
-          j < i -> j = j' ->
-          (elem_rel <~> per_univ j) ->
-          (forall A B R, {{ DF A ≈ B ∈ per_univ_elem j ↘ R }} -> motive j R A B) ->
-          motive i elem_rel d{{{ 𝕌@j }}} d{{{ 𝕌@j' }}})
-      (case_N : forall i {elem_rel},
-          (elem_rel <~> per_nat) ->
-          motive i elem_rel d{{{ ℕ }}} d{{{ ℕ }}})
+    (motive : (St P) -> relation (domain P) -> domain P -> domain P -> Prop)
+      (case_sort :
+        forall s {s1 s2 elem_rel},
+          Ax P s1 s -> s1 = s2 ->
+          (elem_rel <~> per_sort pred_P s1) ->
+          (forall A B R, {{ DF A ≈ B ∈ per_sort_elem P pred_P s1 ↘ R }} -> motive s1 R A B) ->
+          motive s elem_rel d{{{ Sort@s1 }}} d{{{ Sort@s2 }}} )
       (case_Pi :
-        forall i {a ρ B a' ρ' B' in_rel}
-           (out_rel : forall {c c'} (equiv_c_c' : {{ Dom c ≈ c' ∈ in_rel }}), relation domain)
-           {elem_rel},
-          {{ DF a ≈ a' ∈ per_univ_elem i ↘ in_rel }} ->
-          motive i in_rel a a' ->
+        forall s_in s_out s (r : Ru P s_in s_out s)
+          {a ρ B a' ρ' B' in_rel}
+          (out_rel : forall {n n'} (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}), relation (domain P))
+          {elem_rel},
+          {{ DF a ≈ a' ∈ per_sort_elem P pred_P s_in ↘ in_rel }} ->
+          motive s_in in_rel a a' ->
           PER in_rel ->
-          (forall {c c'} (equiv_c_c' : {{ Dom c ≈ c' ∈ in_rel }}),
-              rel_mod_eval (fun R x y => {{ DF x ≈ y ∈ per_univ_elem i ↘ R }} /\ motive i R x y) B d{{{ ρ ↦ c }}} B' d{{{ ρ' ↦ c' }}} (out_rel equiv_c_c')) ->
-          (elem_rel <~> fun f f' => forall c c' (equiv_c_c' : {{ Dom c ≈ c' ∈ in_rel }}), rel_mod_app f c f' c' (out_rel equiv_c_c')) ->
-          motive i elem_rel d{{{ Π a ρ B }}} d{{{ Π a' ρ' B' }}})
-      (case_Eq : forall i {a m1 m2 a' m1' m2' point_rel elem_rel},
-          {{ DF a ≈ a' ∈ per_univ_elem i ↘ point_rel }} ->
-          motive i point_rel a a' ->
-          PER point_rel ->
-          {{ Dom m1 ≈ m1' ∈ point_rel }} ->
-          {{ Dom m2 ≈ m2' ∈ point_rel }} ->
-          (elem_rel <~> per_eq point_rel m1 m2') ->
-          motive i elem_rel d{{{ Eq a m1 m2 }}} d{{{ Eq a' m1' m2' }}})
-      (case_ne : forall i {a b a' b' elem_rel},
+          (forall {n n'} (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}),
+              rel_mod_eval (fun R x y => {{ DF x ≈ y ∈ per_sort_elem P pred_P s_in ↘ R }} /\ motive s_in R x y) B d{{{ ρ ↦ n' }}} B' d{{{ ρ' ↦ n' }}} (out_rel equiv_n_n')) ->
+          (elem_rel <~> fun f f' => forall n n' (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}), rel_mod_app f n f' n' (out_rel equiv_n_n')) ->
+          motive s elem_rel d{{{ Π r a ρ B }}} d{{{ Π r a' ρ' B' }}})
+      (case_ne :
+        forall s {a b a' b' elem_rel},
           {{ Dom b ≈ b' ∈ per_bot }} ->
           (elem_rel <~> per_ne) ->
-          motive i elem_rel d{{{ ⇑ a b }}} d{{{ ⇑ a' b' }}}).
+          motive s elem_rel d{{{ ⇑ a b }}} d{{{ ⇑ a' b' }}}).
 
   #[local]
-  Ltac def_simp := simp per_univ_elem in *; mauto 3.
+  Ltac def_simp := simp per_sort_elem in *; mauto 3.
 
+  Instance Per_sort_elem_ind_def_wf : WellFounded (pred_rel P pred_P) := (wf_rel P pred_P).
+  
+  #[derive(equations=no, eliminator=no), tactic="def_simp"]
+  Equations? per_sort_elem_ind' (s : St P) (R : relation (domain P)) (a b : domain P)
+  (H : {{ DF a ≈ b ∈ per_sort_elem_core P s (fun s' ax_s'_s a a' => exists R', {{ DF a ≈ a' ∈ per_sort_elem P pred_P s' ↘ R' }}) s ↘ R }}) : {{ DF a ≈ b ∈ motive s ↘ R }} by wf s :=
+  | s, R, a, b, H =>
+      per_sort_elem_core_strong_ind P s _ motive
+        (fun _ _ _ ax_s1_s eq HE => case_sort s ax_s1_s eq HE (fun A B R' H' => per_sort_elem_ind' _ R' A B _))
+        (fun s_in s_out r _ _ _ _ _ _ _ out_rel _ _ IHA per _ => case_Pi s_in s_out s r out_rel _ IHA per _)
+        (fun s' _ _ _ _ _ => case_ne s')
+        s R a b H.
+  Proof.
+    - eapply ord_ax; mauto.
+    - admit.
+    - admit.
+  Abort.
+End Per_sort_elem_ind_def.
+
+
+Section Per_univ_elem_ind_def.
   #[derive(equations=no, eliminator=no), tactic="def_simp"]
   Equations per_univ_elem_ind' (i : nat) (R : relation domain) (a b : domain)
     (H : {{ DF a ≈ b ∈ per_univ_elem_core i (fun j lt_j_i a a' => exists R', {{ DF a ≈ a' ∈ per_univ_elem j ↘ R' }}) ↘ R }}) : {{ DF a ≈ b ∈ motive i ↘ R }} by wf i :=
