@@ -79,7 +79,7 @@ Section Per_sort_elem_core_def.
       (per_sort_rec : forall {s1 s2}, Ax P s1 s2 -> relation (domain P)).
 
   (** Defines 'a = b ∈ Sort_s ↘ R' in the paper *)
-  Inductive per_sort_elem_core : St P -> relation (domain P) -> domain P -> domain P -> Prop :=
+  Inductive per_sort_elem_core : (St P) -> relation (domain P) -> domain P -> domain P -> Prop :=
   | per_sort_elem_core_sort :
     `{ forall (elem_rel : relation (domain P))
          (ax_s1_s2 : Ax P s1 s2),
@@ -142,22 +142,30 @@ Section Per_sort_elem_core_def.
         HE;
   | s, R, a, b, (per_sort_elem_core_neut _ equiv_b_b' HE)                 => case_ne equiv_b_b' HE.
 
-  Definition wf_rel_P := (wf_rel P pred_P).
-  
-  Equations per_sort_elem (s : St P) : relation (domain P) -> domain P -> domain P -> Prop by wf s :=
-| s => per_sort_elem_core P (fun s1 s2 ax_s1_s2 a a' => exists R', {{ DF a ≈ a' ∈ per_sort_elem s1 ↘ R' }}) s.
+  (* Derive Subterm for St. *)
+
+
 End Per_sort_elem_core_def.
-  
-#[export]
-Hint Constructors per_sort_elem_core : mcpts.
 
 
-Equations per_sort_elem {P : PtsSig} {pred_P : PredicativeSig P} (s : St P) : relation (domain P) -> domain P -> domain P -> Prop by wf s (pred_rel P pred_P) :=
-| s => per_sort_elem_core P (fun s1 s2 ax_s1_s2 a a' => exists R', {{ DF a ≈ a' ∈ per_sort_elem s1 ↘ R' }}) s.
+Section Per_sort_elem_def.
+
+  Variable
+    (P : PtsSig).
+
+Inductive t_direct_subterm : (St P) -> (St P) -> Prop :=.
+
+Instance wfR : WellFounded t_direct_subterm. Admitted.
+
+Equations per_univ_elem (s : St P) : relation (domain P) -> domain P -> domain P -> Prop by wf s :=
+| s => fun _ _ _ => True.
+
+(* Equations per_sort_elem {P : PtsSig} {pred_P : PredicativeSig P} (s : St P) : relation (domain P) -> domain P -> domain P -> Prop by wf s :=
+| s => per_sort_elem_core P (fun s1 s2 ax_s1_s2 a a' => exists R', {{ DF a ≈ a' ∈ per_sort_elem s1 ↘ R' }}) s. *)
+
+End Per_sort_elem_def.
 
 
-Equations per_univ_elem (i : nat) : relation domain -> domain -> domain -> Prop by wf i :=
-| i => per_univ_elem_core i (fun j lt_j_i a a' => exists R', {{ DF a ≈ a' ∈ per_univ_elem j ↘ R' }}).
 
 Definition per_univ (i : nat) : relation domain := fun a a' => exists R', {{ DF a ≈ a' ∈ per_univ_elem i ↘ R' }}.
 #[global]
