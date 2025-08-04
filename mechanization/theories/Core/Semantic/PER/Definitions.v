@@ -196,11 +196,24 @@ Proof.
 Qed.
 
 Lemma per_sort_elem_core_lowering {P : PtsSig} {pred_P : PredicativeSig P} : forall (s1 s2 : St P) R a b,
-    per_sort_elem_core P s1 (fun s' ax_s'_s a a' => exists R', {{ DF a ≈ a' ∈ per_sort_elem P pred_P s' ↘ R' }}) s2 R a b -> per_sort_elem_core P s2 (fun s' ax_s'_s a a' => exists R', {{ DF a ≈ a' ∈ per_sort_elem P pred_P s' ↘ R' }}) s2 R a b.
+    per_sort_elem_core P s1 (fun s' ax_s'_s a a' => exists R', {{ DF a ≈ a' ∈ per_sort_elem P pred_P s' ↘ R' }}) s2 R a b -> 
+    per_sort_elem_core P s2 (fun s' ax_s'_s a a' => exists R', {{ DF a ≈ a' ∈ per_sort_elem P pred_P s' ↘ R' }}) s2 R a b.
 Proof.
   intros * Helem.
   dependent induction Helem; mauto.
 Qed.
+
+
+Lemma per_sort_elem_core_lowering' {P : PtsSig} {pred_P : PredicativeSig P} : forall (s1 s2 : St P) R a b,
+    per_sort_elem_core P s2 (fun s' ax_s'_s a a' => exists R', {{ DF a ≈ a' ∈ per_sort_elem P pred_P s' ↘ R' }}) s2 R a b -> 
+    per_sort_elem_core P s1 (fun s' ax_s'_s a a' => exists R', {{ DF a ≈ a' ∈ per_sort_elem P pred_P s' ↘ R' }}) s2 R a b.
+Proof.
+  intros * Helem.
+  dependent induction Helem; mauto.
+  - subst. mauto. 
+    admit.
+  - admit.
+Abort.
 
 #[export]
 Hint Resolve per_sort_elem_core_sort' per_sort_elem_core_lowering : mcpts.
