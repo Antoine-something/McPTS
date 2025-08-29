@@ -54,11 +54,11 @@ Ltac destruct_rel_typ :=
 (** Sort/Element PER Helper Tactics *)
 
 Ltac basic_invert_per_sort_elem H :=
-  progress simp per_sort_elem_core in H;
+  progress simp per_sort_elem in H;
   dependent destruction H;
   try rewrite <- per_sort_elem_equation_1 in *.
 
 Ltac basic_per_sort_elem_econstructor :=
-  progress simp per_sort_elem_core;
+  progress simp per_sort_elem;
   econstructor;
   try rewrite <- per_sort_elem_equation_1 in *.
