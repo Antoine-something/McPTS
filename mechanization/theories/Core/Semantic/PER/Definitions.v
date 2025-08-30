@@ -198,7 +198,9 @@ Hint Resolve per_sort_elem_core_sort' : mcpts.
 (** ** Sort/Element PER Induction Principle *)
 
 Section Per_sort_elem_ind_def.
-  Context `(pred_P : PredicativeSig P).
+  Context
+    (P : PtsSig)
+      (pred_P : PredicativeSig P).
 
   Let dom := domain P.
 
@@ -276,7 +278,6 @@ Arguments rel_typ _ _ _ _ _ _ _ _ /.
 Hint Transparent rel_typ : mcpts.
 #[export]
 Hint Unfold rel_typ : mcpts.
-
 
 (** * Context/Environment PER *)
 
