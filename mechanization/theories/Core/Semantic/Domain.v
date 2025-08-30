@@ -7,9 +7,9 @@ From McPTS.Core.Syntactic Require Export Syntax.
 Reserved Notation "'env'".
 
 Inductive domain (P : PtsSig) : Set :=
-| d_sort : St P -> domain P
-| d_pi : forall (s1 s2 s3 : St P), Ru P s1 s2 s3 -> domain P -> env P -> exp P -> domain P
-| d_fn : forall (s1 s2 s3 : St P), Ru P s1 s2 s3 ->  env P -> exp P -> domain P
+| d_sort : P -> domain P
+| d_pi : forall (s1 s2 s3 : P), Ru P s1 s2 s3 -> domain P -> env P -> exp P -> domain P
+| d_fn : forall (s1 s2 s3 : P), Ru P s1 s2 s3 ->  env P -> exp P -> domain P
 | d_neut : domain P -> domain_ne P -> domain P
 with domain_ne (P : PtsSig) : Set :=
 (** Notice that the number x here is not a de Bruijn index but an absolute
@@ -25,8 +25,8 @@ where "'env'" := (fun P => (list (domain P))).
 
 (* Make the signature implicit to all constructors *)
 Arguments d_sort {_}.
-Arguments d_pi {_} {_} {_} {_}.
-Arguments d_fn {_} {_} {_} {_}.
+Arguments d_pi {_ _ _ _}.
+Arguments d_fn {_ _ _ _}.
 Arguments d_neut {_}.
 Arguments d_var {_}.
 Arguments d_app {_}.

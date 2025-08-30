@@ -6,14 +6,14 @@ Import Syntax_Notations.
 
 
  
-Add Parametric Morphism {P : PtsSig} (s : St P) Γ : (wf_exp Γ)
+Add Parametric Morphism {P : PtsSig} (s : P) Γ : (wf_exp Γ)
     with signature wf_exp_eq Γ {{{ Sort@s }}} ==> eq ==> iff as wf_exp_morphism_iff3.
 Proof with mautosolve.
   split; intros; gen_presups;
     eapply wf_exp_conv; mauto 3.
 Qed.
 
-Add Parametric Morphism {P : PtsSig} (s : St P) Γ : (wf_exp_eq Γ)
+Add Parametric Morphism {P : PtsSig} (s : P) Γ : (wf_exp_eq Γ)
     with signature wf_exp_eq Γ {{{ Sort@s }}} ==> eq ==> eq ==> iff as wf_exp_eq_morphism_iff3.
 Proof with mautosolve.
   split; intros; gen_presups;

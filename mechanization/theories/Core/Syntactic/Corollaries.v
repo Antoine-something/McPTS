@@ -69,7 +69,7 @@ Qed.
 #[export]
 Hint Resolve invert_compose_id : mcpts.
 
-Add Parametric Morphism {P : PtsSig} (s : St P) Γ Δ : a_sub
+Add Parametric Morphism {P : PtsSig} (s : P) Γ Δ : a_sub
     with signature wf_exp_eq Δ {{{ Sort@s }}} ==> wf_sub_eq Γ Δ ==> wf_exp_eq Γ {{{ Sort@s }}} as sub_typ_cong.
 Proof.
   intros.

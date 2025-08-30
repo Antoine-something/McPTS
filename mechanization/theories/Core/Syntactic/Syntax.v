@@ -8,7 +8,7 @@ From McPTS.Core Require Import Base.
 Module Cst.
   Inductive obj (P : PtsSig) : Set :=
   (** Sorts *)
-  | st : St P -> obj P
+  | st : P -> obj P
   (** Functions *)
   | pi : string -> obj P -> obj P -> obj P
   | fn : string -> obj P -> obj P -> obj P
@@ -26,10 +26,10 @@ End Cst.
 (** * Abstract Syntac Tree *)
 Inductive exp (P : PtsSig) : Set :=
 (** Sorts *)
-| a_st : St P -> exp P
+| a_st : P -> exp P
 (** Functions *)
-| a_pi : forall (s1 s2 s3 : St P), Ru P s1 s2 s3 -> exp P -> exp P -> exp P
-| a_fn : forall (s1 s2 s3 : St P), Ru P s1 s2 s3 -> exp P -> exp P -> exp P
+| a_pi : forall (s1 s2 s3 : P), Ru P s1 s2 s3 -> exp P -> exp P -> exp P
+| a_fn : forall (s1 s2 s3 : P), Ru P s1 s2 s3 -> exp P -> exp P -> exp P
 | a_app : exp P -> exp P -> exp P
 (** Variable *)
 | a_var : nat -> exp P
@@ -42,8 +42,8 @@ with sub (P : PtsSig) : Set :=
 | a_extend : sub P -> exp P -> sub P.
 
 Arguments a_st {_}.
-Arguments a_pi {_} {_} {_} {_}.
-Arguments a_fn {_} {_} {_} {_}.
+Arguments a_pi {_ _ _ _}.
+Arguments a_fn {_ _ _ _}.
 Arguments a_app {_}.
 Arguments a_var {_}.
 Arguments a_sub {_}.
@@ -60,9 +60,9 @@ Notation ctx := (fun P => list (typ P * knd P)).
 
 (** ** Syntactic Normal/Neutral Form *)
 Inductive nf (P : PtsSig) : Set :=
-| nf_st : St P -> nf P
-| nf_pi : forall (s1 s2 s3 : St P), Ru P s1 s2 s3 -> nf P -> nf P -> nf P
-| nf_fn : forall (s1 s2 s3 : St P), Ru P s1 s2 s3 -> nf P -> nf P -> nf P
+| nf_st : P -> nf P
+| nf_pi : forall (s1 s2 s3 : P), Ru P s1 s2 s3 -> nf P -> nf P -> nf P
+| nf_fn : forall (s1 s2 s3 : P), Ru P s1 s2 s3 -> nf P -> nf P -> nf P
 | nf_neut : ne P -> nf P
 with ne (P : PtsSig) : Set :=
 | ne_app : ne P -> nf P -> ne P
@@ -70,8 +70,8 @@ with ne (P : PtsSig) : Set :=
 .
 
 Arguments nf_st {_}.
-Arguments nf_pi {_} {_} {_} {_}.
-Arguments nf_fn {_} {_} {_} {_}.
+Arguments nf_pi {_ _ _ _}.
+Arguments nf_fn {_ _ _ _}.
 Arguments nf_neut {_}.
 
 Arguments ne_app {_}.
