@@ -9,7 +9,6 @@ Record PtsSig : Type :=
       Ru : St -> St -> St -> Set;
     }.
 
-(* It would be nicer to have this in Prop, but Rocq complains *)
 Record PredicativeSig (P : PtsSig) : Type :=
   mkPredicativeSig {
       pred_rel : relation P;

@@ -1100,7 +1100,7 @@ Ltac invert_per_ctx_env H :=
 
 Ltac invert_per_ctx_envs := match_by_head per_ctx_env ltac:(fun H => directed invert_per_ctx_env H).
 
-Ltac invert_per_ctx_envs_of rel := match_by_head (per_ctx_env rel) ltac:(fun H => directed invert_per_ctx_env H).
+Ltac invert_per_ctx_envs_of pred_P rel := match_by_head (per_ctx_env pred_P rel) ltac:(fun H => directed invert_per_ctx_env H).
 
 Lemma per_ctx_respects_length {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ Γ'},
     {{ Exp Γ ≈ Γ' ∈ per_ctx pred_P }} ->
