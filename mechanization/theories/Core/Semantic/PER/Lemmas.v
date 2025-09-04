@@ -834,8 +834,8 @@ Ltac invert_per_sort_elems := match_by_head per_sort_elem ltac:(fun H => directe
 (*   lia. *)
 (* Qed. *)
 
-Add Parametric Morphism {P : PtsSig} {pred_P : PredicativeSig P} : (per_typ pred_P)
-  with signature (@relation_equivalence (domain P)) ==> eq ==> eq ==> iff as per_typ_morphism_iff.
+Add Parametric Morphism {P : PtsSig} {pred_P : PredicativeSig P} : (per_typ_elem pred_P)
+  with signature (@relation_equivalence (domain P)) ==> eq ==> eq ==> iff as per_typ_elem_morphism_iff.
 Proof with mautosolve.
   intros R R' HRR'.  
   split; intro Horig; [gen R' | gen R];
@@ -843,8 +843,8 @@ Proof with mautosolve.
     apply_relation_equivalence; try reflexivity; try eassumption.
 Qed.
 
-Add Parametric Morphism {P : PtsSig} {pred_P : PredicativeSig P} : (per_typ pred_P)
-  with signature (@relation_equivalence (domain P)) ==> (@relation_equivalence (domain P)) as per_typ_morphism_relation_equivalence.
+Add Parametric Morphism {P : PtsSig} {pred_P : PredicativeSig P} : (per_typ_elem pred_P)
+  with signature (@relation_equivalence (domain P)) ==> (@relation_equivalence (domain P)) as per_typ_elem_morphism_relation_equivalence.
 Proof.
   intros * H ? ?.
   simpl.
@@ -852,9 +852,9 @@ Proof.
   reflexivity.
 Qed.
 
-Lemma per_typ_right_irrel {P : PtsSig} {pred_P : PredicativeSig P} : forall a b b' R R',
-    {{ DF a ≈ b ∈ per_typ pred_P ↘ R }} ->
-    {{ DF a ≈ b' ∈ per_typ pred_P ↘ R' }} ->
+Lemma per_typ_elem_right_irrel {P : PtsSig} {pred_P : PredicativeSig P} : forall a b b' R R',
+    {{ DF a ≈ b ∈ per_typ_elem pred_P ↘ R }} ->
+    {{ DF a ≈ b' ∈ per_typ_elem pred_P ↘ R' }} ->
     R <~> R'.
 Proof.
   intros * Horig.
@@ -872,9 +872,9 @@ Proof.
 Qed.
 
 
-Lemma per_typ_sym {P} {pred_P : PredicativeSig P} : forall {R a b},
-    {{ DF a ≈ b ∈ per_typ pred_P ↘ R }} ->
-    {{ DF b ≈ a ∈ per_typ pred_P ↘ R }} /\
+Lemma per_typ_elem_sym {P} {pred_P : PredicativeSig P} : forall {R a b},
+    {{ DF a ≈ b ∈ per_typ_elem pred_P ↘ R }} ->
+    {{ DF b ≈ a ∈ per_typ_elem pred_P ↘ R }} /\
       (forall m m',
           {{ Dom m ≈ m' ∈ R }} ->
           {{ Dom m' ≈ m ∈ R }}).
@@ -891,71 +891,71 @@ Proof with mautosolve.
     eapply per_elem_sym; mauto.
 Qed.
 
-Corollary per_typ_left_irrel {P} {pred_P : PredicativeSig P} : forall R a b R' a',
-    {{ DF a ≈ b ∈ per_typ pred_P ↘ R }} ->
-    {{ DF a' ≈ b ∈ per_typ pred_P ↘ R' }} ->
+Corollary per_typ_elem_left_irrel {P} {pred_P : PredicativeSig P} : forall R a b R' a',
+    {{ DF a ≈ b ∈ per_typ_elem pred_P ↘ R }} ->
+    {{ DF a' ≈ b ∈ per_typ_elem pred_P ↘ R' }} ->
     R <~> R'.
 Proof.
-  intros * ?%per_typ_sym ?%per_typ_sym.
+  intros * ?%per_typ_elem_sym ?%per_typ_elem_sym.
   destruct_conjs.
-  eauto using per_typ_right_irrel.
+  eauto using per_typ_elem_right_irrel.
 Qed.
 
-Corollary per_typ_cross_irrel {P} {pred_P : PredicativeSig P} : forall R a b R' b',
-    {{ DF a ≈ b ∈ per_typ pred_P ↘ R }} ->
-    {{ DF b' ≈ a ∈ per_typ pred_P ↘ R' }} ->
+Corollary per_typ_elem_cross_irrel {P} {pred_P : PredicativeSig P} : forall R a b R' b',
+    {{ DF a ≈ b ∈ per_typ_elem pred_P ↘ R }} ->
+    {{ DF b' ≈ a ∈ per_typ_elem pred_P ↘ R' }} ->
     R <~> R'.
 Proof.
-  intros * ? ?%per_typ_sym.
+  intros * ? ?%per_typ_elem_sym.
   destruct_conjs.
-  eauto using per_typ_right_irrel.
+  eauto using per_typ_elem_right_irrel.
 Qed.
 
-Ltac do_per_typ_irrel_assert1 :=
-  let tactic_error o1 o2 := fail 2 "per_typ_irrel biconditional between" o1 "and" o2 "cannot be solved" in
+Ltac do_per_typ_elem_irrel_assert1 :=
+  let tactic_error o1 o2 := fail 2 "per_typ_elem_irrel biconditional between" o1 "and" o2 "cannot be solved" in
   match goal with
-  | H1 : {{ DF ^?a ≈ ^_ ∈ per_typ ?pred_P ↘ ?R1 }},
-      H2 : {{ DF ^?a ≈ ^_ ∈ per_typ ?pred_P ↘ ?R2 }} |- _ =>
+  | H1 : {{ DF ^?a ≈ ^_ ∈ per_typ_elem ?pred_P ↘ ?R1 }},
+      H2 : {{ DF ^?a ≈ ^_ ∈ per_typ_elem ?pred_P ↘ ?R2 }} |- _ =>
       assert_fails (unify R1 R2);
       match goal with
       | H : R1 <~> R2 |- _ => fail 1
       | H : R2 <~> R1 |- _ => fail 1
-      | _ => assert (R1 <~> R2) by (eapply per_typ_right_irrel; [apply H1 | apply H2]) || tactic_error R1 R2
+      | _ => assert (R1 <~> R2) by (eapply per_typ_elem_right_irrel; [apply H1 | apply H2]) || tactic_error R1 R2
       end
-  | H1 : {{ DF ^_ ≈ ^?b ∈ per_typ ?pred_P ↘ ?R1 }},
-      H2 : {{ DF ^_ ≈ ^?b ∈ per_typ ?pred_P ↘ ?R2 }} |- _ =>
+  | H1 : {{ DF ^_ ≈ ^?b ∈ per_typ_elem ?pred_P ↘ ?R1 }},
+      H2 : {{ DF ^_ ≈ ^?b ∈ per_typ_elem ?pred_P ↘ ?R2 }} |- _ =>
       assert_fails (unify R1 R2);
       match goal with
       | H : R1 <~> R2 |- _ => fail 1
       | H : R2 <~> R1 |- _ => fail 1
-      | _ => assert (R1 <~> R2) by (eapply per_typ_left_irrel; [apply H1 | apply H2]) || tactic_error R1 R2
+      | _ => assert (R1 <~> R2) by (eapply per_typ_elem_left_irrel; [apply H1 | apply H2]) || tactic_error R1 R2
       end
-  | H1 : {{ DF ^?a ≈ ^_ ∈ per_typ ?pred_P ↘ ?R1 }},
-      H2 : {{ DF ^_ ≈ ^?a ∈ per_typ ?pred_P ↘ ?R2 }} |- _ =>
+  | H1 : {{ DF ^?a ≈ ^_ ∈ per_typ_elem ?pred_P ↘ ?R1 }},
+      H2 : {{ DF ^_ ≈ ^?a ∈ per_typ_elem ?pred_P ↘ ?R2 }} |- _ =>
       (** Order matters less here as H1 and H2 cannot be exchanged *)
       assert_fails (unify R1 R2);
       match goal with
       | H : R1 <~> R2 |- _ => fail 1
       | H : R2 <~> R1 |- _ => fail 1
-      | _ => assert (R1 <~> R2) by (eapply per_typ_cross_irrel; [apply H1 | apply H2]) || tactic_error R1 R2
+      | _ => assert (R1 <~> R2) by (eapply per_typ_elem_cross_irrel; [apply H1 | apply H2]) || tactic_error R1 R2
       end
   end.
 
-Ltac do_per_typ_irrel_assert :=
-  repeat do_per_typ_irrel_assert1.
+Ltac do_per_typ_elem_irrel_assert :=
+  repeat do_per_typ_elem_irrel_assert1.
 
-Ltac handle_per_typ_irrel :=
+Ltac handle_per_typ_elem_irrel :=
   functional_eval_rewrite_clear;
-  do_per_typ_irrel_assert;
+  do_per_typ_elem_irrel_assert;
   apply_relation_equivalence;
   clear_dups.
 
 
-Lemma per_typ_trans {P} {pred_P : PredicativeSig P} : forall R a1 a2,
-    {{ DF a1 ≈ a2 ∈ per_typ pred_P ↘ R }} ->
+Lemma per_typ_elem_trans {P} {pred_P : PredicativeSig P} : forall R a1 a2,
+    {{ DF a1 ≈ a2 ∈ per_typ_elem pred_P ↘ R }} ->
     (forall a3,
-        {{ DF a2 ≈ a3 ∈ per_typ pred_P ↘ R }} ->
-        {{ DF a1 ≈ a3 ∈ per_typ pred_P ↘ R }}) /\
+        {{ DF a2 ≈ a3 ∈ per_typ_elem pred_P ↘ R }} ->
+        {{ DF a1 ≈ a3 ∈ per_typ_elem pred_P ↘ R }}) /\
       (forall m1 m2 m3,
           R m1 m2 ->
           R m2 m3 ->
@@ -980,15 +980,43 @@ Proof with mautosolve.
 Qed.
 
 #[export]
-Instance per_typ_PER {P} {pred_P : PredicativeSig P} {R} : PER (per_typ pred_P R).
+Instance per_typ_elem_PER {P} {pred_P : PredicativeSig P} {R} : PER (per_typ_elem pred_P R).
 Proof.
   split.
   - intros x y H.
-    eapply (per_typ_sym H).
+    eapply (per_typ_elem_sym H).
   - intros x y z Hxy Hyz.
-    eapply (proj1 (per_typ_trans R x y Hxy) z Hyz).
+    eapply (proj1 (per_typ_elem_trans R x y Hxy) z Hyz).
 Qed.
 
+Corollary per_typ_sym {P} {pred_P : PredicativeSig P} : forall a b,
+    {{ Dom a ≈ b ∈ per_typ pred_P }} ->
+    {{ Dom b ≈ a ∈ per_typ pred_P }}.
+Proof.
+  intros * [? ?%per_typ_elem_sym].
+  firstorder.
+Qed.
+
+Corollary per_typ_trans {P : PtsSig} {pred_P : PredicativeSig P} : forall a1 a2 a3,
+    {{ Dom a1 ≈ a2 ∈ per_typ pred_P }} ->
+    {{ Dom a2 ≈ a3 ∈ per_typ pred_P }} ->
+    {{ Dom a1 ≈ a3 ∈ per_typ pred_P }}.
+Proof.
+  intros * [? ?] [? ?].
+  handle_per_typ_elem_irrel.
+  assert (per_typ_elem pred_P x0 a1 a3) by (eapply (proj1 (per_typ_elem_trans x0 a1 a2 H) a3 H0); mauto).
+  mauto.
+Qed.
+
+#[export]
+Instance per_typ_PER {P} {pred_P : PredicativeSig P} : PER (per_typ pred_P).
+Proof.
+  split.
+  - intros x y H.
+    eapply per_typ_sym; mauto.
+  - intros x y z Hxy Hyz.
+    eapply per_typ_trans; mauto.
+Qed.
 
 Add Parametric Morphism {P : PtsSig} {pred_P : PredicativeSig P} : (per_ctx_env pred_P)
     with signature (@relation_equivalence (env P)) ==> eq ==> eq ==> iff as per_ctx_env_morphism_iff.

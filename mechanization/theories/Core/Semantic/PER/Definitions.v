@@ -287,18 +287,38 @@ Section Per_typ_def.
 
   Let dom := domain P.
 
-  Inductive per_typ : relation dom -> dom -> dom -> Prop :=
+  Inductive per_typ_elem : relation dom -> dom -> dom -> Prop :=
   | per_typ_sort :
     `{ R <~> per_sort pred_P s ->
-       {{ DF Sort@s ≈ Sort@s ∈ per_typ ↘ R }} }
+       {{ DF Sort@s ≈ Sort@s ∈ per_typ_elem ↘ R }} }
   | per_typ_type :
     `{ {{ DF a ≈ b ∈ per_sort_elem pred_P s ↘ R }} ->
-       {{ DF a ≈ b ∈ per_typ ↘ R }} }.
+       {{ DF a ≈ b ∈ per_typ_elem ↘ R }} }.
+
 End Per_typ_def.
 
 #[export]
-Hint Constructors per_typ : mcpts.
+Hint Constructors per_typ_elem : mcpts.
 
+
+Definition per_typ `(pred_P : PredicativeSig P) : relation (domain P) :=
+  fun a a' => exists R', {{ DF a ≈ a' ∈ per_typ_elem pred_P ↘ R' }}.
+#[global]
+Arguments per_typ _ _ _ _ /.
+#[export]
+Hint Transparent per_typ : mcpts.
+#[export]
+Hint Unfold per_typ : mcpts.
+
+
+
+
+Definition rel_typ_unsorted `(pred_P : PredicativeSig P) A ρ A' ρ' R' := rel_mod_eval (per_typ_elem pred_P) A ρ A' ρ' R'.
+Arguments rel_typ_unsorted _ _ _ _ _ _ _ /.
+#[export]
+Hint Transparent rel_typ_unsorted : mcpts.
+#[export]
+Hint Unfold rel_typ_unsorted : mcpts.
 
 (** * Context/Environment PER *)
 

@@ -66,20 +66,24 @@ Ltac invert_rel_exp_of_typ H :=
   + (pose proof (rel_exp_of_typ_inversion1 _ H) as []; clear H)
   + invert_rel_exp H.
 
-Lemma rel_exp_of_typ {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ env_rel A A' s},
+Lemma rel_exp_of_typ {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ env_rel A A'},
     {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }} ->
     (forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_rel }}),
-        rel_exp A ρ A' ρ' (per_sort pred_P s)) ->
-    {{ ⟪ pred_P ⟫ Γ ⊨ A ≈ A' : Sort@s }}.
+        rel_exp A ρ A' ρ' (per_typ pred_P)) ->
+    {{ ⟪ pred_P ⟫ Γ ⊨ A ≈ A' }}.
 Proof.
   intros.
-  eexists_rel_exp.
+  eexists.
+  split.
+  mauto.
   intros.
-  eexists; split; eauto.
-  econstructor; mauto.
-  per_sort_elem_econstructor; eauto.
-  reflexivity.
-Admitted.
+  assert (rel_exp A ρ A' ρ' (per_typ pred_P)) by (eapply H0; mauto).
+  inversion H1.
+  unfold per_typ in H4.
+  destruct_conjs.
+  eexists.
+  mauto.
+Qed.
 
 #[export]
 Hint Resolve rel_exp_of_typ : mcpts.
@@ -89,63 +93,38 @@ Ltac eexists_rel_exp_of_typ :=
   shelve_unifiable;
   [eassumption |].
 
-Lemma valid_exp_typ {P : PtsSig} {pred_P : PredicativeSig P} : forall {s s' Γ},
-    Ax P s s' ->
+Lemma valid_exp_typ {P : PtsSig} {pred_P : PredicativeSig P} : forall {s Γ},
+    (* Ax P s s' -> *)
     {{ ⟪ pred_P ⟫ ⊨ Γ }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊨ Sort@s : Sort@s' }}.
+    {{ ⟪ pred_P ⟫ Γ ⊨ Sort@s }}.
 Proof.
-  intros * ax [].
+  intros * [].
   eexists_rel_exp_of_typ.
   intros.
   econstructor; mauto.
-  eexists.
-  per_sort_elem_econstructor; eauto.
-  apply Equivalence_Reflexive.
-
-  Unshelve.
-  assumption.
+  unfold per_typ.
+  exists (per_sort pred_P s).
+  econstructor; mauto.
+  reflexivity.
 Qed.
 
 #[export]
 Hint Resolve valid_exp_typ : mcpts.
 
-Lemma rel_exp_typ_sub {P : PtsSig} {pred_P : PredicativeSig P} : forall {s s' Γ σ Δ},
-    Ax P s s' ->
+Lemma rel_exp_typ_sub {P : PtsSig} {pred_P : PredicativeSig P} : forall {s Γ σ Δ},
     {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊨ Sort@s[σ] ≈ Sort@s : Sort@s' }}.
+    {{ ⟪ pred_P ⟫ Γ ⊨ Sort@s[σ] ≈ Sort@s }}.
 Proof.
-  intros * ax [env_relΓ].
+  intros * [env_relΓ].
   destruct_conjs.
   eexists_rel_exp_of_typ.
   intros.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
   econstructor; mauto.
-  eexists.
-  per_sort_elem_econstructor; eauto.
-  apply Equivalence_Reflexive.
-
-  Unshelve.
-  assumption.
+  exists (per_sort pred_P s).
+  econstructor; mauto.
+  reflexivity.
 Qed.
 
 #[export]
 Hint Resolve rel_exp_typ_sub : mcpts.
-
-
-
-(* Lemma rel_exp_cumu : forall {i Γ A A'}, *)
-(*     {{ Γ ⊨ A ≈ A' : Type@i }} -> *)
-(*     {{ Γ ⊨ A ≈ A' : Type@(S i) }}. *)
-(* Proof. *)
-(*   intros * [env_relΓ]%rel_exp_of_typ_inversion1. *)
-(*   destruct_conjs. *)
-(*   eexists_rel_exp_of_typ. *)
-(*   intros. *)
-(*   (on_all_hyp: destruct_rel_by_assumption env_relΓ). *)
-(*   destruct_by_head per_sort. *)
-(*   match_by_head per_sort_elem ltac:(fun H => apply per_sort_elem_cumu in H). *)
-(*   econstructor; mauto. *)
-(* Qed. *)
-
-(* #[export] *)
-(* Hint Resolve rel_exp_cumu : mcpts. *)
