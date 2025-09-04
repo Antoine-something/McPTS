@@ -26,48 +26,51 @@ Proof.
   do 2 eexists; repeat split; mauto.
 Admitted.
 
-Lemma rel_exp_of_pi {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ env_rel M M' i j A B},
-    {{ EF Γ ≈ Γ ∈ per_ctx_env ↘ env_rel }} ->
+Lemma rel_exp_of_pi {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ env_rel M M' s1 s2 s3 A B} {r : Ru P s1 s2 s3},
+    {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }} ->
 	(forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_rel }}),
       exists in_rel out_rel,
-        rel_typ i A ρ A ρ' in_rel /\
-          (forall c c' (equiv_c_c' : {{ Dom c ≈ c' ∈ in_rel }}), rel_typ j B d{{{ ρ ↦ c }}} B d{{{ ρ' ↦ c' }}} (out_rel c c' equiv_c_c')) /\
+        rel_typ pred_P s1 A ρ A ρ' in_rel /\
+          (forall c c' (equiv_c_c' : {{ Dom c ≈ c' ∈ in_rel }}), rel_typ pred_P s2 B d{{{ ρ ↦ c }}} B d{{{ ρ' ↦ c' }}} (out_rel c c' equiv_c_c')) /\
           rel_exp M ρ M' ρ'
-            (fun f f' : domain => forall (c c' : domain) (equiv_c_c' : in_rel c c'), rel_mod_app f c f' c' (out_rel c c' equiv_c_c'))) ->
-    {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ M' : Π A B }}.
+            (fun f f' : domain P => forall (c c' : domain P) (equiv_c_c' : in_rel c c'), rel_mod_app f c f' c' (out_rel c c' equiv_c_c'))) ->
+    {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ M' : Π r A B }}.
 Proof.
   intros.
   destruct_conjs.
-  eexists_rel_exp_with (max i j).
+  (* eexists_rel_exp_with (max i j). *)
+  eexists_rel_exp_with s3.
   intros.
   (on_all_hyp: destruct_rel_by_assumption env_rel).
   match goal with
-  | _: rel_typ i A ρ A ρ' ?x |- _ =>
+  | _: rel_typ pred_P s1 A ρ A ρ' ?x |- _ =>
       rename x into in_rel
   end.
-  destruct_by_head rel_typ.
-  destruct_by_head rel_exp.
+  destruct_by_head (@rel_typ P).
+  destruct_by_head (@rel_exp P).
   eexists; split; econstructor; mauto.
-  - per_sort_elem_econstructor; eauto using per_sort_elem_cumu_max_left.
-    + intros.
-      (on_all_hyp: destruct_rel_by_assumption in_rel).
-      econstructor; eauto using per_sort_elem_cumu_max_right.
-    + apply Equivalence_Reflexive.
-  - mauto.
-Qed.
+  - admit.
+  (* - per_sort_elem_econstructor; eauto using per_sort_elem_cumu_max_left. *)
+  (*   + intros. *)
+  (*     (on_all_hyp: destruct_rel_by_assumption in_rel). *)
+  (*     econstructor; eauto using per_sort_elem_cumu_max_right. *)
+  (*   + apply Equivalence_Reflexive. *)
+  - admit.
+    (* mauto. *)
+Admitted.
 
 Ltac eexists_rel_exp_of_pi :=
   unshelve eapply (rel_exp_of_pi _); shelve_unifiable; [eassumption |].
 
 #[local]
-Ltac extract_output_info_with {P : PtsSig} {pred_P : PredicativeSig P} ρ c ρ' c' env_rel :=
+Ltac extract_output_info_with P ρ c ρ' c' env_rel :=
   let Hequiv := fresh "equiv" in
   (assert (Hequiv : {{ Dom ρ ↦ c ≈ ρ' ↦ c' ∈ env_rel }}) by (apply_relation_equivalence; mauto 4);
    apply_relation_equivalence;
    (on_all_hyp: fun H => destruct (H _ _ Hequiv));
    destruct_conjs;
-   destruct_by_head rel_typ;
-   destruct_by_head rel_exp).
+   destruct_by_head (@rel_typ P);
+   destruct_by_head (@rel_exp P)).
 
 Lemma rel_exp_pi_core {P : PtsSig} {pred_P : PredicativeSig P} : forall {i o B o' B' R out_rel},
     (forall c c',

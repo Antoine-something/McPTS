@@ -279,6 +279,27 @@ Hint Transparent rel_typ : mcpts.
 #[export]
 Hint Unfold rel_typ : mcpts.
 
+
+(** * (Unsorted) Type PER *)
+Section Per_typ_def.
+  Context
+    `(pred_P : PredicativeSig P).
+
+  Let dom := domain P.
+
+  Inductive per_typ : relation dom -> dom -> dom -> Prop :=
+  | per_typ_sort :
+    `{ R <~> per_sort pred_P s ->
+       {{ DF Sort@s ≈ Sort@s ∈ per_typ ↘ R }} }
+  | per_typ_type :
+    `{ {{ DF a ≈ b ∈ per_sort_elem pred_P s ↘ R }} ->
+       {{ DF a ≈ b ∈ per_typ ↘ R }} }.
+End Per_typ_def.
+
+#[export]
+Hint Constructors per_typ : mcpts.
+
+
 (** * Context/Environment PER *)
 
 Section Per_ctx_env_def.
