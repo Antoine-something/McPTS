@@ -86,26 +86,42 @@ Qed.
 #[export]
 Hint Resolve rel_exp_sub_compose : mcpts.
 
-Lemma rel_exp_conv {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M M' A A' s},
-    {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ M' : A }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊨ A ≈ A' : Sort@s }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ M' : A' }}.
+Lemma rel_exp_conv {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M M' A A'},
+    {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : A }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨ A ≈ A' }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : A' }}.
 Proof with mautosolve.
-  intros * [env_relΓ] HA.
-  destruct_conjs.
-  invert_rel_exp_of_typ HA.
-  eexists_rel_exp.
+
+  
   intros.
-  assert (env_relΓ ρ ρ) by (etransitivity; [| symmetry]; eassumption).
-  (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head (@per_sort P).
-  destruct_by_head (@rel_typ P).
-  destruct_by_head (@rel_exp P).
-  handle_per_sort_elem_irrel.
+  invert_rel_exp_unsorted H;
+    inversion_clear H0;
+    destruct_conjs.
+  rename x into env_relΓ.
+  rename x0 into env_relΓ0.
   eexists.
-  split; econstructor; mauto.
-  etransitivity; [symmetry |].
-Admitted.
+  split; [eassumption|].
+  assert (env_relΓ <~> env_relΓ0) by (eapply per_ctx_env_right_irrel; mauto).
+  apply_relation_equivalence.
+
+  intros.
+  assert (equiv_ρ_ρ : env_relΓ ρ ρ) by (etransitivity; [|symmetry]; eassumption).
+  assert (equiv_ρ'_ρ : env_relΓ ρ' ρ) by (symmetry; mauto).
+  assert (equiv_ρ'_ρ' : env_relΓ ρ' ρ') by (etransitivity; [|symmetry]; eassumption).
+    
+  assert (exists elem_rel : relation (domain P), rel_typ_unsorted pred_P A ρ A ρ' elem_rel /\ rel_exp M ρ M' ρ' elem_rel) by mauto.
+  assert (exists elem_rel : relation (domain P), rel_typ_unsorted pred_P A ρ' A' ρ' elem_rel) by mauto.
+  assert (exists elem_rel : relation (domain P), rel_typ_unsorted pred_P A ρ A' ρ elem_rel) by mauto.
+  destruct_conjs.
+
+  destruct_by_head (@rel_typ_unsorted P).
+  handle_per_typ_elem_irrel.
+  exists H4; split; mauto.
+  eexists; mauto.  
+  symmetry in H11.
+  transitivity a1; mauto.
+  transitivity a'1; mauto.  
+Qed.
 
 #[export]
 Hint Resolve rel_exp_conv : mcpts.
@@ -163,7 +179,7 @@ Qed.
 
 Lemma presup_rel_exp {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M M' A},
     {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ M' : A }} ->
-    {{ ⟪ pred_P ⟫ ⊨ Γ }} /\ {{ ⟪ pred_P ⟫ Γ ⊨ M : A }} /\ {{ ⟪ pred_P ⟫ Γ ⊨ M' : A }} /\ exists s, {{ ⟪ pred_P ⟫ Γ ⊨ A : Sort@s }}.
+    {{ ⟪ pred_P ⟫ ⊨ Γ }} /\ {{ ⟪ pred_P ⟫ Γ ⊨ M : A }} /\ {{ ⟪ pred_P ⟫ Γ ⊨ M' : A }} /\ {{ ⟪ pred_P ⟫ Γ ⊨ A }}.
 Proof.
   intros *.
   assert (Hpart : {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ M' : A }} -> {{ ⟪ pred_P ⟫ Γ ⊨ M : A }} /\ {{ ⟪ pred_P ⟫ Γ ⊨ M' : A }})
@@ -175,11 +191,11 @@ Proof.
   - eexists; eassumption.
   - destruct_by_head (@valid_exp_under_ctx P).
     destruct_conjs.
-    eexists.
-    eexists_rel_exp_of_typ.
+    eexists_rel_exp_of_typ.    
     intros.
     (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-    eapply rel_typ_implies_rel_exp; eauto.
+    eapply rel_typ_unsorted_implies_rel_exp; eauto.
+    eapply rel_typ_implies_rel_typ_unsorted; mauto.
 Qed.
 
 

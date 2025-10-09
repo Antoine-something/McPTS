@@ -27,3 +27,12 @@ Ltac invert_rel_typ_body :=
   handle_per_sort_elem_irrel;
   clear_dups;
   try rewrite <- per_sort_elem_equation_1 in *.
+
+
+Ltac invert_rel_typ_unsorted_body :=
+  simplify_evals;
+  match_by_head per_typ_elem ltac:(fun H => inversion_clear H); subst;
+  clear_dups;
+  clear_refl_eqs;
+  handle_per_typ_elem_irrel;
+  clear_dups.

@@ -29,8 +29,18 @@ Proof.
   mauto.
 Qed.
 
+Lemma rel_exp_implies_rel_typ_unsorted {P} {pred_P : PredicativeSig P} : forall {A ρ A' ρ'},
+    rel_exp A ρ A' ρ' (per_typ pred_P) ->
+    exists R, rel_typ_unsorted pred_P A ρ A' ρ' R.
+Proof.
+  intros.
+  destruct_by_head (@rel_exp P).
+  destruct_by_head (@per_typ P).
+  mauto.
+Qed.
+
 #[export]
-Hint Resolve rel_exp_implies_rel_typ : mcpts.
+Hint Resolve rel_exp_implies_rel_typ rel_exp_implies_rel_typ_unsorted : mcpts.
 
 Lemma rel_typ_implies_rel_exp {P : PtsSig} {pred_P : PredicativeSig P} : forall {s A ρ A' ρ' R},
     rel_typ pred_P s A ρ A' ρ' R ->
@@ -41,8 +51,17 @@ Proof.
   mauto.
 Qed.
 
+Lemma rel_typ_unsorted_implies_rel_exp {P} {pred_P : PredicativeSig P} : forall {A ρ A' ρ' R},
+    rel_typ_unsorted pred_P A ρ A' ρ' R ->
+    rel_exp A ρ A' ρ' (per_typ pred_P).
+Proof.
+  intros.
+  destruct_by_head (@rel_typ_unsorted P).
+  mauto.
+Qed.
+  
 #[export]
-Hint Resolve rel_typ_implies_rel_exp : mcpts.
+Hint Resolve rel_typ_implies_rel_exp rel_typ_unsorted_implies_rel_exp : mcpts.
 
 Lemma rel_exp_clean_inversion {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ env_rel A M M'},
     {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }} ->
@@ -61,4 +80,21 @@ Qed.
 
 Ltac invert_rel_exp H :=
   (unshelve (epose proof (rel_exp_clean_inversion _ H); deex); shelve_unifiable; [eassumption |]; clear H)
+  + dependent destruction H.
+
+Lemma rel_exp_unsorted_clean_inversion {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ env_rel A M M'},
+    {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : A }} ->
+    forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_rel }}),
+    exists (elem_rel : relation (domain P)),
+      rel_typ_unsorted pred_P A ρ A ρ' elem_rel /\ rel_exp M ρ M' ρ' elem_rel.
+Proof.
+  intros * ? [].
+  destruct_conjs.
+  handle_per_ctx_env_irrel.
+  eassumption.
+Qed.
+
+Ltac invert_rel_exp_unsorted H :=
+  (unshelve (epose proof (rel_exp_unsorted_clean_inversion _ H); deex); shelve_unifiable; [eassumption |]; clear H)
   + dependent destruction H.

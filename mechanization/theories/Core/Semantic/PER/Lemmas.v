@@ -1294,6 +1294,83 @@ Proof.
   induction H; simpl; congruence.
 Qed.
 
+Add Parametric Morphism {P} {pred_P : PredicativeSig P} A ρ A' ρ' : (rel_typ_unsorted pred_P A ρ A' ρ')
+    with signature (@relation_equivalence (domain P)) ==> iff as rel_typ_unsorted_morphism.
+Proof.
+  intros * HRR'.
+  split; intros []; econstructor; try eassumption;
+    [setoid_rewrite <- HRR' | setoid_rewrite HRR']; eassumption.
+Qed.
+
+Lemma rel_typ_implies_rel_typ_unsorted {P} {pred_P : PredicativeSig P} : forall s A ρ A' ρ' R,
+    rel_typ pred_P s A ρ A' ρ' R ->
+    rel_typ_unsorted pred_P A ρ A' ρ' R.
+Proof.
+  intros * Hsorted.
+  destruct Hsorted.
+  econstructor; mauto.
+Qed.
+
+#[export]
+Hint Resolve rel_typ_implies_rel_typ_unsorted : mcpts.
+
+(* Lemma rel_typ_unsorted_sym {P} {pred_P : PredicativeSig P} : forall A ρ A' ρ' R Γ Δ env_rel, *)
+(*     {{ EF Γ ≈ Δ ∈ per_ctx_env pred_P ↘ env_rel }} -> *)
+(*     {{ Dom ρ ≈ ρ' ∈ env_rel }} -> *)
+(*     rel_typ_unsorted pred_P A ρ A' ρ' R -> *)
+(*     rel_typ_unsorted pred_P A' ρ' A ρ R. *)
+(* Proof. *)
+(*   intros * HΓ Hρ HA. *)
+(*   simpl in HΓ. *)
+(*   simpl in Hρ. *)
+  
+  
+(*   symmetry in Hρ. *)
+(*   destruct_rel_mod_eval. *)
+(*   dependent destruction HA. *)
+  
+(*   econstructor; mauto. *)
+  
+(*   symmetry in H1. *)
+(*   mauto. *)
+(* Qed. *)
+
+(* #[local] *)
+(* Hint Resolve rel_typ_unsorted_sym : mcpts. *)
+ 
+(* Lemma rel_typ_unsorted_trans {P} {pred_P : PredicativeSig P} : forall A1 ρ1 A2 ρ2 A3 ρ3 R R', *)
+(*     rel_typ_unsorted pred_P A1 ρ1 A2 ρ2 R -> *)
+(*     rel_typ_unsorted pred_P A2 ρ2 A3 ρ3 R' -> *)
+(*     rel_typ_unsorted pred_P A1 ρ1 A3 ρ3 R. *)
+(* Proof. *)
+(*   intros * H12 H23. *)
+(*   inversion H12. *)
+(*   inversion H23. *)
+(*   simplify_evals. *)
+(*   econstructor; mauto. *)
+(*   handle_per_typ_elem_irrel. *)
+(*   eapply (per_typ_elem_trans R' a a' H1); mauto. *)
+(* Qed. *)
+
+(* #[local] *)
+(* Hint Resolve rel_typ_unsorted_trans : mcpts. *)
+
+(* Lemma rel_typ_unsorted_refl {P} {pred_P : PredicativeSig P} : forall A ρ A' ρ' R R', *)
+(*     rel_typ_unsorted pred_P A ρ A ρ' R -> *)
+(*     rel_typ_unsorted pred_P A ρ A' ρ' R' -> *)
+(*     rel_typ_unsorted pred_P A' ρ A' ρ' R. *)
+(* Proof. *)
+(*   intros * HAρAρ' HAρA'ρ'. *)
+(*   assert (HAρ'Aρ : rel_typ_unsorted pred_P A ρ' A ρ R) by mauto. *)
+(*   assert (HAρ'A'ρ' : rel_typ_unsorted pred_P A ρ' A' ρ' R) by mauto. *)
+(* Admitted *)
+
+
+
+
+
+  
+  
 (* The remaining lemmas are about context subtyping.  We might need to replace them at some point *)
 
 (* Lemma per_ctx_subtyp_to_env : forall Γ Δ, *)

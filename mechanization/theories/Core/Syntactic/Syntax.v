@@ -23,7 +23,7 @@ Module Cst.
   Arguments var {_}.
 End Cst.
 
-(** * Abstract Syntac Tree *)
+(** * Abstract Syntax Tree *)
 Inductive exp (P : PtsSig) : Set :=
 (** Sorts *)
 | a_st : P -> exp P
