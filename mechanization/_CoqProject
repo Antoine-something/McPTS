@@ -40,3 +40,4 @@ theories/Core/Completeness/SortCases.v
 theories/Core/Completeness/ContextCases.v
 theories/Core/Completeness/SubstitutionCases.v
 theories/Core/Completeness/TermStructureCases.v
+theories/Core/Completeness/FunctionCases.v

@@ -100,6 +100,28 @@ Ltac invert_rel_exp_of_typ_unsorted H :=
   + (pose proof (rel_exp_of_typ_unsorted_inversion1 _ H) as []; clear H)
   + invert_rel_exp H.
 
+Lemma rel_exp_of_sort {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ env_rel A A' s},
+    {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }} ->
+    (forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_rel }}),
+        rel_exp A ρ A' ρ' (per_sort pred_P s)) ->
+    {{ ⟪ pred_P ⟫ Γ ⊨u A ≈ A' : Sort@s }}.
+Proof.
+  intros.
+  eexists_rel_exp.
+  intros.
+  split; mauto.
+  econstructor; mauto.
+  econstructor; mauto.
+  reflexivity.
+Qed.
+
+#[export]
+Hint Resolve rel_exp_of_sort : mcpts.
+
+Ltac eexists_rel_exp_of_sort :=
+  unshelve eapply (rel_exp_of_sort _);
+  shelve_unifiable;
+  [eassumption |].
 
 Lemma rel_exp_of_typ {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ env_rel A A'},
     {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }} ->
