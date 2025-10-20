@@ -40,10 +40,10 @@ Proof with solve [split; mauto].
         econstructor; mauto.
 Qed.
 
-Lemma valid_exp_var : forall {Γ x A},
-    {{ ⊨ Γ }} ->
-    {{ #x : A ∈ Γ }} ->
-    {{ Γ ⊨ #x : A }}.
+Lemma valid_exp_var {P} {pred_P : PredicativeSig P} : forall {Γ x A K},
+    {{ ⟪ pred_P ⟫⊨ Γ }} ->
+    {{ #x : A :: K ∈ Γ }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨ #x : A }}.
 Proof.
   intros * [? equiv_Γ_Γ] ?.
   unshelve epose proof (valid_lookup equiv_Γ_Γ _) as []; shelve_unifiable; [eassumption |].
@@ -53,10 +53,10 @@ Qed.
 #[export]
 Hint Resolve valid_exp_var : mcpts.
 
-Lemma rel_exp_var_0_sub : forall {Γ M σ Δ A},
-  {{ Γ ⊨s σ : Δ }} ->
-  {{ Γ ⊨ M : A[σ] }} ->
-  {{ Γ ⊨ #0[σ ,, M] ≈ M : A[σ] }}.
+Lemma rel_exp_var_0_sub {P} {pred_P : PredicativeSig P} : forall {Γ M σ Δ A},
+  {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }} ->
+  {{ ⟪ pred_P ⟫ Γ ⊨ M : A[σ] }} ->
+  {{ ⟪ pred_P ⟫ Γ ⊨ #0[σ ,, M] ≈ M : A[σ] }}.
 Proof with mautosolve.
   intros * [env_relΓ [? [env_relΔ]]] HM.
   invert_rel_exp HM.
@@ -64,22 +64,23 @@ Proof with mautosolve.
   eexists_rel_exp.
   intros.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head rel_typ.
-  destruct_by_head rel_exp.
-  dir_inversion_by_head eval_exp; subst.
+  destruct_by_head (@rel_typ P).
+  destruct_by_head (@rel_exp P).
+  dir_inversion_by_head (@eval_exp P); subst.
   functional_eval_rewrite_clear.
   eexists.
-  split...
+  split; mauto.
+  repeat (econstructor; mauto).
 Qed.
 
 #[export]
 Hint Resolve rel_exp_var_0_sub : mcpts.
 
-Lemma rel_exp_var_S_sub : forall {Γ M σ Δ A x B},
-  {{ Γ ⊨s σ : Δ }} ->
-  {{ Γ ⊨ M : A[σ] }} ->
-  {{ #x : B ∈ Δ }} ->
-  {{ Γ ⊨ #(S x)[σ ,, M] ≈ #x[σ] : B[σ] }}.
+Lemma rel_exp_var_S_sub {P} {pred_P : PredicativeSig P} : forall {Γ M σ Δ A x B K},
+  {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }} ->
+  {{ ⟪ pred_P ⟫ Γ ⊨ M : A[σ] }} ->
+  {{ #x : B :: K ∈ Δ }} ->
+  {{ ⟪ pred_P ⟫ Γ ⊨ #(S x)[σ ,, M] ≈ #x[σ] : B[σ] }}.
 Proof with mautosolve.
   intros * [env_relΓ [? [env_relΔ]]] HM HxinΓ.
   invert_rel_exp HM.
@@ -90,21 +91,22 @@ Proof with mautosolve.
   intros.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
   (on_all_hyp: destruct_rel_by_assumption env_relΔ).
-  destruct_by_head rel_typ.
-  destruct_by_head rel_exp.
-  dir_inversion_by_head eval_exp; subst.
+  destruct_by_head (@rel_typ P).
+  destruct_by_head (@rel_exp P).
+  dir_inversion_by_head (@eval_exp P); subst.
   functional_eval_rewrite_clear.
   eexists.
-  split...
+  split; mauto.
+  repeat (econstructor; mauto).
 Qed.
 
 #[export]
 Hint Resolve rel_exp_var_S_sub : mcpts.
 
-Lemma rel_exp_var_weaken : forall {Γ B x A},
-    {{ ⊨ Γ, B }} ->
-    {{ #x : A ∈ Γ }} ->
-    {{ Γ, B ⊨ #x[Wk] ≈ #(S x) : A[Wk] }}.
+Lemma rel_exp_var_weaken {P} {pred_P : PredicativeSig P} : forall {Γ B x A KA KB},
+    {{ ⟪ pred_P ⟫ ⊨ Γ, B::KB }} ->
+    {{ #x : A :: KA ∈ Γ }} ->
+    {{ ⟪ pred_P ⟫ Γ, B :: KB ⊨ #x[Wk] ≈ #(S x) : A[Wk] }}.
 Proof with mautosolve.
   intros * [env_relΓB] HxinΓ.
   invert_per_ctx_envs.
@@ -113,14 +115,16 @@ Proof with mautosolve.
   eexists_rel_exp.
   apply_relation_equivalence.
   intros.
-  destruct_by_head cons_per_ctx_env.
+  destruct_by_head (@cons_per_ctx_env P).
   rename tail_rel into env_relΓ.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head rel_typ.
-  destruct_by_head rel_exp.
-  dir_inversion_by_head eval_exp; subst.
+  destruct_by_head (@rel_typ P).
+  destruct_by_head (@rel_exp P).
+  dir_inversion_by_head (@eval_exp P); subst.
   eexists.
-  split...
+  split; mauto.
+  inversion H3; subst.
+  repeat (econstructor; mauto).  
 Qed.
 
 #[export]

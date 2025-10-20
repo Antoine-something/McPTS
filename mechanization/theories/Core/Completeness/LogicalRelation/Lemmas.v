@@ -98,3 +98,22 @@ Qed.
 Ltac invert_rel_exp_unsorted H :=
   (unshelve (epose proof (rel_exp_unsorted_clean_inversion _ H); deex); shelve_unifiable; [eassumption |]; clear H)
   + dependent destruction H.
+
+
+Lemma rel_exp_implies_rel_exp_unsorted {P} {pred_P : PredicativeSig P} : forall {Γ M M' A},
+    {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ M' : A }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : A }}.
+Proof.
+  intros.
+  inversion_clear H.
+  destruct_conjs.
+  econstructor; split; mauto.
+  intros.
+  assert (exists elem_rel : relation (domain P),
+             rel_typ pred_P H0 A ρ A ρ' elem_rel /\ rel_exp M ρ M' ρ' elem_rel) by mauto.
+  destruct_conjs.
+  eexists; split; mauto.
+Qed.
+
+#[export]
+Hint Resolve rel_exp_implies_rel_exp_unsorted : mcpts.
