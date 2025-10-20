@@ -40,6 +40,27 @@ Proof.
   mauto.
 Qed.
 
+Lemma rel_exp_unsorted_of_typ_inversion1 {P} {pred_P : PredicativeSig P} : forall {Γ A A' s},
+    {{ ⟪ pred_P ⟫ Γ ⊨u A ≈ A' : Sort@s }} ->
+    exists env_rel,
+      {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }} /\
+        forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_rel }}),
+          rel_exp A ρ A' ρ' (per_sort pred_P s).
+Proof.
+  intros * [env_relΓ].
+  destruct_conjs.
+  eexists;
+  eexists; [eassumption |].
+  intros.
+  (on_all_hyp: destruct_rel_by_assumption env_relΓ).
+  destruct_by_head (@rel_typ_unsorted P).
+  invert_rel_typ_body.
+  inversion_clear H4; apply_relation_equivalence; mauto.
+  invert_per_sort_elem H1.
+  apply_relation_equivalence.
+  eassumption.  
+Qed.
+
 Lemma rel_exp_of_typ_inversion2 {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ env_rel A A' s},
     {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨ A ≈ A' : Sort@s }} ->
@@ -59,6 +80,18 @@ Lemma rel_exp_of_typ_unsorted_inversion2 {P : PtsSig} {pred_P : PredicativeSig P
       rel_exp A ρ A' ρ' (per_typ pred_P).
 Proof.
   intros * ? []%rel_exp_of_typ_unsorted_inversion1.
+  destruct_conjs.
+  handle_per_ctx_env_irrel.
+  eassumption.
+Qed.
+
+Lemma rel_exp_unsorted_of_typ_inversion2 {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ env_rel A A' s},
+    {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨u A ≈ A' : Sort@s }} ->
+    forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_rel }}),
+      rel_exp A ρ A' ρ' (per_sort pred_P s).
+Proof.
+  intros * ? []%rel_exp_unsorted_of_typ_inversion1.
   destruct_conjs.
   handle_per_ctx_env_irrel.
   eassumption.
@@ -99,6 +132,12 @@ Ltac invert_rel_exp_of_typ_unsorted H :=
   (unshelve epose proof (rel_exp_of_typ_unsorted_inversion2 _ _ H); shelve_unifiable; [eassumption |]; clear H)
   + (pose proof (rel_exp_of_typ_unsorted_inversion1 _ H) as []; clear H)
   + invert_rel_exp H.
+
+Ltac invert_rel_exp_unsorted_of_typ_unsorted H :=
+  (unshelve epose proof (rel_exp_unsorted_of_typ_inversion2 _ _ H); shelve_unifiable; [eassumption |]; clear H)
+  + (pose proof (rel_exp_unsorted_of_typ_inversion1 _ H) as []; clear H)
+  + invert_rel_exp H.
+
 
 Lemma rel_exp_of_sort {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ env_rel A A' s},
     {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }} ->

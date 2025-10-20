@@ -1314,6 +1314,33 @@ Qed.
 #[export]
 Hint Resolve rel_typ_implies_rel_typ_unsorted : mcpts.
 
+
+Lemma per_ctx_env_cons_clean_inversion_unsorted {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ Γ' env_relΓ A A' env_relΓA s},
+    {{ EF Γ ≈ Γ' ∈ per_ctx_env pred_P ↘ env_relΓ }} ->
+    {{ EF Γ, A::Sort@s ≈ Γ', A'::Sort@s ∈ per_ctx_env pred_P ↘ env_relΓA }} -> 
+    exists (head_rel : forall {ρ ρ'} (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}), relation (domain P)),
+      (forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}),
+          rel_typ_unsorted pred_P A ρ A' ρ' (head_rel equiv_ρ_ρ')) /\
+        (env_relΓA <~> cons_per_ctx_env env_relΓ (@head_rel)).
+Proof with intuition.
+  intros * HΓ HΓA.
+  assert (exists (head_rel : forall {ρ ρ'} (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}), relation (domain P)),
+      (forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}),
+          rel_typ pred_P s A ρ A' ρ' (head_rel equiv_ρ_ρ')) /\
+        (env_relΓA <~> cons_per_ctx_env env_relΓ (@head_rel))) by (eapply per_ctx_env_cons_clean_inversion; mauto).
+  destruct_conjs.
+  eexists.
+  split; mauto.
+Qed.
+
+Ltac invert_per_ctx_env_unsorted H :=
+  (unshelve eapply (per_ctx_env_cons_clean_inversion_unsorted _) in H; [eassumption | |]; deex_in H; destruct H as [])
+  + (inversion H; subst).
+
+Ltac invert_per_ctx_envs_unsorted := match_by_head per_ctx_env ltac:(fun H => directed invert_per_ctx_env_unsorted H).
+
+
+
 (* Lemma rel_typ_unsorted_sym {P} {pred_P : PredicativeSig P} : forall A ρ A' ρ' R Γ Δ env_rel, *)
 (*     {{ EF Γ ≈ Δ ∈ per_ctx_env pred_P ↘ env_rel }} -> *)
 (*     {{ Dom ρ ≈ ρ' ∈ env_rel }} -> *)

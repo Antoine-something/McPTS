@@ -53,6 +53,29 @@ Qed.
 #[export]
 Hint Resolve valid_exp_var : mcpts.
 
+
+Lemma valid_exp_var_unsorted {P} {pred_P : PredicativeSig P} : forall {Γ x A K},
+    {{ ⟪ pred_P ⟫⊨ Γ }} ->
+    {{ #x : A :: K ∈ Γ }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨u #x : A }}.
+Proof.
+  intros.
+  assert ({{ ⟪ pred_P ⟫ Γ ⊨ #x : A }}) by mauto.
+  inversion_clear H1.
+  destruct_conjs.
+  econstructor; split; mauto.
+  intros.
+  assert (exists elem_rel : relation (domain P),
+             rel_typ pred_P H2 A ρ A ρ' elem_rel /\ rel_exp {{{ #x }}} ρ {{{ #x }}} ρ' elem_rel) by mauto.
+  destruct_conjs.
+  eexists; mauto.
+Qed.
+
+#[export]
+Hint Resolve valid_exp_var_unsorted : mcpts.
+
+
+
 Lemma rel_exp_var_0_sub {P} {pred_P : PredicativeSig P} : forall {Γ M σ Δ A},
   {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }} ->
   {{ ⟪ pred_P ⟫ Γ ⊨ M : A[σ] }} ->
@@ -75,6 +98,36 @@ Qed.
 
 #[export]
 Hint Resolve rel_exp_var_0_sub : mcpts.
+
+
+
+Lemma rel_exp_var_0_sub_unsorted {P} {pred_P : PredicativeSig P} : forall {Γ M σ Δ A},
+  {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }} ->
+  {{ ⟪ pred_P ⟫ Γ ⊨u M : A[σ] }} ->
+  {{ ⟪ pred_P ⟫ Γ ⊨u #0[σ ,, M] ≈ M : A[σ] }}.
+Proof with mautosolve.
+  intros * [env_relΓ [? [env_relΔ]]] HM.
+  invert_rel_exp_unsorted HM.
+  destruct_conjs.
+
+  (* eexists_rel_exp. *)
+  eexists; split; [eassumption|].
+  
+  intros.
+  (on_all_hyp: destruct_rel_by_assumption env_relΓ).
+  destruct_by_head (@rel_typ_unsorted P).
+  destruct_by_head (@rel_exp P).
+  dir_inversion_by_head (@eval_exp P); subst.
+  functional_eval_rewrite_clear.
+  eexists.
+  split; mauto.
+  repeat (econstructor; mauto).
+Qed.
+
+#[export]
+Hint Resolve rel_exp_var_0_sub_unsorted : mcpts.
+
+
 
 Lemma rel_exp_var_S_sub {P} {pred_P : PredicativeSig P} : forall {Γ M σ Δ A x B K},
   {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }} ->
@@ -103,6 +156,41 @@ Qed.
 #[export]
 Hint Resolve rel_exp_var_S_sub : mcpts.
 
+
+
+Lemma rel_exp_var_S_sub_unsorted {P} {pred_P : PredicativeSig P} : forall {Γ M σ Δ A x B K},
+  {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }} ->
+  {{ ⟪ pred_P ⟫ Γ ⊨u M : A[σ] }} ->
+  {{ #x : B :: K ∈ Δ }} ->
+  {{ ⟪ pred_P ⟫ Γ ⊨u #(S x)[σ ,, M] ≈ #x[σ] : B[σ] }}.
+Proof with mautosolve.
+  intros * [env_relΓ [? [env_relΔ]]] HM HxinΓ.
+  invert_rel_exp_unsorted HM.
+  destruct_conjs.
+  pose proof (valid_lookup ltac:(eassumption) HxinΓ).
+  destruct_conjs.
+
+  (* eexists_rel_exp. *)
+  eexists; split; [eassumption|].
+  
+  intros.
+  (on_all_hyp: destruct_rel_by_assumption env_relΓ).
+  (on_all_hyp: destruct_rel_by_assumption env_relΔ).
+  destruct_by_head (@rel_typ_unsorted P).
+  destruct_by_head (@rel_typ P).
+  destruct_by_head (@rel_exp P).
+  dir_inversion_by_head (@eval_exp P); subst.
+  functional_eval_rewrite_clear.
+  eexists.
+  split; mauto;
+    repeat (econstructor; mauto).
+Qed.
+
+#[export]
+Hint Resolve rel_exp_var_S_sub_unsorted : mcpts.
+
+
+
 Lemma rel_exp_var_weaken {P} {pred_P : PredicativeSig P} : forall {Γ B x A KA KB},
     {{ ⟪ pred_P ⟫ ⊨ Γ, B::KB }} ->
     {{ #x : A :: KA ∈ Γ }} ->
@@ -129,3 +217,36 @@ Qed.
 
 #[export]
 Hint Resolve rel_exp_var_weaken : mcpts.
+
+
+
+Lemma rel_exp_var_weaken_unsorted {P} {pred_P : PredicativeSig P} : forall {Γ B x A KA KB},
+    {{ ⟪ pred_P ⟫ ⊨ Γ, B::KB }} ->
+    {{ #x : A :: KA ∈ Γ }} ->
+    {{ ⟪ pred_P ⟫ Γ, B :: KB ⊨u #x[Wk] ≈ #(S x) : A[Wk] }}.
+Proof with mautosolve.
+  intros * [env_relΓB] HxinΓ.
+  invert_per_ctx_envs_unsorted.
+  pose proof (valid_lookup ltac:(eassumption) HxinΓ).
+  destruct_conjs.
+
+  (* eexists_rel_exp. *)
+  eexists; split; [eassumption |].
+    
+  apply_relation_equivalence.
+  intros.
+  destruct_by_head (@cons_per_ctx_env P).
+  rename tail_rel into env_relΓ.
+  (on_all_hyp: destruct_rel_by_assumption env_relΓ).
+  destruct_by_head (@rel_typ P).
+  destruct_by_head (@rel_typ_unsorted P).
+  destruct_by_head (@rel_exp P).
+  dir_inversion_by_head (@eval_exp P); subst.
+  eexists.
+  split; mauto;
+    inversion H3; subst;
+    repeat (econstructor; mauto).  
+Qed.
+
+#[export]
+Hint Resolve rel_exp_var_weaken_unsorted : mcpts.
