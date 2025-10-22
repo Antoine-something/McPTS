@@ -43,4 +43,4 @@ theories/Core/Completeness/TermStructureCases.v
 theories/Core/Completeness/FunctionCases.v
 theories/Core/Completeness/VariableCases.v
 theories/Core/Completeness/FundamentalTheorem.v
-
+theories/Core/Completeness.v

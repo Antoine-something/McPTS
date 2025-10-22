@@ -41,7 +41,7 @@ Proof with solve [split; mauto].
 Qed.
 
 Lemma valid_exp_var {P} {pred_P : PredicativeSig P} : forall {Γ x A K},
-    {{ ⟪ pred_P ⟫⊨ Γ }} ->
+    {{ ⟪ pred_P ⟫ ⊨ Γ }} ->
     {{ #x : A :: K ∈ Γ }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨ #x : A }}.
 Proof.
@@ -53,6 +53,27 @@ Qed.
 #[export]
 Hint Resolve valid_exp_var : mcpts.
 
+Lemma valid_exp_unsorted_var {P} {pred_P : PredicativeSig P} : forall {Γ x A K},
+    {{ ⟪ pred_P ⟫ ⊨ Γ }} ->
+    {{ # x : A :: K ∈ Γ }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨u #x : A }}.
+Proof.
+  intros * HΓ Hx.
+  assert ({{ ⟪ pred_P ⟫ Γ ⊨ #x : A }}) by mauto.
+  mauto.
+Qed.
+
+#[export]
+Hint Resolve valid_exp_unsorted_var : mcpts.
+
+Lemma rel_exp_unsorted_var {P} {pred_P : PredicativeSig P} : forall {Γ x A s},
+    {{ ⟪ pred_P ⟫ ⊨ Γ }} ->
+    {{ # x : A :: Sort@s ∈ Γ }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨u #x ≈ #x : A}}.
+Proof.
+  intros.
+  eapply valid_exp_unsorted_var; mauto.
+Qed.
 
 Lemma valid_exp_var_unsorted {P} {pred_P : PredicativeSig P} : forall {Γ x A K},
     {{ ⟪ pred_P ⟫⊨ Γ }} ->

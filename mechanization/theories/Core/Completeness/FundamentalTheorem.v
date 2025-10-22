@@ -22,41 +22,40 @@ Section completeness_fundamental.
       (forall Γ A, {{ Γ ⊢ A }} -> {{ ⟪ pred_P ⟫ Γ ⊨ A }}) /\
       (forall Γ A A', {{ Γ ⊢ A ≈ A' }} -> {{ ⟪ pred_P ⟫ Γ ⊨ A ≈ A' }}) /\
       (forall Γ Δ σ, {{ Γ ⊢s σ : Δ }} -> {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }}) /\
-      (forall Γ Δ σ σ', {{ Γ ⊢s σ ≈ σ' : Δ }} -> {{ ⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Δ }}).
-      
-  Proof.
+      (forall Γ Δ σ σ', {{ Γ ⊢s σ ≈ σ' : Δ }} -> {{ ⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Δ }}).      
+  Proof using Type.
     apply syntactic_wf_mut_ind;
       mauto 3.
     intros.
-    (* apply valid_exp_var; *)
-    (*   mauto. *)
-  Admitted.
+    eapply valid_exp_unsorted_var;
+      mauto.
+  Qed.
 
   #[local]
   Ltac solve_it := pose proof completeness_fundamental; firstorder.
 
 
   Theorem completeness_fundamental_ctx : forall Γ, {{ ⊢ Γ }} -> {{ ⟪ pred_P ⟫ ⊨ Γ }}.
-  Proof. solve_it. Qed.
+  Proof using Type. solve_it. Qed.
 
   Theorem completeness_fundamental_ctx_subtyp : forall Γ Γ', {{ ⊢ Γ ≈ Γ' }} -> {{ ⟪ pred_P ⟫ ⊨ Γ ≈ Γ' }}.
-  Proof. solve_it. Qed.
+  Proof using Type. solve_it. Qed.
 
   Theorem completeness_fundamental_exp : forall Γ M A, {{ Γ ⊢ M : A }} -> {{ ⟪ pred_P ⟫ Γ ⊨u M : A }}.
-  Proof. solve_it. Qed.
+  Proof using Type. solve_it. Qed.
 
   Theorem completeness_fundamental_exp_eq : forall Γ A M M', {{ Γ ⊢ M ≈ M' : A }} -> {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : A }}.
-  Proof. solve_it. Qed.
+  Proof using Type. solve_it. Qed.
 
   Theorem completeness_fundamental_sub : forall Γ σ Δ, {{ Γ ⊢s σ : Δ }} -> {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }}.
-  Proof. solve_it. Qed.
+  Proof using Type. solve_it. Qed.
 
   Theorem completeness_fundamental_sub_eq : forall Γ Δ σ σ', {{ Γ ⊢s σ ≈ σ' : Δ }} -> {{ ⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Δ }}.
-  Proof. solve_it. Qed.
+  Proof using Type. solve_it. Qed.
 
   Theorem completeness_fundamental_typ : forall Γ A, {{ Γ ⊢ A }} -> {{ ⟪ pred_P ⟫ Γ ⊨ A }}.
-  Proof. solve_it. Qed.
+  Proof using Type. solve_it. Qed.
     
   Theorem completeness_fundamental_typ_eq : forall Γ A A', {{ Γ ⊢ A ≈ A' }} -> {{ ⟪ pred_P ⟫ Γ ⊨ A ≈ A' }}.
-  Proof. solve_it. Qed.
+  Proof using Type. solve_it. Qed.
 End completeness_fundamental.

@@ -131,3 +131,65 @@ Proof.
   intros.
   eapply per_bot_then_per_elem; mauto.
 Qed.
+
+
+
+(* Realizability for per_typ_elem *)
+Lemma realize_per_typ_elem_gen {P : PtsSig} {pred_P : PredicativeSig P} : forall {a a' R},
+    {{ DF a ≈ a' ∈ per_typ_elem pred_P ↘ R }} ->
+    {{ Dom a ≈ a' ∈ per_top_typ }}
+    /\ (forall {c c'}, {{ Dom c ≈ c' ∈ per_bot }} -> {{ Dom ⇑ a c ≈ ⇑ a' c' ∈ R }})
+    /\ (forall {b b'}, {{ Dom b ≈ b' ∈ R }} -> {{ Dom ⇓ a b ≈ ⇓ a' b' ∈ per_top }}).
+Proof with (solve [try (try (eexists; split); econstructor); mauto]).
+  intros * Htypelem. simpl in Htypelem.
+  induction Htypelem.     
+  - repeat split.
+    + econstructor; mauto.
+    + intros.
+      apply_relation_equivalence.
+      exists per_ne.     
+      per_sort_elem_econstructor; mauto.
+      reflexivity.
+    + intros.
+      apply_relation_equivalence.
+      unfold per_sort in H0.
+      destruct_conjs.
+      assert ({{ Dom b ≈ b' ∈ (@per_top_typ P) }}) by mauto.
+      simpl in H1.
+      intros n.
+      assert (exists C : nf P, {{ Rtyp b in n ↘ C }} /\ {{ Rtyp b' in n ↘ C }}) by mauto.
+      destruct_conjs.
+      econstructor; mauto.  
+  - eapply realize_per_sort_elem_gen; mauto.
+Qed.
+
+Corollary per_typ_elem_then_per_top_typ {P : PtsSig} {pred_P : PredicativeSig P} : forall {a a' R},
+    {{ DF a ≈ a' ∈ per_typ_elem pred_P ↘ R }} ->
+    {{ Dom a ≈ a' ∈ per_top_typ }}.
+Proof.
+  intros * ?%realize_per_typ_elem_gen; firstorder.
+Qed.
+
+#[export]
+Hint Resolve per_typ_elem_then_per_top_typ : mcpts.
+
+Corollary per_bot_then_per_typ_elem {P : PtsSig} {pred_P : PredicativeSig P} : forall {a a' R c c'},
+    {{ DF a ≈ a' ∈ per_typ_elem pred_P ↘ R }} ->
+    {{ Dom c ≈ c' ∈ per_bot }} -> {{ Dom ⇑ a c ≈ ⇑ a' c' ∈ R }}.
+Proof.
+  intros * ?%realize_per_typ_elem_gen; firstorder.
+Qed.
+
+(** We cannot add [per_bot_then_per_elem] as a hint
+    because we don't know what "R" is (i.e. the pattern becomes higher-order.)
+    In fact, Coq complains it cannot add one if we try. *)
+
+Corollary per_typ_elem_then_per_top {P : PtsSig} {pred_P : PredicativeSig P} : forall {a a' R b b'},
+    {{ DF a ≈ a' ∈ per_typ_elem pred_P ↘ R }} ->
+    {{ Dom b ≈ b' ∈ R }} -> {{ Dom ⇓ a b ≈ ⇓ a' b' ∈ per_top }}.
+Proof.
+  intros * ?%realize_per_typ_elem_gen; firstorder.
+Qed.
+
+#[export]
+Hint Resolve per_typ_elem_then_per_top : mcpts.

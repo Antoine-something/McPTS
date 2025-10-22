@@ -17,15 +17,16 @@ Proof with mautosolve.
   functional_initial_env_rewrite_clear.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
   destruct_by_head (@rel_typ P).
+  destruct_by_head (@rel_typ_unsorted P).
   functional_eval_rewrite_clear.
-  destruct_by_head (@rel_exp P).
-  unshelve epose proof (per_elem_then_per_top _ _ (length Γ)) as [? []]; shelve_unifiable; mauto.
+  destruct_by_head (@rel_exp P).  
+  unshelve epose proof (per_typ_elem_then_per_top _ _ (length Γ)) as [? []]; shelve_unifiable; mauto.
 Qed.
 
-Lemma completeness_ty : forall {Γ i A A'},
-    {{ Γ ⊢ A ≈ A' : Type@i }} ->
+Lemma completeness_ty {P} {pred_P : PredicativeSig P} : forall {Γ : ctx P} {s A A'},
+    {{ Γ ⊢ A ≈ A' : Sort@s }} ->
     exists W, nbe_ty Γ A W /\ nbe_ty Γ A' W.
 Proof.
-  intros * [? [?%nbe_type_to_nbe_ty ?%nbe_type_to_nbe_ty]]%completeness.
+  intros * [? [?%nbe_type_to_nbe_ty ?%nbe_type_to_nbe_ty]]%(@completeness P pred_P).
   mauto 3.
 Qed.

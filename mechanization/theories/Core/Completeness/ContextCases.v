@@ -15,6 +15,16 @@ Qed.
 #[export]
 Hint Resolve valid_ctx_empty : mcpts.
 
+Lemma rel_ctx_empty {P} {pred_P : PredicativeSig P} :
+  {{ ⟪ pred_P ⟫ ⊨ ⋅ ≈ ⋅ }}.
+Proof.
+  apply valid_ctx_empty.
+Qed.
+
+#[export]
+Hint Resolve rel_ctx_empty : mcpts.
+
+
 Lemma rel_ctx_extend {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ Γ' A A' s},
     {{ ⟪ pred_P ⟫ ⊨ Γ ≈ Γ' }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨ A ≈ A' : Sort@s }} ->

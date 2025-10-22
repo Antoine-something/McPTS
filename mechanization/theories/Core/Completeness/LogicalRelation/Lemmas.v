@@ -38,7 +38,7 @@ Proof.
   destruct_by_head (@per_typ P).
   mauto.
 Qed.
-
+  
 #[export]
 Hint Resolve rel_exp_implies_rel_typ rel_exp_implies_rel_typ_unsorted : mcpts.
 

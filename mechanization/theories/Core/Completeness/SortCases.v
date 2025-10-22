@@ -206,6 +206,17 @@ Qed.
 #[export]
 Hint Resolve valid_exp_typ : mcpts.
 
+Lemma rel_typ_sort {P} {pred_P : PredicativeSig P} : forall {Γ s},
+    {{ ⟪ pred_P ⟫ ⊨ Γ }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨ Sort@s ≈ Sort@s }}.
+Proof.
+  intros.
+  eapply valid_exp_typ; mauto.
+Qed.
+
+#[export]
+Hint Resolve rel_typ_sort : mcpts.
+
 Lemma rel_exp_typ_sub {P : PtsSig} {pred_P : PredicativeSig P} : forall {s Γ σ Δ},
     {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨ Sort@s[σ] ≈ Sort@s }}.
@@ -223,3 +234,52 @@ Qed.
 
 #[export]
 Hint Resolve rel_exp_typ_sub : mcpts.
+
+
+Lemma rel_exp_axiom {P} {pred_P : PredicativeSig P} : forall {s1 s2 Γ},
+    Ax P s1 s2 ->
+    {{ ⟪ pred_P ⟫ ⊨ Γ }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨u Sort@s1 : Sort@s2 }}.
+Proof.
+  intros * HAx [env_relΓ].
+  eexists; split; [eassumption |].
+  intros.
+  exists (per_sort pred_P s2).
+  split.
+  - econstructor; mauto.
+    econstructor; mauto.
+    reflexivity.
+  - econstructor; mauto.
+    eexists.
+    eapply per_sort_elem_core_sort'; mauto.
+    reflexivity.
+Qed.
+  
+#[export]
+Hint Resolve rel_exp_axiom : mcpts.
+
+
+Lemma rel_exp_axiom_sub {P} {pred_P : PredicativeSig P} : forall {Γ Δ σ s1 s2},
+    Ax P s1 s2 ->
+    {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨u Sort@s1[σ] ≈ Sort@s1 : Sort@s2 }}.
+Proof.
+  intros * Hax [env_relΓ [? [env_relΔ]]].
+  destruct_conjs.
+  eexists; split; [eassumption|].
+  intros.
+  assert (rel_sub σ ρ σ ρ' env_relΔ) by mauto.
+  destruct_by_head (@rel_sub P).
+  eexists.
+  split.
+  - econstructor; mauto.
+    econstructor; mauto.
+    reflexivity.
+  - econstructor; mauto.
+    econstructor; mauto.
+    eapply per_sort_elem_core_sort'; mauto.                       
+    reflexivity.
+Qed.
+
+#[export]
+Hint Resolve rel_exp_axiom_sub : mcpts.
