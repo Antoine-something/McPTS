@@ -240,6 +240,19 @@ Qed.
 #[export]
 Hint Resolve exp_sub_typ : mcpts.
 
+Lemma eq_exp_sub_typ {P: PtsSig} : forall {Δ : ctx P} {Γ A A' σ s},
+    {{ Δ ⊢ A ≈ A' : Sort@s }} ->
+    {{ Γ ⊢s σ : Δ }} ->
+    {{ Γ ⊢ A[σ] ≈ A'[σ] : Sort@s }}.
+Proof with mautosolve 3.
+  intros.
+  econstructor; mauto 3.
+Qed.
+
+#[export]
+Hint Resolve eq_exp_sub_typ : mcpts.
+
+
 Lemma presup_ctx_lookup_typ {P : PtsSig} : forall {Γ : ctx P} {A x K},
     {{ ⊢ Γ }} ->
     {{ #x : A :: K ∈ Γ }} ->
