@@ -762,6 +762,39 @@ Hint Resolve sub_eq_q_sigma_id_extend : mcpts.
 #[export]
 Hint Rewrite -> @sub_eq_q_sigma_id_extend using mauto 4 : mcpts.
 
+
+Lemma sub_eq_q_sigma_sigma0_extend {P} : forall {Γ1 Γ2 Γ3 : ctx P} {A s σ σ0 M},
+    {{ Γ3 ⊢ A : Sort@s }} ->
+    {{ Γ2 ⊢s σ : Γ3 }} ->
+    {{ Γ1 ⊢s σ0 : Γ2 }} ->
+    {{ Γ1 ⊢ M : A[σ][σ0] }} ->
+    {{ Γ1 ⊢s (q σ)∘(σ0,,M) ≈ (σ∘σ0),,M : Γ3, A::Sort@s }}.
+Proof.
+  intros.
+  assert {{ Γ2, A[σ]::Sort@s ⊢s σ ∘ Wk : Γ3 }} by mauto.
+  assert {{ Γ2, A[σ]::Sort@s ⊢ #0 : A[σ][Wk] }} by mauto 3.
+  assert {{ Γ2, A[σ]::Sort@s ⊢ A[σ][Wk] ≈ A[σ∘Wk] }} by mauto.
+  assert {{ Γ2, A[σ]::Sort@s ⊢ #0 : A[σ∘Wk] }} by mauto 4.
+  assert {{ Γ1 ⊢s (q σ) ∘ (σ0,,M) ≈ ((σ∘Wk)∘(σ0,,M)),,#0[σ0,,M] : Γ3, A::Sort@s }} by mauto 4.
+  assert {{ Γ1 ⊢s (σ∘Wk)∘(σ0,,M) ≈ σ∘(Wk∘(σ0,,M)) : Γ3 }} by (econstructor; mauto 3).
+  assert {{ Γ1 ⊢s σ∘(Wk∘(σ0,,M)) ≈ σ∘σ0 : Γ3 }} by mauto.
+  assert {{ Γ1 ⊢s (σ ∘ Wk) ∘ (σ0,,M) ≈ σ∘σ0 : Γ3 }} by (etransitivity; mauto).
+  assert {{ Γ1 ⊢ #0[σ0,,M] ≈ M : A[σ][σ0] }} by mauto.
+  assert {{ Γ1 ⊢ A[σ][σ0] ≈ A[(σ∘Wk)∘(σ0,,M)] }} by (econstructor; mauto).
+  assert {{ Γ1 ⊢s (σ∘Wk)∘(σ0,,M),,#0[σ0,,M] ≈ σ∘σ0,,M : Γ3, A::Sort@s }}.
+  {
+    eapply wf_sub_eq_extend_cong; mauto 2.
+    eapply wf_exp_eq_conv with (A := {{{ A[σ][σ0] }}}); mauto.
+    econstructor; mauto.
+  }
+  do 2 etransitivity; mauto.
+Qed.
+
+#[export]
+Hint Resolve sub_eq_q_sigma_sigma0_extend : mcpts.
+#[export]
+Hint Rewrite -> @sub_eq_q_sigma_sigma0_extend using mauto 4 : mcpts.
+
 Lemma sub_eq_p_q_sigma {P : PtsSig} : forall {Γ : ctx P} {A s σ Δ},
     {{ Δ ⊢ A : Sort@s }} ->
     {{ Γ ⊢s σ : Δ }} ->

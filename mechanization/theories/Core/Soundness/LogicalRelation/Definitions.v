@@ -48,35 +48,33 @@ Variant neut_glu_exp_pred {P : PtsSig} (s : P) a : glu_exp_pred P :=
                    {{ Δ ⊢ M[σ] ≈ M' : A[σ] }}) ->
      {{ Γ ⊢ M : A ® ⇑ b m ∈ neut_glu_exp_pred s a }} }.
 
-Variant pi_glu_typ_pred {P : PtsSig} (s : P)
+Variant pi_glu_typ_pred {P : PtsSig} {s1 s2} (s : P) (r : Ru P s1 s2 s)
   (IR : relation (domain P))
   (IP : glu_typ_pred P)
   (IEl : glu_exp_pred P)
   (OP : forall c (equiv_c : {{ Dom c ≈ c ∈ IR }}), glu_typ_pred P) : glu_typ_pred P :=
 | mk_pi_glu_typ_pred :
-  `{ forall {r : Ru P s1 s2 s},
-        {{ Γ ⊢ A ≈ Π r IT OT : Sort@s }} ->
-        {{ Γ ⊢ IT : Sort@s1 }} ->
-        {{ Γ , IT::Sort@s1 ⊢ OT : Sort@s2 }} ->
-        (forall Δ σ, {{ Δ ⊢w σ : Γ }} -> {{ Δ ⊢ IT[σ] ® IP }}) ->
-        (forall Δ σ M m,
-            {{ Δ ⊢w σ : Γ }} ->
-            {{ Δ ⊢ M : IT[σ] ® m ∈ IEl }} ->
-            forall (equiv_m : {{ Dom m ≈ m ∈ IR }}),
-              {{ Δ ⊢ OT[σ,,M] ® OP _ equiv_m }}) ->
-        {{ Γ ⊢ A ® pi_glu_typ_pred s IR IP IEl OP }} }.
+  `{ {{ Γ ⊢ A ≈ Π r IT OT : Sort@s }} ->
+     {{ Γ ⊢ IT : Sort@s1 }} ->
+     {{ Γ , IT::Sort@s1 ⊢ OT : Sort@s2 }} ->
+     (forall Δ σ, {{ Δ ⊢w σ : Γ }} -> {{ Δ ⊢ IT[σ] ® IP }}) ->
+     (forall Δ σ M m,
+         {{ Δ ⊢w σ : Γ }} ->
+         {{ Δ ⊢ M : IT[σ] ® m ∈ IEl }} ->
+         forall (equiv_m : {{ Dom m ≈ m ∈ IR }}),
+           {{ Δ ⊢ OT[σ,,M] ® OP _ equiv_m }}) ->
+     {{ Γ ⊢ A ® pi_glu_typ_pred s r IR IP IEl OP }} }.
 
-Variant pi_glu_exp_pred {P : PtsSig} (s : P)
+Variant pi_glu_exp_pred {P : PtsSig} {s1 s2} (s : P) (r : Ru P s1 s2 s)
   (IR : relation (domain P))
   (IP : glu_typ_pred P)
   (IEl : glu_exp_pred P)
   (elem_rel : relation (domain P))
   (OEl : forall c (equiv_c : {{ Dom c ≈ c ∈ IR }}), glu_exp_pred P): glu_exp_pred P :=
 | mk_pi_glu_exp_pred :
-  `{ forall {r : Ru P s1 s2 s},
-        {{ Γ ⊢ M : A }} ->
-        {{ Dom m ≈ m ∈ elem_rel }} ->
-        {{ Γ ⊢ A ≈ Π r IT OT : Sort@s }} ->
+  `{ {{ Γ ⊢ M : A }} ->
+     {{ Dom m ≈ m ∈ elem_rel }} ->
+     {{ Γ ⊢ A ≈ Π r IT OT : Sort@s }} ->
      {{ Γ ⊢ IT : Sort@s1 }} ->
      {{ Γ , IT::Sort@s1 ⊢ OT : Sort@s2 }} ->
      (forall Δ σ, {{ Δ ⊢w σ : Γ }} -> {{ Δ ⊢ IT[σ] ® IP }}) ->
@@ -85,7 +83,7 @@ Variant pi_glu_exp_pred {P : PtsSig} (s : P)
          {{ Δ ⊢ N : IT[σ] ® n ∈ IEl }} ->
          forall (equiv_n : {{ Dom n ≈ n ∈ IR }}),
          exists mn, {{ $| m & n |↘ mn }} /\ {{ Δ ⊢ M[σ] N : OT[σ,,N] ® mn ∈ OEl _ equiv_n }}) ->
-     {{ Γ ⊢ M : A ® m ∈ pi_glu_exp_pred s IR IP IEl elem_rel OEl }} }.
+     {{ Γ ⊢ M : A ® m ∈ pi_glu_exp_pred s r IR IP IEl elem_rel OEl }} }.
 
 #[export]
 Hint Constructors neut_glu_exp_pred pi_glu_typ_pred pi_glu_exp_pred : mcpts.
@@ -140,8 +138,8 @@ Section Gluing.
               {{ ⟦ B ⟧ ρ ↦ c ↘ b }} ->
               (s2 = s -> {{ DG b ∈ glu_sort_elem_core ↘ OP _ equiv_c ↘ OEL _ equiv_c }}) /\ (forall (lt_s2_s : pred_rel pred_P s2 s), {{ DG b ∈ glu_sort_typ_elem_rec lt_s2_s ↘ OP _ equiv_c ↘ OEL _ equiv_c }})) ->
           {{ DF Π r a ρ B ≈ Π r a ρ B ∈ per_sort_elem pred_P s ↘ elem_rel }} ->
-          typ_rel <∙> pi_glu_typ_pred s in_rel IP IEL OP ->
-          el_rel <∙> pi_glu_exp_pred s in_rel IP IEL elem_rel OEL ->
+          typ_rel <∙> pi_glu_typ_pred s r in_rel IP IEL OP ->
+          el_rel <∙> pi_glu_exp_pred s r in_rel IP IEL elem_rel OEL ->
           {{ DG Π r a ρ B ∈ glu_sort_elem_core ↘ typ_rel ↘ el_rel }} }
 
   | glu_sort_elem_core_neut :
@@ -179,8 +177,8 @@ Section Gluing.
               {{ ⟦ B ⟧ ρ ↦ c ↘ b }} ->
               (s2 = s -> {{ DG b ∈ glu_sort_elem_core ↘ OP c equiv_c ↘ OEL c equiv_c }} /\ motive (OP c equiv_c) (OEL c equiv_c) b) /\ (forall (lt_s2_s : pred_rel pred_P s2 s), {{ DG b ∈ glu_sort_typ_elem_rec lt_s2_s ↘ OP c equiv_c ↘ OEL c equiv_c }})) ->
           {{ DF Π r a ρ B ≈ Π r a ρ B ∈ per_sort_elem pred_P s ↘ elem_rel }} ->
-          typ_rel <∙> pi_glu_typ_pred s in_rel IP IEL OP ->
-          el_rel <∙> pi_glu_exp_pred s in_rel IP IEL elem_rel OEL ->
+          typ_rel <∙> pi_glu_typ_pred s r in_rel IP IEL OP ->
+          el_rel <∙> pi_glu_exp_pred s r in_rel IP IEL elem_rel OEL ->
           motive typ_rel el_rel d{{{ Π r a ρ B }}} )
 
       (case_neut :
@@ -277,8 +275,8 @@ Section GluingInduction.
               {{ ⟦ B ⟧ ρ ↦ c ↘ b }} -> 
               motive s2 (OP c equiv_c) (OEL c equiv_c) b) ->
           {{ DF Π r a ρ B ≈ Π r a ρ B ∈ per_sort_elem pred_P s3 ↘ elem_rel }} ->
-          typ_rel <∙> pi_glu_typ_pred s3 in_rel IP IEL OP ->
-          exp_rel <∙> pi_glu_exp_pred s3 in_rel IP IEL elem_rel OEL ->
+          typ_rel <∙> pi_glu_typ_pred s3 r in_rel IP IEL OP ->
+          exp_rel <∙> pi_glu_exp_pred s3 r in_rel IP IEL elem_rel OEL ->
           motive s3 typ_rel exp_rel d{{{ Π r a ρ B }}} )
 
       (case_neut :
