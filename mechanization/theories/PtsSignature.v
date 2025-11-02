@@ -7,6 +7,7 @@ Record PtsSig : Type :=
       St :> Set;
       Ax : St -> St -> Set;
       Ru : St -> St -> St -> Set;
+      Ru_nat : St -> Set;
     }.
 
 Record PredicativeSig (P : PtsSig) : Type :=
