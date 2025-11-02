@@ -54,8 +54,7 @@ Arguments a_extend {_}.
 
 
 Notation typ := (fun P => exp P).
-Notation knd := (fun P => exp P).
-Notation ctx := (fun P => list (typ P * knd P)).
+Notation ctx := (fun P => list (typ P)).
 
 
 (** ** Syntactic Normal/Neutral Form *)
@@ -140,7 +139,7 @@ Module Syntax_Notations.
   Notation "'q' σ" := (q σ) (in custom exp at level 30) : mcpts_scope.
 
   Notation "⋅" := nil (in custom exp at level 0) : mcpts_scope.
-  Notation "Γ , A :: K" := (cons (A, K) Γ) (in custom exp at level 50, left associativity, format "Γ ,  A :: K") : mcpts_scope.
+  Notation "Γ , A" := (cons A Γ) (in custom exp at level 50, left associativity, format "Γ , A") : mcpts_scope.
 
   Notation "n{{{ x }}}" := x (at level 0, x custom nf at level 99, format "'n{{{'  x  '}}}'") : mcpts_scope.
   Notation "( x )" := x (in custom nf at level 0, x custom nf at level 60) : mcpts_scope.
