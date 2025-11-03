@@ -11,43 +11,43 @@ theories/Core/Syntactic/System/Definitions.v
 theories/Core/Syntactic/System/Lemmas.v
 theories/Core/Syntactic/System/Tactics.v
 theories/Core/Syntactic/System.v
-# theories/Core/Syntactic/CtxEq.v
-# theories/Core/Syntactic/CoreInversions.v
-# theories/Core/Syntactic/Presup.v
-# theories/Core/Syntactic/SystemOpt.v
-# theories/Core/Syntactic/Corollaries.v
+theories/Core/Syntactic/CtxEq.v
+theories/Core/Syntactic/CoreInversions.v
+theories/Core/Syntactic/Presup.v
+theories/Core/Syntactic/SystemOpt.v
+theories/Core/Syntactic/Corollaries.v
 
-# theories/Core/Semantic/Domain.v
-# theories/Core/Semantic/Evaluation/Definitions.v
-# theories/Core/Semantic/Evaluation/Lemmas.v
-# theories/Core/Semantic/Evaluation/Tactics.v
-# theories/Core/Semantic/Evaluation.v
-# theories/Core/Semantic/Readback/Definitions.v
-# theories/Core/Semantic/Readback/Lemmas.v
-# theories/Core/Semantic/Readback.v
-# theories/Core/Semantic/NbE.v
-# theories/Core/Semantic/PER/Definitions.v
-# theories/Core/Semantic/PER/CoreTactics.v
-# theories/Core/Semantic/PER/Lemmas.v
-# theories/Core/Semantic/PER.v
-# theories/Core/Semantic/Realizability.v
+theories/Core/Semantic/Domain.v
+theories/Core/Semantic/Evaluation/Definitions.v
+theories/Core/Semantic/Evaluation/Lemmas.v
+theories/Core/Semantic/Evaluation/Tactics.v
+theories/Core/Semantic/Evaluation.v
+theories/Core/Semantic/Readback/Definitions.v
+theories/Core/Semantic/Readback/Lemmas.v
+theories/Core/Semantic/Readback.v
+theories/Core/Semantic/NbE.v
+theories/Core/Semantic/PER/Definitions.v
+theories/Core/Semantic/PER/CoreTactics.v
+theories/Core/Semantic/PER/Lemmas.v
+theories/Core/Semantic/PER.v
+theories/Core/Semantic/Realizability.v
 
-# theories/Core/Completeness/LogicalRelation/Definitions.v
-# theories/Core/Completeness/LogicalRelation/Tactics.v
-# theories/Core/Completeness/LogicalRelation/Lemmas.v
-# theories/Core/Completeness/LogicalRelation.v
-# theories/Core/Completeness/SortCases.v
-# theories/Core/Completeness/ContextCases.v
-# theories/Core/Completeness/SubstitutionCases.v
-# theories/Core/Completeness/TermStructureCases.v
-# theories/Core/Completeness/FunctionCases.v
-# theories/Core/Completeness/VariableCases.v
-# theories/Core/Completeness/FundamentalTheorem.v
-# theories/Core/Completeness.v
+theories/Core/Completeness/LogicalRelation/Definitions.v
+theories/Core/Completeness/LogicalRelation/Tactics.v
+theories/Core/Completeness/LogicalRelation/Lemmas.v
+theories/Core/Completeness/LogicalRelation.v
+theories/Core/Completeness/SortCases.v
+theories/Core/Completeness/ContextCases.v
+theories/Core/Completeness/SubstitutionCases.v
+theories/Core/Completeness/TermStructureCases.v
+theories/Core/Completeness/FunctionCases.v
+theories/Core/Completeness/VariableCases.v
+theories/Core/Completeness/FundamentalTheorem.v
+theories/Core/Completeness.v
 
-# theories/Core/Soundness/Weakening/Definitions.v
-# theories/Core/Soundness/Weakening/Lemmas.v
-# theories/Core/Soundness/LogicalRelation/Definitions.v
-# theories/Core/Soundness/LogicalRelation/CoreTactics.v
-# theories/Core/Soundness/LogicalRelation/CoreLemmas.v
-# theories/Core/Soundness/LogicalRelation/Core.v
+theories/Core/Soundness/Weakening/Definitions.v
+theories/Core/Soundness/Weakening/Lemmas.v
+theories/Core/Soundness/LogicalRelation/Definitions.v
+theories/Core/Soundness/LogicalRelation/CoreTactics.v
+theories/Core/Soundness/LogicalRelation/CoreLemmas.v
+theories/Core/Soundness/LogicalRelation/Core.v

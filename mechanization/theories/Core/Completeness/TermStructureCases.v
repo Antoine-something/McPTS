@@ -5,41 +5,41 @@ From McPTS.Core Require Import Base.
 From McPTS.Core.Completeness Require Import LogicalRelation SortCases.
 Import Domain_Notations.
 
+(* Lemma rel_exp_sub_cong {P : PtsSig} {pred_P : PredicativeSig P} : forall {Δ M M' A σ σ' Γ}, *)
+(*     {{ ⟪ pred_P ⟫ Δ ⊨ M ≈ M' : A }} -> *)
+(*     {{ ⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Δ }} -> *)
+(*     {{ ⟪ pred_P ⟫ Γ ⊨ M[σ] ≈ M'[σ'] : A[σ] }}. *)
+(* Proof with mautosolve. *)
+(*   intros * [env_relΔ] [env_relΓ]. *)
+(*   destruct_conjs. *)
+(*   pose env_relΔ. *)
+(*   handle_per_ctx_env_irrel. *)
+(*   eexists_rel_exp. *)
+(*   intros. *)
+(*   assert (env_relΓ ρ' ρ) by (symmetry; eassumption). *)
+(*   assert (env_relΓ ρ ρ) by (etransitivity; eassumption). *)
+(*   (on_all_hyp: destruct_rel_by_assumption env_relΓ). *)
+(*   handle_per_sort_elem_irrel. *)
+(*   match goal with *)
+(*   | _: {{ ⟦ σ ⟧s ρ ↘ ^?ρ0 }}, *)
+(*       _: {{ ⟦ σ ⟧s ρ' ↘ ^?ρ'0 }} |- _ => *)
+(*       rename ρ0 into ρσ; *)
+(*       rename ρ'0 into ρ'σ *)
+(*   end. *)
+(*   assert (env_relΔ ρσ ρ'σ) by (etransitivity; [|symmetry; eassumption]; eassumption). *)
+(*   (on_all_hyp: destruct_rel_by_assumption env_relΔ). *)
+(*   destruct_by_head (@rel_typ P). *)
+(*   destruct_by_head (@rel_exp P). *)
+(*   handle_per_sort_elem_irrel. *)
+(*   eexists. *)
+(*   split... *)
+(* Qed. *)
+
+(* #[export] *)
+(* Hint Resolve rel_exp_sub_cong : mcpts. *)
+
+
 Lemma rel_exp_sub_cong {P : PtsSig} {pred_P : PredicativeSig P} : forall {Δ M M' A σ σ' Γ},
-    {{ ⟪ pred_P ⟫ Δ ⊨ M ≈ M' : A }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Δ }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊨ M[σ] ≈ M'[σ'] : A[σ] }}.
-Proof with mautosolve.
-  intros * [env_relΔ] [env_relΓ].
-  destruct_conjs.
-  pose env_relΔ.
-  handle_per_ctx_env_irrel.
-  eexists_rel_exp.
-  intros.
-  assert (env_relΓ ρ' ρ) by (symmetry; eassumption).
-  assert (env_relΓ ρ ρ) by (etransitivity; eassumption).
-  (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  handle_per_sort_elem_irrel.
-  match goal with
-  | _: {{ ⟦ σ ⟧s ρ ↘ ^?ρ0 }},
-      _: {{ ⟦ σ ⟧s ρ' ↘ ^?ρ'0 }} |- _ =>
-      rename ρ0 into ρσ;
-      rename ρ'0 into ρ'σ
-  end.
-  assert (env_relΔ ρσ ρ'σ) by (etransitivity; [|symmetry; eassumption]; eassumption).
-  (on_all_hyp: destruct_rel_by_assumption env_relΔ).
-  destruct_by_head (@rel_typ P).
-  destruct_by_head (@rel_exp P).
-  handle_per_sort_elem_irrel.
-  eexists.
-  split...
-Qed.
-
-#[export]
-Hint Resolve rel_exp_sub_cong : mcpts.
-
-
-Lemma rel_exp_sub_cong_unsorted {P : PtsSig} {pred_P : PredicativeSig P} : forall {Δ M M' A σ σ' Γ},
     {{ ⟪ pred_P ⟫ Δ ⊨u M ≈ M' : A }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Δ }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u M[σ] ≈ M'[σ'] : A[σ] }}.
@@ -72,30 +72,30 @@ Proof with mautosolve.
 Qed.
 
 #[export]
-Hint Resolve rel_exp_sub_cong_unsorted : mcpts.
+Hint Resolve rel_exp_sub_cong : mcpts.
+
+
+(* Lemma rel_exp_sub_id {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M A}, *)
+(*     {{ ⟪ pred_P ⟫ Γ ⊨ M : A }} -> *)
+(*     {{ ⟪ pred_P ⟫ Γ ⊨ M[Id] ≈ M : A }}. *)
+(* Proof with mautosolve. *)
+(*   intros * [env_relΓ]. *)
+(*   destruct_conjs. *)
+(*   eexists_rel_exp. *)
+(*   intros. *)
+(*   (on_all_hyp: destruct_rel_by_assumption env_relΓ). *)
+(*   destruct_by_head (@rel_typ P). *)
+(*   destruct_by_head (@rel_exp P). *)
+(*   eexists. *)
+(*   split... *)
+(* Qed. *)
+
+(* #[export] *)
+(* Hint Resolve rel_exp_sub_id : mcpts. *)
+
 
 
 Lemma rel_exp_sub_id {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M A},
-    {{ ⟪ pred_P ⟫ Γ ⊨ M : A }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊨ M[Id] ≈ M : A }}.
-Proof with mautosolve.
-  intros * [env_relΓ].
-  destruct_conjs.
-  eexists_rel_exp.
-  intros.
-  (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head (@rel_typ P).
-  destruct_by_head (@rel_exp P).
-  eexists.
-  split...
-Qed.
-
-#[export]
-Hint Resolve rel_exp_sub_id : mcpts.
-
-
-
-Lemma rel_exp_sub_id_unsorted {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M A},
     {{ ⟪ pred_P ⟫ Γ ⊨u M : A }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u M[Id] ≈ M : A }}.
 Proof with mautosolve.
@@ -112,42 +112,42 @@ Proof with mautosolve.
 Qed.
 
 #[export]
-Hint Resolve rel_exp_sub_id_unsorted : mcpts.
+Hint Resolve rel_exp_sub_id : mcpts.
+
+
+(* Lemma rel_exp_sub_compose {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ τ Γ' σ Γ'' M A}, *)
+(*     {{ ⟪ pred_P ⟫ Γ ⊨s τ : Γ' }} -> *)
+(*     {{ ⟪ pred_P ⟫ Γ' ⊨s σ : Γ'' }} -> *)
+(*     {{ ⟪ pred_P ⟫ Γ'' ⊨ M : A }} -> *)
+(*     {{ ⟪ pred_P ⟫ Γ ⊨ M[σ ∘ τ] ≈ M[σ][τ] : A[σ ∘ τ] }}. *)
+(* Proof with mautosolve. *)
+(*   intros * [env_relΓ [? [env_relΓ']]] [? [? [env_relΓ'']]] HM. *)
+(*   destruct_conjs. *)
+(*   invert_rel_exp HM. *)
+(*   pose env_relΓ'. *)
+(*   handle_per_ctx_env_irrel. *)
+(*   eexists_rel_exp. *)
+(*   intros. *)
+(*   assert (env_relΓ ρ' ρ) by (symmetry; eassumption). *)
+(*   assert (env_relΓ ρ ρ) by (etransitivity; eassumption). *)
+(*   (on_all_hyp: destruct_rel_by_assumption env_relΓ). *)
+(*   handle_per_sort_elem_irrel. *)
+(*   (on_all_hyp: destruct_rel_by_assumption env_relΓ'). *)
+(*   handle_per_sort_elem_irrel. *)
+(*   (on_all_hyp: destruct_rel_by_assumption env_relΓ''). *)
+(*   destruct_by_head (@rel_typ P). *)
+(*   destruct_by_head (@rel_exp P). *)
+(*   handle_per_sort_elem_irrel. *)
+(*   eexists. *)
+(*   split; econstructor... *)
+(* Qed. *)
+
+(* #[export] *)
+(* Hint Resolve rel_exp_sub_compose : mcpts. *)
+
 
 
 Lemma rel_exp_sub_compose {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ τ Γ' σ Γ'' M A},
-    {{ ⟪ pred_P ⟫ Γ ⊨s τ : Γ' }} ->
-    {{ ⟪ pred_P ⟫ Γ' ⊨s σ : Γ'' }} ->
-    {{ ⟪ pred_P ⟫ Γ'' ⊨ M : A }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊨ M[σ ∘ τ] ≈ M[σ][τ] : A[σ ∘ τ] }}.
-Proof with mautosolve.
-  intros * [env_relΓ [? [env_relΓ']]] [? [? [env_relΓ'']]] HM.
-  destruct_conjs.
-  invert_rel_exp HM.
-  pose env_relΓ'.
-  handle_per_ctx_env_irrel.
-  eexists_rel_exp.
-  intros.
-  assert (env_relΓ ρ' ρ) by (symmetry; eassumption).
-  assert (env_relΓ ρ ρ) by (etransitivity; eassumption).
-  (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  handle_per_sort_elem_irrel.
-  (on_all_hyp: destruct_rel_by_assumption env_relΓ').
-  handle_per_sort_elem_irrel.
-  (on_all_hyp: destruct_rel_by_assumption env_relΓ'').
-  destruct_by_head (@rel_typ P).
-  destruct_by_head (@rel_exp P).
-  handle_per_sort_elem_irrel.
-  eexists.
-  split; econstructor...
-Qed.
-
-#[export]
-Hint Resolve rel_exp_sub_compose : mcpts.
-
-
-
-Lemma rel_exp_sub_compose_unsorted {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ τ Γ' σ Γ'' M A},
     {{ ⟪ pred_P ⟫ Γ ⊨s τ : Γ' }} ->
     {{ ⟪ pred_P ⟫ Γ' ⊨s σ : Γ'' }} ->
     {{ ⟪ pred_P ⟫ Γ'' ⊨u M : A }} ->
@@ -176,7 +176,7 @@ Proof with mautosolve.
 Qed.
 
 #[export]
-Hint Resolve rel_exp_sub_compose_unsorted : mcpts.
+Hint Resolve rel_exp_sub_compose : mcpts.
 
 
 
@@ -218,29 +218,29 @@ Qed.
 #[export]
 Hint Resolve rel_exp_conv : mcpts.
 
+(* Lemma rel_exp_sym {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M M' A}, *)
+(*     {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ M' : A }} -> *)
+(*     {{ ⟪ pred_P ⟫ Γ ⊨ M' ≈ M : A }}. *)
+(* Proof with mautosolve. *)
+(*   intros * [env_relΓ]. *)
+(*   destruct_conjs. *)
+(*   eexists_rel_exp. *)
+(*   intros. *)
+(*   assert (env_relΓ ρ' ρ) by (symmetry; eauto). *)
+(*   (on_all_hyp: destruct_rel_by_assumption env_relΓ); destruct_conjs. *)
+(*   destruct_by_head (@rel_typ P). *)
+(*   destruct_by_head (@rel_exp P). *)
+(*   handle_per_sort_elem_irrel. *)
+(*   eexists. *)
+(*   split; econstructor; mauto. *)
+(*   symmetry... *)
+(* Qed. *)
+
+(* #[export] *)
+(* Hint Resolve rel_exp_sym : mcpts. *)
+
+
 Lemma rel_exp_sym {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M M' A},
-    {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ M' : A }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊨ M' ≈ M : A }}.
-Proof with mautosolve.
-  intros * [env_relΓ].
-  destruct_conjs.
-  eexists_rel_exp.
-  intros.
-  assert (env_relΓ ρ' ρ) by (symmetry; eauto).
-  (on_all_hyp: destruct_rel_by_assumption env_relΓ); destruct_conjs.
-  destruct_by_head (@rel_typ P).
-  destruct_by_head (@rel_exp P).
-  handle_per_sort_elem_irrel.
-  eexists.
-  split; econstructor; mauto.
-  symmetry...
-Qed.
-
-#[export]
-Hint Resolve rel_exp_sym : mcpts.
-
-
-Lemma rel_exp_sym_unsorted {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M M' A},
     {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : A }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u M' ≈ M : A }}.
 Proof with mautosolve.
@@ -263,36 +263,36 @@ Proof with mautosolve.
 Qed.
 
 #[export]
-Hint Resolve rel_exp_sym_unsorted : mcpts.
+Hint Resolve rel_exp_sym : mcpts.
 
+
+
+(* Lemma rel_exp_trans {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M1 M2 M3 A}, *)
+(*     {{ ⟪ pred_P ⟫ Γ ⊨ M1 ≈ M2 : A }} -> *)
+(*     {{ ⟪ pred_P ⟫ Γ ⊨ M2 ≈ M3 : A }} -> *)
+(*     {{ ⟪ pred_P ⟫ Γ ⊨ M1 ≈ M3 : A }}. *)
+(* Proof with mautosolve. *)
+(*   intros * [env_relΓ] HM2M3. *)
+(*   destruct_conjs. *)
+(*   invert_rel_exp HM2M3. *)
+(*   eexists_rel_exp. *)
+(*   intros. *)
+(*   assert (env_relΓ ρ' ρ) by (symmetry; eauto). *)
+(*   assert (env_relΓ ρ' ρ') by (etransitivity; eauto). *)
+(*   (on_all_hyp: destruct_rel_by_assumption env_relΓ); destruct_conjs. *)
+(*   destruct_by_head (@rel_typ P). *)
+(*   destruct_by_head (@rel_exp P). *)
+(*   handle_per_sort_elem_irrel. *)
+(*   eexists. *)
+(*   split; econstructor; mauto. *)
+(*   etransitivity... *)
+(* Qed. *)
+
+(* #[export] *)
+(* Hint Resolve rel_exp_trans : mcpts. *)
 
 
 Lemma rel_exp_trans {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M1 M2 M3 A},
-    {{ ⟪ pred_P ⟫ Γ ⊨ M1 ≈ M2 : A }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊨ M2 ≈ M3 : A }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊨ M1 ≈ M3 : A }}.
-Proof with mautosolve.
-  intros * [env_relΓ] HM2M3.
-  destruct_conjs.
-  invert_rel_exp HM2M3.
-  eexists_rel_exp.
-  intros.
-  assert (env_relΓ ρ' ρ) by (symmetry; eauto).
-  assert (env_relΓ ρ' ρ') by (etransitivity; eauto).
-  (on_all_hyp: destruct_rel_by_assumption env_relΓ); destruct_conjs.
-  destruct_by_head (@rel_typ P).
-  destruct_by_head (@rel_exp P).
-  handle_per_sort_elem_irrel.
-  eexists.
-  split; econstructor; mauto.
-  etransitivity...
-Qed.
-
-#[export]
-Hint Resolve rel_exp_trans : mcpts.
-
-
-Lemma rel_exp_trans_unsorted {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M1 M2 M3 A},
     {{ ⟪ pred_P ⟫ Γ ⊨u M1 ≈ M2 : A }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u M2 ≈ M3 : A }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u M1 ≈ M3 : A }}.
@@ -317,15 +317,15 @@ Proof with mautosolve.
 Qed.
 
 #[export]
-Hint Resolve rel_exp_trans_unsorted : mcpts.
+Hint Resolve rel_exp_trans : mcpts.
 
 
 
-#[export]
-Instance rel_exp_PER {P : PtsSig} {pred_P : PredicativeSig P} {Γ A} : PER (rel_exp_under_ctx pred_P Γ A).
-Proof.
-  split; mauto.
-Qed.
+(* #[export] *)
+(* Instance rel_exp_PER {P : PtsSig} {pred_P : PredicativeSig P} {Γ A} : PER (rel_exp_under_ctx pred_P Γ A). *)
+(* Proof. *)
+(*   split; mauto. *)
+(* Qed. *)
 
 #[export]
 Instance rel_exp_unsorted_PER {P : PtsSig} {pred_P : PredicativeSig P} {Γ A} : PER (rel_exp_under_ctx_unsorted pred_P Γ A).
@@ -519,29 +519,29 @@ Qed.
 
 
 
+(* Lemma presup_rel_exp {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M M' A}, *)
+(*     {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ M' : A }} -> *)
+(*     {{ ⟪ pred_P ⟫ ⊨ Γ }} /\ {{ ⟪ pred_P ⟫ Γ ⊨ M : A }} /\ {{ ⟪ pred_P ⟫ Γ ⊨ M' : A }} /\ {{ ⟪ pred_P ⟫ Γ ⊨ A }}. *)
+(* Proof. *)
+(*   intros *. *)
+(*   assert (Hpart : {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ M' : A }} -> {{ ⟪ pred_P ⟫ Γ ⊨ M : A }} /\ {{ ⟪ pred_P ⟫ Γ ⊨ M' : A }}) *)
+(*     by (split; unfold valid_exp_under_ctx; etransitivity; [|symmetry|symmetry|]; eassumption). *)
+(*   intros Hrel; repeat split; *)
+(*     try solve [intuition]; clear Hpart; *)
+(*     destruct Hrel as [env_relΓ]; *)
+(*     destruct_conjs. *)
+(*   - eexists; eassumption. *)
+(*   - destruct_by_head (@valid_exp_under_ctx P). *)
+(*     destruct_conjs. *)
+(*     eexists_rel_exp_of_typ.     *)
+(*     intros. *)
+(*     (on_all_hyp: destruct_rel_by_assumption env_relΓ). *)
+(*     eapply rel_typ_unsorted_implies_rel_exp; eauto. *)
+(*     eapply rel_typ_implies_rel_typ_unsorted; mauto. *)
+(* Qed. *)
+
+
 Lemma presup_rel_exp {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M M' A},
-    {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ M' : A }} ->
-    {{ ⟪ pred_P ⟫ ⊨ Γ }} /\ {{ ⟪ pred_P ⟫ Γ ⊨ M : A }} /\ {{ ⟪ pred_P ⟫ Γ ⊨ M' : A }} /\ {{ ⟪ pred_P ⟫ Γ ⊨ A }}.
-Proof.
-  intros *.
-  assert (Hpart : {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ M' : A }} -> {{ ⟪ pred_P ⟫ Γ ⊨ M : A }} /\ {{ ⟪ pred_P ⟫ Γ ⊨ M' : A }})
-    by (split; unfold valid_exp_under_ctx; etransitivity; [|symmetry|symmetry|]; eassumption).
-  intros Hrel; repeat split;
-    try solve [intuition]; clear Hpart;
-    destruct Hrel as [env_relΓ];
-    destruct_conjs.
-  - eexists; eassumption.
-  - destruct_by_head (@valid_exp_under_ctx P).
-    destruct_conjs.
-    eexists_rel_exp_of_typ.    
-    intros.
-    (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-    eapply rel_typ_unsorted_implies_rel_exp; eauto.
-    eapply rel_typ_implies_rel_typ_unsorted; mauto.
-Qed.
-
-
-Lemma presup_rel_exp_unsorted {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M M' A},
     {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : A }} ->
     {{ ⟪ pred_P ⟫ ⊨ Γ }} /\ {{ ⟪ pred_P ⟫ Γ ⊨u M : A }} /\ {{ ⟪ pred_P ⟫ Γ ⊨u M' : A }} /\ {{ ⟪ pred_P ⟫ Γ ⊨ A }}.
 Proof.
@@ -561,7 +561,7 @@ Proof.
 Qed.
 
 #[export]
-Hint Resolve presup_rel_exp_unsorted : mcpts.
+Hint Resolve presup_rel_exp : mcpts.
 
 
 

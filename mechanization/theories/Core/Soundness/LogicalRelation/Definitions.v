@@ -56,7 +56,7 @@ Variant pi_glu_typ_pred {P : PtsSig} {s1 s2} (s : P) (r : Ru P s1 s2 s)
 | mk_pi_glu_typ_pred :
   `{ {{ Γ ⊢ A ≈ Π r IT OT : Sort@s }} ->
      {{ Γ ⊢ IT : Sort@s1 }} ->
-     {{ Γ , IT::Sort@s1 ⊢ OT : Sort@s2 }} ->
+     {{ Γ , IT ⊢ OT : Sort@s2 }} ->
      (forall Δ σ, {{ Δ ⊢w σ : Γ }} -> {{ Δ ⊢ IT[σ] ® IP }}) ->
      (forall Δ σ M m,
          {{ Δ ⊢w σ : Γ }} ->
@@ -76,7 +76,7 @@ Variant pi_glu_exp_pred {P : PtsSig} {s1 s2} (s : P) (r : Ru P s1 s2 s)
      {{ Dom m ≈ m ∈ elem_rel }} ->
      {{ Γ ⊢ A ≈ Π r IT OT : Sort@s }} ->
      {{ Γ ⊢ IT : Sort@s1 }} ->
-     {{ Γ , IT::Sort@s1 ⊢ OT : Sort@s2 }} ->
+     {{ Γ , IT ⊢ OT : Sort@s2 }} ->
      (forall Δ σ, {{ Δ ⊢w σ : Γ }} -> {{ Δ ⊢ IT[σ] ® IP }}) ->
      (forall Δ σ N n,
          {{ Δ ⊢w σ : Γ }} ->
@@ -330,8 +330,8 @@ Section GluingInduction.
       + eapply H2; mauto.
       + assert (s2 = s ->
                 glu_sort_elem_core pred_P s
-                  (fun (s' : P) (_ : pred_rel pred_P s' s) (typ_rel : list (exp P * exp P) -> exp P -> Prop)
-                     (exp_rel : list (exp P * exp P) -> exp P -> exp P -> domain P -> Prop) 
+                  (fun (s' : P) (_ : pred_rel pred_P s' s) (typ_rel : list (exp P) -> exp P -> Prop)
+                       (exp_rel : list (exp P) -> exp P -> exp P -> domain P -> Prop) 
                      (a : domain P) => glu_sort_elem pred_P s' typ_rel exp_rel a) (OP c equiv_c) 
                   (OEL c equiv_c) b /\ motive s (OP c equiv_c) (OEL c equiv_c) b) by (eapply H2; mauto).
         subst.
@@ -343,15 +343,14 @@ Section GluingInduction.
         eapply H2; mauto.
       + assert (s2 = s ->
      glu_sort_elem_core pred_P s
-       (fun (s' : P) (_ : pred_rel pred_P s' s) (typ_rel : list (exp P * exp P) -> exp P -> Prop)
-          (exp_rel : list (exp P * exp P) -> exp P -> exp P -> domain P -> Prop) 
+       (fun (s' : P) (_ : pred_rel pred_P s' s) (typ_rel : list (exp P) -> exp P -> Prop)
+          (exp_rel : list (exp P) -> exp P -> exp P -> domain P -> Prop) 
           (a : domain P) => glu_sort_elem pred_P s' typ_rel exp_rel a) (OP c equiv_c) 
        (OEL c equiv_c) b /\ motive s (OP c equiv_c) (OEL c equiv_c) b) by (eapply H2; mauto).
         subst.
         eapply H10; mauto.
   Qed.                   
 End GluingInduction.
-
 
 
 
@@ -405,7 +404,7 @@ Arguments nil_glu_sub_pred {P} Δ σ ρ/.
 Variant cons_glu_sub_pred {P} (pred_P : PredicativeSig P) (s : P) Γ A (TSb : glu_sub_pred P) : glu_sub_pred P :=
 | mk_cons_glu_sub_pred :
   `{ forall P El,
-        {{ Δ ⊢s σ : Γ, A::Sort@s }} ->
+        {{ Δ ⊢s σ : Γ, A }} ->
         {{ ⟦ A ⟧ ρ ↯ ↘ a }} ->
         {{ DG a ∈ glu_sort_elem pred_P s ↘ P ↘ El }} ->
         (env_lookup ρ 0 m) ->
@@ -431,7 +430,7 @@ Inductive glu_ctx_env {P} (pred_P : PredicativeSig P) : glu_sub_pred P -> ctx P 
             {{ Δ ⊢s σ ® ρ ∈ TSb }} ->
             glu_rel_typ_with_sub pred_P s Δ A σ ρ) ->
         Sb <∙> cons_glu_sub_pred pred_P s Γ A TSb ->
-        {{ EG Γ, A::Sort@s ∈ glu_ctx_env pred_P ↘ Sb }} }.
+        {{ EG Γ, A ∈ glu_ctx_env pred_P ↘ Sb }} }.
 
 Variant glu_rel_exp_with_sub {P} (pred_P : PredicativeSig P) s Δ M A σ ρ : Prop :=
 | mk_glu_rel_exp_with_sub :
