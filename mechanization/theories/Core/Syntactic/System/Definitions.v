@@ -62,6 +62,27 @@ with wf_exp {P : PtsSig} : ctx P -> typ P -> exp P -> Prop :=
      {{ #x : A :: Sort@s ∈ Γ }} ->
      {{ Γ ⊢ #x : A }} )
 
+(** Naturals **)
+| wf_nat :
+  `( forall (r : Ru_nat P s),
+        {{ ⊢ Γ }} ->
+        {{ Γ ⊢ ℕ r: Sort@s }} )
+   
+| wf_zero :
+  `(forall (r : Ru_nat P s),
+      {{ ⊢ Γ }} ->
+      {{ Γ ⊢ zero : ℕ r}} )
+| wf_succ :
+  `( forall (r : Ru_nat P s),
+        {{ Γ ⊢ M : ℕ r}} ->
+        {{ Γ ⊢ succ M : ℕ r}} )
+(* | wf_natrec : *)
+(*   `( {{ Γ, ℕ ⊢ A : Type@i }} -> *)
+(*      {{ Γ ⊢ MZ : A[Id,,zero] }} -> *)
+(*      {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,,succ #1] }} -> *)
+(*      {{ Γ ⊢ M : ℕ }} -> *)
+(*      {{ Γ ⊢ rec M return A | zero -> MZ | succ -> MS end : A[Id,,M] }} ) *)
+
 
 | wf_exp_sub :
   `( {{ Γ ⊢s σ : Δ }} ->

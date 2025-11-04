@@ -183,7 +183,7 @@ Module Syntax_Notations.
   Notation "x" := x (in custom exp at level 0, x ident) : mcpts_scope.
 
   Notation "'Sort' @ s" := (a_st s) (in custom exp at level 0, s constr at level 0, format "'Sort' @ s") : mcpts_scope.
-  Notation "'ℕ'" := a_nat (in custom exp) : mcpts_scope.
+  Notation "'ℕ' r" := (a_nat r) (in custom exp at level 0, r constr at level 0) : mcpts_scope.
   Notation "'zero'" := a_zero (in custom exp at level 0) : mcpts_scope.
   Notation "'succ' e" := (a_succ e) (in custom exp at level 1, e custom exp at level 0) : mcpts_scope.
   Notation "'rec' e 'return' A | 'zero' -> ez | 'succ' -> es 'end'" := (a_natrec A ez es e) (in custom exp at level 0, A custom exp at level 60, ez custom exp at level 60, es custom exp at level 60, e custom exp at level 60) : mcpts_scope.
@@ -207,7 +207,7 @@ Module Syntax_Notations.
   Notation "x" := x (in custom nf at level 0, x ident) : mcpts_scope.
 
   Notation "'Sort' @ s" := (nf_st s) (in custom nf at level 0, s constr at level 0, format "'Sort' @ s") : mcpts_scope.
-  Notation "'ℕ'" := nf_nat (in custom nf) : mcpts_scope.
+  Notation "'ℕ' r" := (nf_nat r) (in custom nf at level 0, r constr at level 0) : mcpts_scope.
   Notation "'zero'" := nf_zero (in custom nf at level 0) : mcpts_scope.
   Notation "'succ' M" := (nf_succ M) (in custom nf at level 2, M custom nf at level 1) : mcpts_scope.
   Notation "'rec' M 'return' A | 'zero' -> MZ | 'succ' -> MS 'end'" := (ne_natrec A MZ MS M) (in custom nf at level 0, A custom nf at level 60, MZ custom nf at level 60, MS custom nf at level 60, M custom nf at level 60) : mcpts_scope.
