@@ -5,8 +5,8 @@ Import Syntax_Notations.
 
 (** ** Basic Context Properties *)
 
-Lemma ctx_lookup_lt {P : PtsSig} : forall {Γ : ctx P} {A x K},
-    {{ #x : A :: K ∈ Γ }} ->
+Lemma ctx_lookup_lt {P : PtsSig} : forall {Γ : ctx P} {A x},
+    {{ #x : A ∈ Γ }} ->
     x < length Γ.
 Proof.
   induction 1; simpl; lia.
@@ -14,39 +14,18 @@ Qed.
 #[export]
 Hint Resolve ctx_lookup_lt : mcpts.
 
-Lemma functional_ctx_lookup_typ {P : PtsSig} : forall {Γ : ctx P} {A A' x K K'},
-    {{ #x : A :: K ∈ Γ }} ->
-    {{ #x : A' :: K' ∈ Γ }} ->
+Lemma functional_ctx_lookup {P : PtsSig} : forall {Γ : ctx P} {A A' x},
+    {{ #x : A ∈ Γ }} ->
+    {{ #x : A' ∈ Γ }} ->
     A = A'.
 Proof with mautosolve.
-  intros * Hx Hx'; gen K' A'.
+  intros * Hx Hx'; gen A'.
   induction Hx as [|* ? IHHx]; intros; inversion_clear Hx';
     f_equal;
     intuition.
 Qed.
 
-Lemma functional_ctx_lookup_kd {P : PtsSig} : forall {Γ : ctx P} {A A' x K K'},
-    {{ #x : A :: K ∈ Γ }} ->
-    {{ #x : A' :: K' ∈ Γ }} ->
-    K = K'.
-Proof with mautosolve.
-  intros * Hx Hx'; gen K' A'. dependent induction Hx; intros.
-  - inversion_clear Hx'. auto. 
-  - inversion_clear Hx'; auto.
-    eapply IHHx; mauto.
-Qed.
-
-Lemma functional_ctx_lookup {P : PtsSig} : forall {Γ : ctx P} {A A' x K K'},
-    {{ #x : A :: K ∈ Γ }} ->
-    {{ #x : A' :: K' ∈ Γ }} ->
-    A = A' /\ K = K'.
-Proof with mautosolve.
-  intros; split.
-  - eapply functional_ctx_lookup_typ; mauto.
-  - eapply functional_ctx_lookup_kd; mauto.
-Qed.
-
-Lemma ctx_decomp {P : PtsSig} : forall {Γ : ctx P} {A K}, {{ ⊢ Γ, A::K }} -> {{ ⊢ Γ }} /\ {{ Γ ⊢ A : K }}.
+Lemma ctx_decomp {P : PtsSig} : forall {Γ : ctx P} {A}, {{ ⊢ Γ, A }} -> {{ ⊢ Γ }} /\ {{ Γ ⊢ A }}.
 Proof with now eauto.
   inversion 1...
 Qed.
@@ -54,12 +33,12 @@ Qed.
 #[export]
 Hint Resolve ctx_decomp : mcpts.
 
-Corollary ctx_decomp_left {P : PtsSig} : forall {Γ : ctx P} {A K}, {{ ⊢ Γ , A::K }} -> {{ ⊢ Γ }}.
+Corollary ctx_decomp_left {P : PtsSig} : forall {Γ : ctx P} {A}, {{ ⊢ Γ , A }} -> {{ ⊢ Γ }}.
 Proof with easy.
   intros * ?%ctx_decomp...
 Qed.
 
-Corollary ctx_decomp_right {P : PtsSig} : forall {Γ : ctx P} {A K}, {{ ⊢ Γ, A::K }} -> {{ Γ ⊢ A : K }}.
+Corollary ctx_decomp_right {P : PtsSig} : forall {Γ : ctx P} {A}, {{ ⊢ Γ, A }} -> {{ Γ ⊢ A }}.
 Proof with easy.
   intros * ?%ctx_decomp...
 Qed.
@@ -117,11 +96,19 @@ Qed.
 #[export]
 Hint Resolve presup_exp_ctx : mcpts.
 
+Lemma presup_typ_ctx {P} : forall {Γ : ctx P} {A}, {{ Γ ⊢ A }} -> {{ ⊢ Γ }}.
+Proof with mautosolve.
+  induction 1...
+Qed.
+
+#[export]
+Hint Resolve presup_typ_ctx : mcpts.
+
 (** and other presuppositions about context well-formedness. *)
 
 Lemma presup_sub_eq_ctx {P : PtsSig} : forall {Γ : ctx P} {Δ σ σ'}, {{ Γ ⊢s σ ≈ σ' : Δ }} -> {{ ⊢ Γ }} /\ {{ ⊢ Δ }}.
 Proof with mautosolve.
-  induction 1; destruct_pairs...
+  induction 1; split; destruct_pairs; mauto 3.
 Qed.
 
 Corollary presup_sub_eq_ctx_left {P : PtsSig} : forall {Γ : ctx P} {Δ σ σ'}, {{ Γ ⊢s σ ≈ σ' : Δ }} -> {{ ⊢ Γ }}.
@@ -138,6 +125,14 @@ Qed.
 Hint Resolve presup_sub_eq_ctx presup_sub_eq_ctx_left presup_sub_eq_ctx_right : mcpts.
 
 Lemma presup_exp_eq_ctx {P : PtsSig} : forall {Γ : ctx P} {M M' A}, {{ Γ ⊢ M ≈ M' : A }} -> {{ ⊢ Γ }}.
+Proof with mautosolve 2.
+  induction 1...
+Qed.
+
+#[export]
+Hint Resolve presup_exp_eq_ctx : mcpts.
+
+Lemma presup_typ_eq_ctx {P : PtsSig} : forall {Γ : ctx P} {A A'}, {{ Γ ⊢ A ≈ A' }} -> {{ ⊢ Γ }}.
 Proof with mautosolve 2.
   induction 1...
 Qed.
@@ -165,7 +160,11 @@ Lemma wf_sub_conv {P : PtsSig} : forall (Γ : ctx P) σ Δ Δ',
   {{ Γ ⊢s σ : Δ }} ->
   {{ ⊢ Δ ≈ Δ' }} ->
   {{ Γ ⊢s σ : Δ' }}.
-Proof. mauto. Qed.
+Proof.
+  intros.
+  assert {{ ⊢ Δ' }} by (eapply presup_ctx_eq; eassumption).
+  eapply wf_sub_conv; mauto.
+Qed.
 
 #[export]
 Hint Resolve wf_sub_conv : mcpts.
@@ -240,15 +239,29 @@ Qed.
 #[export]
 Hint Resolve exp_sub_typ : mcpts.
 
-Lemma presup_ctx_lookup_typ {P : PtsSig} : forall {Γ : ctx P} {A x K},
+Lemma eq_exp_sub_typ {P: PtsSig} : forall {Δ : ctx P} {Γ A A' σ s},
+    {{ Δ ⊢ A ≈ A' : Sort@s }} ->
+    {{ Γ ⊢s σ : Δ }} ->
+    {{ Γ ⊢ A[σ] ≈ A'[σ] : Sort@s }}.
+Proof with mautosolve 3.
+  intros.
+  econstructor; mauto 3.
+Qed.
+
+#[export]
+Hint Resolve eq_exp_sub_typ : mcpts.
+
+
+Lemma presup_ctx_lookup_typ {P : PtsSig} : forall {Γ : ctx P} {A x},
     {{ ⊢ Γ }} ->
-    {{ #x : A :: K ∈ Γ }} ->
-    {{ Γ ⊢ A : K }} /\ exists s, K = {{{ Sort@s }}}.
+    {{ #x : A ∈ Γ }} ->
+    {{ Γ ⊢ A }}.
 Proof with mautosolve 4.
   intros * HΓ.
-  induction 1; inversion_clear HΓ; split; mauto 4;
-    assert ({{ Γ ⊢ A : K }} /\ exists s, K = {{{ Sort@s }}}) by (eapply IHctx_lookup; mauto 2);
-    destruct_conjs; subst; mauto 4.
+  induction 1; inversion_clear HΓ;
+    [ mauto 4 |];
+    assert {{ Γ ⊢ A }} by (eapply IHctx_lookup; eauto);
+    econstructor...
 Qed.
 
 #[export]
@@ -286,15 +299,15 @@ Qed.
 #[export]
 Hint Resolve exp_eq_sub_cong_typ1 exp_eq_sub_cong_typ2' exp_eq_sub_compose_typ : mcpts.
 
-Lemma exp_eq_sub_compose_weaken_extend_typ {P : PtsSig} : forall {Γ : ctx P} {σ Δ A B M s},
+Lemma exp_eq_sub_compose_weaken_extend_typ {P : PtsSig} : forall {Γ : ctx P} {σ Δ A B M},
     {{ Γ ⊢s σ : Δ }} ->
     {{ Δ ⊢ A }} ->
-    {{ Δ ⊢ B : Sort@s }} ->
+    {{ Δ ⊢ B }} ->
     {{ Γ ⊢ M : B[σ] }} ->
     {{ Γ ⊢ A[Wk][σ,,M] ≈ A[σ] }}.
 Proof with mautosolve 3.
   intros.
-  assert {{ Δ, B::Sort@s ⊢s Wk : Δ }} by mauto 4.
+  assert {{ Δ, B ⊢s Wk : Δ }} by mauto 4.
   transitivity {{{ A[Wk∘(σ,,M)] }}}; [mautosolve 4 |].
   eapply exp_eq_sub_cong_typ2'...
 Qed.
@@ -302,14 +315,14 @@ Qed.
 #[export]
 Hint Resolve exp_eq_sub_compose_weaken_extend_typ : mcpts.
 
-Lemma exp_eq_sub_compose_weaken_id_extend_typ {P : PtsSig} : forall {Γ : ctx P} {A s B M},
+Lemma exp_eq_sub_compose_weaken_id_extend_typ {P : PtsSig} : forall {Γ : ctx P} {A B M},
     {{ Γ ⊢ A }} ->
-    {{ Γ ⊢ B : Sort@s }} ->
+    {{ Γ ⊢ B }} ->
     {{ Γ ⊢ M : B }} ->
     {{ Γ ⊢ A[Wk][Id,,M] ≈ A }}.
 Proof with mautosolve 4.
   intros.
-  assert {{ Γ ⊢ B[Id] : Sort@s }} by mauto 4.
+  assert {{ Γ ⊢ B[Id] }} by mauto 4.
   assert {{ Γ ⊢ B ≈ B[Id] }} by mauto 4.
   assert {{ Γ ⊢ M : B[Id] }} by (eapply wf_conv; mauto 2).
   transitivity {{{ A[Id] }}}...
@@ -318,18 +331,18 @@ Qed.
 #[export]
 Hint Resolve exp_eq_sub_compose_weaken_id_extend_typ : mcpts.
 
-Lemma exp_eq_sub_compose_double_weaken_double_extend_typ {P : PtsSig} : forall {Γ : ctx P} {σ Δ A s1 B M s2 C N},
+Lemma exp_eq_sub_compose_double_weaken_double_extend_typ {P : PtsSig} : forall {Γ : ctx P} {σ Δ A B M C N},
     {{ Γ ⊢s σ : Δ }} ->
     {{ Δ ⊢ A }} ->
-    {{ Δ ⊢ B : Sort@s1 }} ->
+    {{ Δ ⊢ B }} ->
     {{ Γ ⊢ M : B[σ] }} ->
-    {{ Δ, B::Sort@s1 ⊢ C : Sort@s2 }} ->
+    {{ Δ, B ⊢ C }} ->
     {{ Γ ⊢ N : C[σ,,M] }} ->
     {{ Γ ⊢ A[Wk∘Wk][σ,,M,,N] ≈ A[σ] }}.
 Proof with mautosolve 4.
   intros.
-  assert {{ Δ, B::Sort@s1 ⊢s Wk : Δ }} by mauto 4.
-  assert {{ Δ, B::Sort@s1, C::Sort@s2 ⊢s Wk : Δ, B::Sort@s1 }} by mauto 4.
+  assert {{ Δ, B ⊢s Wk : Δ }} by mauto 4.
+  assert {{ Δ, B, C ⊢s Wk : Δ, B }} by mauto 4.
   transitivity {{{ A[Wk][Wk][σ,,M,,N] }}}; [eapply exp_eq_sub_cong_typ1; mautosolve 3 |].
   transitivity {{{ A[Wk][σ,,M] }}}...
 Qed.
@@ -337,16 +350,16 @@ Qed.
 #[export]
 Hint Resolve exp_eq_sub_compose_double_weaken_double_extend_typ : mcpts.
 
-Lemma exp_eq_sub_compose_double_weaken_id_double_extend_typ {P : PtsSig} : forall {Γ : ctx P} {A s1 B M s2 C N},
+Lemma exp_eq_sub_compose_double_weaken_id_double_extend_typ {P : PtsSig} : forall {Γ : ctx P} {A B M C N},
     {{ Γ ⊢ A }} ->
-    {{ Γ ⊢ B : Sort@s1 }} ->
+    {{ Γ ⊢ B }} ->
     {{ Γ ⊢ M : B }} ->
-    {{ Γ, B::Sort@s1 ⊢ C : Sort@s2 }} ->
+    {{ Γ, B ⊢ C }} ->
     {{ Γ ⊢ N : C[Id,,M] }} ->
     {{ Γ ⊢ A[Wk∘Wk][Id,,M,,N] ≈ A }}.
 Proof with mautosolve 4.
   intros.
-  assert {{ Γ ⊢ B[Id] : Sort@s1 }} by mauto 4.
+  assert {{ Γ ⊢ B[Id] }} by mauto 4.
   assert {{ Γ ⊢ B ≈ B[Id] }} by mauto 4.
   assert {{ Γ ⊢ M : B[Id] }} by (eapply wf_conv; mauto 2).
   transitivity {{{ A[Id] }}}...
@@ -369,21 +382,20 @@ Hint Rewrite -> @exp_eq_sub_compose_typ @exp_eq_typ_sub_sub using mauto 4 : mcpt
 Lemma vlookup_0_typ {P : PtsSig} : forall {Γ : ctx P} {s1 s2},
     Ax P s1 s2 ->
     {{ ⊢ Γ }} ->
-    {{ Γ, Sort@s1::Sort@s2 ⊢ #0 : Sort@s1 }}.
+    {{ Γ, Sort@s1 ⊢ #0 : Sort@s1 }}.
 Proof with mautosolve 4.
   intros.
   eapply wf_conv; mauto 4.
   econstructor...
 Qed.
 
-Lemma vlookup_1_typ {P : PtsSig} : forall {Γ : ctx P} {s1 s2 A s3},
-    Ax P s1 s2 ->
-    {{ Γ, Sort@s1::Sort@s2 ⊢ A : Sort@s3 }} ->
-    {{ Γ, Sort@s1::Sort@s2, A::Sort@s3 ⊢ #1 : Sort@s1 }}.
+Lemma vlookup_1_typ {P : PtsSig} : forall {Γ : ctx P} {s1 s2 A},
+    {{ Γ, Sort@s1 ⊢ A : Sort@s2 }} ->
+    {{ Γ, Sort@s1, A ⊢ #1 : Sort@s1 }}.
 Proof with mautosolve 4.
   intros.
-  assert {{ Γ, Sort@s1::Sort@s2 ⊢s Wk : Γ }} by mauto 4.
-  assert {{ Γ, Sort@s1::Sort@s2, A::Sort@s3 ⊢s Wk : Γ, Sort@s1::Sort@s2 }} by mauto 4.
+  assert {{ Γ, Sort@s1 ⊢s Wk : Γ }} by mauto 4.
+  assert {{ Γ, Sort@s1, A ⊢s Wk : Γ, Sort@s1 }} by (econstructor; mauto 4).
   eapply wf_conv...
 Qed.
 
@@ -413,16 +425,16 @@ Proof with mautosolve 4.
   econstructor...
 Qed.
 
-Lemma exp_eq_var_1_sub_typ {P : PtsSig} : forall {Γ : ctx P} {σ Δ A s1 M s2 s3},
+Lemma exp_eq_var_1_sub_typ {P : PtsSig} : forall {Γ : ctx P} {σ Δ A s1 M s2},
     {{ Γ ⊢s σ : Δ }} ->
     {{ Δ ⊢ A : Sort@s1 }} ->
     {{ Γ ⊢ M : A[σ] }} ->
-    {{ #0 : Sort@s2[Wk] :: Sort@s3 ∈ Δ }} ->
+    {{ #0 : Sort@s2[Wk] ∈ Δ }} ->
     {{ Γ ⊢ #1[σ,,M] ≈ #0[σ] : Sort@s2 }}.
 Proof with mautosolve 4.
-  inversion 4 as [? ? Δ'|]; subst.
+  inversion 4 as [? Δ'|]; subst.
   assert {{ ⊢ Δ' }} by mauto 4.
-  assert {{ Δ', Sort@s2::Sort@s3 ⊢s Wk : Δ' }} by mauto 4.
+  assert {{ Δ', Sort@s2 ⊢s Wk : Δ' }} by mauto 4.
   eapply wf_exp_eq_conv...
 Qed.
 
@@ -431,16 +443,16 @@ Hint Resolve exp_eq_var_0_sub_typ exp_eq_var_1_sub_typ : mcpts.
 #[export]
 Hint Rewrite -> @exp_eq_var_0_sub_typ @exp_eq_var_1_sub_typ : mcpts.
 
-Lemma exp_eq_var_0_weaken_typ {P : PtsSig} : forall {Γ : ctx P} {A s1 s2 s3},
-    {{ ⊢ Γ, A::Sort@s1 }} ->
-    {{ #0 : Sort@s2[Wk]::Sort@s3 ∈ Γ }} ->
-    {{ Γ, A::Sort@s1 ⊢ #0[Wk] ≈ #1 : Sort@s2 }}.
+Lemma exp_eq_var_0_weaken_typ {P : PtsSig} : forall {Γ : ctx P} {A s},
+    {{ ⊢ Γ, A }} ->
+    {{ #0 : Sort@s[Wk] ∈ Γ }} ->
+    {{ Γ, A ⊢ #0[Wk] ≈ #1 : Sort@s }}.
 Proof with mautosolve 3.
   inversion_clear 1.
-  inversion 1 as [? ? Γ'|]; subst.
+  inversion 1 as [? Γ'|]; subst.
   assert {{ ⊢ Γ' }} by mauto.
-  assert {{ Γ', Sort@s2::Sort@s3 ⊢s Wk : Γ' }} by mauto 4.
-  assert {{ Γ', Sort@s2::Sort@s3, A::Sort@s1 ⊢s Wk : Γ', Sort@s2::Sort@s3 }} by mauto 4.
+  assert {{ Γ', Sort@s ⊢s Wk : Γ' }} by mauto 4.
+  assert {{ Γ', Sort@s, A ⊢s Wk : Γ', Sort@s }} by mauto 4.
   eapply wf_exp_eq_conv...
 Qed.
 
@@ -451,7 +463,7 @@ Lemma sub_extend_typ {P : PtsSig} : forall {Γ : ctx P} {σ Δ M s1 s2},
     Ax P s1 s2 ->
     {{ Γ ⊢s σ : Δ }} ->
     {{ Γ ⊢ M : Sort@s1 }} ->
-    {{ Γ ⊢s σ,,M : Δ, Sort@s1::Sort@s2 }}.
+    {{ Γ ⊢s σ,,M : Δ, Sort@s1 }}.
 Proof with mautosolve 4.
   intros.
   econstructor...
@@ -465,7 +477,7 @@ Lemma sub_eq_extend_cong_typ {P : PtsSig} : forall {Γ : ctx P} {σ σ' Δ M M' 
     {{ Γ ⊢s σ : Δ }} ->
     {{ Γ ⊢s σ ≈ σ' : Δ }} ->
     {{ Γ ⊢ M ≈ M' : Sort@s1 }} ->
-    {{ Γ ⊢s σ,,M ≈ σ',,M' : Δ, Sort@s1::Sort@s2 }}.
+    {{ Γ ⊢s σ,,M ≈ σ',,M' : Δ, Sort@s1 }}.
 Proof with mautosolve 4.
   intros.
   econstructor; mauto 3.
@@ -478,7 +490,7 @@ Lemma sub_eq_extend_compose_typ {P : PtsSig} : forall {Γ : ctx P} {τ Γ' σ Γ
     {{ Γ'' ⊢ A : Sort@s1 }} ->
     {{ Γ' ⊢ M : Sort@s2 }} ->
     {{ Γ ⊢s τ : Γ' }} ->
-    {{ Γ ⊢s (σ,,M)∘τ ≈ (σ∘τ),,M[τ] : Γ'', Sort@s2::Sort@s3 }}.
+    {{ Γ ⊢s (σ,,M)∘τ ≈ (σ∘τ),,M[τ] : Γ'', Sort@s2 }}.
 Proof with mautosolve 4.
   intros.
   econstructor...
@@ -491,7 +503,7 @@ Lemma sub_eq_p_extend_typ {P : PtsSig} : forall {Γ : ctx P} {σ Γ' M s1 s2},
     {{ Γ' ⊢s Wk∘(σ,,M) ≈ σ : Γ }}.
 Proof with mautosolve 4.
   intros.
-  assert {{ Γ ⊢ Sort@s1 : Sort@s2 }} by mauto.
+  assert {{ Γ ⊢ Sort@s1 : Sort@s2 }} by (econstructor; mauto).
   econstructor; mauto 3.
 Qed.
 
@@ -520,15 +532,15 @@ Hint Resolve exp_eq_sub_sub_compose_cong_typ : mcpts.
 
 (** *** Other Tedious Lemmas *)
 
-Lemma sub_eq_weaken_var0_id {P : PtsSig} : forall {Γ : ctx P} {A s},
-    {{ Γ ⊢ A : Sort@s }} ->
-    {{ Γ, A::Sort@s ⊢s Wk,,#0 ≈ Id : Γ, A::Sort@s }}.
+Lemma sub_eq_weaken_var0_id {P : PtsSig} : forall {Γ : ctx P} {A},
+    {{ Γ ⊢ A }} ->
+    {{ Γ, A ⊢s Wk,,#0 ≈ Id : Γ, A }}.
 Proof with mautosolve 4.
   intros * ?.
-  assert {{ ⊢ Γ, A::Sort@s }} by mauto 3.
-  assert {{ Γ, A::Sort@s ⊢s (Wk∘Id),,#0[Id] ≈ Id : Γ, A::Sort@s }} by mauto.
-  assert {{ Γ, A::Sort@s ⊢s Wk ≈ Wk∘Id : Γ }} by mauto.
-  enough {{ Γ, A::Sort@s ⊢ #0 ≈ #0[Id] : A[Wk] }}...
+  assert {{ ⊢ Γ, A }} by mauto 3.
+  assert {{ Γ, A ⊢s (Wk∘Id),,#0[Id] ≈ Id : Γ, A }} by mauto.
+  assert {{ Γ, A ⊢s Wk ≈ Wk∘Id : Γ }} by mauto.
+  enough {{ Γ, A ⊢ #0 ≈ #0[Id] : A[Wk] }}...
 Qed.
 
 #[export]
@@ -536,8 +548,8 @@ Hint Resolve sub_eq_weaken_var0_id : mcpts.
 #[export]
 Hint Rewrite -> @sub_eq_weaken_var0_id using mauto 4 : mcpts.
 
-Lemma exp_eq_sub_sub_compose_cong {P : PtsSig} : forall {Γ : ctx P} {Δ Δ' Ψ σ τ σ' τ' M A s},
-    {{ Ψ ⊢ A : Sort@s }} ->
+Lemma exp_eq_sub_sub_compose_cong {P : PtsSig} : forall {Γ : ctx P} {Δ Δ' Ψ σ τ σ' τ' M A},
+    {{ Ψ ⊢ A }} ->
     {{ Ψ ⊢ M : A }} ->
     {{ Δ ⊢s σ : Ψ }} ->
     {{ Δ' ⊢s σ' : Ψ }} ->
@@ -547,7 +559,7 @@ Lemma exp_eq_sub_sub_compose_cong {P : PtsSig} : forall {Γ : ctx P} {Δ Δ' Ψ 
     {{ Γ ⊢ M[σ][τ] ≈ M[σ'][τ'] : A[σ∘τ] }}.
 Proof with mautosolve 4.
   intros.
-  assert {{ Γ ⊢ A[σ∘τ] ≈ A[σ'∘τ'] : Sort@s }} by (eapply wf_exp_eq_conv; mauto).
+  assert {{ Γ ⊢ A[σ∘τ] ≈ A[σ'∘τ'] }} by mauto.
   assert {{ Γ ⊢ M[σ][τ] ≈ M[σ∘τ] : A[σ∘τ] }} by mauto.
   assert {{ Γ ⊢ M[σ∘τ] ≈ M[σ'∘τ'] : A[σ∘τ] }} by mauto.
   assert {{ Γ ⊢ M[σ'∘τ'] ≈ M[σ'][τ'] : A[σ'∘τ'] }} by mauto.
@@ -558,45 +570,25 @@ Qed.
 #[export]
 Hint Resolve exp_eq_sub_sub_compose_cong : mcpts.
 
-Lemma ctxeq_ctx_lookup {P : PtsSig} : forall {Γ : ctx P} {Δ A x s},
+Lemma ctxeq_ctx_lookup {P : PtsSig} : forall {Γ : ctx P} {Δ A x},
     {{ ⊢ Γ ≈ Δ }} ->
-    {{ #x : A :: Sort@s ∈ Γ }} ->
+    {{ #x : A ∈ Γ }} ->
     exists B,
-      {{ #x : B :: Sort@s ∈ Δ }} /\
-        {{ Γ ⊢ A ≈ B : Sort@s }} /\
-        {{ Δ ⊢ A ≈ B : Sort@s }} /\
-        {{ Δ ⊢ A : Sort@s }}.
+      {{ #x : B ∈ Δ }} /\
+        {{ Γ ⊢ A ≈ B }} /\
+        {{ Δ ⊢ A ≈ B }} /\
+        {{ Δ ⊢ A }}.
 Proof with mautosolve.
   intros * HΓΔ Hx; gen Δ.
-  induction Hx as [|* ? IHHx]; inversion_clear 1 as [|? ? ? ? ? HΓΔ'];
-    [|specialize (IHHx _ HΓΔ')]; destruct_conjs; eexists.
-  - split.
-    + econstructor; mauto.
-    + split.
-      * eapply wf_exp_eq_conv; mauto.
-      * split.
-        -- eapply wf_exp_eq_conv; mauto.
-        -- econstructor; mauto.
-  - split.
-    + econstructor; mauto.
-    + split.
-      * assert ({{ Γ ⊢ A : K }} /\ exists s', K = {{{ Sort@s' }}}) by (eapply presup_ctx_lookup_typ; mauto).
-        destruct_conjs; subst.
-        eapply wf_exp_eq_conv; mauto.
-      * split.
-        -- assert ({{ Δ0 ⊢ IHHx : K }} /\ exists s', K = {{{ Sort@s' }}}) by (eapply presup_ctx_lookup_typ; mauto).
-        destruct_conjs; subst.
-        eapply wf_exp_eq_conv; mauto.
-        -- assert ({{ Δ0 ⊢ IHHx : K }} /\ exists s', K = {{{ Sort@s' }}}) by (eapply presup_ctx_lookup_typ; mauto).
-           destruct_conjs; subst.
-           econstructor; mauto.           
+  induction Hx as [|* ? IHHx]; inversion_clear 1 as [|? ? ? ? HΓΔ'];
+    [|specialize (IHHx _ HΓΔ')]; destruct_conjs; repeat eexists...
 Qed.
 
 #[export]
 Hint Resolve ctxeq_ctx_lookup : mcpts.
 
-Lemma sub_id_on_typ {P : PtsSig} : forall {Γ : ctx P} {M A s},
-    {{ Γ ⊢ A : Sort@s }} ->
+Lemma sub_id_on_typ {P : PtsSig} : forall {Γ : ctx P} {M A},
+    {{ Γ ⊢ A }} ->
     {{ Γ ⊢ M : A }} ->
     {{ Γ ⊢ M : A[Id] }}.
 Proof with mautosolve 4.
@@ -607,10 +599,10 @@ Qed.
 #[export]
 Hint Resolve sub_id_on_typ : mcpts.
 
-Lemma sub_id_extend {P : PtsSig} : forall {Γ : ctx P} {M A s},
-    {{ Γ ⊢ A : Sort@s }} ->
+Lemma sub_id_extend {P : PtsSig} : forall {Γ : ctx P} {M A},
+    {{ Γ ⊢ A }} ->
     {{ Γ ⊢ M : A }} ->
-    {{ Γ ⊢s Id,,M : Γ, A::Sort@s }}.
+    {{ Γ ⊢s Id,,M : Γ, A }}.
 Proof with mautosolve 4.
   intros.
   econstructor...
@@ -619,8 +611,8 @@ Qed.
 #[export]
 Hint Resolve sub_id_extend : mcpts.
 
-Lemma sub_eq_id_on_typ {P : PtsSig} : forall {Γ : ctx P} {M M' A s},
-    {{ Γ ⊢ A : Sort@s }} ->
+Lemma sub_eq_id_on_typ {P : PtsSig} : forall {Γ : ctx P} {M M' A},
+    {{ Γ ⊢ A }} ->
     {{ Γ ⊢ M ≈ M' : A }} ->
     {{ Γ ⊢ M ≈ M' : A[Id] }}.
 Proof with mautosolve 4.
@@ -631,10 +623,10 @@ Qed.
 #[export]
 Hint Resolve sub_eq_id_on_typ : mcpts.
 
-Lemma sub_eq_id_extend_cong {P : PtsSig} : forall {Γ : ctx P} {M M' A s},
-    {{ Γ ⊢ A : Sort@s }} ->
+Lemma sub_eq_id_extend_cong {P : PtsSig} : forall {Γ : ctx P} {M M' A},
+    {{ Γ ⊢ A }} ->
     {{ Γ ⊢ M ≈ M' : A }} ->
-    {{ Γ ⊢s Id,,M ≈ Id,,M' : Γ, A::Sort@s }}.
+    {{ Γ ⊢s Id,,M ≈ Id,,M' : Γ, A }}.
 Proof with mautosolve 4.
   intros.
   econstructor; mauto 3.
@@ -643,8 +635,8 @@ Qed.
 #[export]
 Hint Resolve sub_eq_id_extend_cong : mcpts.
 
-Lemma sub_eq_p_id_extend {P : PtsSig} : forall {Γ : ctx P} {M A s},
-    {{ Γ ⊢ A : Sort@s }} ->
+Lemma sub_eq_p_id_extend {P : PtsSig} : forall {Γ : ctx P} {M A},
+    {{ Γ ⊢ A }} ->
     {{ Γ ⊢ M : A }} ->
     {{ Γ ⊢s Wk∘(Id,,M) ≈ Id : Γ }}.
 Proof with mautosolve 4.
@@ -657,46 +649,47 @@ Hint Resolve sub_eq_p_id_extend : mcpts.
 #[export]
 Hint Rewrite -> @sub_eq_p_id_extend using mauto 4 : mcpts.
 
-Lemma sub_q {P : PtsSig} : forall {Γ : ctx P} {A s σ Δ},
-    {{ Δ ⊢ A : Sort@s }} ->
+Lemma sub_q {P : PtsSig} : forall {Γ : ctx P} {A σ Δ},
+    {{ Δ ⊢ A }} ->
     {{ Γ ⊢s σ : Δ }} ->
-    {{ Γ, A[σ]::Sort@s ⊢s q σ : Δ, A::Sort@s }}.
+    {{ Γ, A[σ] ⊢s q σ : Δ, A }}.
 Proof with mautosolve 3.
   intros.
-  assert {{ Γ ⊢ A[σ] : Sort@s }} by mauto 4.
-  assert {{ Γ, A[σ]::Sort@s ⊢s Wk : Γ }} by mauto 4.
-  assert {{ Γ, A[σ]::Sort@s ⊢ #0 : A[σ][Wk] }} by mauto 4.
+  assert {{ Γ ⊢ A[σ] }} by mauto 4.
+  assert {{ Γ, A[σ] ⊢s Wk : Γ }} by mauto 4.
+  assert {{ Γ, A[σ] ⊢ #0 : A[σ][Wk] }} by mauto 4.
   econstructor; mauto 3.
   eapply wf_conv; mauto.
 Qed.
 
-Lemma sub_q_typ {P : PtsSig} : forall {Γ σ Δ s1 s2},
-    Ax P s1 s2 ->
+Lemma sub_q_typ {P : PtsSig} : forall {Γ : ctx P} {σ Δ s},
     {{ Γ ⊢s σ : Δ }} ->
-    {{ Γ, Sort@s1::Sort@s2 ⊢s q σ : Δ, Sort@s1::Sort@s2 }}.
+    {{ Γ, Sort@s ⊢s q σ : Δ, Sort@s }}.
 Proof with mautosolve 4.
   intros.
   assert {{ ⊢ Γ }} by mauto 3.
-  assert {{ Γ, Sort@s1::Sort@s2 ⊢s Wk : Γ }} by mauto 4.
-  assert {{ Γ, Sort@s1::Sort@s2 ⊢s σ∘Wk : Δ }} by mauto 4.
-  assert {{ Γ, Sort@s1::Sort@s2 ⊢ #0 : Sort@s1 }}...
+  assert {{ Γ, Sort@s ⊢s Wk : Γ }} by mauto 4.
+  assert {{ Γ, Sort@s ⊢s σ∘Wk : Δ }} by mauto 4.
+  assert {{ Γ, Sort@s ⊢ #0 : Sort@s }} by (econstructor; mauto 3).
+  simpl.
+  econstructor; mauto 3.
 Qed.
 
 #[export]
 Hint Resolve sub_q sub_q_typ : mcpts.
 
-Lemma sub_eq_id_extend_compose_sigma {P : PtsSig} : forall {Γ : ctx P} {M A σ Δ s},
+Lemma sub_eq_id_extend_compose_sigma {P : PtsSig} : forall {Γ : ctx P} {M A σ Δ},
     {{ Γ ⊢s σ : Δ }} ->
-    {{ Δ ⊢ A : Sort@s }} ->
+    {{ Δ ⊢ A }} ->
     {{ Δ ⊢ M : A }} ->
-    {{ Γ ⊢s (Id,,M)∘σ ≈ σ,,M[σ] : Δ, A::Sort@s }}.
+    {{ Γ ⊢s (Id,,M)∘σ ≈ σ,,M[σ] : Δ, A }}.
 Proof with mautosolve 4.
   intros.
   assert {{ Δ ⊢s Id : Δ }} by mauto.
   assert {{ Δ ⊢ M : A[Id] }} by mauto.
-  assert {{ Γ ⊢s (Id,,M)∘σ ≈ (Id∘σ),,M[σ] : Δ, A::Sort@s }} by mauto 3.
+  assert {{ Γ ⊢s (Id,,M)∘σ ≈ (Id∘σ),,M[σ] : Δ, A }} by mauto 3.
   assert {{ Γ ⊢ M[σ] : A[Id][σ] }} by mauto.
-  assert {{ Γ ⊢ A[Id][σ] ≈ A[Id∘σ] : Sort@s }} by (eapply wf_exp_eq_conv; mauto).
+  assert {{ Γ ⊢ A[Id][σ] ≈ A[Id∘σ] }} by mauto.
   assert {{ Γ ⊢ M[σ] : A[Id∘σ] }} by (eapply wf_conv; mauto 4).
   enough {{ Γ ⊢ M[σ] ≈ M[σ] : A[Id∘σ] }}...
 Qed.
@@ -704,14 +697,14 @@ Qed.
 #[export]
 Hint Resolve sub_eq_id_extend_compose_sigma : mcpts.
 
-Lemma sub_eq_sigma_compose_weak_id_extend {P : PtsSig} : forall {Γ : ctx P} {M A s σ Δ},
-    {{ Γ ⊢ A : Sort@s }} ->
+Lemma sub_eq_sigma_compose_weak_id_extend {P : PtsSig} : forall {Γ : ctx P} {M A σ Δ},
+    {{ Γ ⊢ A }} ->
     {{ Γ ⊢s σ : Δ }} ->
     {{ Γ ⊢ M : A }} ->
     {{ Γ ⊢s (σ∘Wk)∘(Id,,M) ≈ σ : Δ }}.
 Proof with mautosolve.
   intros.
-  assert {{ Γ ⊢s Id,,M : Γ, A::Sort@s }} by mauto.
+  assert {{ Γ ⊢s Id,,M : Γ, A }} by mauto.
   assert {{ Γ ⊢s (σ∘Wk)∘(Id,,M) ≈ σ∘(Wk∘(Id,,M)) : Δ }} by mauto 4.
   assert {{ Γ ⊢s Wk∘(Id,,M) ≈ Id : Γ }} by mauto.
   enough {{ Γ ⊢s σ∘(Wk∘ (Id,,M)) ≈ σ∘Id : Δ }} by mauto.
@@ -721,27 +714,27 @@ Qed.
 #[export]
 Hint Resolve sub_eq_sigma_compose_weak_id_extend : mcpts.
 
-Lemma sub_eq_q_sigma_id_extend {P : PtsSig} : forall {Γ : ctx P} {M A s σ Δ},
-    {{ Δ ⊢ A : Sort@s }} ->
+Lemma sub_eq_q_sigma_id_extend {P : PtsSig} : forall {Γ : ctx P} {M A σ Δ},
+    {{ Δ ⊢ A }} ->
     {{ Γ ⊢s σ : Δ }} ->
     {{ Γ ⊢ M : A[σ] }} ->
-    {{ Γ ⊢s q σ∘(Id,,M) ≈ σ,,M : Δ, A::Sort@s }}.
+    {{ Γ ⊢s q σ∘(Id,,M) ≈ σ,,M : Δ, A }}.
 Proof with mautosolve 4.
   intros.
   assert {{ ⊢ Γ }} by mauto 3.
-  assert {{ Γ ⊢ A[σ] : Sort@s }} by mauto.
+  assert {{ Γ ⊢ A[σ] }} by mauto.
   assert {{ Γ ⊢ M : A[σ] }} by mauto.
-  assert {{ Γ ⊢s Id,,M : Γ, A[σ]::Sort@s }} by mauto.
-  assert {{ Γ, A[σ]::Sort@s ⊢s Wk : Γ }} by mauto.
-  assert {{ Γ, A[σ]::Sort@s ⊢ #0 : A[σ][Wk] }} by mauto.
-  assert {{ Γ, A[σ]::Sort@s ⊢ #0 : A[σ∘Wk] }} by (eapply wf_conv; mauto 4).
-  assert {{ Γ ⊢s q σ∘(Id,,M) ≈ ((σ∘Wk)∘(Id,,M)),,#0[Id,,M] : Δ, A::Sort@s }} by mauto.
+  assert {{ Γ ⊢s Id,,M : Γ, A[σ] }} by mauto.
+  assert {{ Γ, A[σ] ⊢s Wk : Γ }} by mauto 3.
+  assert {{ Γ, A[σ] ⊢ #0 : A[σ][Wk] }} by mauto 3.
+  assert {{ Γ, A[σ] ⊢ #0 : A[σ∘Wk] }} by (eapply wf_conv; mauto 4).
+  assert {{ Γ ⊢s q σ∘(Id,,M) ≈ ((σ∘Wk)∘(Id,,M)),,#0[Id,,M] : Δ, A }} by mauto.
   assert {{ Γ ⊢s (σ∘Wk)∘(Id,,M) ≈ σ : Δ }} by mauto.
   assert {{ Γ ⊢ M : A[σ][Id] }} by mauto 4.
   assert {{ Γ ⊢ #0[Id,,M] ≈ M : A[σ][Id] }} by mauto 3.
   assert {{ Γ ⊢ #0[Id,,M] ≈ M : A[σ] }} by mauto.
   enough {{ Γ ⊢ #0[Id,,M] ≈ M : A[(σ∘Wk)∘(Id,,M)] }} by mauto.
-  eapply wf_exp_eq_conv; mauto.
+  eapply wf_exp_eq_conv; mauto 4. 
 Qed.
 
 #[export]
@@ -749,15 +742,47 @@ Hint Resolve sub_eq_q_sigma_id_extend : mcpts.
 #[export]
 Hint Rewrite -> @sub_eq_q_sigma_id_extend using mauto 4 : mcpts.
 
-Lemma sub_eq_p_q_sigma {P : PtsSig} : forall {Γ : ctx P} {A s σ Δ},
-    {{ Δ ⊢ A : Sort@s }} ->
+
+Lemma sub_eq_q_sigma_sigma0_extend {P} : forall {Γ1 Γ2 Γ3 : ctx P} {A σ σ0 M},
+    {{ Γ3 ⊢ A }} ->
+    {{ Γ2 ⊢s σ : Γ3 }} ->
+    {{ Γ1 ⊢s σ0 : Γ2 }} ->
+    {{ Γ1 ⊢ M : A[σ][σ0] }} ->
+    {{ Γ1 ⊢s (q σ)∘(σ0,,M) ≈ (σ∘σ0),,M : Γ3, A }}.
+Proof.
+  intros.
+  assert {{ Γ2, A[σ] ⊢s σ ∘ Wk : Γ3 }} by mauto.
+  assert {{ Γ2, A[σ] ⊢ #0 : A[σ][Wk] }} by mauto 3.
+  assert {{ Γ2, A[σ] ⊢ A[σ][Wk] ≈ A[σ∘Wk] }} by mauto.
+  assert {{ Γ2, A[σ] ⊢ #0 : A[σ∘Wk] }} by mauto 4.
+  assert {{ Γ1 ⊢s (q σ) ∘ (σ0,,M) ≈ ((σ∘Wk)∘(σ0,,M)),,#0[σ0,,M] : Γ3, A }} by mauto 4.
+  assert {{ Γ1 ⊢s (σ∘Wk)∘(σ0,,M) ≈ σ∘(Wk∘(σ0,,M)) : Γ3 }} by (econstructor; mauto 3).
+  assert {{ Γ1 ⊢s σ∘(Wk∘(σ0,,M)) ≈ σ∘σ0 : Γ3 }} by mauto.
+  assert {{ Γ1 ⊢s (σ ∘ Wk) ∘ (σ0,,M) ≈ σ∘σ0 : Γ3 }} by (etransitivity; mauto).
+  assert {{ Γ1 ⊢ #0[σ0,,M] ≈ M : A[σ][σ0] }} by mauto.
+  assert {{ Γ1 ⊢ A[σ][σ0] ≈ A[(σ∘Wk)∘(σ0,,M)] }} by (econstructor; mauto).
+  assert {{ Γ1 ⊢s (σ∘Wk)∘(σ0,,M),,#0[σ0,,M] ≈ σ∘σ0,,M : Γ3, A }}.
+  {
+    eapply wf_sub_eq_extend_cong; mauto 2.
+    eapply wf_exp_eq_conv with (A := {{{ A[σ][σ0] }}}); mauto.
+  }
+  do 2 etransitivity; mauto.
+Qed.
+
+#[export]
+Hint Resolve sub_eq_q_sigma_sigma0_extend : mcpts.
+#[export]
+Hint Rewrite -> @sub_eq_q_sigma_sigma0_extend using mauto 4 : mcpts.
+
+Lemma sub_eq_p_q_sigma {P : PtsSig} : forall {Γ : ctx P} {A σ Δ},
+    {{ Δ ⊢ A }} ->
     {{ Γ ⊢s σ : Δ }} ->
-    {{ Γ, A[σ]::Sort@s ⊢s Wk∘q σ ≈ σ∘Wk : Δ }}.
+    {{ Γ, A[σ] ⊢s Wk∘q σ ≈ σ∘Wk : Δ }}.
 Proof with mautosolve 3.
   intros.
-  assert {{ Γ, A[σ]::Sort@s ⊢s Wk : Γ }} by mauto 4.
-  assert {{ Γ, A[σ]::Sort@s ⊢ #0 : A[σ][Wk] }} by mauto 3.
-  enough {{ Γ, A[σ]::Sort@s ⊢ #0 : A[σ∘Wk] }} by mauto.
+  assert {{ Γ, A[σ] ⊢s Wk : Γ }} by mauto 4.
+  assert {{ Γ, A[σ] ⊢ #0 : A[σ][Wk] }} by mauto 3.
+  enough {{ Γ, A[σ] ⊢ #0 : A[σ∘Wk] }} by mauto.
   eapply wf_conv; mauto.
 Qed.
 
@@ -785,38 +810,37 @@ Proof. mauto. Qed.
 #[export]
 Hint Resolve wf_typ_eq_sub : mcpts.
 
-Lemma wf_subtyp_univ_weaken {P : PtsSig} : forall {Γ : ctx P} {s1 s2 A},
-    {{ Γ ⊢ Sort@s1 ≈ Sort@s1 }} ->
-    {{ ⊢ Γ, A::Sort@s2 }} ->
-    {{ Γ, A::Sort@s2 ⊢ Sort@s1 ≈ Sort@s1 }}.
+Lemma wf_subtyp_univ_weaken {P : PtsSig} : forall {Γ : ctx P} {s A},
+    {{ Γ ⊢ Sort@s ≈ Sort@s }} ->
+    {{ ⊢ Γ, A }} ->
+    {{ Γ, A ⊢ Sort@s ≈ Sort@s }}.
 Proof. mauto. Qed.
 
-Lemma var_compose_subs {P : PtsSig} : forall {Γ : ctx P} {τ Δ σ Ψ s A x},
-    {{ Ψ ⊢ A : Sort@s }} ->
+Lemma var_compose_subs {P : PtsSig} : forall {Γ : ctx P} {τ Δ σ Ψ A x},
+    {{ Ψ ⊢ A }} ->
     {{ Δ ⊢s σ : Ψ }} ->
     {{ Γ ⊢s τ : Δ }} ->
-    {{ #x : A[σ][τ] :: Sort@s ∈ Γ }} ->
+    {{ #x : A[σ][τ] ∈ Γ }} ->
     {{ Γ ⊢ #x : A[σ∘τ] }}.
 Proof.
   intros.
   eapply wf_conv; mauto 3.
-  econstructor; mauto.
 Qed.
 
 #[export]
 Hint Resolve var_compose_subs : mcpts.
 
-Lemma sub_lookup_var0 {P : PtsSig} : forall (Δ : ctx P) Γ σ M1 M2 B s,
+Lemma sub_lookup_var0 {P : PtsSig} : forall (Δ : ctx P) Γ σ M1 M2 B,
     {{ Δ ⊢s σ : Γ }} ->
-    {{ Γ ⊢ B : Sort@s }} ->
+    {{ Γ ⊢ B }} ->
     {{ Δ ⊢ M1 : B[σ] }} ->
     {{ Δ ⊢ M2 : B[σ] }} ->
     {{ Δ ⊢ #0[σ,,M1,,M2] ≈ M2 : B[σ] }}.
 Proof.
   intros.
-  assert {{ Γ, B::Sort@s ⊢ B[Wk] : Sort@s }} by mauto.
-  assert {{ Δ ⊢s σ,,M1 : Γ, B::Sort@s }} by mauto 4.
-  assert {{ Δ ⊢ B[Wk][σ,,M1] : Sort@s }} by mauto 4.
+  assert {{ Γ, B ⊢ B[Wk] }} by mauto.
+  assert {{ Δ ⊢s σ,,M1 : Γ, B }} by mauto 4.
+  assert {{ Δ ⊢ B[Wk][σ,,M1] }} by mauto 4.
   assert {{ Δ ⊢ B[Wk][σ,,M1] ≈ B[σ] }}.
   {
     transitivity {{{ B[Wk∘(σ,,M1)] }}}.
@@ -828,8 +852,8 @@ Proof.
     mauto 4.
 Qed.
 
-Lemma id_sub_lookup_var0 {P : PtsSig} : forall (Γ : ctx P) M1 M2 B s,
-    {{ Γ ⊢ B : Sort@s }} ->
+Lemma id_sub_lookup_var0 {P : PtsSig} : forall (Γ : ctx P) M1 M2 B,
+    {{ Γ ⊢ B }} ->
     {{ Γ ⊢ M1 : B }} ->
     {{ Γ ⊢ M2 : B }} ->
     {{ Γ ⊢ #0[Id,,M1,,M2] ≈ M2 : B }}.
@@ -840,17 +864,17 @@ Proof.
     mauto 3.
 Qed.
 
-Lemma sub_lookup_var1 {P : PtsSig} : forall (Δ : ctx P) Γ σ M1 M2 B s,
+Lemma sub_lookup_var1 {P : PtsSig} : forall (Δ : ctx P) Γ σ M1 M2 B,
     {{ Δ ⊢s σ : Γ }} ->
-    {{ Γ ⊢ B : Sort@s }} ->
+    {{ Γ ⊢ B }} ->
     {{ Δ ⊢ M1 : B[σ] }} ->
     {{ Δ ⊢ M2 : B[σ] }} ->
     {{ Δ ⊢ #1[σ,,M1,,M2] ≈ M1 : B[σ] }}.
 Proof.
   intros.
-  assert {{ Γ, B::Sort@s ⊢ B[Wk] : Sort@s }} by mauto.
-  assert {{ Δ ⊢s σ,,M1 : Γ, B::Sort@s }} by mauto 4.
-  assert {{ Δ ⊢ B[Wk][σ,,M1] : Sort@s }} by mauto 4.
+  assert {{ Γ, B ⊢ B[Wk] }} by mauto.
+  assert {{ Δ ⊢s σ,,M1 : Γ, B }} by mauto 4.
+  assert {{ Δ ⊢ B[Wk][σ,,M1] }} by mauto 4.
   assert {{ Δ ⊢ B[Wk][σ,,M1] ≈ B[σ] }}.
   {
     transitivity {{{ B[Wk∘(σ,,M1)] }}}.
@@ -866,8 +890,8 @@ Proof.
     mauto.
 Qed.
 
-Lemma id_sub_lookup_var1 {P : PtsSig} : forall (Γ : ctx P) M1 M2 B s,
-    {{ Γ ⊢ B : Sort@s }} ->
+Lemma id_sub_lookup_var1 {P : PtsSig} : forall (Γ : ctx P) M1 M2 B,
+    {{ Γ ⊢ B }} ->
     {{ Γ ⊢ M1 : B }} ->
     {{ Γ ⊢ M2 : B }} ->
     {{ Γ ⊢ #1[Id,,M1,,M2] ≈ M1 : B }}.
@@ -878,41 +902,41 @@ Proof.
     mauto 3.
 Qed.
 
-Lemma exp_eq_var_1_sub_q_sigma {P : PtsSig} : forall {Γ : ctx P} {A s1 B s2 σ Δ},
-    {{ Δ ⊢ B : Sort@s1 }} ->
-    {{ Δ, B::Sort@s1 ⊢ A : Sort@s2 }} ->
+Lemma exp_eq_var_1_sub_q_sigma {P : PtsSig} : forall {Γ : ctx P} {A B σ Δ},
+    {{ Δ ⊢ B }} ->
+    {{ Δ, B ⊢ A }} ->
     {{ Γ ⊢s σ : Δ }} ->
-    {{ Γ, B[σ]::Sort@s1, A[q σ]::Sort@s2 ⊢ #1[q (q σ)] ≈ #1 : B[σ][Wk∘Wk] }}.
+    {{ Γ, B[σ], A[q σ] ⊢ #1[q (q σ)] ≈ #1 : B[σ][Wk∘Wk] }}.
 Proof with mautosolve 4.
   intros.
   assert {{ ⊢ Δ }} by mauto 2.
-  assert {{ Γ, B[σ]::Sort@s1 ⊢s q σ : Δ, B::Sort@s1 }} by mauto 2.
-  assert {{ ⊢ Γ, B[σ]::Sort@s1 }} by mauto 3.
-  assert {{ ⊢ Γ, B[σ]::Sort@s1, A[q σ]::Sort@s2 }} by mauto 3.
-  assert {{ Δ, B::Sort@s1 ⊢ B[Wk] : Sort@s1 }} by mauto 4.
-  assert {{ Δ, B::Sort@s1 ⊢ #0 : B[Wk] }} by mauto 3.
-  assert {{ Γ, B[σ]::Sort@s1, A[q σ]::Sort@s2 ⊢ #0 : A[q σ][Wk] }} by mauto 2.
-  assert {{ Γ, B[σ]::Sort@s1, A[q σ]::Sort@s2 ⊢ A[q σ∘Wk] ≈ A[q σ][Wk] : Sort@s2 }} by (eapply wf_exp_eq_conv; mauto 4).
-  assert {{ Γ, B[σ]::Sort@s1, A[q σ]::Sort@s2 ⊢s q σ∘Wk : Δ, B::Sort@s1 }} by mauto 3.
-  assert {{ Γ, B[σ]::Sort@s1, A[q σ]::Sort@s2 ⊢ #0 : A[q σ∘Wk] }} by mauto 3.
-  assert {{ Γ ⊢ B[σ] : Sort@s1 }} by mauto 2.
-  assert {{ Γ, B[σ]::Sort@s1 ⊢s Wk : Γ }} by mauto 2.
-  assert {{ Γ, B[σ]::Sort@s1, A[q σ]::Sort@s2 ⊢s Wk : Γ, B[σ]::Sort@s1 }} by mauto 2.
-  assert {{ Γ, B[σ]::Sort@s1 ⊢ B[σ][Wk] : Sort@s1 }} by mauto 2.
-  assert {{ Γ, B[σ]::Sort@s1, A[q σ]::Sort@s2 ⊢ B[σ][Wk][Wk] : Sort@s1 }} by mauto 2.
-  assert {{ Γ, B[σ]::Sort@s1 ⊢ B[Wk][q σ] ≈ B[σ][Wk] }} by (eapply exp_eq_sub_sub_compose_cong_typ; mauto 3).  
-  assert {{ Γ, B[σ]::Sort@s1 ,A[q σ]::Sort@s2 ⊢ B[Wk][q σ∘Wk] ≈ B[σ][Wk][Wk] }} by (transitivity {{{ B[Wk][q σ][Wk] }}}; mauto 3).
-  assert {{ Γ, B[σ]::Sort@s1, A[q σ]::Sort@s2 ⊢ #1[q (q σ)] ≈ #0[q σ∘Wk] : B[σ][Wk][Wk] }} by mauto 4.
-  assert {{ Γ, B[σ]::Sort@s1, A[q σ]::Sort@s2 ⊢ #0[q σ∘Wk] ≈ #0[q σ][Wk] : B[σ][Wk][Wk] }} by mauto 4. 
-  assert {{ Γ, B[σ]::Sort@s1 ⊢s σ∘Wk : Δ }} by mauto 2.
-  assert {{ Γ, B[σ]::Sort@s1 ⊢ #0 : B[σ∘Wk] }} by mauto 2.
-  assert {{ Γ, B[σ]::Sort@s1 ⊢ #0[q σ] ≈ #0 : B[σ∘Wk] }} by mauto 2.
-  assert {{ Γ, B[σ]::Sort@s1, A[q σ]::Sort@s2 ⊢ #0[q σ][Wk] ≈ #0[Wk] : B[σ∘Wk][Wk] }} by mauto 3.
-  assert {{ Γ, B[σ]::Sort@s1, A[q σ]::Sort@s2 ⊢ B[σ∘Wk][Wk] ≈ B[σ][Wk][Wk] }} by mauto 4.
-  assert {{ Γ, B[σ]::Sort@s1, A[q σ]::Sort@s2 ⊢ #0[q σ][Wk] ≈ #0[Wk] : B[σ][Wk][Wk] }} by mauto 3.
-  assert {{ Γ, B[σ]::Sort@s1, A[q σ]::Sort@s2 ⊢ #1[q (q σ)] ≈ #1 : B[σ][Wk][Wk] }} by (do 2 etransitivity; mauto 2).
-  assert {{ Γ, B[σ]::Sort@s1, A[q σ]::Sort@s2 ⊢s Wk∘Wk : Γ }} by mauto 2.
-  assert {{ Γ, B[σ]::Sort@s1, A[q σ]::Sort@s2 ⊢ B[σ][Wk∘Wk] : Sort@s1 }} by mauto 2.
+  assert {{ Γ, B[σ] ⊢s q σ : Δ, B }} by mauto 2.
+  assert {{ ⊢ Γ, B[σ] }} by mauto 3.
+  assert {{ ⊢ Γ, B[σ], A[q σ] }} by mauto 3.
+  assert {{ Δ, B ⊢ B[Wk] }} by mauto 4.
+  assert {{ Δ, B ⊢ #0 : B[Wk] }} by mauto 3.
+  assert {{ Γ, B[σ], A[q σ] ⊢ #0 : A[q σ][Wk] }} by mauto 2.
+  assert {{ Γ, B[σ], A[q σ] ⊢ A[q σ∘Wk] ≈ A[q σ][Wk] }} by mauto 4.
+  assert {{ Γ, B[σ], A[q σ] ⊢s q σ∘Wk : Δ, B }} by mauto 3.
+  assert {{ Γ, B[σ], A[q σ] ⊢ #0 : A[q σ∘Wk] }} by mauto 4.
+  assert {{ Γ ⊢ B[σ] }} by mauto 2.
+  assert {{ Γ, B[σ] ⊢s Wk : Γ }} by mauto 2.
+  assert {{ Γ, B[σ], A[q σ] ⊢s Wk : Γ, B[σ] }} by mauto 2.
+  assert {{ Γ, B[σ] ⊢ B[σ][Wk] }} by mauto 2.
+  assert {{ Γ, B[σ], A[q σ] ⊢ B[σ][Wk][Wk] }} by mauto 2.
+  assert {{ Γ, B[σ] ⊢ B[Wk][q σ] ≈ B[σ][Wk] }} by (eapply exp_eq_sub_sub_compose_cong_typ; mauto 3).  
+  assert {{ Γ, B[σ] ,A[q σ] ⊢ B[Wk][q σ∘Wk] ≈ B[σ][Wk][Wk] }} by (transitivity {{{ B[Wk][q σ][Wk] }}}; mauto 3).
+  assert {{ Γ, B[σ], A[q σ] ⊢ #1[q (q σ)] ≈ #0[q σ∘Wk] : B[σ][Wk][Wk] }} by mauto 4.
+  assert {{ Γ, B[σ], A[q σ] ⊢ #0[q σ∘Wk] ≈ #0[q σ][Wk] : B[σ][Wk][Wk] }} by mauto 4. 
+  assert {{ Γ, B[σ] ⊢s σ∘Wk : Δ }} by mauto 2.
+  assert {{ Γ, B[σ] ⊢ #0 : B[σ∘Wk] }} by (eapply wf_conv; mauto 4).
+  assert {{ Γ, B[σ] ⊢ #0[q σ] ≈ #0 : B[σ∘Wk] }} by mauto 2.
+  assert {{ Γ, B[σ], A[q σ] ⊢ #0[q σ][Wk] ≈ #0[Wk] : B[σ∘Wk][Wk] }} by mauto 3.
+  assert {{ Γ, B[σ], A[q σ] ⊢ B[σ∘Wk][Wk] ≈ B[σ][Wk][Wk] }} by mauto 4.
+  assert {{ Γ, B[σ], A[q σ] ⊢ #0[q σ][Wk] ≈ #0[Wk] : B[σ][Wk][Wk] }} by mauto 3.
+  assert {{ Γ, B[σ], A[q σ] ⊢ #1[q (q σ)] ≈ #1 : B[σ][Wk][Wk] }} by (do 2 etransitivity; mauto 2).
+  assert {{ Γ, B[σ], A[q σ] ⊢s Wk∘Wk : Γ }} by mauto 2.
+  assert {{ Γ, B[σ], A[q σ] ⊢ B[σ][Wk∘Wk] }} by mauto 2.
   eapply wf_exp_eq_conv; mauto 3.
 Qed.
 
@@ -923,10 +947,7 @@ Lemma presup_exp_typ {P : PtsSig} : forall {Γ : ctx P} {M A},
     {{ Γ ⊢ A }}.
 Proof.
   induction 1; assert {{ ⊢ Γ }} by mauto 3; destruct_conjs; mauto 3.
-
-  - enough {{ Γ ⊢s Id,,N : Γ, A::Sort@s1 }}; mauto 3.
-  - assert ({{ Γ ⊢ A : Sort@s }} /\ exists s', {{{ Sort@s }}} = {{{ Sort@s' }}}) by mauto 2.
-    destruct_conjs; mauto.
+  enough {{ Γ ⊢s Id,,N : Γ, A }}; mauto 3.
 Qed.
 
 Lemma presup_exp {P : PtsSig} : forall {Γ : ctx P} {M A},
@@ -941,7 +962,10 @@ Lemma presup_typ {P : PtsSig} : forall {Γ : ctx P} {A},
     {{ ⊢ Γ }}.
 Proof.
   intros *.
-  inversion_clear 1; mauto.
+  inversion_clear 1.
+  - eassumption.
+  - eapply presup_exp; mauto 2.
+  - eapply presup_sub; mauto 3.
 Qed.
 
 
@@ -959,3 +983,5 @@ Proof.
 Qed.
 #[export]
 Hint Resolve no_closed_neutral : mcpts.
+
+

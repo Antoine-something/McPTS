@@ -27,7 +27,7 @@ Section completeness_fundamental.
     apply syntactic_wf_mut_ind;
       mauto 3.
     intros.
-    eapply valid_exp_unsorted_var;
+    eapply valid_exp_var;
       mauto.
   Qed.
 

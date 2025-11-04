@@ -50,6 +50,15 @@ Ltac destruct_rel_typ :=
         dependent destruction H
     end;
   unmark_all.
+Ltac destruct_rel_typ_unsorted :=
+  repeat
+    match goal with
+    | H : (forall c c' (equiv_c_c' : {{ Dom c ≈ c' ∈ ?in_rel }}), rel_typ_unsorted _ _ _ _ _ _) |- _ =>
+        destruct_rel_by_assumption in_rel H; mark H
+    | H : rel_typ_unsorted _ _ _ _ _ _ |- _ =>
+        dependent destruction H
+    end;
+  unmark_all.
 
 (** Sort/Element PER Helper Tactics *)
 

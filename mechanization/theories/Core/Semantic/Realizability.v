@@ -106,33 +106,6 @@ Qed.
 #[export]
 Hint Resolve per_elem_then_per_top : mcpts.
 
-Lemma per_ctx_then_per_env_initial_env {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ Γ' env_rel},
-    {{ EF Γ ≈ Γ' ∈ per_ctx_env pred_P ↘ env_rel }} ->
-    exists ρ ρ', initial_env Γ ρ /\ initial_env Γ' ρ' /\ {{ Dom ρ ≈ ρ' ∈ env_rel }}.
-Proof.
-  induction 1.
-  - do 2 eexists; intuition.
-  - destruct_conjs.
-    (on_all_hyp: destruct_rel_by_assumption tail_rel).
-    do 2 eexists; repeat split; only 1-2: econstructor; eauto.
-    apply_relation_equivalence.
-    eexists.
-    econstructor; mauto.
-    econstructor; mauto.
-    eapply per_bot_then_per_elem; eauto.
-    erewrite per_ctx_respects_length; mauto.
-    eexists; eauto.
-Qed.
-
-Lemma var_per_elem {P : PtsSig} {pred_P : PredicativeSig P} : forall {a b s R} n,
-    {{ DF a ≈ b ∈ per_sort_elem pred_P s ↘ R }} ->
-    {{ Dom ⇑! a n ≈ ⇑! b n ∈ R }}.
-Proof.
-  intros.
-  eapply per_bot_then_per_elem; mauto.
-Qed.
-
-
 
 (* Realizability for per_typ_elem *)
 Lemma realize_per_typ_elem_gen {P : PtsSig} {pred_P : PredicativeSig P} : forall {a a' R},
@@ -193,3 +166,34 @@ Qed.
 
 #[export]
 Hint Resolve per_typ_elem_then_per_top : mcpts.
+
+Lemma per_ctx_then_per_env_initial_env {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ Γ' env_rel},
+    {{ EF Γ ≈ Γ' ∈ per_ctx_env pred_P ↘ env_rel }} ->
+    exists ρ ρ', initial_env Γ ρ /\ initial_env Γ' ρ' /\ {{ Dom ρ ≈ ρ' ∈ env_rel }}.
+Proof.
+  induction 1.
+  - do 2 eexists; intuition.
+  - destruct_conjs.
+    (on_all_hyp: destruct_rel_by_assumption tail_rel).
+    do 2 eexists; repeat split; only 1-2: econstructor; eauto.
+    apply_relation_equivalence.
+    (* eexists. *)
+    
+    econstructor; mauto;[ econstructor; mauto | econstructor; mauto |].
+    
+    eapply per_bot_then_per_typ_elem; eauto.
+    erewrite per_ctx_respects_length; mauto.
+    eexists; eauto.
+Qed.
+
+Lemma var_per_elem {P : PtsSig} {pred_P : PredicativeSig P} : forall {a b s R} n,
+    {{ DF a ≈ b ∈ per_sort_elem pred_P s ↘ R }} ->
+    {{ Dom ⇑! a n ≈ ⇑! b n ∈ R }}.
+Proof.
+  intros.
+  eapply per_bot_then_per_elem; mauto.
+Qed.
+
+
+
+

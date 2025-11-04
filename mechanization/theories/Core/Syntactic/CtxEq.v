@@ -6,7 +6,8 @@ Import Syntax_Notations.
 
 Lemma ctx_eq_refl {P : PtsSig} : forall {Γ : ctx P}, {{ ⊢ Γ }} -> {{ ⊢ Γ ≈ Γ }}.
 Proof with mautosolve.
-  induction 1...
+  induction 1; mauto 2.
+  econstructor; mauto 2.
 Qed.
 
 #[export]
@@ -21,7 +22,6 @@ Qed.
 
 #[export]
 Hint Resolve ctx_eq_sym : mcpts.
-
 
 #[local]
 Ltac gen_ctxeq_helper_IH ctxeq_exp_helper ctxeq_exp_eq_helper ctxeq_typ_helper ctxeq_typ_eq_helper ctxeq_sub_helper ctxeq_sub_eq_helper H :=
@@ -55,10 +55,15 @@ Proof with mautosolve.
 
   (** Exp well-formedness cases *)
   (** Π and λ cases *)
-  1,2,3: assert {{ Δ ⊢ B : Sort@s1 }} by mauto; econstructor; mauto.
+  1,2,3:
+    assert {{ Δ ⊢ B : Sort@s1 }} by mauto;
+    assert {{ ⊢ Δ, B ≈ Γ, B }} by (econstructor; mauto 3);
+    assert {{ Δ, B ⊢ C : Sort@s2 }} by mauto;
+    econstructor; mauto.
+    
   
   (** Variable case *)
-  - assert (exists B, {{ #x : B :: Sort@s ∈ Δ }} /\ {{ Γ ⊢ A ≈ B : Sort@s }} /\ {{ Δ ⊢ A ≈ B : Sort@s }} /\ {{ Δ ⊢ A : Sort@s }}) by mauto.
+  - assert (exists B, {{ #x : B ∈ Δ }} /\ {{ Γ ⊢ A ≈ B }} /\ {{ Δ ⊢ A ≈ B }} /\ {{ Δ ⊢ A }}) by mauto.
     destruct_conjs.
     eapply wf_exp_conv; mauto 3.
 
@@ -72,47 +77,52 @@ Proof with mautosolve.
   (** Π congruence case *)
   - assert {{ Δ ⊢ B : Sort@s1 }} by mauto.
     assert {{ Δ ⊢ B ≈ B' : Sort@s1 }} by mauto.
-    assert {{ Δ, B::Sort@s1 ⊢ C ≈ C' : Sort@s2 }} by mauto.
+    assert {{ ⊢ Δ, B ≈ Γ, B }} by (econstructor; mauto 3).
+    assert {{ Δ, B ⊢ C ≈ C' : Sort@s2 }} by mauto.
     mauto 2.
 
   (** λ congruence case *)
   - assert {{ Δ ⊢ B : Sort@s1 }} by mauto.
     assert {{ Δ ⊢ B ≈ B' : Sort@s1 }} by mauto.
-    assert {{ Δ, B::Sort@s1 ⊢ C : Sort@s2 }} by mauto.
-    assert {{ Δ, B::Sort@s1 ⊢ M0 ≈ M'0 : C }} by mauto.
+    assert {{ ⊢ Δ, B ≈ Γ, B }} by (econstructor; mauto 3).
+    assert {{ Δ, B ⊢ C : Sort@s2 }} by mauto.
+    assert {{ Δ, B ⊢ M0 ≈ M'0 : C }} by mauto.
     mauto 2.
     
   (** Function application congruence case *)
   - assert {{ Δ ⊢ N ≈ N' : B }} by mauto.
     assert {{ Δ ⊢ M0 ≈ M'0 : Π r B C }} by mauto.
     assert {{ Δ ⊢ B : Sort@s1 }} by mauto.
-    assert {{ Δ, B::Sort@s1 ⊢ C : Sort@s2 }} by mauto.
+    assert {{ ⊢ Δ, B ≈ Γ, B }} by (econstructor; mauto 3).
+    assert {{ Δ, B ⊢ C : Sort@s2 }} by mauto.
     mauto 2.
     
   (** β case *)
   - assert {{ Δ ⊢ B : Sort@s1 }} by mauto.
-    assert {{ Δ, B::Sort@s1 ⊢ C : Sort@s2 }} by mauto.
-    assert {{ Δ, B::Sort@s1 ⊢ M0 : C }} by mauto.
+    assert {{ ⊢ Δ, B ≈ Γ, B }} by (econstructor; mauto 3).
+    assert {{ Δ, B ⊢ C : Sort@s2 }} by mauto.
+    assert {{ Δ, B ⊢ M0 : C }} by mauto.
     assert {{ Δ ⊢ N : B }} by mauto.
     mauto 2.
 
   (** η case *)
   - assert {{ Δ ⊢ B : Sort@s1 }} by mauto.
-    assert {{ Δ, B::Sort@s1 ⊢ C : Sort@s2 }} by mauto.
+    assert {{ ⊢ Δ, B ≈ Γ, B }} by (econstructor; mauto 3).
+    assert {{ Δ, B ⊢ C : Sort@s2 }} by mauto.
     assert {{ Δ ⊢ M : Π r B C }} by mauto.
     mauto 2.
 
   (** Variable reflexivity case *)
-  - assert (exists B, {{ #x : B :: Sort@s ∈ Δ }} /\ {{ Γ ⊢ A ≈ B : Sort@s }} /\ {{ Δ ⊢ A ≈ B : Sort@s }} /\ {{ Δ ⊢ A : Sort@s }}) by mauto.
+  - assert (exists B, {{ #x : B ∈ Δ }} /\ {{ Γ ⊢ A ≈ B }} /\ {{ Δ ⊢ A ≈ B }} /\ {{ Δ ⊢ A }}) by mauto.
     destruct_conjs.
     eapply wf_exp_eq_conv; mauto.
 
   (** Variable weakening case *)
   - inversion_clear HΓΔ.
-    assert {{ ⊢ Γ1, A0::Sort@s }} by mauto.
-    assert (exists B1, {{ #x : B1 :: Sort@s' ∈ Γ1 }} /\ {{ Γ0 ⊢ B ≈ B1 : Sort@s' }} /\ {{ Γ1 ⊢ B ≈ B1 : Sort@s' }} /\ {{ Γ1 ⊢ B : Sort@s' }}) by mauto.
+    assert {{ ⊢ Γ1, A0 }} by (econstructor; mauto 3).
+    assert (exists B1, {{ #x : B1 ∈ Γ1 }} /\ {{ Γ0 ⊢ B ≈ B1 }} /\ {{ Γ1 ⊢ B ≈ B1 }} /\ {{ Γ1 ⊢ B }}) by mauto.
     destruct_conjs.
-    eapply wf_exp_eq_conv; mauto.
+    eapply wf_exp_eq_conv; mauto 4.
 
   (** Conversion case *)
   - assert {{ Δ ⊢ M ≈ M' : B }} by mauto.
@@ -163,16 +173,13 @@ Hint Resolve ctxeq_exp ctxeq_exp_eq ctxeq_typ ctxeq_typ_eq ctxeq_sub ctxeq_sub_e
 Lemma ctx_eq_trans {P : PtsSig} : forall {Γ0 Γ1 Γ2 : ctx P}, {{ ⊢ Γ0 ≈ Γ1 }} -> {{ ⊢ Γ1 ≈ Γ2 }} -> {{ ⊢ Γ0 ≈ Γ2 }}.
 Proof with mautosolve.
   intros * HΓ01.
-  gen Γ2.
-  induction HΓ01 as [|Γ0 ? s01 T0 T1]; mauto.
-  inversion_clear 1 as [|? Γ2' s12 ? T2].
+  gen Γ2.  
+  induction HΓ01 as [|Γ0 ? T0 T1]; mauto.
+  inversion_clear 1 as [|? Γ2' ? T2].
   clear Γ2; rename Γ2' into Γ2.
-  assert {{ ⊢ Γ0 ≈ Γ2 }} by mauto.
-  assert {{ Γ0 ⊢ T0 ≈ T2 : Sort@s01 }}.
-  {
-    transitivity {{{ T1 }}}; mauto.
-  }
-  econstructor...
+  assert {{ ⊢ Γ0 ≈ Γ2 }} by mauto. 
+  assert {{ Γ0 ⊢ T0 ≈ T2 }} by (transitivity {{{ T1 }}}; mauto 3).
+  econstructor; mauto 3.
 Qed.
 
 #[export]

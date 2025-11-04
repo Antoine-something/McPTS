@@ -139,374 +139,377 @@ Proof with intuition.
   intuition.
 Qed.
 
-Lemma rel_exp_pi_cong {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru P s1 s2 s3} {Γ A A' B B'},
-    {{ ⟪ pred_P ⟫ Γ ⊨ A ≈ A' : Sort@s1 }} ->
-    {{ ⟪ pred_P ⟫ Γ, A::Sort@s1 ⊨ B ≈ B' : Sort@s2 }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊨u Π r A B ≈ Π r A' B' : Sort@s3 }}.
-Proof with mautosolve.
-  intros * [env_relΓ]%rel_exp_of_typ_inversion1 []%rel_exp_of_typ_inversion1.
-  destruct_conjs.
-  invert_per_ctx_envs.
-  eexists_rel_exp_of_sort.
-  intros.
-  (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head (@per_sort P).
-  handle_per_sort_elem_irrel.
-  econstructor; mauto.
-  eexists.
-  per_sort_elem_econstructor; eauto.
-  - intros.
-    eapply rel_exp_pi_core; mauto.
-    + intros.
-      eapply H1; mauto.
-      econstructor; mauto;
-        econstructor; mauto.
-    + reflexivity.
-  - solve_refl.
-Qed.
 
-#[export]
-Hint Resolve rel_exp_pi_cong : mcpts.
 
-Lemma rel_exp_pi_sub {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru P s1 s2 s3} {Γ σ Δ A B},
-    {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }} ->
-    {{ ⟪ pred_P ⟫ Δ ⊨ A : Sort@s1 }} ->
-    {{ ⟪ pred_P ⟫ Δ, A::Sort@s1 ⊨ B : Sort@s2 }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊨u (Π r A B)[σ] ≈ Π r (A[σ]) (B[q σ]) : Sort@s3 }}.
-Proof with mautosolve.
-  intros * [env_relΓ] [env_relΔ]%rel_exp_of_typ_inversion1 []%rel_exp_of_typ_inversion1.
-  destruct_conjs.
-  pose env_relΔ.
-  invert_per_ctx_envs.
-  match goal with
-  | _: _ <~> cons_per_ctx_env env_relΔ ?x |- _ =>
-      rename x into elem_relA
-  end.
-  handle_per_ctx_env_irrel.
-  eexists_rel_exp_of_sort.
-  intros.
-  (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  assert {{ Dom ρ'σ' ≈ ρ'σ' ∈ env_relΔ }} by (etransitivity; [symmetry |]; eassumption).
-  (on_all_hyp: destruct_rel_by_assumption env_relΔ).
-  destruct_by_head (@per_sort P).
-  handle_per_sort_elem_irrel.
-  econstructor; mauto.
-  eexists.
-  per_sort_elem_econstructor; eauto.
-  - eapply rel_exp_pi_core; eauto; try reflexivity.
-    intros.
-    (* The original proof involves the following tactics, but the assertion fails in our setting (why?)*)
-    (* extract_output_info_with P ρσ c ρ'σ' c' (cons_per_ctx_env env_relΔ elem_relA)... *)
-    (* It is essentially the same as the following, but the assertion is proven differently *)
-    assert (Hequiv : {{ Dom ρσ ↦ c ≈ ρ'σ' ↦ c' ∈ (cons_per_ctx_env env_relΔ elem_relA) }}) by (econstructor; mauto; econstructor; mauto);
-    apply_relation_equivalence;     
-      (on_all_hyp: fun H => destruct (H _ _ Hequiv));
-      destruct_conjs;
-      destruct_by_head (@rel_typ P);
-      destruct_by_head (@rel_exp P).
-    repeat (econstructor; mauto).    
-  - solve_refl.
-Qed.
+(* Lemma rel_exp_pi_cong {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru P s1 s2 s3} {Γ A A' B B'}, *)
+(*     {{ ⟪ pred_P ⟫ Γ ⊨ A ≈ A' : Sort@s1 }} -> *)
+(*     {{ ⟪ pred_P ⟫ Γ, A ⊨ B ≈ B' : Sort@s2 }} -> *)
+(*     {{ ⟪ pred_P ⟫ Γ ⊨u Π r A B ≈ Π r A' B' : Sort@s3 }}. *)
+(* Proof with mautosolve. *)
+(*   intros * [env_relΓ]%rel_exp_of_typ_inversion1 []%rel_exp_of_typ_inversion1. *)
+(*   destruct_conjs. *)
+(*   invert_per_ctx_envs. *)
+(*   eexists_rel_exp_of_sort. *)
+(*   intros. *)
+(*   (on_all_hyp: destruct_rel_by_assumption env_relΓ). *)
+(*   destruct_by_head (@per_sort P). *)
+(*   destruct_by_head (@per_typ P). *)
+(*   handle_per_sort_elem_irrel. *)
+(*   econstructor; mauto. *)
+(*   eexists. *)
+(*   per_sort_elem_econstructor; eauto. *)
+(*   - intros. *)
+(*     eapply rel_exp_pi_core; mauto. *)
+(*     + intros. *)
+(*       eapply H1; mauto. *)
+(*       econstructor; mauto; *)
+(*         econstructor; mauto. *)
+(*     + reflexivity. *)
+(*   - solve_refl. *)
+(* Qed. *)
 
-#[export]
-Hint Resolve rel_exp_pi_sub : mcpts.
+(* #[export] *)
+(* Hint Resolve rel_exp_pi_cong : mcpts. *)
 
-Lemma rel_exp_fn_cong {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru P s1 s2 s3} {Γ A A' B M M'},
-    {{ ⟪ pred_P ⟫ Γ ⊨ A ≈ A' : Sort@s1 }} ->
-    {{ ⟪ pred_P ⟫ Γ, A::Sort@s1 ⊨ M ≈ M' : B }} ->
-    {{ ⟪ pred_P ⟫ Γ, A::Sort@s1 ⊨ B : Sort@s2 }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊨ λ r A M ≈ λ r A' M' : Π r A B }}.
-Proof with mautosolve.
-  intros * [env_relΓ]%rel_exp_of_typ_inversion1 [] [env_relΓA]%rel_exp_of_typ_inversion1.  
-  destruct_conjs.
-  invert_per_ctx_envs.
+(* Lemma rel_exp_pi_sub {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru P s1 s2 s3} {Γ σ Δ A B}, *)
+(*     {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }} -> *)
+(*     {{ ⟪ pred_P ⟫ Δ ⊨ A : Sort@s1 }} -> *)
+(*     {{ ⟪ pred_P ⟫ Δ, A::Sort@s1 ⊨ B : Sort@s2 }} -> *)
+(*     {{ ⟪ pred_P ⟫ Γ ⊨u (Π r A B)[σ] ≈ Π r (A[σ]) (B[q σ]) : Sort@s3 }}. *)
+(* Proof with mautosolve. *)
+(*   intros * [env_relΓ] [env_relΔ]%rel_exp_of_typ_inversion1 []%rel_exp_of_typ_inversion1. *)
+(*   destruct_conjs. *)
+(*   pose env_relΔ. *)
+(*   invert_per_ctx_envs. *)
+(*   match goal with *)
+(*   | _: _ <~> cons_per_ctx_env env_relΔ ?x |- _ => *)
+(*       rename x into elem_relA *)
+(*   end. *)
+(*   handle_per_ctx_env_irrel. *)
+(*   eexists_rel_exp_of_sort. *)
+(*   intros. *)
+(*   (on_all_hyp: destruct_rel_by_assumption env_relΓ). *)
+(*   assert {{ Dom ρ'σ' ≈ ρ'σ' ∈ env_relΔ }} by (etransitivity; [symmetry |]; eassumption). *)
+(*   (on_all_hyp: destruct_rel_by_assumption env_relΔ). *)
+(*   destruct_by_head (@per_sort P). *)
+(*   handle_per_sort_elem_irrel. *)
+(*   econstructor; mauto. *)
+(*   eexists. *)
+(*   per_sort_elem_econstructor; eauto. *)
+(*   - eapply rel_exp_pi_core; eauto; try reflexivity. *)
+(*     intros. *)
+(*     (* The original proof involves the following tactics, but the assertion fails in our setting (why?)*) *)
+(*     (* extract_output_info_with P ρσ c ρ'σ' c' (cons_per_ctx_env env_relΔ elem_relA)... *) *)
+(*     (* It is essentially the same as the following, but the assertion is proven differently *) *)
+(*     assert (Hequiv : {{ Dom ρσ ↦ c ≈ ρ'σ' ↦ c' ∈ (cons_per_ctx_env env_relΔ elem_relA) }}) by (econstructor; mauto; econstructor; mauto); *)
+(*     apply_relation_equivalence;      *)
+(*       (on_all_hyp: fun H => destruct (H _ _ Hequiv)); *)
+(*       destruct_conjs; *)
+(*       destruct_by_head (@rel_typ P); *)
+(*       destruct_by_head (@rel_exp P). *)
+(*     repeat (econstructor; mauto).     *)
+(*   - solve_refl. *)
+(* Qed. *)
+
+(* #[export] *)
+(* Hint Resolve rel_exp_pi_sub : mcpts. *)
+
+(* Lemma rel_exp_fn_cong {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru P s1 s2 s3} {Γ A A' B M M'}, *)
+(*     {{ ⟪ pred_P ⟫ Γ ⊨ A ≈ A' : Sort@s1 }} -> *)
+(*     {{ ⟪ pred_P ⟫ Γ, A::Sort@s1 ⊨ M ≈ M' : B }} -> *)
+(*     {{ ⟪ pred_P ⟫ Γ, A::Sort@s1 ⊨ B : Sort@s2 }} -> *)
+(*     {{ ⟪ pred_P ⟫ Γ ⊨ λ r A M ≈ λ r A' M' : Π r A B }}. *)
+(* Proof with mautosolve. *)
+(*   intros * [env_relΓ]%rel_exp_of_typ_inversion1 [] [env_relΓA]%rel_exp_of_typ_inversion1.   *)
+(*   destruct_conjs. *)
+(*   invert_per_ctx_envs. *)
   
-  match goal with
-  | _: _ <~> cons_per_ctx_env env_relΓ ?x |- _ =>
-      rename x into elem_relA
-  end.
-  handle_per_ctx_env_irrel.
-  assert (forall ρ ρ' equiv_ρ_ρ', elem_relA ρ ρ' equiv_ρ_ρ' <~> head_rel ρ ρ' equiv_ρ_ρ').
-  {
-    intros.
-    assert (rel_typ pred_P s1 A ρ A ρ' (head_rel ρ ρ' equiv_ρ_ρ')) by mauto.
-    assert (rel_typ pred_P s1 A ρ A ρ' (elem_relA ρ ρ' equiv_ρ_ρ')) by mauto.
-    destruct_by_head (@rel_typ P).
-    functional_eval_rewrite_clear.
-    handle_per_sort_elem_irrel.
-    reflexivity.
-  }
-  eexists_rel_exp_of_pi.
-  intros.
-  (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head (@per_sort P).
-  functional_eval_rewrite_clear.
-  do 2 eexists.
-  repeat split; [econstructor | | econstructor]; mauto.
-  - eapply rel_exp_pi_core; eauto; try reflexivity.
-    intros.
-    assert (Hequiv : {{ Dom ρ ↦ c ≈ ρ' ↦ c' ∈ (cons_per_ctx_env env_relΓ elem_relA) }}).
-    {
-      econstructor; mauto.
-      econstructor; mauto.
-      econstructor; mauto.
-      simpl; mauto.
-      handle_per_sort_elem_irrel.
-      apply_relation_equivalence.
-      eapply H16; mauto.
-    }
-    apply_relation_equivalence;
-      (on_all_hyp: fun H => destruct (H _ _ Hequiv));
-      destruct_conjs;
-      destruct_by_head (@rel_typ P);
-      destruct_by_head (@rel_exp P).
+(*   match goal with *)
+(*   | _: _ <~> cons_per_ctx_env env_relΓ ?x |- _ => *)
+(*       rename x into elem_relA *)
+(*   end. *)
+(*   handle_per_ctx_env_irrel. *)
+(*   assert (forall ρ ρ' equiv_ρ_ρ', elem_relA ρ ρ' equiv_ρ_ρ' <~> head_rel ρ ρ' equiv_ρ_ρ'). *)
+(*   { *)
+(*     intros. *)
+(*     assert (rel_typ pred_P s1 A ρ A ρ' (head_rel ρ ρ' equiv_ρ_ρ')) by mauto. *)
+(*     assert (rel_typ pred_P s1 A ρ A ρ' (elem_relA ρ ρ' equiv_ρ_ρ')) by mauto. *)
+(*     destruct_by_head (@rel_typ P). *)
+(*     functional_eval_rewrite_clear. *)
+(*     handle_per_sort_elem_irrel. *)
+(*     reflexivity. *)
+(*   } *)
+(*   eexists_rel_exp_of_pi. *)
+(*   intros. *)
+(*   (on_all_hyp: destruct_rel_by_assumption env_relΓ). *)
+(*   destruct_by_head (@per_sort P). *)
+(*   functional_eval_rewrite_clear. *)
+(*   do 2 eexists. *)
+(*   repeat split; [econstructor | | econstructor]; mauto. *)
+(*   - eapply rel_exp_pi_core; eauto; try reflexivity. *)
+(*     intros. *)
+(*     assert (Hequiv : {{ Dom ρ ↦ c ≈ ρ' ↦ c' ∈ (cons_per_ctx_env env_relΓ elem_relA) }}). *)
+(*     { *)
+(*       econstructor; mauto. *)
+(*       econstructor; mauto. *)
+(*       econstructor; mauto. *)
+(*       simpl; mauto. *)
+(*       handle_per_sort_elem_irrel. *)
+(*       apply_relation_equivalence. *)
+(*       eapply H16; mauto. *)
+(*     } *)
+(*     apply_relation_equivalence; *)
+(*       (on_all_hyp: fun H => destruct (H _ _ Hequiv)); *)
+(*       destruct_conjs; *)
+(*       destruct_by_head (@rel_typ P); *)
+(*       destruct_by_head (@rel_exp P). *)
     
-    (* extract_output_info_with P ρ c ρ' c' (cons_per_ctx_env env_relΓ elem_relA). *)
-    econstructor; eauto.
-    (* eexists. *)
-    assert (rel_exp B d{{{ ρ ↦ c }}} B d{{{ ρ' ↦ c' }}} (per_sort pred_P s2)).
-    {
-      eapply H2.
-      econstructor; mauto;
-        econstructor; mauto.
-    }
-    inversion_clear H20.
-    destruct_by_head (@per_sort P).
-    functional_eval_rewrite_clear.
-    eexists; mauto.
-  - intros.
-    assert (Hequiv : {{ Dom ρ ↦ c ≈ ρ' ↦ c' ∈ (cons_per_ctx_env env_relΓ elem_relA) }}).
-    {
-      econstructor; mauto.
-      econstructor; mauto.
-      econstructor; mauto.
-      simpl; mauto.
-      handle_per_sort_elem_irrel.
-      apply_relation_equivalence.
-      eapply H13; mauto.
-    }
-    (* extract_output_info_with P ρ c ρ' c' (cons_per_ctx_env env_relΓ elem_relA). *)
+(*     (* extract_output_info_with P ρ c ρ' c' (cons_per_ctx_env env_relΓ elem_relA). *) *)
+(*     econstructor; eauto. *)
+(*     (* eexists. *) *)
+(*     assert (rel_exp B d{{{ ρ ↦ c }}} B d{{{ ρ' ↦ c' }}} (per_sort pred_P s2)). *)
+(*     { *)
+(*       eapply H2. *)
+(*       econstructor; mauto; *)
+(*         econstructor; mauto. *)
+(*     } *)
+(*     inversion_clear H20. *)
+(*     destruct_by_head (@per_sort P). *)
+(*     functional_eval_rewrite_clear. *)
+(*     eexists; mauto. *)
+(*   - intros. *)
+(*     assert (Hequiv : {{ Dom ρ ↦ c ≈ ρ' ↦ c' ∈ (cons_per_ctx_env env_relΓ elem_relA) }}). *)
+(*     { *)
+(*       econstructor; mauto. *)
+(*       econstructor; mauto. *)
+(*       econstructor; mauto. *)
+(*       simpl; mauto. *)
+(*       handle_per_sort_elem_irrel. *)
+(*       apply_relation_equivalence. *)
+(*       eapply H13; mauto. *)
+(*     } *)
+(*     (* extract_output_info_with P ρ c ρ' c' (cons_per_ctx_env env_relΓ elem_relA). *) *)
 
-    assert (exists elem_rel : relation (domain P),
-               rel_typ pred_P H3 B d{{{ ρ ↦ c }}} B d{{{ ρ' ↦ c' }}} elem_rel /\ rel_exp M d{{{ ρ ↦ c }}} M' d{{{ ρ' ↦ c' }}} elem_rel).
-    {
-        eapply H5.
-        econstructor; mauto.
-        econstructor; mauto.
-        econstructor; mauto.
-        simpl; mauto.
-        handle_per_sort_elem_irrel.
-        apply_relation_equivalence.
-        eapply H13; mauto.
-    }
-    destruct_conjs.
-    destruct_by_head (@rel_exp).
-    econstructor; mauto.
+(*     assert (exists elem_rel : relation (domain P), *)
+(*                rel_typ pred_P H3 B d{{{ ρ ↦ c }}} B d{{{ ρ' ↦ c' }}} elem_rel /\ rel_exp M d{{{ ρ ↦ c }}} M' d{{{ ρ' ↦ c' }}} elem_rel). *)
+(*     { *)
+(*         eapply H5. *)
+(*         econstructor; mauto. *)
+(*         econstructor; mauto. *)
+(*         econstructor; mauto. *)
+(*         simpl; mauto. *)
+(*         handle_per_sort_elem_irrel. *)
+(*         apply_relation_equivalence. *)
+(*         eapply H13; mauto. *)
+(*     } *)
+(*     destruct_conjs. *)
+(*     destruct_by_head (@rel_exp). *)
+(*     econstructor; mauto. *)
     
-    intros.
-    destruct_by_head (@rel_typ P).
-    handle_per_sort_elem_irrel.
-    mauto.
-Qed.
+(*     intros. *)
+(*     destruct_by_head (@rel_typ P). *)
+(*     handle_per_sort_elem_irrel. *)
+(*     mauto. *)
+(* Qed. *)
 
-#[export]
-Hint Resolve rel_exp_fn_cong : mcpts.
+(* #[export] *)
+(* Hint Resolve rel_exp_fn_cong : mcpts. *)
 
-Lemma rel_exp_fn_sub {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru P s1 s2 s3} {Γ σ Δ A M B},
-    {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }} ->
-    {{ ⟪ pred_P ⟫ Δ, A::Sort@s1 ⊨ M : B }} ->
-    {{ ⟪ pred_P ⟫ Δ, A::Sort@s1 ⊨ B : Sort@s2 }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊨ (λ r A M)[σ] ≈ λ r A[σ] M[q σ] : (Π r A B)[σ] }}.
-Proof with mautosolve.
-  intros * [env_relΓ [? [env_relΔ]]] [env_relΔA] [env_relΔA']%rel_exp_of_typ_inversion1.
-  destruct_conjs.
-  pose env_relΔA.
-  invert_per_ctx_envs.
-  handle_per_ctx_env_irrel.
-  eexists_rel_exp.
-  intros.
-  (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  (on_all_hyp: destruct_rel_by_assumption env_relΔ).
-  eexists.
-  split; econstructor; mauto 4.
-  - per_sort_elem_econstructor; [| | apply Equivalence_Reflexive]; eauto.
-    intros.
-    eapply rel_exp_pi_core; eauto; try reflexivity.
-    clear dependent c.
-    clear dependent c'.
-    intros.
+(* Lemma rel_exp_fn_sub {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru P s1 s2 s3} {Γ σ Δ A M B}, *)
+(*     {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }} -> *)
+(*     {{ ⟪ pred_P ⟫ Δ, A::Sort@s1 ⊨ M : B }} -> *)
+(*     {{ ⟪ pred_P ⟫ Δ, A::Sort@s1 ⊨ B : Sort@s2 }} -> *)
+(*     {{ ⟪ pred_P ⟫ Γ ⊨ (λ r A M)[σ] ≈ λ r A[σ] M[q σ] : (Π r A B)[σ] }}. *)
+(* Proof with mautosolve. *)
+(*   intros * [env_relΓ [? [env_relΔ]]] [env_relΔA] [env_relΔA']%rel_exp_of_typ_inversion1. *)
+(*   destruct_conjs. *)
+(*   pose env_relΔA. *)
+(*   invert_per_ctx_envs. *)
+(*   handle_per_ctx_env_irrel. *)
+(*   eexists_rel_exp. *)
+(*   intros. *)
+(*   (on_all_hyp: destruct_rel_by_assumption env_relΓ). *)
+(*   (on_all_hyp: destruct_rel_by_assumption env_relΔ). *)
+(*   eexists. *)
+(*   split; econstructor; mauto 4. *)
+(*   - per_sort_elem_econstructor; [| | apply Equivalence_Reflexive]; eauto. *)
+(*     intros. *)
+(*     eapply rel_exp_pi_core; eauto; try reflexivity. *)
+(*     clear dependent c. *)
+(*     clear dependent c'. *)
+(*     intros. *)
     
-    (* extract_output_info_with P ρσ c ρ'σ' c' env_relΔA. *)
-    assert (Hequiv : {{ Dom ρσ ↦ c ≈ ρ'σ' ↦ c' ∈ env_relΔA }}).
-    {
-      apply_relation_equivalence.
-      econstructor; mauto; [econstructor; mauto | econstructor; mauto|].
-      simpl; mauto.
-      handle_per_sort_elem_irrel.
-      apply_relation_equivalence.
-      eapply H14; mauto.      
-    }
-    apply_relation_equivalence;
-      (on_all_hyp: fun H => destruct (H _ _ Hequiv));
-      destruct_conjs;
-      destruct_by_head (@rel_typ P);
-      destruct_by_head (@rel_exp P).
+(*     (* extract_output_info_with P ρσ c ρ'σ' c' env_relΔA. *) *)
+(*     assert (Hequiv : {{ Dom ρσ ↦ c ≈ ρ'σ' ↦ c' ∈ env_relΔA }}). *)
+(*     { *)
+(*       apply_relation_equivalence. *)
+(*       econstructor; mauto; [econstructor; mauto | econstructor; mauto|]. *)
+(*       simpl; mauto. *)
+(*       handle_per_sort_elem_irrel. *)
+(*       apply_relation_equivalence. *)
+(*       eapply H14; mauto.       *)
+(*     } *)
+(*     apply_relation_equivalence; *)
+(*       (on_all_hyp: fun H => destruct (H _ _ Hequiv)); *)
+(*       destruct_conjs; *)
+(*       destruct_by_head (@rel_typ P); *)
+(*       destruct_by_head (@rel_exp P). *)
                        
-    econstructor; eauto.
+(*     econstructor; eauto. *)
     
-    assert (rel_exp B d{{{ ρσ ↦ c }}} B d{{{ ρ'σ' ↦ c' }}} (per_sort pred_P s2)).
-    {
-      eapply H3; mauto.
-      apply_relation_equivalence.
-      econstructor; mauto;
-        econstructor; mauto.
-    }
-    destruct_by_head (@rel_exp P).
-    functional_eval_rewrite_clear.
-    assumption.
+(*     assert (rel_exp B d{{{ ρσ ↦ c }}} B d{{{ ρ'σ' ↦ c' }}} (per_sort pred_P s2)). *)
+(*     { *)
+(*       eapply H3; mauto. *)
+(*       apply_relation_equivalence. *)
+(*       econstructor; mauto; *)
+(*         econstructor; mauto. *)
+(*     } *)
+(*     destruct_by_head (@rel_exp P). *)
+(*     functional_eval_rewrite_clear. *)
+(*     assumption. *)
     
-  - intros ? **.
-    (* extract_output_info_with ρσ c ρ'σ' c' env_relΔA. *)
-    assert (Hequiv : {{ Dom ρσ ↦ c ≈ ρ'σ' ↦ c' ∈ env_relΔA }}).
-    {
-      apply_relation_equivalence.
-      econstructor; mauto; [econstructor; mauto | econstructor; mauto|].
-      simpl; mauto.
-      handle_per_sort_elem_irrel.
-      apply_relation_equivalence.
-      eapply H14; mauto.      
-    }
-    apply_relation_equivalence;
-      (on_all_hyp: fun H => destruct (H _ _ Hequiv));
-      destruct_conjs;
-      destruct_by_head (@rel_typ P);
-      destruct_by_head (@rel_exp P).
+(*   - intros ? **. *)
+(*     (* extract_output_info_with ρσ c ρ'σ' c' env_relΔA. *) *)
+(*     assert (Hequiv : {{ Dom ρσ ↦ c ≈ ρ'σ' ↦ c' ∈ env_relΔA }}). *)
+(*     { *)
+(*       apply_relation_equivalence. *)
+(*       econstructor; mauto; [econstructor; mauto | econstructor; mauto|]. *)
+(*       simpl; mauto. *)
+(*       handle_per_sort_elem_irrel. *)
+(*       apply_relation_equivalence. *)
+(*       eapply H14; mauto.       *)
+(*     } *)
+(*     apply_relation_equivalence; *)
+(*       (on_all_hyp: fun H => destruct (H _ _ Hequiv)); *)
+(*       destruct_conjs; *)
+(*       destruct_by_head (@rel_typ P); *)
+(*       destruct_by_head (@rel_exp P). *)
 
-    econstructor; mauto; [repeat (econstructor; mauto)|].
-    intros.
-    destruct_by_head (@rel_typ P).
-    handle_per_sort_elem_irrel...
-Qed.
+(*     econstructor; mauto; [repeat (econstructor; mauto)|]. *)
+(*     intros. *)
+(*     destruct_by_head (@rel_typ P). *)
+(*     handle_per_sort_elem_irrel... *)
+(* Qed. *)
 
-#[export]
-Hint Resolve rel_exp_fn_sub : mcpts.
+(* #[export] *)
+(* Hint Resolve rel_exp_fn_sub : mcpts. *)
 
-Lemma rel_exp_app_cong {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru P s1 s2 s3} {Γ M M' A B N N'},
-    {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ M' : Π r A B }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊨ N ≈ N' : A }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊨ M N ≈ M' N' : B[Id,,N] }}.
-Proof with intuition.
-  intros * [env_relΓ]%rel_exp_of_pi_inversion [].
-  destruct_conjs.
-  pose env_relΓ.
-  handle_per_ctx_env_irrel.
-  eexists_rel_exp.
-  intros.
-  assert (equiv_p'_p' : env_relΓ ρ' ρ') by (etransitivity; [symmetry |]; eassumption).
-  (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head (@rel_typ P).
-  destruct_by_head (@rel_exp P).
-  handle_per_sort_elem_irrel.
-  assert (in_rel0 m1 m2) by (etransitivity; [| symmetry]; eassumption).
-  assert (in_rel0 m1 m'2) by intuition.
-  (on_all_hyp: destruct_rel_by_assumption in_rel0).
-  handle_per_sort_elem_irrel.
-  eexists.
-  split; econstructor; mauto...
-Qed.
+(* Lemma rel_exp_app_cong {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru P s1 s2 s3} {Γ M M' A B N N'}, *)
+(*     {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ M' : Π r A B }} -> *)
+(*     {{ ⟪ pred_P ⟫ Γ ⊨ N ≈ N' : A }} -> *)
+(*     {{ ⟪ pred_P ⟫ Γ ⊨ M N ≈ M' N' : B[Id,,N] }}. *)
+(* Proof with intuition. *)
+(*   intros * [env_relΓ]%rel_exp_of_pi_inversion []. *)
+(*   destruct_conjs. *)
+(*   pose env_relΓ. *)
+(*   handle_per_ctx_env_irrel. *)
+(*   eexists_rel_exp. *)
+(*   intros. *)
+(*   assert (equiv_p'_p' : env_relΓ ρ' ρ') by (etransitivity; [symmetry |]; eassumption). *)
+(*   (on_all_hyp: destruct_rel_by_assumption env_relΓ). *)
+(*   destruct_by_head (@rel_typ P). *)
+(*   destruct_by_head (@rel_exp P). *)
+(*   handle_per_sort_elem_irrel. *)
+(*   assert (in_rel0 m1 m2) by (etransitivity; [| symmetry]; eassumption). *)
+(*   assert (in_rel0 m1 m'2) by intuition. *)
+(*   (on_all_hyp: destruct_rel_by_assumption in_rel0). *)
+(*   handle_per_sort_elem_irrel. *)
+(*   eexists. *)
+(*   split; econstructor; mauto... *)
+(* Qed. *)
 
-#[export]
-Hint Resolve rel_exp_app_cong : mcpts.
+(* #[export] *)
+(* Hint Resolve rel_exp_app_cong : mcpts. *)
 
-Lemma rel_exp_app_sub {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru P s1 s2 s3} {Γ σ Δ M A B N},
-    {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }} ->
-    {{ ⟪ pred_P ⟫ Δ ⊨ M : Π r A B }} ->
-    {{ ⟪ pred_P ⟫ Δ ⊨ N : A }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊨ (M N)[σ] ≈ M[σ] N[σ] : B[σ,,N[σ]] }}.
-Proof with mautosolve.
-  intros * [env_relΓ] [env_relΔ]%rel_exp_of_pi_inversion [].
-  destruct_conjs.
-  pose env_relΓ.
-  pose env_relΔ.
-  handle_per_ctx_env_irrel.
-  eexists_rel_exp.
-  intros.
-  (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  (on_all_hyp: destruct_rel_by_assumption env_relΔ).
-  destruct_by_head (@rel_typ P).
-  handle_per_sort_elem_irrel.
-  destruct_by_head (@rel_exp P).
-  (on_all_hyp_rev: destruct_rel_by_assumption in_rel).
-  eexists.
-  split; econstructor...
-Qed.
+(* Lemma rel_exp_app_sub {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru P s1 s2 s3} {Γ σ Δ M A B N}, *)
+(*     {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }} -> *)
+(*     {{ ⟪ pred_P ⟫ Δ ⊨ M : Π r A B }} -> *)
+(*     {{ ⟪ pred_P ⟫ Δ ⊨ N : A }} -> *)
+(*     {{ ⟪ pred_P ⟫ Γ ⊨ (M N)[σ] ≈ M[σ] N[σ] : B[σ,,N[σ]] }}. *)
+(* Proof with mautosolve. *)
+(*   intros * [env_relΓ] [env_relΔ]%rel_exp_of_pi_inversion []. *)
+(*   destruct_conjs. *)
+(*   pose env_relΓ. *)
+(*   pose env_relΔ. *)
+(*   handle_per_ctx_env_irrel. *)
+(*   eexists_rel_exp. *)
+(*   intros. *)
+(*   (on_all_hyp: destruct_rel_by_assumption env_relΓ). *)
+(*   (on_all_hyp: destruct_rel_by_assumption env_relΔ). *)
+(*   destruct_by_head (@rel_typ P). *)
+(*   handle_per_sort_elem_irrel. *)
+(*   destruct_by_head (@rel_exp P). *)
+(*   (on_all_hyp_rev: destruct_rel_by_assumption in_rel). *)
+(*   eexists. *)
+(*   split; econstructor... *)
+(* Qed. *)
 
-#[export]
-Hint Resolve rel_exp_app_sub : mcpts.
+(* #[export] *)
+(* Hint Resolve rel_exp_app_sub : mcpts. *)
 
-Lemma rel_exp_pi_beta {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru P s1 s2 s3} {Γ A M B N},
-    {{ ⟪ pred_P ⟫ Γ , A::Sort@s1 ⊨ M : B }} ->
-    {{ ⟪ pred_P ⟫ Γ, A::Sort@s1 ⊨ B : Sort@s2 }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊨ N : A }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊨ (λ r A M) N ≈ M[Id,,N] : B[Id,,N] }}.
-Proof with mautosolve.
-  intros * [env_relΓA] [env_relΓA']%rel_exp_of_typ_inversion1 [env_relΓ].
-  destruct_conjs.
-  pose env_relΓA.
-  invert_per_ctx_envs.
-  handle_per_ctx_env_irrel.
-  eexists_rel_exp.
-  intros.
-  (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head (@rel_typ P).
-  handle_per_sort_elem_irrel.
-  destruct_by_head (@rel_exp P).
-  rename m into n.
-  rename m' into n'.
+(* Lemma rel_exp_pi_beta {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru P s1 s2 s3} {Γ A M B N}, *)
+(*     {{ ⟪ pred_P ⟫ Γ , A::Sort@s1 ⊨ M : B }} -> *)
+(*     {{ ⟪ pred_P ⟫ Γ, A::Sort@s1 ⊨ B : Sort@s2 }} -> *)
+(*     {{ ⟪ pred_P ⟫ Γ ⊨ N : A }} -> *)
+(*     {{ ⟪ pred_P ⟫ Γ ⊨ (λ r A M) N ≈ M[Id,,N] : B[Id,,N] }}. *)
+(* Proof with mautosolve. *)
+(*   intros * [env_relΓA] [env_relΓA']%rel_exp_of_typ_inversion1 [env_relΓ]. *)
+(*   destruct_conjs. *)
+(*   pose env_relΓA. *)
+(*   invert_per_ctx_envs. *)
+(*   handle_per_ctx_env_irrel. *)
+(*   eexists_rel_exp. *)
+(*   intros. *)
+(*   (on_all_hyp: destruct_rel_by_assumption env_relΓ). *)
+(*   destruct_by_head (@rel_typ P). *)
+(*   handle_per_sort_elem_irrel. *)
+(*   destruct_by_head (@rel_exp P). *)
+(*   rename m into n. *)
+(*   rename m' into n'. *)
   
-  (* extract_output_info_with P ρ n ρ' n' env_relΓA. *)
-  assert (Hequiv : {{ Dom ρ ↦ n ≈ ρ' ↦ n' ∈ env_relΓA }}).
-  {
-    apply_relation_equivalence.
-    econstructor; mauto; [econstructor; mauto | econstructor; mauto|].
-    simpl; mauto.
-    handle_per_sort_elem_irrel.
-    apply_relation_equivalence.
-    eapply H14; mauto.          
-  }
-  apply_relation_equivalence;
-   (on_all_hyp: fun H => destruct (H _ _ Hequiv));
-   destruct_conjs;
-   destruct_by_head (@rel_typ P);
-   destruct_by_head (@rel_exp P).
-  eexists.
-  split; econstructor...
-Qed.
+(*   (* extract_output_info_with P ρ n ρ' n' env_relΓA. *) *)
+(*   assert (Hequiv : {{ Dom ρ ↦ n ≈ ρ' ↦ n' ∈ env_relΓA }}). *)
+(*   { *)
+(*     apply_relation_equivalence. *)
+(*     econstructor; mauto; [econstructor; mauto | econstructor; mauto|]. *)
+(*     simpl; mauto. *)
+(*     handle_per_sort_elem_irrel. *)
+(*     apply_relation_equivalence. *)
+(*     eapply H14; mauto.           *)
+(*   } *)
+(*   apply_relation_equivalence; *)
+(*    (on_all_hyp: fun H => destruct (H _ _ Hequiv)); *)
+(*    destruct_conjs; *)
+(*    destruct_by_head (@rel_typ P); *)
+(*    destruct_by_head (@rel_exp P). *)
+(*   eexists. *)
+(*   split; econstructor... *)
+(* Qed. *)
 
-#[export]
-Hint Resolve rel_exp_pi_beta : mcpts.
+(* #[export] *)
+(* Hint Resolve rel_exp_pi_beta : mcpts. *)
 
-Lemma rel_exp_pi_eta {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru P s1 s2 s3} {Γ M A B},
-  {{ ⟪ pred_P ⟫ Γ ⊨ M : Π r A B }} ->
-  {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ λ r A (M[Wk] #0) : Π r A B }}.
-Proof with mautosolve.
-  intros * [env_relΓ]%rel_exp_of_pi_inversion.
-  destruct_conjs.
-  pose env_relΓ.
-  eexists_rel_exp_of_pi.
-  intros.
-  (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head (@rel_typ P).
-  destruct_by_head (@rel_exp P).
-  do 2 eexists.
-  repeat split; only 1,3: econstructor; mauto.
-  intros.
-  (on_all_hyp: destruct_rel_by_assumption in_rel).
-  repeat (econstructor; mauto).
-Qed.
+(* Lemma rel_exp_pi_eta {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru P s1 s2 s3} {Γ M A B}, *)
+(*   {{ ⟪ pred_P ⟫ Γ ⊨ M : Π r A B }} -> *)
+(*   {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ λ r A (M[Wk] #0) : Π r A B }}. *)
+(* Proof with mautosolve. *)
+(*   intros * [env_relΓ]%rel_exp_of_pi_inversion. *)
+(*   destruct_conjs. *)
+(*   pose env_relΓ. *)
+(*   eexists_rel_exp_of_pi. *)
+(*   intros. *)
+(*   (on_all_hyp: destruct_rel_by_assumption env_relΓ). *)
+(*   destruct_by_head (@rel_typ P). *)
+(*   destruct_by_head (@rel_exp P). *)
+(*   do 2 eexists. *)
+(*   repeat split; only 1,3: econstructor; mauto. *)
+(*   intros. *)
+(*   (on_all_hyp: destruct_rel_by_assumption in_rel). *)
+(*   repeat (econstructor; mauto). *)
+(* Qed. *)
 
-#[export]
-Hint Resolve rel_exp_pi_eta : mcpts.
+(* #[export] *)
+(* Hint Resolve rel_exp_pi_eta : mcpts. *)
 
 
 
@@ -533,7 +536,7 @@ Ltac eexists_rel_exp_unsorted_of_pi :=
 Lemma rel_exp_unsorted_pi_cong {P} {pred_P : PredicativeSig P} : forall {s1 s2 s3 Γ A A' B B'} {r : Ru P s1 s2 s3},
     {{ ⟪ pred_P ⟫ Γ ⊨u A : Sort@s1 }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u A ≈ A' : Sort@s1 }} ->
-    {{ ⟪ pred_P ⟫ Γ, A::Sort@s1 ⊨u B ≈ B' : Sort@s2 }} ->
+    {{ ⟪ pred_P ⟫ Γ, A ⊨u B ≈ B' : Sort@s2 }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u Π r A B ≈ Π r A' B' : Sort@s3 }}.
 Proof.
   intros * [env_relΓ]%rel_exp_unsorted_of_typ_inversion1 []%rel_exp_unsorted_of_typ_inversion1 [env_relΓA]%rel_exp_unsorted_of_typ_inversion1.
@@ -545,9 +548,9 @@ Proof.
   eexists; split; [eassumption|].
   intros.
   assert (rel_exp A ρ A' ρ' (per_sort pred_P s1)) by mauto.
-  assert (rel_typ pred_P s1 A ρ A ρ' (head_rel ρ ρ' equiv_ρ_ρ')) by mauto.
+  assert (rel_typ_unsorted pred_P A ρ A ρ' (head_rel ρ ρ' equiv_ρ_ρ')) by mauto.
   destruct_by_head (@rel_exp P).
-  destruct_by_head (@rel_typ P).
+  destruct_by_head (@rel_typ_unsorted P).
   destruct_by_head (@per_sort P).
   functional_eval_rewrite_clear.
   handle_per_sort_elem_irrel.
@@ -561,8 +564,10 @@ Proof.
     + eapply rel_exp_pi_core; mauto; [|reflexivity].
       intros.
       eapply H2; mauto.
-      econstructor; mauto;
-        econstructor; mauto.
+      econstructor; mauto; [econstructor; mauto | econstructor; mauto |].
+      assert (per_typ_elem pred_P x m m') by mauto.
+      handle_per_typ_elem_irrel.
+      eassumption.
     + solve_refl.
 Qed.
 
@@ -574,7 +579,7 @@ Hint Resolve rel_exp_unsorted_pi_cong : mcpts.
 Lemma rel_exp_unsorted_pi_sub {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru P s1 s2 s3} {Γ σ Δ A B},
     {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }} ->
     {{ ⟪ pred_P ⟫ Δ ⊨u A : Sort@s1 }} ->
-    {{ ⟪ pred_P ⟫ Δ, A::Sort@s1 ⊨u B : Sort@s2 }} ->
+    {{ ⟪ pred_P ⟫ Δ, A ⊨u B : Sort@s2 }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u (Π r A B)[σ] ≈ Π r (A[σ]) (B[q σ]) : Sort@s3 }}.
 Proof with mautosolve.
   intros * [env_relΓ] [env_relΔ]%rel_exp_unsorted_of_typ_inversion1 []%rel_exp_unsorted_of_typ_inversion1.
@@ -595,13 +600,18 @@ Proof with mautosolve.
   handle_per_sort_elem_irrel.
   econstructor; mauto.
   eexists.
+  assert (per_typ_elem pred_P x0 a a) by mauto.
+  assert (per_typ_elem pred_P x0 a0 a) by mauto.
+  handle_per_typ_elem_irrel.
   per_sort_elem_econstructor; eauto.
   - eapply rel_exp_pi_core; eauto; try reflexivity.
     intros.
     (* The original proof involves the following tactics, but the assertion fails in our setting (why?)*)
     (* extract_output_info_with P ρσ c ρ'σ' c' (cons_per_ctx_env env_relΔ elem_relA)... *)
     (* It is essentially the same as the following, but the assertion is proven differently *)
-    assert (Hequiv : {{ Dom ρσ ↦ c ≈ ρ'σ' ↦ c' ∈ (cons_per_ctx_env env_relΔ elem_relA) }}) by (econstructor; mauto; econstructor; mauto);
+
+    
+    assert (Hequiv : {{ Dom ρσ ↦ c ≈ ρ'σ' ↦ c' ∈ (cons_per_ctx_env env_relΔ elem_relA) }}) by (econstructor; mauto; econstructor; mauto).
     apply_relation_equivalence;     
       (on_all_hyp: fun H => destruct (H _ _ Hequiv));
       destruct_conjs;
@@ -617,8 +627,8 @@ Hint Resolve rel_exp_unsorted_pi_sub : mcpts.
 
 Lemma rel_exp_unsorted_fn_cong {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru P s1 s2 s3} {Γ A A' B M M'},
     {{ ⟪ pred_P ⟫ Γ ⊨u A ≈ A' : Sort@s1 }} ->
-    {{ ⟪ pred_P ⟫ Γ, A::Sort@s1 ⊨u M ≈ M' : B }} ->
-    {{ ⟪ pred_P ⟫ Γ, A::Sort@s1 ⊨u B : Sort@s2 }} ->
+    {{ ⟪ pred_P ⟫ Γ, A ⊨u M ≈ M' : B }} ->
+    {{ ⟪ pred_P ⟫ Γ, A ⊨u B : Sort@s2 }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u λ r A M ≈ λ r A' M' : Π r A B }}.
 Proof with mautosolve.
   intros * [env_relΓ]%rel_exp_unsorted_of_typ_inversion1 [] [env_relΓA]%rel_exp_unsorted_of_typ_inversion1.  
@@ -633,11 +643,11 @@ Proof with mautosolve.
   assert (forall ρ ρ' equiv_ρ_ρ', elem_relA ρ ρ' equiv_ρ_ρ' <~> head_rel ρ ρ' equiv_ρ_ρ').
   {
     intros.
-    assert (rel_typ pred_P s1 A ρ A ρ' (head_rel ρ ρ' equiv_ρ_ρ')) by mauto.
-    assert (rel_typ pred_P s1 A ρ A ρ' (elem_relA ρ ρ' equiv_ρ_ρ')) by mauto.
-    destruct_by_head (@rel_typ P).
+    assert (rel_typ_unsorted pred_P A ρ A ρ' (head_rel ρ ρ' equiv_ρ_ρ')) by mauto.
+    assert (rel_typ_unsorted pred_P A ρ A ρ' (elem_relA ρ ρ' equiv_ρ_ρ')) by mauto.
+    destruct_by_head (@rel_typ_unsorted P).
     functional_eval_rewrite_clear.
-    handle_per_sort_elem_irrel.
+    handle_per_typ_elem_irrel.
     reflexivity.
   }
   eexists_rel_exp_unsorted_of_pi.
@@ -651,13 +661,16 @@ Proof with mautosolve.
     intros.
     assert (Hequiv : {{ Dom ρ ↦ c ≈ ρ' ↦ c' ∈ (cons_per_ctx_env env_relΓ elem_relA) }}).
     {
+      assert (exists R'', per_sort_elem pred_P s1 R'' a a') by mauto.
+      destruct_conjs.
       econstructor; mauto.
       econstructor; mauto.
       econstructor; mauto.
       simpl; mauto.
       handle_per_sort_elem_irrel.
-      apply_relation_equivalence.
-      eapply H15; mauto.
+      handle_per_typ_elem_irrel.
+      apply_relation_equivalence.      
+      eapply H10; mauto.      
     }
     apply_relation_equivalence;
       (on_all_hyp: fun H => destruct (H _ _ Hequiv));
@@ -688,8 +701,9 @@ Proof with mautosolve.
       econstructor; mauto.
       simpl; mauto.
       handle_per_sort_elem_irrel.
+      handle_per_typ_elem_irrel.
       apply_relation_equivalence.
-      eapply H12; mauto.
+      eapply H9; mauto.
     }
     extract_output_info_with P ρ c ρ' c' (cons_per_ctx_env env_relΓ elem_relA).
 
@@ -716,24 +730,34 @@ Hint Resolve rel_exp_unsorted_fn_cong : mcpts.
 
 Lemma rel_exp_unsorted_fn_sub {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru P s1 s2 s3} {Γ σ Δ A M B},
     {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }} ->
-    {{ ⟪ pred_P ⟫ Δ, A::Sort@s1 ⊨u M : B }} ->
-    {{ ⟪ pred_P ⟫ Δ, A::Sort@s1 ⊨u B : Sort@s2 }} ->
+    {{ ⟪ pred_P ⟫ Δ ⊨u A : Sort@s1 }} ->
+    {{ ⟪ pred_P ⟫ Δ, A ⊨u M : B }} ->
+    {{ ⟪ pred_P ⟫ Δ, A ⊨u B : Sort@s2 }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u (λ r A M)[σ] ≈ λ r A[σ] M[q σ] : (Π r A B)[σ] }}.
 Proof with mautosolve.
-  intros * [env_relΓ [? [env_relΔ]]] [env_relΔA] [env_relΔA']%rel_exp_unsorted_of_typ_inversion1.
+  intros * [env_relΓ [? [env_relΔ]]] [env_relΔ']%rel_exp_unsorted_of_typ_inversion1 [env_relΔA] [env_relΔA']%rel_exp_unsorted_of_typ_inversion1.
   destruct_conjs.
   pose env_relΔA.
   invert_per_ctx_envs.
   handle_per_ctx_env_irrel.
   
-    
   (*eexists_rel_exp. *)
   eexists; split; [eassumption|].
     
   intros.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  (on_all_hyp: destruct_rel_by_assumption env_relΔ).
-  eexists.
+  (on_all_hyp: destruct_rel_by_assumption env_relΔ').
+  simplify_evals.
+  inversion_clear H19.
+  
+  assert (rel_typ_unsorted pred_P A ρσ A ρ'σ' (head_rel ρσ ρ'σ' H10)) by mauto.
+  assert (rel_typ_unsorted pred_P A ρσ A ρ'σ' (head_rel0 ρσ ρ'σ' H10)) by mauto.
+  destruct_by_head (@rel_typ_unsorted P).
+  simplify_evals.
+  handle_per_typ_elem_irrel. 
+  
+  
+  eexists.  
   split; econstructor; mauto 4.
   - econstructor; mauto.
     per_sort_elem_econstructor; [| | apply Equivalence_Reflexive]; eauto.
@@ -742,16 +766,17 @@ Proof with mautosolve.
     clear dependent c.
     clear dependent c'.
     intros.
-    
+
+    assert (per_sort_elem pred_P s1 (head_rel0 ρσ ρ'σ' H10) a a') by mauto.
+    handle_per_sort_elem_irrel.
     (* extract_output_info_with P ρσ c ρ'σ' c' env_relΔA. *)
     assert (Hequiv : {{ Dom ρσ ↦ c ≈ ρ'σ' ↦ c' ∈ env_relΔA }}).
     {
       apply_relation_equivalence.
       econstructor; mauto; [econstructor; mauto | econstructor; mauto|].
       simpl; mauto.
-      handle_per_sort_elem_irrel.
-      apply_relation_equivalence.
-      eapply H13; mauto.      
+      handle_per_typ_elem_irrel.
+      eapply H17; mauto.      
     }
     apply_relation_equivalence;
       (on_all_hyp: fun H => destruct (H _ _ Hequiv));
@@ -764,7 +789,7 @@ Proof with mautosolve.
     
     assert (rel_exp B d{{{ ρσ ↦ c }}} B d{{{ ρ'σ' ↦ c' }}} (per_sort pred_P s2)).
     {
-      eapply H3; mauto.
+      eapply H4; mauto.
       apply_relation_equivalence.
       econstructor; mauto;
         econstructor; mauto.
@@ -775,6 +800,7 @@ Proof with mautosolve.
     
   - intros ? **.
     (* extract_output_info_with ρσ c ρ'σ' c' env_relΔA.  *)
+    assert (per_sort_elem pred_P s1 (head_rel0 ρσ ρ'σ' H10) a a') by mauto.
     assert (Hequiv : {{ Dom ρσ ↦ c ≈ ρ'σ' ↦ c' ∈ env_relΔA }}).
     {
       apply_relation_equivalence.
@@ -782,7 +808,7 @@ Proof with mautosolve.
       simpl; mauto.
       handle_per_sort_elem_irrel.
       apply_relation_equivalence.
-      eapply H13; mauto.      
+      eapply H16; mauto.      
     }
     apply_relation_equivalence;
       (on_all_hyp: fun H => destruct (H _ _ Hequiv));
@@ -795,7 +821,7 @@ Proof with mautosolve.
     intros.
     destruct_by_head (@rel_typ P).
     destruct_by_head (@rel_typ_unsorted P).
-    assert (per_typ_elem pred_P R' a2 a'2) by mauto.
+    assert (per_typ_elem pred_P R' a1 a'1) by mauto.
     functional_eval_rewrite_clear.
     handle_per_typ_elem_irrel...
 Qed.
@@ -944,8 +970,8 @@ Hint Resolve rel_exp_unsorted_app_sub : mcpts.
 
 
 Lemma rel_exp_unsorted_pi_beta {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru P s1 s2 s3} {Γ A M B N},
-    {{ ⟪ pred_P ⟫ Γ , A::Sort@s1 ⊨u M : B }} ->
-    {{ ⟪ pred_P ⟫ Γ, A::Sort@s1 ⊨u B : Sort@s2 }} ->
+    {{ ⟪ pred_P ⟫ Γ , A ⊨u M : B }} ->
+    {{ ⟪ pred_P ⟫ Γ, A ⊨u B : Sort@s2 }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u N : A }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u (λ r A M) N ≈ M[Id,,N] : B[Id,,N] }}.
 Proof with mautosolve.
