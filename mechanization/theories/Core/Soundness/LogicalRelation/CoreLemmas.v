@@ -340,7 +340,7 @@ Ltac apply_predicate_equivalence :=
   rewrite_predicate_equivalence_left;
   clear_predicate_equivalence.
 
-(** *** Simple Morphism instance for [glu_univ_elem] *)
+(** *** Simple Morphism instance for [glu_sort_elem] *)
 Add Parametric Morphism {P} (pred_P : PredicativeSig P) s : (glu_sort_elem pred_P s)
     with signature glu_typ_pred_equivalence P ==> glu_exp_pred_equivalence P ==> eq ==> iff as simple_glu_sort_elem_morphism_iff.
 Proof with mautosolve.
@@ -407,7 +407,7 @@ Proof with mautosolve.
 Qed.
 
 
-Lemma functional_glu_univ_elem {P} (pred_P : PredicativeSig P) : forall s a typ_rel typ_rel' exp_rel exp_rel',
+Lemma functional_glu_sort_elem {P} (pred_P : PredicativeSig P) : forall s a typ_rel typ_rel' exp_rel exp_rel',
     {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
     {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel' ↘ exp_rel' }} ->
     (typ_rel <∙> typ_rel') /\ (exp_rel <∙> exp_rel').
@@ -490,7 +490,7 @@ Ltac apply_functional_glu_sort_elem1 :=
       | H : typ_rel1 <∙> typ_rel2, H0 : exp_rel2 <∙> exp_rel1 |- _ => fail 1
       | H : typ_rel2 <∙> typ_rel1, H0 : exp_rel1 <∙> exp_rel2 |- _ => fail 1
       | H : typ_rel2 <∙> typ_rel1, H0 : exp_rel2 <∙> exp_rel1 |- _ => fail 1
-      | _ => assert ((typ_rel1 <∙> typ_rel2) /\ (exp_rel1 <∙> exp_rel2)) as [] by (eapply functional_glu_univ_elem; [apply H1 | apply H2]) || tactic_error typ_rel1 typ_rel2
+      | _ => assert ((typ_rel1 <∙> typ_rel2) /\ (exp_rel1 <∙> exp_rel2)) as [] by (eapply functional_glu_sort_elem; [apply H1 | apply H2]) || tactic_error typ_rel1 typ_rel2
       end
   end.
 
@@ -1065,7 +1065,7 @@ Proof.
 Qed.
 
 
-Lemma glu_univ_elem_typ_monotone {P} (pred_P : PredicativeSig P) : forall s a typ_rel exp_rel Δ σ Γ A,
+Lemma glu_sort_elem_typ_monotone {P} (pred_P : PredicativeSig P) : forall s a typ_rel exp_rel Δ σ Γ A,
     {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
     {{ Γ ⊢ A ® typ_rel }} ->
     {{ Δ ⊢w σ : Γ }} ->
@@ -1076,7 +1076,7 @@ Proof.
   intuition.
 Qed.
 
-Lemma glu_univ_elem_exp_monotone {P} (pred_P : PredicativeSig P) : forall s a typ_rel exp_rel Δ σ Γ M A m,
+Lemma glu_sort_elem_exp_monotone {P} (pred_P : PredicativeSig P) : forall s a typ_rel exp_rel Δ σ Γ M A m,
     {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
     {{ Γ ⊢ M : A ® m ∈ exp_rel }} ->
     {{ Δ ⊢w σ : Γ }} ->

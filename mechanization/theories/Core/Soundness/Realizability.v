@@ -8,16 +8,15 @@ Import Domain_Notations.
 
 Open Scope list_scope.
 
-Lemma wf_ctx_sub_ctx_lookup {P} : forall n (A : typ P) Γ s,
-    {{ #n : A :: Sort@s ∈ Γ }} ->
+Lemma wf_ctx_sub_ctx_lookup {P} : forall n (A : typ P) Γ,
+    {{ #n : A ∈ Γ }} ->
     forall Δ,
       {{ ⊢ Δ ≈ Γ }} ->
-      exists Δ1 A0 s0 Δ2 A',
-        Δ = Δ1 ++ (A0, {{{ Sort@s0 }}}) :: Δ2 /\
+      exists Δ1 A0 Δ2 A',
+        Δ = Δ1 ++ A0 :: Δ2 /\
           n = length Δ1 /\
-          s = s0 /\
           A' = iter (S n) (fun A => {{{ A[Wk] }}}) A0 /\
-          {{ #n : A' :: Sort@s0 ∈ Δ }} /\
+          {{ #n : A' ∈ Δ }} /\
           (wf_typ_eq Δ A' A).
   (* I don't understand why this notation does not work *)
   (* {{ Δ ⊢ A' ≈ A }}. *)
@@ -25,14 +24,13 @@ Proof.
   induction 1; intros; progressive_inversion.
   - exists nil.
     repeat eexists; mauto 4.
-    econstructor; mauto.
-  - edestruct IHctx_lookup as [Δ1 [? [? [? [? [? [? [? []]]]]]]]]; mauto.
-    exists ((A0,{{{ Sort@s0 }}}) :: Δ1). subst.
+  - edestruct IHctx_lookup as [Δ1 [? [? [? [? [? [? []]]]]]]]; mauto.
+    exists (A0 :: Δ1). subst.
     repeat eexists; mauto 4.
 Qed.
 
-Lemma var_arith {P} : forall (Γ1 Γ2 : ctx P) (A : typ P) s,
-    length (Γ1 ++ (A, {{{ Sort@s }}}) :: Γ2) - length Γ2 - 1 = length Γ1.
+Lemma var_arith {P} : forall (Γ1 Γ2 : ctx P) (A : typ P),
+    length (Γ1 ++ A :: Γ2) - length Γ2 - 1 = length Γ1.
 Proof.
   intros.
   rewrite List.length_app. simpl.
@@ -43,80 +41,81 @@ Lemma var_weaken_gen {P} : forall (Δ : ctx P) (σ : sub P) (Γ : ctx P),
   (* Again, I don't understand why notation does not work *)
   (* {{ Δ ⊢w σ : Γ }} -> *)
     (weakening Δ σ Γ) ->
-    forall Γ1 Γ2 A0 s,
-      Γ = Γ1 ++ (A0, {{{ Sort@s }}}) :: Γ2 ->
+    forall Γ1 Γ2 A0,
+      Γ = Γ1 ++ A0 :: Γ2 ->
       wf_exp_eq Δ (a_sub (iter (S (length Γ1)) (fun A => {{{ A[Wk] }}}) A0) σ) (a_sub (a_var (length Γ1)) σ) (a_var (length Δ - length Γ2 - 1)).
       (* {{ Δ ⊢ #(length Γ1)[σ] ≈ #(length Δ - length Γ2 - 1) : ^(iter (S (length Γ1)) (fun A => {{{ A[Wk] }}}) A0)[σ] }}. *)
-Proof.
+Proof.  
   induction 1; intros; subst; gen_presups.
-  - pose proof (app_ctx_vlookup _ _ _ _ _ ltac:(eassumption) eq_refl) as Hvar.
+  - pose proof (app_ctx_vlookup _ _ _ _ ltac:(eassumption) eq_refl) as Hvar.
 
     (* gen_presup Hvar. *)
-    assert {{ ⊢ ^ (app Γ1 {{{ Γ2, A0::Sort@s }}}) }} by mauto.
-    assert (wf_typ (app Γ1 {{{ Γ2, A0::Sort@s }}}) (iter (S (length Γ1)) (fun T : exp P => {{{ T[Wk] }}}) A0)) by (eapply presup_exp_typ; mauto).    
+    assert {{ ⊢ ^ (app Γ1 {{{ Γ2, A0 }}}) }} by mauto.
+    assert (wf_typ (app Γ1 {{{ Γ2, A0 }}}) (iter (S (length Γ1)) (fun T : exp P => {{{ T[Wk] }}}) A0)) by (eapply presup_exp_typ; mauto).    
     clear_dups.
     apply wf_sub_id_inversion in Hτ.
     pose proof (wf_ctx_sub_length _ _ Hτ).
     transitivity {{{ #(length Γ1)[^(@a_id P)] }}}; [mauto 3 |].
-    replace (length Γ) with (length (Γ1 ++ {{{ Γ2, A0::Sort@s }}})) by lia.
+    replace (length Γ) with (length (Γ1 ++ {{{ Γ2, A0 }}})) by lia.
     rewrite var_arith.
     eapply wf_exp_eq_conv; [eapply wf_exp_eq_sub_id; mauto | mauto |].
     transitivity {{{ ^(iter (S (length Γ1)) (fun T : exp P => {{{ T[Wk] }}}) A0)[Id] }}}; mauto.
 
-  - pose proof (app_ctx_vlookup _ _ _ _ _ HΔ0 eq_refl) as Hvar.
-    pose proof (app_ctx_lookup Γ1 A0 Γ2 _ {{{ Sort@s }}} eq_refl).
+  - pose proof (app_ctx_vlookup _ _ _ _ HΔ0 eq_refl) as Hvar.
+    pose proof (app_ctx_lookup Γ1 A0 Γ2 _ eq_refl).
 
-    (* gen_presup Hvar. *)
-    assert {{ ⊢ ^ (app Γ1 {{{ Γ2, A0::Sort@s0 }}}) }} by mauto.
-    assert (wf_typ (app Γ1 {{{ Γ2, A0::Sort@s0 }}}) (iter (S (length Γ1)) (fun T : exp P => {{{ T[Wk] }}}) A0)) by (eapply presup_exp_typ; mauto).
-
+    gen_presup Hvar.
     clear_dups.
-    assert {{ ⊢ Δ', A::Sort@s }} by mauto 3.
-    assert (wf_sub {{{ Δ', A::Sort@s }}} (Γ1 ++ {{{ Γ2, A0::Sort@s0 }}}) (@a_weaken P)) by mauto 3.
+    assert {{ ⊢ Δ', A }} by mauto 3.
+    assert (wf_sub {{{ Δ', A }}} (Γ1 ++ {{{ Γ2, A0 }}}) (@a_weaken P)) by mauto 3.
     transitivity {{{ #(length Γ1)[Wk∘τ] }}}; [mauto 3 |].
-    eapply wf_exp_eq_conv with (A := {{{ ^ (iter (S (length Γ1)) (fun A1 : exp P => {{{ A1[Wk] }}}) A0)[Wk∘τ] }}}); mauto 3.
-    + etransitivity; [eapply wf_exp_eq_sub_compose; mauto 3 |].
-      pose proof (wf_ctx_sub_length _ _ H0).
+    eapply wf_exp_eq_conv' with (A := {{{ ^ (iter (S (length Γ1)) (fun A1 : exp P => {{{ A1[Wk] }}}) A0)[Wk∘τ] }}}); mauto 3.
+    
+    etransitivity; [eapply wf_exp_eq_sub_compose; mauto 3 |].
+    pose proof (wf_ctx_sub_length _ _ H0).
 
-      eapply wf_exp_eq_conv with (A := {{{ ^ (iter (S (length Γ1)) (fun A1 : exp P => {{{ A1[Wk] }}}) A0)[Wk][τ] }}}); mauto 3.
-      
-      deepexec (@wf_ctx_sub_ctx_lookup P) ltac:(fun H => destruct H as [Γ1' [? [? [Γ2' [? [-> [? [-> []]]]]]]]]).
+    eapply wf_exp_eq_conv' with {{{ ^ (iter (S (length Γ1)) (fun A1 : exp P => {{{ A1[Wk] }}}) A0)[Wk][τ] }}}; mauto 3.
 
-      repeat rewrite List.length_app in *.
-      
-      replace (length Γ1) with (length Γ1') in * by lia.
-      clear_refl_eqs.
-      replace (length Γ2) with (length Γ2') by (simpl in *; lia).
+    deepexec (@wf_ctx_sub_ctx_lookup P) ltac:(fun H => destruct H as [Γ1' [? [Γ2' [? [-> [? [-> []]]]]]]]).
+    repeat rewrite List.length_app in *.
+    replace (length Γ1) with (length Γ1') in * by lia.
+    clear_refl_eqs.
+    replace (length Γ2) with (length Γ2') by (simpl in *; lia).
 
-      etransitivity.
-      * eapply wf_exp_eq_sub_cong; [ |mauto 3].
-        eapply wf_exp_eq_conv'.
-        -- eapply wf_exp_eq_var_weaken; [mauto 3|]; mauto.
-           
-        -- mauto 4.
-      * eapply wf_exp_eq_subtyp'.
-        -- eapply IHweakening with (Γ1 := A :: _).
-           reflexivity.
-        -- eapply wf_subtyp_subst; [ |mauto 3].
-           simpl. eapply wf_subtyp_subst; mauto 3.
+    etransitivity.
+    + eapply wf_exp_eq_sub_cong; [ |mauto 3].
+      eapply wf_exp_eq_conv'.
+      * eapply wf_exp_eq_var_weaken; [mauto 3|]; eauto.
+      * mauto 4.
+    + eapply wf_exp_eq_conv'.
+      * eapply IHweakening with (Γ1 := A :: _).
+        reflexivity.
+      * eapply wf_subtyp_subst; [ |mauto 3].
+        simpl. eapply wf_subtyp_subst; mauto 3.
 Qed.
 
-Lemma var_glu_elem_bot : forall a i P El Γ A,
-    {{ DG a ∈ glu_univ_elem i ↘ P ↘ El }} ->
-    {{ Γ ⊢ A ® P }} ->
-    {{ Γ, A ⊢ #0 : A[Wk] ® !(length Γ) ∈ glu_elem_bot i a }}.
+Lemma var_glu_elem_bot {P} (pred_P : PredicativeSig P) : forall a s typ_rel exp_rel Γ A,
+    {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
+    typ_rel Γ A ->
+    (* {{ Γ ⊢ A ® P }} -> *)
+    glu_elem_bot pred_P s a {{{ Γ, A }}} {{{ A[Wk] }}} {{{ #0 }}} (d_var (length Γ) ).
+    (* {{ Γ, A ⊢ #0 : A[Wk] ® !(length Γ) ∈ glu_elem_bot pred_P s a }}. *)
 Proof.
   intros. saturate_glu_info.
   econstructor; mauto 4.
-  - eapply glu_univ_elem_typ_monotone; eauto.
-    mauto 4.
+  - econstructor; mauto 4.
+  - eapply glu_sort_elem_typ_monotone; eauto.
+    assert (wf_typ Γ A) by mauto 2.
+    assert {{ ⊢ Γ, A }} by mauto 3.
+    eapply weakening_wk; mauto 3.
   - intros. progressive_inversion.
     exact (var_weaken_gen _ _ _ H2 nil _ _ eq_refl).
 Qed.
 
 #[local]
-Hint Rewrite -> wf_sub_eq_extend_compose using mauto 4 : mcpts.
+Hint Rewrite -> @wf_sub_eq_extend_compose using mauto 4 : mcpts.
 
+(* STOPPED HERE *)
 Theorem realize_glu_univ_elem_gen : forall a i P El,
     {{ DG a ∈ glu_univ_elem i ↘ P ↘ El }} ->
     (forall Γ A R,
