@@ -67,7 +67,6 @@ with wf_exp {P : PtsSig} : ctx P -> typ P -> exp P -> Prop :=
   `( forall (r : Ru_nat P s),
         {{ ⊢ Γ }} ->
         {{ Γ ⊢ ℕ r: Sort@s }} )
-   
 | wf_zero :
   `(forall (r : Ru_nat P s),
       {{ ⊢ Γ }} ->
@@ -76,12 +75,13 @@ with wf_exp {P : PtsSig} : ctx P -> typ P -> exp P -> Prop :=
   `( forall (r : Ru_nat P s),
         {{ Γ ⊢ M : ℕ r}} ->
         {{ Γ ⊢ succ M : ℕ r}} )
-(* | wf_natrec : *)
-(*   `( {{ Γ, ℕ ⊢ A : Type@i }} -> *)
-(*      {{ Γ ⊢ MZ : A[Id,,zero] }} -> *)
-(*      {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,,succ #1] }} -> *)
-(*      {{ Γ ⊢ M : ℕ }} -> *)
-(*      {{ Γ ⊢ rec M return A | zero -> MZ | succ -> MS end : A[Id,,M] }} ) *)
+| wf_natrec :
+  `( forall (r : Ru_nat P s),
+        {{ Γ, ℕ r ⊢ A }} ->
+        {{ Γ ⊢ MZ : A[Id,,zero] }} ->
+        {{ Γ, ℕ r, A ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
+        {{ Γ ⊢ M : ℕ r}} ->
+        {{ Γ ⊢ rec M return A | zero -> MZ | succ -> MS end : A[Id,,M] }} )
 
 
 | wf_exp_sub :
@@ -217,6 +217,53 @@ with wf_exp_eq {P : PtsSig} : ctx P -> typ P -> exp P -> exp P -> Prop :=
         {{ Γ, A ⊢ B : Sort@s2 }} ->
         {{ Γ ⊢ M : Π r A B }} ->
         {{ Γ ⊢ M ≈ λ r A (M[Wk] #0) : Π r A B }} )
+(** Naturals **)
+| wf_exp_eq_nat_sub :
+  `( forall (r : Ru_nat P s),
+        {{ Γ ⊢s σ : Δ }} ->
+        {{ Γ ⊢ (ℕ r)[σ] ≈ ℕ r : Sort@s }} )
+| wf_exp_eq_zero_sub :
+  `( forall (r : Ru_nat P s),
+        {{ Γ ⊢s σ : Δ }} ->
+        {{ Γ ⊢ zero[σ] ≈ zero : ℕ r}} )
+| wf_exp_eq_succ_sub :
+  `( forall (r : Ru_nat P s),
+        {{ Γ ⊢s σ : Δ }} ->
+        {{ Δ ⊢ M : ℕ r}} ->
+        {{ Γ ⊢ (succ M)[σ] ≈ succ (M[σ]) : ℕ r}} )
+| wf_exp_eq_succ_cong :
+  `( forall (r : Ru_nat P s),
+        {{ Γ ⊢ M ≈ M' : ℕ r}} ->
+        {{ Γ ⊢ succ M ≈ succ M' : ℕ r}} )
+| wf_exp_eq_natrec_cong :
+  `( forall (r : Ru_nat P s),
+        {{ Γ, ℕ r ⊢ A }} ->
+        {{ Γ, ℕ r ⊢ A ≈ A' }} ->
+        {{ Γ ⊢ MZ ≈ MZ' : A[Id,,zero] }} ->
+        {{ Γ, ℕ r, A ⊢ MS ≈ MS' : A[Wk∘Wk,,succ #1] }} ->
+        {{ Γ ⊢ M ≈ M' : ℕ r}} ->
+        {{ Γ ⊢ rec M return A | zero -> MZ | succ -> MS end ≈ rec M' return A' | zero -> MZ' | succ -> MS' end : A[Id,,M] }} )
+| wf_exp_eq_natrec_sub :
+  `( forall (r : Ru_nat P s),
+       {{ Γ ⊢s σ : Δ }} ->
+       {{ Δ, ℕ r ⊢ A }} ->
+       {{ Δ ⊢ MZ : A[Id,,zero] }} ->
+       {{ Δ, ℕ r, A ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
+       {{ Δ ⊢ M : ℕ r}} ->
+       {{ Γ ⊢ rec M return A | zero -> MZ | succ -> MS end[σ] ≈ rec M[σ] return A[q σ] | zero -> MZ[σ] | succ -> MS[q (q σ)] end : A[σ,,M[σ]] }} )
+| wf_exp_eq_nat_beta_zero :
+  `( forall (r : Ru_nat P s),
+        {{ Γ, ℕ r ⊢ A }} ->
+        {{ Γ ⊢ MZ : A[Id,,zero] }} ->
+        {{ Γ, ℕ r, A ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
+        {{ Γ ⊢ rec zero return A | zero -> MZ | succ -> MS end ≈ MZ : A[Id,,zero] }} )
+| wf_exp_eq_nat_beta_succ :
+  `( forall (r : Ru_nat P s),
+        {{ Γ, ℕ r ⊢ A }} ->
+        {{ Γ ⊢ MZ : A[Id,,zero] }} ->
+        {{ Γ, ℕ r, A ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
+        {{ Γ ⊢ M : ℕ r}} ->
+        {{ Γ ⊢ rec succ M return A | zero -> MZ | succ -> MS end ≈ MS[Id,,M,,rec M return A | zero -> MZ | succ -> MS end] : A[Id,,succ M] }} )
 
 | wf_exp_eq_var :
   `( {{ ⊢ Γ }} ->
@@ -475,7 +522,11 @@ Hint Rewrite -> @wf_sub_eq_id_compose_right @wf_sub_eq_id_compose_left
                   @wf_sub_eq_p_extend using mauto 4 : mcpts.
 
 #[export]
-Hint Rewrite -> @wf_exp_eq_sub_id @wf_exp_eq_pi_sub using mauto 4 : mcpts.
+  Hint Rewrite -> @wf_exp_eq_sub_id @wf_exp_eq_pi_sub using mauto 4 : mcpts.
+
+#[export]
+Hint Rewrite -> @wf_exp_eq_typ_sub @wf_exp_eq_nat_sub using mauto 3 : mcpts.
+
 
 #[export]
 Instance wf_exp_eq_per_elem {P : PtsSig} (Γ : ctx P) T : PERElem _ (wf_exp Γ T) (wf_exp_eq Γ T).
