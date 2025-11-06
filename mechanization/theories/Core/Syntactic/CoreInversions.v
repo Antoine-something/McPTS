@@ -107,13 +107,19 @@ Qed.
 #[export]
   Hint Resolve wf_nat_inversion : mcpts.
 
-Corollary wf_zero_inversion {P} : forall {Γ : ctx P} {A s} {r : Ru_nat P s},
+Corollary wf_zero_inversion {P} : forall {Γ : ctx P} {A},
     {{ Γ ⊢ zero : A }} ->
-    {{ Γ ⊢ ℕ r ≈ A }}.
+    exists s (r : Ru_nat P s),
+      {{ Γ ⊢ ℕ r ≈ A }}.
 Proof with mautosolve.
   intros * H.
-  dependent induction H; admit.
-Admitted.
+  dependent induction H; subst.
+  - do 2 eexists; mauto.
+  - specialize (IHwf_exp A0 ltac:(reflexivity) ltac:(reflexivity)).
+    destruct_conjs.
+    do 2 eexists.
+    etransitivity; mauto.
+Qed.
 
 #[export]
 Hint Resolve wf_zero_inversion : mcpts.
