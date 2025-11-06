@@ -67,6 +67,14 @@ Proof with mautosolve.
     destruct_conjs.
     eapply wf_exp_conv; mauto 3.
 
+  (** Natural recursion case **)
+  - assert {{ Δ ⊢ MZ : B[Id,,zero] }} by mauto.
+    assert {{ Δ ⊢ M0 : ℕ r }} by mauto.
+    assert {{ ⊢ Δ, ℕ r ≈ Γ, ℕ r }} by (econstructor; mauto).
+    assert {{ ⊢ Δ, ℕ r, B ≈ Γ, ℕ r, B }} by (econstructor; mauto).
+    assert {{ Δ, ℕ r, B ⊢ MS : B[Wk∘Wk,,succ #1] }} by mauto.
+    mauto.
+
   (** Conversion case *)
   - assert {{ Δ ⊢ B ≈ A }} by mauto.
     assert {{ Δ ⊢ A }} by mauto.
@@ -112,6 +120,29 @@ Proof with mautosolve.
     assert {{ Δ ⊢ M : Π r B C }} by mauto.
     mauto 2.
 
+  (** Natural recursion congruence case **)
+  - assert {{ Δ ⊢ MZ ≈ MZ' : B[Id,,zero] }} by mauto.
+    assert {{ Δ ⊢ M0 ≈ M'0 : ℕ r }} by mauto.
+    assert {{ ⊢ Δ, ℕ r ≈ Γ, ℕ r }} by (econstructor; mauto).
+    assert {{ ⊢ Δ, ℕ r, B ≈ Γ, ℕ r, B }} by (econstructor; mauto).
+    assert {{ Δ, ℕ r, B ⊢ MS ≈ MS' : B[Wk∘Wk,,succ #1] }} by mauto.
+    mauto.
+
+  (** Natural recursion base case **)
+  - assert {{ ⊢ Δ, ℕ r ≈ Γ, ℕ r }} by (econstructor; mauto).
+    assert {{ ⊢ Δ, ℕ r, B ≈ Γ, ℕ r, B }} by (econstructor; mauto).
+    assert {{ Δ, ℕ r ⊢ B }} by mauto.
+    assert {{ Δ ⊢ M' : B[Id,,zero] }} by mauto.
+    assert {{ Δ, ℕ r, B ⊢ MS : B[Wk∘Wk,,succ #1] }} by mauto.
+    mauto.
+
+  (** Natural recursion succ case **)
+  - assert {{ ⊢ Δ, ℕ r ≈ Γ, ℕ r }} by (econstructor; mauto).
+    assert {{ ⊢ Δ, ℕ r, B ≈ Γ, ℕ r, B }} by (econstructor; mauto).
+    assert {{ Δ ⊢ M0 : ℕ r }} by mauto.
+    assert {{ Δ, ℕ r, B ⊢ MS : B[Wk∘Wk,,succ #1] }} by mauto.
+    mauto.
+
   (** Variable reflexivity case *)
   - assert (exists B, {{ #x : B ∈ Δ }} /\ {{ Γ ⊢ A ≈ B }} /\ {{ Δ ⊢ A ≈ B }} /\ {{ Δ ⊢ A }}) by mauto.
     destruct_conjs.
@@ -137,6 +168,8 @@ Proof with mautosolve.
   (** Id expansion cases (only weakening reflexivity) *)
   - inversion_clear HΓΔ.
     mauto.
+
+  (** Natural recursion **)
 Qed.  (* I don't know why this Qed takes so long to check *)
 
 
