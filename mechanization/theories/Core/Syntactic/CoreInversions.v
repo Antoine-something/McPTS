@@ -96,6 +96,46 @@ Qed.
 #[export]
 Hint Resolve wf_vlookup_inversion : mcpts.
 
+Lemma wf_nat_inversion {P} : forall {Γ : ctx P} {A s} {r : Ru_nat P s},
+    {{ Γ ⊢ ℕ r : A }} ->
+    {{ Γ ⊢ Sort@s ≈ A }}.
+Proof with mautosolve.
+  intros * H.
+  dependent induction H...
+Qed.
+
+#[export]
+  Hint Resolve wf_nat_inversion : mcpts.
+
+Corollary wf_zero_inversion {P} : forall {Γ : ctx P} {A s} {r : Ru_nat P s},
+    {{ Γ ⊢ zero : A }} ->
+    {{ Γ ⊢ ℕ r ≈ A }}.
+Proof with mautosolve.
+  intros * H.
+  dependent induction H; admit.
+Admitted.
+
+#[export]
+Hint Resolve wf_zero_inversion : mcpts.
+
+Corollary wf_succ_inversion {P} : forall {Γ : ctx P} {A M s} {r : Ru_nat P s},
+    {{ Γ ⊢ succ M : A }} ->
+    {{ Γ ⊢ M : ℕ r }} /\ {{ Γ ⊢ ℕ r ≈ A }}.
+Proof with mautosolve.
+  Admitted.
+
+#[export]
+Hint Resolve wf_succ_inversion : mcpts.
+
+Lemma wf_natrec_inversion {P} : forall {Γ : ctx P} {A M A' MZ MS s} {r : Ru_nat P s},
+    {{ Γ ⊢ rec M return A' | zero -> MZ | succ -> MS end : A }} ->
+    {{ Γ ⊢ MZ : A'[Id,,zero] }} /\ {{ Γ, ℕ r, A' ⊢ MS : A'[Wk∘Wk,,succ(#1)] }} /\ {{ Γ ⊢ M : ℕ r }} /\ {{ Γ ⊢ A'[Id,,M] ≈ A }}.
+Proof with mautosolve.
+  Admitted.
+
+#[export]
+Hint Resolve wf_natrec_inversion : mcpts.
+
 Lemma wf_exp_sub_inversion {P : PtsSig} : forall {Γ : ctx P} {M σ A},
     {{ Γ ⊢ M[σ] : A }} ->
     exists Δ A', {{ Γ ⊢s σ : Δ }} /\ {{ Δ ⊢ M : A' }} /\ {{ Γ ⊢ A'[σ] ≈ A }}.
