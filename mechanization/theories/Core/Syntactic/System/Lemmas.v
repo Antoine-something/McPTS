@@ -251,7 +251,35 @@ Qed.
 #[export]
 Hint Resolve eq_exp_sub_typ : mcpts.
 
+Lemma eq_exp_eq_sub_typ {P} : forall {Δ : ctx P} {Γ A A' σ σ' s},
+    {{ Δ ⊢ A ≈ A' : Sort@s }} ->
+    {{ Γ ⊢s σ : Δ }} ->
+    {{ Γ ⊢s σ ≈ σ' : Δ }} ->
+    {{ Γ ⊢ A[σ] ≈ A'[σ'] : Sort@s }}.
+Proof.
+  intros.
+  econstructor; mauto 3.
+Qed.
 
+#[export]
+Hint Resolve eq_exp_eq_sub_typ : mcpts.
+
+
+Lemma exp_eq_sub_compose_typ_sort {P} : forall {Γ Γ' Γ'' : ctx P} {A A' σ τ s},
+    {{ Γ'' ⊢ A' : Sort@s }} ->
+    {{ Γ'' ⊢ A ≈ A' : Sort@s }} ->
+    {{ Γ' ⊢s σ : Γ'' }} ->
+    {{ Γ ⊢s τ : Γ' }} ->
+    {{ Γ ⊢ A[σ∘τ] ≈ A'[σ][τ] : Sort@s }}.
+Proof.
+  intros.
+  transitivity {{{ A'[σ∘τ] }}};
+    econstructor; mauto 3.
+Qed.
+
+#[export]
+Hint Resolve exp_eq_sub_compose_typ_sort : mcpts.
+  
 Lemma presup_ctx_lookup_typ {P : PtsSig} : forall {Γ : ctx P} {A x},
     {{ ⊢ Γ }} ->
     {{ #x : A ∈ Γ }} ->

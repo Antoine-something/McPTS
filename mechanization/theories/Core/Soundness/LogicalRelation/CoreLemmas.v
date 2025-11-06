@@ -24,9 +24,6 @@ Proof.
   simpl.  
   induction 1 using glu_sort_elem_ind; intros;
     simpl_glu_rel; trivial.
-  destruct H6.
-  gen_presup H6.
-  eassumption.
 Qed.
 
 
@@ -40,11 +37,8 @@ Proof.
   simpl.
   induction 1 using glu_sort_elem_ind; intros;
     simpl_glu_rel; mauto 4.
-  - destruct H6.
-    mauto.
-  
-  - split; [trivial |].
-    intros.
+  split; [trivial |].
+  intros.
     transitivity {{{ A[σ] }}}; mauto 4.
 Qed.
 
@@ -65,8 +59,7 @@ Proof.
   induction 1 using glu_sort_elem_ind; intros;
     simpl_glu_rel; repeat split; intros; mauto 3.
   - firstorder.
-  - destruct H6.
-    econstructor; mauto 3.    
+  - econstructor; mauto 3.    
   - transitivity {{{ A[σ] }}}; mauto 4.
   - assert {{ Δ ⊢ A[σ] ≈ A'[σ] : Sort@s }}; mauto 4.    
 Qed.
@@ -88,9 +81,8 @@ Lemma glu_sort_elem_typ_resp_ctx_eq {P} (pred_P : PredicativeSig P) : forall s t
 Proof.
   simpl.
   induction 1 using glu_sort_elem_ind; intros;
-    simpl_glu_rel; mauto 2.
-  1: destruct H6.
-  all: econstructor; mauto.
+    simpl_glu_rel; mauto 2;
+    econstructor; mauto.
 Qed.
 
 Add Parametric Morphism {P} (pred_P : PredicativeSig P) s typ_rel exp_rel a (H : glu_sort_elem pred_P s typ_rel exp_rel a) : typ_rel
@@ -150,7 +142,6 @@ Proof.
   simpl.
   induction 1 using glu_sort_elem_ind; intros;
     simpl_glu_rel; mauto 4.
-  destruct H6; mauto.
 Qed.
 
 Lemma glu_sort_elem_per_sort {P} (pred_P : PredicativeSig P) : forall s typ_rel exp_rel a,
@@ -194,14 +185,13 @@ Proof.
     mauto 4.
 
   - intros.
-    destruct H6.
     destruct_rel_mod_app.    
     destruct_rel_mod_eval.
     functional_eval_rewrite_clear.
     do_per_sort_elem_irrel_assert.
     apply_relation_equivalence.
     assert (rel_mod_app m n m n' (x0 n n' equiv_n_n')) by mauto.
-    rewrite -> H19 in H8.
+    rewrite -> H22 in H8.
     eassumption.    
 Qed.
 
@@ -216,7 +206,6 @@ Proof.
     simpl_glu_rel;
     mauto 4.
 
-  destruct H6.
   econstructor; eauto.
   match_by_head (@per_sort_elem P) ltac:(fun H => directed invert_per_sort_elem H).
   intros ? ? N n ? ? equiv_n.
@@ -248,8 +237,7 @@ Proof.
   - repeat eexists; try split; eauto.
     eapply glu_sort_elem_typ_resp_exp_eq; mauto.
 
-  - destruct H6.
-    econstructor; eauto.
+  - econstructor; eauto.
     match_by_head (@per_sort_elem P) ltac:(fun H => directed invert_per_sort_elem H).
     intros.
     destruct_rel_mod_eval.
@@ -732,18 +720,17 @@ Proof.
   - reflexivity.
   - simpl_glu_rel.
     invert_per_sort_elem H10.
-    destruct H13.
     econstructor; mauto 3.
-    + eapply H4.
-      pose proof (proj1 (H4 _ _) H14).
+    + eapply H17.
+      pose proof (proj1 (H17 _ _) H16).
       simpl in *.
 
       intros.
       saturate_refl_for in_rel.
       pose proof (H18 _ _ equiv_n_n') as [].
       pose proof (H18 _ _ H19) as [].
-      pose proof (H3 _ _ equiv_n_n') as [].
-      pose proof (H3 _ _ H19) as [].
+      pose proof (H10 _ _ equiv_n_n') as [].
+      pose proof (H10 _ _ H19) as [].
       simplify_evals.
       econstructor; eauto.
       symmetry.
@@ -757,8 +744,8 @@ Proof.
       handle_per_sort_elem_irrel.
       pose proof (H9 _ equiv_n _ H22).
       eapply H28 in H25 as []; eauto.
-      destruct (H17 _ _ _ _ H20 H21 equiv_n) as [? []].
-      destruct (H14 _ _ equiv_n) as [].
+      destruct (H15 _ _ _ _ H20 H21 equiv_n) as [? []].
+      destruct (H16 _ _ equiv_n) as [].
       simplify_evals.
       eauto.
   

@@ -126,6 +126,18 @@ Hint Resolve wf_exp_eq_typ_sub' : mcpts.
 #[export]
 Hint Rewrite -> @wf_exp_eq_typ_sub' using solve [lia | mauto 3] : mcpts.
 
+Corollary wf_exp_eq_pi_cong' {P} : forall {Γ A A' s1 s2 s3 B B'} {r : Ru P s1 s2 s3},
+    {{ Γ ⊢ A ≈ A' : Sort@s1 }} ->
+    {{ Γ, A ⊢ B ≈ B' : Sort@s2 }} ->
+    {{ Γ ⊢ Π r A B ≈ Π r A' B' : Sort@s3 }}.
+Proof.
+  impl_opt_constructor.
+Qed.
+
+#[export]
+Hint Resolve wf_exp_eq_pi_cong' : mcpts.
+#[export]
+Remove Hints wf_exp_eq_pi_cong : mcpts.
 
 Corollary wf_exp_eq_fn_cong' {P : PtsSig} : forall {Γ : ctx P} {A A' s1 s2 s3 B M M'} {r : Ru P s1 s2 s3},
     {{ Γ ⊢ A ≈ A' : Sort@s1 }} ->
