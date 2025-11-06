@@ -115,7 +115,6 @@ Qed.
 #[local]
 Hint Rewrite -> @wf_sub_eq_extend_compose using mauto 4 : mcpts.
 
-(* STOPPED HERE *)
 Theorem realize_glu_sort_elem_gen {P} (pred_P : PredicativeSig P) : forall a s typ_rel exp_rel,
     {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
     (forall Γ A R,
@@ -182,28 +181,6 @@ Proof.
       deepexec H17 ltac:(fun H => pose proof H).
       functional_read_rewrite_clear.
       bulky_rewrite.
-
-  (* - econstructor; eauto; intros. *)
-  (*   progressive_inversion. *)
-  (*   transitivity {{{ ℕ[σ] }}}; mauto 3. *)
-  (* - handle_functional_glu_univ_elem. *)
-  (*   match_by_head glu_univ_elem invert_glu_univ_elem. *)
-  (*   apply_equiv_left. *)
-  (*   repeat split; eauto. *)
-  (*   econstructor; trivial. *)
-
-  (*   intros. *)
-  (*   saturate_weakening_escape. *)
-  (*   assert {{ Δ ⊢ A[σ] ≈ ℕ[σ] : Type @ i }} by mauto 3. *)
-  (*   rewrite <- wf_exp_eq_nat_sub; try eassumption. *)
-  (*   mauto 3. *)
-  (* - econstructor; mauto 3. *)
-  (*   + bulky_rewrite. mauto 3. *)
-  (*   + apply_equiv_left. trivial. *)
-  (*   + intros. *)
-  (*     saturate_weakening_escape. *)
-  (*     bulky_rewrite. *)
-  (*     mauto using glu_nat_readback. *)
 
   - match_by_head (@pi_glu_typ_pred P) progressive_invert.
     handle_per_sort_elem_irrel.
@@ -349,7 +326,8 @@ Proof.
       autorewrite with mcpts in H29.
       rewrite @wf_exp_eq_pi_eta' with (M := {{{ M[σ] }}}); [| trivial].
       cbn [nf_to_exp].
-      eapply wf_exp_eq_fn_cong'; eauto; [| eapply wf_pi_inversion'; mauto 3].
+
+      eapply wf_exp_eq_fn_cong'; eauto; [| mauto 4].
 
       pose proof (var_per_elem (length Δ) H0).
       destruct_rel_mod_eval.
@@ -381,137 +359,94 @@ Proof.
       (* assert {{ Δ, IT[σ] ⊢ #0 : IT[σ∘Wk] }} by (rewrite <- @exp_eq_sub_compose_typ; mauto 3). *)
       rewrite <- @sub_eq_q_sigma_id_extend; mauto 4.
 
-      rewrite <- @exp_eq_sub_compose_typ; mauto 2.
-      assert (wf_typ_eq {{{ Δ, IT[σ] }}} {{{ OT[q (σ∘Wk)∘(Id,,#0)] }}} {{{ OT[q (σ∘Wk)][Id,,#0] }}}).
-      {
-        eapply wf_typ_eq_sub_compose; mauto 3.
-      }
+      (* *)
+      
+      (* rewrite <- (@exp_eq_sub_compose_typ_sort); mauto 2. *)
+      assert (wf_typ {{{ Γ, IT }}} OT ) by mauto 3.
+      assert (wf_sub Δ Γ σ) by mauto 3.
+      assert (wf_sub {{{ Δ, IT[σ] }}} Δ {{{ Wk }}}) by mauto 3.
+      assert (wf_sub {{{ Δ, IT[σ] }}} Γ {{{ σ ∘ Wk }}}) by mauto 3.
+      assert (wf_sub {{{ Δ, IT[σ], IT[σ∘Wk] }}} {{{ Γ, IT }}} {{{ q (σ ∘ Wk ) }}}) by mauto 3.
+      assert (wf_exp {{{ Δ, IT[σ] }}} {{{ IT[σ∘Wk] }}} {{{ #0 }}}) by mauto 3.
+      assert (wf_sub {{{ Δ, IT[σ] }}} {{{ Δ, IT[σ], IT[σ∘Wk] }}} {{{ Id,,#0 }}}) by mauto 4.
+      assert (wf_typ_eq {{{ Δ, IT[σ] }}} {{{ OT[q (σ∘Wk)∘(Id,,#0)] }}} {{{ OT[q (σ∘Wk)][Id,,#0] }}}) by (symmetry; mauto 3).
       eapply wf_exp_eq_conv' with (A := {{{ OT[q (σ∘Wk)][Id,,#0] }}}); mauto 2.
       
-
-      
-      2:eapply sub_q; mauto 4.
-      2:gen_presup H41; econstructor; mauto 3.
       eapply wf_exp_eq_app_cong'; [| mauto 3].
       symmetry.
       rewrite <- wf_exp_eq_pi_sub; mauto 4.
 
-  - match_by_head eq_glu_typ_pred progressive_invert.
-    econstructor; eauto; intros.
-    + gen_presups; trivial.
-    + saturate_weakening_escape.
-      assert {{ Γ ⊢w Id : Γ }} by mauto 4.
-      assert (P Γ {{{ B[Id] }}}) as HB by mauto 3.
-      bulky_rewrite_in HB.
-      assert (El Γ {{{ B[Id] }}} {{{ M[Id] }}} m) as HM by mauto 3.
-      bulky_rewrite_in HM.
-      assert (El Γ {{{ B[Id] }}} {{{ N[Id] }}} n) as HN by mauto 3.
-      bulky_rewrite_in HN.
-      dir_inversion_clear_by_head read_typ.
-      assert {{ Γ ⊢ B ® glu_typ_top i a }} as [] by mauto 3.
-      assert {{ Γ ⊢ M : B ® m ∈ glu_elem_top i a }} as [] by mauto 3.
-      assert {{ Γ ⊢ N : B ® n ∈ glu_elem_top i a }} as [] by mauto 3.
-      bulky_rewrite.
-      simpl.
-      eapply wf_exp_eq_eq_cong; firstorder.
-
-  - handle_functional_glu_univ_elem.
-    invert_glu_rel1.
-    mauto.
-
-  - handle_functional_glu_univ_elem.
-    invert_glu_rel1.
-    econstructor; intros; mauto 3.
-
-    saturate_weakening_escape.
-    destruct_glu_eq;
-      dir_inversion_clear_by_head read_nf.
-    + pose proof (PER_refl1 _ _ _ _ _ H25).
-      gen_presups.
-      assert {{ Γ ⊢w Id : Γ }} by mauto 4.
-      assert (P Γ {{{ B[Id] }}}) as HB by mauto 3.
-      bulky_rewrite_in HB.
-      assert (El Γ {{{ B[Id] }}} {{{ M''[Id] }}} m') as HM'' by mauto 3.
-      bulky_rewrite_in HM''.
-      assert {{ Γ ⊢ B ® glu_typ_top i a }} as [] by mauto 3.
-      assert {{ Γ ⊢ N : B ® m' ∈ glu_elem_top i a }} as [] by mauto 3.
-      assert {{ Γ ⊢ Eq B M N ≈ Eq B N N : Type@i }} by (eapply wf_exp_eq_eq_cong; mauto 3).
-      assert {{ Γ ⊢ Eq B M'' M'' ≈ Eq B N N : Type@i }} by (eapply wf_exp_eq_eq_cong; mauto 3).
-      assert {{ Γ ⊢ A ≈ Eq B N N : Type@i }} by mauto 3.
-      assert {{ Γ ⊢ refl B M'' ≈ refl B N : Eq B M'' M'' }} by mauto 3.
-      assert {{ Γ ⊢ refl B M'' ≈ refl B N : Eq B N N }} by mauto 3.
-      assert {{ Γ ⊢ M' ≈ refl B N : A }} by mauto 4.
-      simpl.
-
-      transitivity {{{ (refl B N)[σ] }}}; [mauto 3 |].
-      bulky_rewrite.
-      transitivity {{{ refl (B[σ]) (N[σ]) }}};
-        [ eapply wf_exp_eq_conv'; [econstructor |]; mauto 3 |].
-      econstructor; mauto 3.
-    + firstorder.
-
-  - econstructor; eauto.
+  - assert (per_top_typ d{{{ ⇑ a b }}} d{{{ ⇑ a b }}}) by mauto.
+    econstructor; eauto.
     intros.
     progressive_inversion.
     firstorder.
-  - handle_functional_glu_univ_elem.
+  - handle_functional_glu_sort_elem P.
     apply_equiv_left.
     econstructor; eauto.
-  - handle_functional_glu_univ_elem.
+  - handle_functional_glu_sort_elem P.
     invert_glu_rel1.
     econstructor; eauto.
-    + intros s. destruct (H3 s) as [? []].
-      mauto.
+    + mauto.
     + intros.
       progressive_inversion.
-      specialize (H11 (length Δ)) as [? []].
+      specialize (H3 (length Δ)) as [? []].
       firstorder.
 Qed.
 
-Corollary realize_glu_typ_top : forall a i P El,
-    {{ DG a ∈ glu_univ_elem i ↘ P ↘ El }} ->
+
+Corollary realize_glu_typ_top {P} (pred_P : PredicativeSig P) : forall a s typ_rel exp_rel,
+    {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
     forall Γ A,
-      {{ Γ ⊢ A ® P }} ->
-      {{ Γ ⊢ A ® glu_typ_top i a }}.
+      (typ_rel Γ A) ->
+      (glu_typ_top pred_P s a Γ A).
+      (* {{ Γ ⊢ A ® P }} -> *)
+      (* {{ Γ ⊢ A ® glu_typ_top i a }}. *)
 Proof.
   intros.
   pose proof H.
-  eapply glu_univ_elem_per_univ in H.
+  eapply glu_sort_elem_per_sort in H.
   simpl in *. destruct_all.
-  eapply realize_glu_univ_elem_gen; eauto.
+  eapply realize_glu_sort_elem_gen; eauto.
 Qed.
 
-Theorem realize_glu_elem_bot : forall a i P El,
-    {{ DG a ∈ glu_univ_elem i ↘ P ↘ El }} ->
+Theorem realize_glu_elem_bot {P} (pred_P : PredicativeSig P) : forall a s typ_rel exp_rel,
+    {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
     forall Γ A M m,
-      {{ Γ ⊢ M : A ® m ∈ glu_elem_bot i a }} ->
-      {{ Γ ⊢ M : A ® ⇑ a m ∈ El }}.
+      (glu_elem_bot pred_P s a Γ A M m) ->
+      (exp_rel Γ A M d{{{ ⇑ a m }}}).
+      (* {{ Γ ⊢ M : A ® m ∈ glu_elem_bot i a }} -> *)
+      (* {{ Γ ⊢ M : A ® ⇑ a m ∈ El }}. *)
 Proof.
   intros.
-  eapply realize_glu_univ_elem_gen; eauto.
+  eapply realize_glu_sort_elem_gen; eauto.
 Qed.
 
-Theorem realize_glu_elem_top : forall a i P El,
-    {{ DG a ∈ glu_univ_elem i ↘ P ↘ El }} ->
+Theorem realize_glu_elem_top {P} (pred_P : PredicativeSig P) : forall a s typ_rel exp_rel,
+    {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
     forall Γ A M m,
-      {{ Γ ⊢ M : A ® m ∈ El }} ->
-      {{ Γ ⊢ M : A ® m ∈ glu_elem_top i a }}.
+      (exp_rel Γ A M m) ->
+      (glu_elem_top pred_P s a Γ A M m).
+      (* {{ Γ ⊢ M : A ® m ∈ El }} -> *)
+      (* {{ Γ ⊢ M : A ® m ∈ glu_elem_top i a }}. *)
 Proof.
   intros.
   pose proof H.
-  eapply glu_univ_elem_per_univ in H.
+  eapply glu_sort_elem_per_sort in H.
   simpl in *. destruct_all.
-  eapply realize_glu_univ_elem_gen; eauto.
-  eapply glu_univ_elem_per_elem; eauto.
+  eapply realize_glu_sort_elem_gen; eauto.
+  eapply glu_sort_elem_per_elem; eauto.
 Qed.
 
 #[export]
 Hint Resolve realize_glu_typ_top realize_glu_elem_top : mcpts.
 
-Corollary var0_glu_elem : forall {i a P El Γ A},
-    {{ DG a ∈ glu_univ_elem i ↘ P ↘ El }} ->
-    {{ Γ ⊢ A ® P }} ->
-    {{ Γ, A ⊢ #0 : A[Wk] ® ⇑! a (length Γ) ∈ El }}.
+Corollary var0_glu_elem {P} (pred_P : PredicativeSig P) : forall {s a typ_rel exp_rel Γ A},
+    {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
+    (typ_rel Γ A) ->
+    (exp_rel {{{ Γ, A }}} {{{ A[Wk] }}} {{{ #0 }}} d{{{ ⇑! a (length Γ) }}}).
+    (* {{ Γ ⊢ A ® P }} -> *)
+    (* {{ Γ, A ⊢ #0 : A[Wk] ® ⇑! a (length Γ) ∈ El }}. *)
 Proof.
   intros.
   eapply realize_glu_elem_bot; mauto 4.
