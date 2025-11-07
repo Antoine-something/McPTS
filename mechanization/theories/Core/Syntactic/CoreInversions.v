@@ -96,12 +96,18 @@ Qed.
 #[export]
 Hint Resolve wf_vlookup_inversion : mcpts.
 
-Lemma wf_nat_inversion {P} : forall {Γ : ctx P} {A s} {r : Ru_nat P s},
-    {{ Γ ⊢ ℕ r : A }} ->
-    {{ Γ ⊢ Sort@s ≈ A }}.
+Lemma wf_nat_inversion {P} : forall {Γ : ctx P} {A},
+    {{ Γ ⊢ ℕ : A }} ->
+    exists s (r : Ru_nat P s),
+      {{ Γ ⊢ Sort@s ≈ A }}.
 Proof with mautosolve.
   intros * H.
-  dependent induction H...
+  dependent induction H.
+  - eexists. mauto.
+  - specialize (IHwf_exp A0 ltac:(reflexivity) ltac:(reflexivity)).
+    destruct_conjs.
+    do 2 eexists. apply H2.
+    etransitivity; mauto.
 Qed.
 
 #[export]
@@ -110,35 +116,52 @@ Qed.
 Corollary wf_zero_inversion {P} : forall {Γ : ctx P} {A},
     {{ Γ ⊢ zero : A }} ->
     exists s (r : Ru_nat P s),
-      {{ Γ ⊢ ℕ r ≈ A }}.
+      {{ Γ ⊢ ℕ ≈ A }}.
 Proof with mautosolve.
   intros * H.
-  dependent induction H; subst.
-  - do 2 eexists; mauto.
+  dependent induction H.
+  - eexists. mauto.
   - specialize (IHwf_exp A0 ltac:(reflexivity) ltac:(reflexivity)).
     destruct_conjs.
-    do 2 eexists.
+    do 2 eexists. apply H2.
     etransitivity; mauto.
 Qed.
 
 #[export]
 Hint Resolve wf_zero_inversion : mcpts.
 
-Corollary wf_succ_inversion {P} : forall {Γ : ctx P} {A M s} {r : Ru_nat P s},
+Corollary wf_succ_inversion {P} : forall {Γ : ctx P} {A M},
     {{ Γ ⊢ succ M : A }} ->
-    {{ Γ ⊢ M : ℕ r }} /\ {{ Γ ⊢ ℕ r ≈ A }}.
+    {{ Γ ⊢ M : ℕ }} /\ {{ Γ ⊢ ℕ ≈ A }}.
 Proof with mautosolve.
-  Admitted.
+  intros * H.
+  dependent induction H.
+  - eexists; mautosolve.
+  - specialize (IHwf_exp A0 M ltac:(reflexivity) ltac:(reflexivity)).
+    destruct_conjs.
+    eexists. apply H2.
+    etransitivity; mauto.
+Qed.
 
 #[export]
 Hint Resolve wf_succ_inversion : mcpts.
 
-Lemma wf_natrec_inversion {P} : forall {Γ : ctx P} {A M A' MZ MS s} {r : Ru_nat P s},
+Lemma wf_natrec_inversion {P} : forall {Γ : ctx P} {A M A' MZ MS},
     {{ Γ ⊢ rec M return A' | zero -> MZ | succ -> MS end : A }} ->
-    {{ Γ ⊢ MZ : A'[Id,,zero] }} /\ {{ Γ, ℕ r, A' ⊢ MS : A'[Wk∘Wk,,succ(#1)] }} /\ {{ Γ ⊢ M : ℕ r }} /\ {{ Γ ⊢ A'[Id,,M] ≈ A }}.
+    {{ Γ ⊢ MZ : A'[Id,,zero] }} /\ {{ Γ, ℕ, A' ⊢ MS : A'[Wk∘Wk,,succ(#1)] }} /\ {{ Γ ⊢ M : ℕ }} /\ {{ Γ ⊢ A'[Id,,M] ≈ A }}.
 Proof with mautosolve.
-  Admitted.
-
+  intros * H.
+  dependent induction H.
+  - do 3 (eexists; mauto).
+    eapply wf_typ_eq_refl. mauto.
+  - specialize (IHwf_exp A0 M A' MZ MS ltac:(reflexivity) ltac:(reflexivity)).
+    destruct_conjs.
+    eexists. mauto.
+    eexists. mauto.
+    eexists. mauto.
+    mauto.
+Qed.
+    
 #[export]
 Hint Resolve wf_natrec_inversion : mcpts.
 
