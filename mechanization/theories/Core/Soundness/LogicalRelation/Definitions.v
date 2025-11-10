@@ -354,15 +354,22 @@ End GluingInduction.
 
 
 (** Gluing model for untyped judgments *)
-Definition unsorted_glu_typ_pred {P} (pred_P : PredicativeSig P) (s : P) : glu_typ_pred P :=
+Definition sort_glu_typ_pred_unsorted {P} (pred_P : PredicativeSig P) (s : P) : glu_typ_pred P :=
   fun Γ A => {{ Γ ⊢ A ≈ Sort@s }}.
-Arguments unsorted_glu_typ_pred {P} pred_P s Γ A/.
-Transparent unsorted_glu_typ_pred.
+Arguments sort_glu_typ_pred_unsorted {P} pred_P s Γ A/.
+Transparent sort_glu_typ_pred_unsorted.
 
 Definition unsorted_glu_exp_pred {P} (pred_P : PredicativeSig P) (s : P) : glu_exp_pred P :=
   fun Γ A M m =>
     {{ Γ ⊢ M : A }} /\ {{ Γ ⊢ A ≈ Sort@s }} /\
-      {{ Γ ⊢ M : A ® m ∈ unsorted_glu_typ_pred pred_P s }}.
+      (exists typ_rel exp_rel, forall a,
+          ({{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} /\  {{ Γ ⊢ A ® typ_rel }}) ->
+          {{ Γ ⊢ M : A ® m ∈ exp_rel }}).
+
+(* Definition unsorted_glu_exp_pred {P} (pred_P : PredicativeSig P) (s : P) : glu_exp_pred P := *)
+(*   fun Γ A M m => *)
+(*     {{ Γ ⊢ M : A }} /\ {{ Γ ⊢ A ≈ Sort@s }} /\ *)
+(*       {{ Γ ⊢ M : A ® m ∈ unsorted_glu_typ_pred pred_P s }}. *)
 
 Inductive glu_typ_unsorted_elem {P} (pred_P : PredicativeSig P) : glu_typ_pred P -> glu_exp_pred P -> domain P -> Prop :=
 | glu_typ_unsorted_sort :
