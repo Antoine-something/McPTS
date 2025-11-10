@@ -1011,5 +1011,3 @@ Proof.
 Qed.
 #[export]
 Hint Resolve no_closed_neutral : mcpts.
-
-

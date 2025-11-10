@@ -432,4 +432,4 @@ Qed.
 #[export]
 Hint Resolve sub_eq_q_compose : mcpts.
 #[export]
-Hint Rewrite -> @sub_eq_q_compose using mauto 4 : mcpts.
+Hint Rewrite -> @sub_eq_q_compose using mauto 4 : mcpts.    

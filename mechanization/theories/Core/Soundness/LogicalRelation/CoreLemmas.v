@@ -27,6 +27,23 @@ Proof.
 Qed.
 
 
+Lemma glu_typ_unsorted_elem_sort_lvl {P} (pred_P : PredicativeSig P) : forall typ_rel exp_rel a,
+    {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} ->
+    forall Γ A,
+      {{ Γ ⊢ A ® typ_rel }} ->
+      {{ Γ ⊢ A }}.
+Proof.
+  simpl.
+  induction 1; intros.
+  - rewrite -> H in H1.
+    unfold unsorted_glu_typ_pred in H1.
+    gen_presup H1.
+    eassumption.
+  - assert {{ Γ ⊢ A : Sort@s }} by (eapply glu_sort_elem_sort_lvl; mauto 3).
+    econstructor; mauto 2.
+Qed.
+
+
 Lemma glu_sort_elem_typ_resp_exp_eq {P} (pred_P : PredicativeSig P) : forall s typ_rel exp_rel a,
     {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
     forall Γ A A',
@@ -36,12 +53,32 @@ Lemma glu_sort_elem_typ_resp_exp_eq {P} (pred_P : PredicativeSig P) : forall s t
 Proof.
   simpl.
   induction 1 using glu_sort_elem_ind; intros;
-    simpl_glu_rel; mauto 4.
+    simpl_glu_rel; mauto 4.  
   split; [trivial |].
   intros.
     transitivity {{{ A[σ] }}}; mauto 4.
 Qed.
 
+
+Lemma glu_typ_unsorted_elem_resp_typ_eq {P} (pred_P : PredicativeSig P) : forall typ_rel exp_rel a,
+    {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} ->
+    forall Γ A A',
+      {{ Γ ⊢ A ® typ_rel }} ->
+      {{ Γ ⊢ A ≈ A' }} ->
+      {{ Γ ⊢ A' ® typ_rel }}.
+Proof.
+  simpl.
+  induction 1; intros.
+  - rewrite -> H in *.
+    unfold unsorted_glu_typ_pred in *.
+    etransitivity; mauto 2.
+  - assert {{ Γ ⊢ A : Sort@s }} by (eapply glu_sort_elem_sort_lvl; mauto 2).
+    
+    
+    assert {{ Γ ⊢ A ≈ A' : Sort@s }}.
+      
+
+    
 Add Parametric Morphism {P} (pred_P : PredicativeSig P) s typ_rel exp_rel a (H : glu_sort_elem pred_P s typ_rel exp_rel a) Γ : (typ_rel Γ)
     with signature wf_exp_eq Γ {{{ Sort@s }}} ==> iff as glu_sort_elem_typ_morphism_iff1.
 Proof.

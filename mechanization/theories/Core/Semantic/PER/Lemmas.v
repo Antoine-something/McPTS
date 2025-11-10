@@ -989,6 +989,7 @@ Proof.
     eapply (proj1 (per_typ_elem_trans R x y Hxy) z Hyz).
 Qed.
 
+
 Corollary per_typ_sym {P} {pred_P : PredicativeSig P} : forall a b,
     {{ Dom a ≈ b ∈ per_typ pred_P }} ->
     {{ Dom b ≈ a ∈ per_typ pred_P }}.

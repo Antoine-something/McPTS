@@ -86,31 +86,31 @@ Proof. mautosolve 4. Qed.
 #[export]
 Hint Resolve glu_sort_elem_typ_unique_upto_exp_eq' : mcpts.
 
-(* STOPPED HERE *)
-Lemma glu_sort_elem_per_sort_elem_typ_escape : forall {i a a' elem_rel P P' El El' Γ A A'},
-    {{ DF a ≈ a' ∈ per_sort_elem i ↘ elem_rel }} ->
-    {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }} ->
-    {{ DG a' ∈ glu_sort_elem i ↘ P' ↘ El' }} ->
-    {{ Γ ⊢ A ® P }} ->
-    {{ Γ ⊢ A' ® P' }} ->
-    {{ Γ ⊢ A ≈ A' : Type@i }}.
+
+Lemma glu_sort_elem_per_sort_elem_typ_escape {P} (pred_P : PredicativeSig P) : forall {s a a' elem_rel typ_rel typ_rel' exp_rel exp_rel' Γ A A'},
+    {{ DF a ≈ a' ∈ per_sort_elem pred_P s ↘ elem_rel }} ->
+    {{ DG a ∈ glu_sort_elem pred_P s  ↘ typ_rel ↘ exp_rel }} ->
+    {{ DG a' ∈ glu_sort_elem pred_P s ↘ typ_rel' ↘ exp_rel' }} ->
+    {{ Γ ⊢ A ® typ_rel }} ->
+    {{ Γ ⊢ A' ® typ_rel' }} ->
+    {{ Γ ⊢ A ≈ A' }}.
 Proof with mautosolve 4.
   simpl in *.
   intros * Hper Hglu Hglu' HA HA'.
-  assert {{ DG a ∈ glu_sort_elem i ↘ P' ↘ El' }} by (setoid_rewrite Hper; eassumption).
-  handle_functional_glu_sort_elem...
+  assert {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel' ↘ exp_rel' }} by (setoid_rewrite Hper; eassumption).
+  (handle_functional_glu_sort_elem P)...
 Qed.
 
 #[export]
 Hint Resolve glu_sort_elem_per_sort_elem_typ_escape : mcpts.
 
-Lemma glu_sort_elem_per_sort_typ_escape : forall {i a a' P P' El El' Γ A A'},
-    {{ Dom a ≈ a' ∈ per_sort i }} ->
-    {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }} ->
-    {{ DG a' ∈ glu_sort_elem i ↘ P' ↘ El' }} ->
-    {{ Γ ⊢ A ® P }} ->
-    {{ Γ ⊢ A' ® P' }} ->
-    {{ Γ ⊢ A ≈ A' : Type@i }}.
+Lemma glu_sort_elem_per_sort_typ_escape {P} (pred_P : PredicativeSig P) : forall {s a a' typ_rel typ_rel' exp_rel exp_rel' Γ A A'},
+    {{ Dom a ≈ a' ∈ per_sort pred_P s }} ->
+    {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
+    {{ DG a' ∈ glu_sort_elem pred_P s ↘ typ_rel' ↘ exp_rel' }} ->
+    {{ Γ ⊢ A ® typ_rel }} ->
+    {{ Γ ⊢ A' ® typ_rel' }} ->
+    {{ Γ ⊢ A ≈ A' }}.
 Proof.
   intros * [] **...
   mauto 4.
@@ -119,18 +119,18 @@ Qed.
 #[export]
 Hint Resolve glu_sort_elem_per_sort_typ_escape : mcpts.
 
-Lemma glu_sort_elem_exp_unique_upto_exp_eq : forall {i j a P P' El El' Γ A A' M M' m},
-    {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }} ->
-    {{ DG a ∈ glu_sort_elem j ↘ P' ↘ El' }} ->
-    {{ Γ ⊢ M : A ® m ∈ El }} ->
-    {{ Γ ⊢ M' : A' ® m ∈ El' }} ->
+Lemma glu_sort_elem_exp_unique_upto_exp_eq {P} (pred_P : PredicativeSig P) : forall {s s' a typ_rel typ_rel' exp_rel exp_rel' Γ A A' M M' m},
+    {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
+    {{ DG a ∈ glu_sort_elem pred_P s' ↘ typ_rel' ↘ exp_rel' }} ->
+    {{ Γ ⊢ M : A ® m ∈ exp_rel }} ->
+    {{ Γ ⊢ M' : A' ® m ∈ exp_rel' }} ->
     {{ Γ ⊢ M ≈ M' : A }}.
 Proof.
   intros.
-  assert {{ Γ ⊢ M : A ® m ∈ glu_elem_top i a }} as [] by mauto 3.
-  assert {{ Γ ⊢ M' : A' ® m ∈ glu_elem_top j a }} as [] by mauto 3.
-  assert {{ Γ ⊢ A ≈ A' : Type@(max i j) }} by mauto 3.
-  match_by_head per_top ltac:(fun H => destruct (H (length Γ)) as [W []]).
+  assert {{ Γ ⊢ M : A ® m ∈ glu_elem_top pred_P s a }} as [] by mauto 3.
+  assert {{ Γ ⊢ M' : A' ® m ∈ glu_elem_top pred_P s' a }} as [] by mauto 3.
+  assert {{ Γ ⊢ A ≈ A' }} by mauto 3.
+  match_by_head (@per_top P) ltac:(fun H => destruct (H (length Γ)) as [W []]).
   clear_dups.
   assert {{ Γ ⊢ M[Id] ≈ W : A[Id] }} by mauto 4.
   assert {{ Γ ⊢ M[Id] ≈ W : A }} by (gen_presups; mauto 4).
@@ -147,10 +147,10 @@ Qed.
 #[export]
  Hint Resolve glu_sort_elem_exp_unique_upto_exp_eq : mcpts.
 
-Lemma glu_sort_elem_exp_unique_upto_exp_eq' : forall {i a P El Γ M M' m A},
-    {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }} ->
-    {{ Γ ⊢ M : A ® m ∈ El }} ->
-    {{ Γ ⊢ M' : A ® m ∈ El }} ->
+Lemma glu_sort_elem_exp_unique_upto_exp_eq' {P} (pred_P : PredicativeSig P) : forall {s a typ_rel exp_rel Γ M M' m A},
+    {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
+    {{ Γ ⊢ M : A ® m ∈ exp_rel }} ->
+    {{ Γ ⊢ M' : A ® m ∈ exp_rel }} ->
     {{ Γ ⊢ M ≈ M' : A }}.
 Proof. mautosolve 4. Qed.
 
@@ -158,11 +158,11 @@ Proof. mautosolve 4. Qed.
 #[export]
 Hint Resolve glu_sort_elem_exp_unique_upto_exp_eq' : mcpts.
 
-Lemma glu_sort_elem_per_sort_typ_iff : forall {i a a' P P' El El'},
-    {{ Dom a ≈ a' ∈ per_sort i }} ->
-    {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }} ->
-    {{ DG a' ∈ glu_sort_elem i ↘ P' ↘ El' }} ->
-    (P <∙> P') /\ (El <∙> El').
+Lemma glu_sort_elem_per_sort_typ_iff {P} (pred_P : PredicativeSig P) : forall {s a a' typ_rel typ_rel' exp_rel exp_rel'},
+    {{ Dom a ≈ a' ∈ per_sort pred_P s }} ->
+    {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
+    {{ DG a' ∈ glu_sort_elem pred_P s ↘ typ_rel' ↘ exp_rel' }} ->
+    (typ_rel <∙> typ_rel') /\ (exp_rel <∙> exp_rel').
 Proof.
   intros * Hper **.
   eapply functional_glu_sort_elem;
@@ -170,311 +170,309 @@ Proof.
     eassumption.
 Qed.
 
-Corollary glu_sort_elem_cumu_ge : forall {i j a P El},
-    i <= j ->
-    {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }} ->
-    exists P' El', {{ DG a ∈ glu_sort_elem j ↘ P' ↘ El' }}.
+
+Lemma glu_sort_elem_sort_irrel {P} (pred_P : PredicativeSig P) : forall {s s' a typ_rel typ_rel' exp_rel exp_rel'},
+    {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
+    {{ DG a ∈ glu_sort_elem pred_P s' ↘ typ_rel' ↘ exp_rel' }} ->
+    (forall Γ A, {{ Γ ⊢ A ® typ_rel' }} -> {{ Γ ⊢ A ® typ_rel' }}) /\
+      (forall Γ A M m, {{ Γ ⊢ M : A ® m ∈ exp_rel }} -> {{ Γ ⊢ M : A ® m ∈ exp_rel' }}) /\
+      (forall Γ A M m, {{ Γ ⊢ A ® typ_rel }} -> {{ Γ ⊢ M : A ® m ∈ exp_rel' }} -> {{ Γ ⊢ M : A ® m ∈ exp_rel }}).
+Proof with mautosolve 4.
+  simpl.
+  intros * Hglu Hglu'.
+  gen exp_rel' typ_rel' s'.
+  induction Hglu using glu_sort_elem_ind; repeat split; intros;
+    try assert {{ DF a ≈ a ∈ per_sort_elem pred_P s' ↘ in_rel }} by mauto 2;
+    invert_glu_sort_elem Hglu';
+    handle_functional_glu_sort_elem P;
+    simpl in *;
+    try solve [repeat split; intros; destruct_conjs; mauto 2 | intuition mauto 3].
+
+  - repeat split; intros; destruct_conjs; mauto 2.
+Abort.
+
+
+    
+(* Section glu_sort_elem_cumulativity. *)
+(*   #[local] *)
+(*   Lemma glu_sort_elem_cumulativity_ge : forall {i j a P P' El El'}, *)
+(*       i <= j -> *)
+(*       {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }} -> *)
+(*       {{ DG a ∈ glu_sort_elem j ↘ P' ↘ El' }} -> *)
+(*       (forall Γ A, {{ Γ ⊢ A ® P }} -> {{ Γ ⊢ A ® P' }}) /\ *)
+(*         (forall Γ A M m, {{ Γ ⊢ M : A ® m ∈ El }} -> {{ Γ ⊢ M : A ® m ∈ El' }}) /\ *)
+(*         (forall Γ A M m, {{ Γ ⊢ A ® P }} -> {{ Γ ⊢ M : A ® m ∈ El' }} -> {{ Γ ⊢ M : A ® m ∈ El }}). *)
+(*   Proof with mautosolve 4. *)
+(*     simpl. *)
+(*     intros * Hge Hglu Hglu'. gen El' P' j. *)
+(*     induction Hglu using glu_sort_elem_ind; repeat split; intros; *)
+(*       try assert {{ DF a ≈ a ∈ per_sort_elem j ↘ in_rel }} by mauto 2; *)
+(*       invert_glu_sort_elem Hglu'; *)
+(*       handle_functional_glu_sort_elem; *)
+(*       simpl in *; *)
+(*       try solve [repeat split; intros; destruct_conjs; mauto 2 | intuition mauto 3]. *)
+
+(*     - rename x into IP'. *)
+(*       rename x0 into IEl'. *)
+(*       rename x1 into OP'. *)
+(*       rename x2 into OEl'. *)
+(*       destruct_by_head pi_glu_typ_pred. *)
+(*       econstructor; intros; mauto 4. *)
+(*       + assert {{ Δ ⊢ IT[σ] ® IP }} by mauto. *)
+(*         enough (forall Γ A, {{ Γ ⊢ A ® IP }} -> {{ Γ ⊢ A ® IP' }}) by mauto 4. *)
+(*         eapply proj1... *)
+(*       + match_by_head per_sort_elem ltac:(fun H => directed invert_per_sort_elem H). *)
+(*         apply_relation_equivalence. *)
+(*         destruct_rel_mod_eval. *)
+(*         handle_per_sort_elem_irrel. *)
+(*         assert (forall Γ A, {{ Γ ⊢ A ® OP m equiv_m }} -> {{ Γ ⊢ A ® OP' m equiv_m }}) by (eapply proj1; mauto). *)
+(*         enough {{ Δ ⊢ OT[σ,,M] ® OP m equiv_m }} by mauto. *)
+(*         enough {{ Δ ⊢ M : IT[σ] ® m ∈ IEl }} by mauto. *)
+(*         eapply IHHglu... *)
+(*     - rename x into IP'. *)
+(*       rename x0 into IEl'. *)
+(*       rename x1 into OP'. *)
+(*       rename x2 into OEl'. *)
+(*       destruct_by_head pi_glu_exp_pred. *)
+(*       handle_per_sort_elem_irrel. *)
+(*       econstructor; intros; mauto 4. *)
+(*       + enough (forall Γ A, {{ Γ ⊢ A ® IP }} -> {{ Γ ⊢ A ® IP' }}) by mauto 4. *)
+(*         eapply proj1... *)
+(*       + match_by_head per_sort_elem ltac:(fun H => directed invert_per_sort_elem H). *)
+(*         handle_per_sort_elem_irrel. *)
+(*         destruct_rel_mod_eval. *)
+(*         destruct_rel_mod_app. *)
+(*         handle_per_sort_elem_irrel. *)
+(*         eexists; split; mauto 4. *)
+(*         assert (forall Γ A M m, {{ Γ ⊢ M : A ® m ∈ OEl n equiv_n }} -> {{ Γ ⊢ M : A ® m ∈ OEl' n equiv_n }}) by (eapply proj1, proj2; mauto 4). *)
+(*         enough {{ Δ ⊢ M[σ] N : OT[σ,,N] ® fa ∈ OEl n equiv_n }} by mauto 4. *)
+(*         assert {{ Δ ⊢ N : IT[σ] ® n ∈ IEl }} by (eapply IHHglu; mauto 3). *)
+(*         assert (exists mn, {{ $| m & n |↘ mn }} /\ {{ Δ ⊢ M[σ] N : OT[σ,,N] ® mn ∈ OEl n equiv_n }}) by mauto 4. *)
+(*         destruct_conjs. *)
+(*         functional_eval_rewrite_clear... *)
+(*     - rename x into IP'. *)
+(*       rename x0 into IEl'. *)
+(*       rename x1 into OP'. *)
+(*       rename x2 into OEl'. *)
+(*       destruct_by_head pi_glu_typ_pred. *)
+(*       destruct_by_head pi_glu_exp_pred. *)
+(*       handle_per_sort_elem_irrel. *)
+(*       econstructor; intros; mauto. *)
+(*       match_by_head per_sort_elem ltac:(fun H => directed invert_per_sort_elem H). *)
+(*       handle_per_sort_elem_irrel. *)
+(*       destruct_rel_mod_eval. *)
+(*       destruct_rel_mod_app. *)
+(*       handle_per_sort_elem_irrel. *)
+(*       match goal with *)
+(*       | _: {{ ⟦ B ⟧ ρ ↦ n ↘ ^?a }} |- _ => *)
+(*           rename a into b *)
+(*       end. *)
+(*       eexists; split; mauto 4. *)
+(*       assert (forall Γ A M m, {{ Γ ⊢ A ® OP n equiv_n }} -> {{ Γ ⊢ M : A ® m ∈ OEl' n equiv_n }} -> {{ Γ ⊢ M : A ® m ∈ OEl n equiv_n }}) by (eapply proj2, proj2; eauto 3). *)
+(*       assert {{ Δ ⊢ OT[σ,,N] ® OP n equiv_n }} by mauto 4. *)
+(*       enough {{ Δ ⊢ M[σ] N : OT[σ,,N] ® fa ∈ OEl' n equiv_n }} by mauto 4. *)
+(*       assert {{ Δ ⊢ N : IT[σ] ® n ∈ IEl' }} by (eapply IHHglu; mauto 3). *)
+(*       assert {{ Δ ⊢ IT[σ] ® IP' }} by (eapply glu_sort_elem_trm_typ; mauto 2). *)
+(*       assert {{ Δ ⊢ IT0[σ] ® IP' }} by mauto 2. *)
+(*       assert {{ Δ ⊢ IT[σ] ≈ IT0[σ] : Type@j }} as HITeq by mauto 2. *)
+(*       assert {{ Δ ⊢ N : IT0[σ] ® n ∈ IEl' }} by (rewrite <- HITeq; mauto 3). *)
+(*       assert (exists mn, {{ $| m & n |↘ mn }} /\ {{ Δ ⊢ M[σ] N : OT0[σ,,N] ® mn ∈ OEl' n equiv_n }}) by mauto 3. *)
+(*       destruct_conjs. *)
+(*       functional_eval_rewrite_clear. *)
+(*       assert {{ DG b ∈ glu_sort_elem j ↘ OP' n equiv_n ↘ OEl' n equiv_n }} by mauto 3. *)
+(*       assert {{ Δ ⊢ OT0[σ,,N] ® OP' n equiv_n }} by (eapply glu_sort_elem_trm_typ; mauto 3). *)
+(*       enough {{ Δ ⊢ OT[σ,,N] ≈ OT0[σ,,N] : Type@j }} as ->... *)
+
+(*     - invert_glu_rel1. *)
+(*       econstructor; intros; firstorder mauto 3. *)
+(*     - invert_glu_rel1. *)
+(*       handle_per_sort_elem_irrel. *)
+
+(*       econstructor; intros; firstorder mauto 3. *)
+(*       destruct_glu_eq; econstructor; firstorder mauto 3. *)
+(*     - repeat invert_glu_rel1. *)
+(*       handle_per_sort_elem_irrel. *)
+
+(*       econstructor; intros; firstorder mauto 3. *)
+(*       assert {{ Γ ⊢w Id : Γ }} by mauto 4. *)
+(*       assert (P Γ {{{ B[Id] }}}) as HB by mauto 3. *)
+(*       bulky_rewrite_in HB. *)
+(*       assert (P0 Γ B) as HB' by firstorder. *)
+(*       assert (P0 Γ {{{ B0[Id] }}}) as HB0 by mauto 3. *)
+(*       bulky_rewrite_in HB0. *)
+(*       assert {{ Γ ⊢ B0 ≈ B : Type@j }} by mauto 3. *)
+(*       assert (El Γ {{{ B[Id] }}} {{{ M0[Id] }}} m) as HM0 by mauto 3. *)
+(*       bulky_rewrite_in HM0. *)
+(*       assert (El0 Γ B M0 m) as HM0' by firstorder. *)
+(*       assert (El Γ {{{ B[Id] }}} {{{ N[Id] }}} n) as HN by mauto 3. *)
+(*       bulky_rewrite_in HN. *)
+(*       assert (El0 Γ B N n) as HN' by firstorder. *)
+(*       assert (El0 Γ {{{ B0[Id] }}} {{{ M[Id] }}} m) as HM by mauto 3. *)
+(*       bulky_rewrite_in HM. *)
+(*       assert (El0 Γ {{{ B0[Id] }}} {{{ N0[Id] }}} n) as HN0 by mauto 3. *)
+(*       bulky_rewrite_in HN0. *)
+(*       assert {{ Γ ⊢ M0 ≈ M : B }} by mauto 3. *)
+(*       assert {{ Γ ⊢ N ≈ N0 : B }} by mauto 3. *)
+
+(*       destruct_glu_eq; econstructor; apply_equiv_left; mauto 3. *)
+(*       + bulky_rewrite. *)
+(*         eapply wf_exp_eq_conv'; [econstructor |]; mauto 3. *)
+(*         transitivity M; mauto 3. *)
+(*         bulky_rewrite. *)
+(*       + transitivity M; mauto 3. *)
+(*         transitivity M''; mauto 3. *)
+(*         transitivity N0; mauto 3. *)
+(*       + intros. *)
+(*         assert (P Δ {{{ B[σ] }}}) by mauto 3. *)
+(*         assert {{ Δ ⊢ B0[σ] ≈ B[σ] : Type@j }} by mauto 3. *)
+(*         assert {{ Γ ⊢ M'' ≈ M0 : B }} by (transitivity M; mauto 3). *)
+(*         assert {{ Δ ⊢ M''[σ] ≈ M0[σ] : B[σ] }} by mauto 4. *)
+(*         assert (El0 Δ {{{ B0[σ] }}} {{{M''[σ]}}} m') as HEl0 by mauto 3. *)
+(*         bulky_rewrite_in HEl0. *)
+(*         firstorder. *)
+
+(*     - destruct_by_head neut_glu_exp_pred. *)
+(*       econstructor; mauto. *)
+(*       destruct_by_head neut_glu_typ_pred. *)
+(*       econstructor... *)
+(*     - destruct_by_head neut_glu_exp_pred. *)
+(*       econstructor... *)
+(*   Qed. *)
+(* End glu_sort_elem_cumulativity. *)
+
+(* Corollary glu_sort_elem_typ_cumu_ge : forall {i j a P P' El El' Γ A}, *)
+(*     i <= j -> *)
+(*     {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }} -> *)
+(*     {{ DG a ∈ glu_sort_elem j ↘ P' ↘ El' }} -> *)
+(*     {{ Γ ⊢ A ® P }} -> *)
+(*     {{ Γ ⊢ A ® P' }}. *)
+(* Proof. *)
+(*   intros. *)
+(*   eapply glu_sort_elem_cumulativity_ge; mauto 4. *)
+(* Qed. *)
+
+(* Corollary glu_sort_elem_typ_cumu_max_left : forall {i j a P P' El El' Γ A}, *)
+(*     {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }} -> *)
+(*     {{ DG a ∈ glu_sort_elem (max i j) ↘ P' ↘ El' }} -> *)
+(*     {{ Γ ⊢ A ® P }} -> *)
+(*     {{ Γ ⊢ A ® P' }}. *)
+(* Proof. *)
+(*   intros. *)
+(*   assert (i <= max i j) by lia. *)
+(*   eapply glu_sort_elem_typ_cumu_ge; mauto 4. *)
+(* Qed. *)
+
+(* Corollary glu_sort_elem_typ_cumu_max_right : forall {i j a P P' El El' Γ A}, *)
+(*     {{ DG a ∈ glu_sort_elem j ↘ P ↘ El }} -> *)
+(*     {{ DG a ∈ glu_sort_elem (max i j) ↘ P' ↘ El' }} -> *)
+(*     {{ Γ ⊢ A ® P }} -> *)
+(*     {{ Γ ⊢ A ® P' }}. *)
+(* Proof. *)
+(*   intros. *)
+(*   assert (j <= max i j) by lia. *)
+(*   eapply glu_sort_elem_typ_cumu_ge; mauto 4. *)
+(* Qed. *)
+
+(* Corollary glu_sort_elem_exp_cumu_ge : forall {i j a P P' El El' Γ A M m}, *)
+(*     i <= j -> *)
+(*     {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }} -> *)
+(*     {{ DG a ∈ glu_sort_elem j ↘ P' ↘ El' }} -> *)
+(*     {{ Γ ⊢ M : A ® m ∈ El }} -> *)
+(*     {{ Γ ⊢ M : A ® m ∈ El' }}. *)
+(* Proof. *)
+(*   intros. gen m M A Γ. *)
+(*   eapply glu_sort_elem_cumulativity_ge; mauto 4. *)
+(* Qed. *)
+
+(* Corollary glu_sort_elem_exp_cumu_max_left : forall {i j a P P' El El' Γ A M m}, *)
+(*     {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }} -> *)
+(*     {{ DG a ∈ glu_sort_elem (max i j) ↘ P' ↘ El' }} -> *)
+(*     {{ Γ ⊢ M : A ® m ∈ El }} -> *)
+(*     {{ Γ ⊢ M : A ® m ∈ El' }}. *)
+(* Proof. *)
+(*   intros. *)
+(*   assert (i <= max i j) by lia. *)
+(*   eapply glu_sort_elem_exp_cumu_ge; mauto 4. *)
+(* Qed. *)
+
+(* Corollary glu_sort_elem_exp_cumu_max_right : forall {i j a P P' El El' Γ A M m}, *)
+(*     {{ DG a ∈ glu_sort_elem j ↘ P ↘ El }} -> *)
+(*     {{ DG a ∈ glu_sort_elem (max i j) ↘ P' ↘ El' }} -> *)
+(*     {{ Γ ⊢ M : A ® m ∈ El }} -> *)
+(*     {{ Γ ⊢ M : A ® m ∈ El' }}. *)
+(* Proof. *)
+(*   intros. *)
+(*   assert (j <= max i j) by lia. *)
+(*   eapply glu_sort_elem_exp_cumu_ge; mauto 4. *)
+(* Qed. *)
+
+(* Corollary glu_sort_elem_exp_lower :  forall {i j a P P' El El' Γ A M m}, *)
+(*     i <= j -> *)
+(*     {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }} -> *)
+(*     {{ DG a ∈ glu_sort_elem j ↘ P' ↘ El' }} -> *)
+(*     {{ Γ ⊢ A ® P }} -> *)
+(*     {{ Γ ⊢ M : A ® m ∈ El' }} -> *)
+(*     {{ Γ ⊢ M : A ® m ∈ El }}. *)
+(* Proof. *)
+(*   intros * ? ? ?. gen m M A Γ. *)
+(*   eapply glu_sort_elem_cumulativity_ge; mauto 4. *)
+(* Qed. *)
+
+(* Corollary glu_sort_elem_exp_lower_max_left :  forall {i j a P P' El El' Γ A M m}, *)
+(*     {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }} -> *)
+(*     {{ DG a ∈ glu_sort_elem (max i j) ↘ P' ↘ El' }} -> *)
+(*     {{ Γ ⊢ A ® P }} -> *)
+(*     {{ Γ ⊢ M : A ® m ∈ El' }} -> *)
+(*     {{ Γ ⊢ M : A ® m ∈ El }}. *)
+(* Proof. *)
+(*   intros. *)
+(*   assert (i <= max i j) by lia. *)
+(*   eapply glu_sort_elem_exp_lower; mauto 4. *)
+(* Qed. *)
+
+(* Corollary glu_sort_elem_exp_lower_max_right :  forall {i j a P P' El El' Γ A M m}, *)
+(*     {{ DG a ∈ glu_sort_elem j ↘ P ↘ El }} -> *)
+(*     {{ DG a ∈ glu_sort_elem (max i j) ↘ P' ↘ El' }} -> *)
+(*     {{ Γ ⊢ A ® P }} -> *)
+(*     {{ Γ ⊢ M : A ® m ∈ El' }} -> *)
+(*     {{ Γ ⊢ M : A ® m ∈ El }}. *)
+(* Proof. *)
+(*   intros. *)
+(*   assert (j <= max i j) by lia. *)
+(*   eapply glu_sort_elem_exp_lower; mauto 4. *)
+(* Qed. *)
+
+Lemma glu_sort_elem_exp_conv {P} (pred_P : PredicativeSig P) : forall {s a a' typ_rel typ_rel' exp_rel exp_rel' Γ A M m},
+    {{ Dom a ≈ a' ∈ per_sort pred_P s }} ->
+    {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
+    {{ DG a' ∈ glu_sort_elem pred_P s ↘ typ_rel' ↘ exp_rel' }} ->
+    {{ Γ ⊢ M : A ® m ∈ exp_rel }} ->
+    {{ Γ ⊢ A ® typ_rel' }} ->
+    {{ Γ ⊢ M : A ® m ∈ exp_rel' }}.
 Proof.
-  intros.
-  assert {{ Dom a ≈ a ∈ per_sort i }} as [R] by mauto.
-  assert {{ DF a ≈ a ∈ per_sort_elem j ↘ R }} by mauto.
-  mauto.
+  intros * [] Hglu Hglu' ER TR.
+  
+  assert ((typ_rel <∙> typ_rel') /\ (exp_rel <∙> exp_rel')) by (eapply glu_sort_elem_per_sort_typ_iff; mauto 3).
+  destruct_conjs.
+  eapply H1; mauto 2.
 Qed.
 
-#[export]
-Hint Resolve glu_sort_elem_cumu_ge : mcpts.
+(*   (* assert {{ Dom a ≈ a' ∈ per_sort (max i k) }} as Haa' by (eexists; mauto using per_sort_elem_cumu_max_right). *) *)
+(*   assert (exists P El, {{ DG a ∈ glu_sort_elem (max i k) ↘ P ↘ El }}) as [Pik [Elik]] by mauto using glu_sort_elem_cumu_max_left. *)
+(*   assert {{ DG a' ∈ glu_sort_elem (max i k) ↘ Pik ↘ Elik }} by (setoid_rewrite <- Haa'; eassumption). *)
+(*   assert {{ Γ ⊢ M : A ® m ∈ Elik }} by (eapply glu_sort_elem_exp_cumu_max_left; [| | eassumption]; eassumption). *)
+(*   assert (exists P El, {{ DG a' ∈ glu_sort_elem (max j (max i k)) ↘ P ↘ El }}) as [Ptop [Eltop]] by mauto using glu_sort_elem_cumu_max_right. *)
+(*   assert {{ Γ ⊢ M : A ® m ∈ Eltop }} by (eapply glu_sort_elem_exp_cumu_max_right; [| | eassumption]; eassumption). *)
+(*   eapply glu_sort_elem_exp_lower_max_left; mauto. *)
+(* Qed. *)
 
-Corollary glu_sort_elem_cumu_max_left : forall {i j a P El},
-    {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }} ->
-    exists P' El', {{ DG a ∈ glu_sort_elem (max i j) ↘ P' ↘ El' }}.
-Proof.
-  intros.
-  assert (i <= max i j) by lia.
-  mauto.
-Qed.
 
-Corollary glu_sort_elem_cumu_max_right : forall {i j a P El},
-    {{ DG a ∈ glu_sort_elem j ↘ P ↘ El }} ->
-    exists P' El', {{ DG a ∈ glu_sort_elem (max i j) ↘ P' ↘ El' }}.
-Proof.
-  intros.
-  assert (j <= max i j) by lia.
-  mauto.
-Qed.
-
-Section glu_sort_elem_cumulativity.
-  #[local]
-  Lemma glu_sort_elem_cumulativity_ge : forall {i j a P P' El El'},
-      i <= j ->
-      {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }} ->
-      {{ DG a ∈ glu_sort_elem j ↘ P' ↘ El' }} ->
-      (forall Γ A, {{ Γ ⊢ A ® P }} -> {{ Γ ⊢ A ® P' }}) /\
-        (forall Γ A M m, {{ Γ ⊢ M : A ® m ∈ El }} -> {{ Γ ⊢ M : A ® m ∈ El' }}) /\
-        (forall Γ A M m, {{ Γ ⊢ A ® P }} -> {{ Γ ⊢ M : A ® m ∈ El' }} -> {{ Γ ⊢ M : A ® m ∈ El }}).
-  Proof with mautosolve 4.
-    simpl.
-    intros * Hge Hglu Hglu'. gen El' P' j.
-    induction Hglu using glu_sort_elem_ind; repeat split; intros;
-      try assert {{ DF a ≈ a ∈ per_sort_elem j ↘ in_rel }} by mauto 2;
-      invert_glu_sort_elem Hglu';
-      handle_functional_glu_sort_elem;
-      simpl in *;
-      try solve [repeat split; intros; destruct_conjs; mauto 2 | intuition mauto 3].
-
-    - rename x into IP'.
-      rename x0 into IEl'.
-      rename x1 into OP'.
-      rename x2 into OEl'.
-      destruct_by_head pi_glu_typ_pred.
-      econstructor; intros; mauto 4.
-      + assert {{ Δ ⊢ IT[σ] ® IP }} by mauto.
-        enough (forall Γ A, {{ Γ ⊢ A ® IP }} -> {{ Γ ⊢ A ® IP' }}) by mauto 4.
-        eapply proj1...
-      + match_by_head per_sort_elem ltac:(fun H => directed invert_per_sort_elem H).
-        apply_relation_equivalence.
-        destruct_rel_mod_eval.
-        handle_per_sort_elem_irrel.
-        assert (forall Γ A, {{ Γ ⊢ A ® OP m equiv_m }} -> {{ Γ ⊢ A ® OP' m equiv_m }}) by (eapply proj1; mauto).
-        enough {{ Δ ⊢ OT[σ,,M] ® OP m equiv_m }} by mauto.
-        enough {{ Δ ⊢ M : IT[σ] ® m ∈ IEl }} by mauto.
-        eapply IHHglu...
-    - rename x into IP'.
-      rename x0 into IEl'.
-      rename x1 into OP'.
-      rename x2 into OEl'.
-      destruct_by_head pi_glu_exp_pred.
-      handle_per_sort_elem_irrel.
-      econstructor; intros; mauto 4.
-      + enough (forall Γ A, {{ Γ ⊢ A ® IP }} -> {{ Γ ⊢ A ® IP' }}) by mauto 4.
-        eapply proj1...
-      + match_by_head per_sort_elem ltac:(fun H => directed invert_per_sort_elem H).
-        handle_per_sort_elem_irrel.
-        destruct_rel_mod_eval.
-        destruct_rel_mod_app.
-        handle_per_sort_elem_irrel.
-        eexists; split; mauto 4.
-        assert (forall Γ A M m, {{ Γ ⊢ M : A ® m ∈ OEl n equiv_n }} -> {{ Γ ⊢ M : A ® m ∈ OEl' n equiv_n }}) by (eapply proj1, proj2; mauto 4).
-        enough {{ Δ ⊢ M[σ] N : OT[σ,,N] ® fa ∈ OEl n equiv_n }} by mauto 4.
-        assert {{ Δ ⊢ N : IT[σ] ® n ∈ IEl }} by (eapply IHHglu; mauto 3).
-        assert (exists mn, {{ $| m & n |↘ mn }} /\ {{ Δ ⊢ M[σ] N : OT[σ,,N] ® mn ∈ OEl n equiv_n }}) by mauto 4.
-        destruct_conjs.
-        functional_eval_rewrite_clear...
-    - rename x into IP'.
-      rename x0 into IEl'.
-      rename x1 into OP'.
-      rename x2 into OEl'.
-      destruct_by_head pi_glu_typ_pred.
-      destruct_by_head pi_glu_exp_pred.
-      handle_per_sort_elem_irrel.
-      econstructor; intros; mauto.
-      match_by_head per_sort_elem ltac:(fun H => directed invert_per_sort_elem H).
-      handle_per_sort_elem_irrel.
-      destruct_rel_mod_eval.
-      destruct_rel_mod_app.
-      handle_per_sort_elem_irrel.
-      match goal with
-      | _: {{ ⟦ B ⟧ ρ ↦ n ↘ ^?a }} |- _ =>
-          rename a into b
-      end.
-      eexists; split; mauto 4.
-      assert (forall Γ A M m, {{ Γ ⊢ A ® OP n equiv_n }} -> {{ Γ ⊢ M : A ® m ∈ OEl' n equiv_n }} -> {{ Γ ⊢ M : A ® m ∈ OEl n equiv_n }}) by (eapply proj2, proj2; eauto 3).
-      assert {{ Δ ⊢ OT[σ,,N] ® OP n equiv_n }} by mauto 4.
-      enough {{ Δ ⊢ M[σ] N : OT[σ,,N] ® fa ∈ OEl' n equiv_n }} by mauto 4.
-      assert {{ Δ ⊢ N : IT[σ] ® n ∈ IEl' }} by (eapply IHHglu; mauto 3).
-      assert {{ Δ ⊢ IT[σ] ® IP' }} by (eapply glu_sort_elem_trm_typ; mauto 2).
-      assert {{ Δ ⊢ IT0[σ] ® IP' }} by mauto 2.
-      assert {{ Δ ⊢ IT[σ] ≈ IT0[σ] : Type@j }} as HITeq by mauto 2.
-      assert {{ Δ ⊢ N : IT0[σ] ® n ∈ IEl' }} by (rewrite <- HITeq; mauto 3).
-      assert (exists mn, {{ $| m & n |↘ mn }} /\ {{ Δ ⊢ M[σ] N : OT0[σ,,N] ® mn ∈ OEl' n equiv_n }}) by mauto 3.
-      destruct_conjs.
-      functional_eval_rewrite_clear.
-      assert {{ DG b ∈ glu_sort_elem j ↘ OP' n equiv_n ↘ OEl' n equiv_n }} by mauto 3.
-      assert {{ Δ ⊢ OT0[σ,,N] ® OP' n equiv_n }} by (eapply glu_sort_elem_trm_typ; mauto 3).
-      enough {{ Δ ⊢ OT[σ,,N] ≈ OT0[σ,,N] : Type@j }} as ->...
-
-    - invert_glu_rel1.
-      econstructor; intros; firstorder mauto 3.
-    - invert_glu_rel1.
-      handle_per_sort_elem_irrel.
-
-      econstructor; intros; firstorder mauto 3.
-      destruct_glu_eq; econstructor; firstorder mauto 3.
-    - repeat invert_glu_rel1.
-      handle_per_sort_elem_irrel.
-
-      econstructor; intros; firstorder mauto 3.
-      assert {{ Γ ⊢w Id : Γ }} by mauto 4.
-      assert (P Γ {{{ B[Id] }}}) as HB by mauto 3.
-      bulky_rewrite_in HB.
-      assert (P0 Γ B) as HB' by firstorder.
-      assert (P0 Γ {{{ B0[Id] }}}) as HB0 by mauto 3.
-      bulky_rewrite_in HB0.
-      assert {{ Γ ⊢ B0 ≈ B : Type@j }} by mauto 3.
-      assert (El Γ {{{ B[Id] }}} {{{ M0[Id] }}} m) as HM0 by mauto 3.
-      bulky_rewrite_in HM0.
-      assert (El0 Γ B M0 m) as HM0' by firstorder.
-      assert (El Γ {{{ B[Id] }}} {{{ N[Id] }}} n) as HN by mauto 3.
-      bulky_rewrite_in HN.
-      assert (El0 Γ B N n) as HN' by firstorder.
-      assert (El0 Γ {{{ B0[Id] }}} {{{ M[Id] }}} m) as HM by mauto 3.
-      bulky_rewrite_in HM.
-      assert (El0 Γ {{{ B0[Id] }}} {{{ N0[Id] }}} n) as HN0 by mauto 3.
-      bulky_rewrite_in HN0.
-      assert {{ Γ ⊢ M0 ≈ M : B }} by mauto 3.
-      assert {{ Γ ⊢ N ≈ N0 : B }} by mauto 3.
-
-      destruct_glu_eq; econstructor; apply_equiv_left; mauto 3.
-      + bulky_rewrite.
-        eapply wf_exp_eq_conv'; [econstructor |]; mauto 3.
-        transitivity M; mauto 3.
-        bulky_rewrite.
-      + transitivity M; mauto 3.
-        transitivity M''; mauto 3.
-        transitivity N0; mauto 3.
-      + intros.
-        assert (P Δ {{{ B[σ] }}}) by mauto 3.
-        assert {{ Δ ⊢ B0[σ] ≈ B[σ] : Type@j }} by mauto 3.
-        assert {{ Γ ⊢ M'' ≈ M0 : B }} by (transitivity M; mauto 3).
-        assert {{ Δ ⊢ M''[σ] ≈ M0[σ] : B[σ] }} by mauto 4.
-        assert (El0 Δ {{{ B0[σ] }}} {{{M''[σ]}}} m') as HEl0 by mauto 3.
-        bulky_rewrite_in HEl0.
-        firstorder.
-
-    - destruct_by_head neut_glu_exp_pred.
-      econstructor; mauto.
-      destruct_by_head neut_glu_typ_pred.
-      econstructor...
-    - destruct_by_head neut_glu_exp_pred.
-      econstructor...
-  Qed.
-End glu_sort_elem_cumulativity.
-
-Corollary glu_sort_elem_typ_cumu_ge : forall {i j a P P' El El' Γ A},
-    i <= j ->
-    {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }} ->
-    {{ DG a ∈ glu_sort_elem j ↘ P' ↘ El' }} ->
-    {{ Γ ⊢ A ® P }} ->
-    {{ Γ ⊢ A ® P' }}.
-Proof.
-  intros.
-  eapply glu_sort_elem_cumulativity_ge; mauto 4.
-Qed.
-
-Corollary glu_sort_elem_typ_cumu_max_left : forall {i j a P P' El El' Γ A},
-    {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }} ->
-    {{ DG a ∈ glu_sort_elem (max i j) ↘ P' ↘ El' }} ->
-    {{ Γ ⊢ A ® P }} ->
-    {{ Γ ⊢ A ® P' }}.
-Proof.
-  intros.
-  assert (i <= max i j) by lia.
-  eapply glu_sort_elem_typ_cumu_ge; mauto 4.
-Qed.
-
-Corollary glu_sort_elem_typ_cumu_max_right : forall {i j a P P' El El' Γ A},
-    {{ DG a ∈ glu_sort_elem j ↘ P ↘ El }} ->
-    {{ DG a ∈ glu_sort_elem (max i j) ↘ P' ↘ El' }} ->
-    {{ Γ ⊢ A ® P }} ->
-    {{ Γ ⊢ A ® P' }}.
-Proof.
-  intros.
-  assert (j <= max i j) by lia.
-  eapply glu_sort_elem_typ_cumu_ge; mauto 4.
-Qed.
-
-Corollary glu_sort_elem_exp_cumu_ge : forall {i j a P P' El El' Γ A M m},
-    i <= j ->
-    {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }} ->
-    {{ DG a ∈ glu_sort_elem j ↘ P' ↘ El' }} ->
-    {{ Γ ⊢ M : A ® m ∈ El }} ->
-    {{ Γ ⊢ M : A ® m ∈ El' }}.
-Proof.
-  intros. gen m M A Γ.
-  eapply glu_sort_elem_cumulativity_ge; mauto 4.
-Qed.
-
-Corollary glu_sort_elem_exp_cumu_max_left : forall {i j a P P' El El' Γ A M m},
-    {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }} ->
-    {{ DG a ∈ glu_sort_elem (max i j) ↘ P' ↘ El' }} ->
-    {{ Γ ⊢ M : A ® m ∈ El }} ->
-    {{ Γ ⊢ M : A ® m ∈ El' }}.
-Proof.
-  intros.
-  assert (i <= max i j) by lia.
-  eapply glu_sort_elem_exp_cumu_ge; mauto 4.
-Qed.
-
-Corollary glu_sort_elem_exp_cumu_max_right : forall {i j a P P' El El' Γ A M m},
-    {{ DG a ∈ glu_sort_elem j ↘ P ↘ El }} ->
-    {{ DG a ∈ glu_sort_elem (max i j) ↘ P' ↘ El' }} ->
-    {{ Γ ⊢ M : A ® m ∈ El }} ->
-    {{ Γ ⊢ M : A ® m ∈ El' }}.
-Proof.
-  intros.
-  assert (j <= max i j) by lia.
-  eapply glu_sort_elem_exp_cumu_ge; mauto 4.
-Qed.
-
-Corollary glu_sort_elem_exp_lower :  forall {i j a P P' El El' Γ A M m},
-    i <= j ->
-    {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }} ->
-    {{ DG a ∈ glu_sort_elem j ↘ P' ↘ El' }} ->
-    {{ Γ ⊢ A ® P }} ->
-    {{ Γ ⊢ M : A ® m ∈ El' }} ->
-    {{ Γ ⊢ M : A ® m ∈ El }}.
-Proof.
-  intros * ? ? ?. gen m M A Γ.
-  eapply glu_sort_elem_cumulativity_ge; mauto 4.
-Qed.
-
-Corollary glu_sort_elem_exp_lower_max_left :  forall {i j a P P' El El' Γ A M m},
-    {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }} ->
-    {{ DG a ∈ glu_sort_elem (max i j) ↘ P' ↘ El' }} ->
-    {{ Γ ⊢ A ® P }} ->
-    {{ Γ ⊢ M : A ® m ∈ El' }} ->
-    {{ Γ ⊢ M : A ® m ∈ El }}.
-Proof.
-  intros.
-  assert (i <= max i j) by lia.
-  eapply glu_sort_elem_exp_lower; mauto 4.
-Qed.
-
-Corollary glu_sort_elem_exp_lower_max_right :  forall {i j a P P' El El' Γ A M m},
-    {{ DG a ∈ glu_sort_elem j ↘ P ↘ El }} ->
-    {{ DG a ∈ glu_sort_elem (max i j) ↘ P' ↘ El' }} ->
-    {{ Γ ⊢ A ® P }} ->
-    {{ Γ ⊢ M : A ® m ∈ El' }} ->
-    {{ Γ ⊢ M : A ® m ∈ El }}.
-Proof.
-  intros.
-  assert (j <= max i j) by lia.
-  eapply glu_sort_elem_exp_lower; mauto 4.
-Qed.
-
-Lemma glu_sort_elem_exp_conv : forall {i j k a a' P P' El El' Γ A M m},
-    {{ Dom a ≈ a' ∈ per_sort k }} ->
-    {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }} ->
-    {{ DG a' ∈ glu_sort_elem j ↘ P' ↘ El' }} ->
-    {{ Γ ⊢ M : A ® m ∈ El }} ->
-    {{ Γ ⊢ A ® P' }} ->
-    {{ Γ ⊢ M : A ® m ∈ El' }}.
-Proof.
-  intros * [] ? ? ? ?.
-  assert {{ Dom a ≈ a' ∈ per_sort (max i k) }} as Haa' by (eexists; mauto using per_sort_elem_cumu_max_right).
-  assert (exists P El, {{ DG a ∈ glu_sort_elem (max i k) ↘ P ↘ El }}) as [Pik [Elik]] by mauto using glu_sort_elem_cumu_max_left.
-  assert {{ DG a' ∈ glu_sort_elem (max i k) ↘ Pik ↘ Elik }} by (setoid_rewrite <- Haa'; eassumption).
-  assert {{ Γ ⊢ M : A ® m ∈ Elik }} by (eapply glu_sort_elem_exp_cumu_max_left; [| | eassumption]; eassumption).
-  assert (exists P El, {{ DG a' ∈ glu_sort_elem (max j (max i k)) ↘ P ↘ El }}) as [Ptop [Eltop]] by mauto using glu_sort_elem_cumu_max_right.
-  assert {{ Γ ⊢ M : A ® m ∈ Eltop }} by (eapply glu_sort_elem_exp_cumu_max_right; [| | eassumption]; eassumption).
-  eapply glu_sort_elem_exp_lower_max_left; mauto.
-Qed.
-
-Lemma glu_sort_elem_exp_conv' : forall {i j a P P' El El' Γ A M m},
-    {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }} ->
-    {{ DG a ∈ glu_sort_elem j ↘ P' ↘ El' }} ->
-    {{ Γ ⊢ M : A ® m ∈ El }} ->
-    {{ Γ ⊢ A ® P' }} ->
-    {{ Γ ⊢ M : A ® m ∈ El' }}.
+Lemma glu_sort_elem_exp_conv' {P} (pred_P : PredicativeSig P) : forall {s a typ_rel typ_rel' exp_rel exp_rel' Γ A M m},
+    {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
+    {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel' ↘ exp_rel' }} ->
+    {{ Γ ⊢ M : A ® m ∈ exp_rel }} ->
+    {{ Γ ⊢ A ® typ_rel' }} ->
+    {{ Γ ⊢ M : A ® m ∈ exp_rel' }}.
 Proof.
   intros.
   eapply glu_sort_elem_exp_conv; only 2: exact H; eauto.
@@ -482,207 +480,208 @@ Proof.
 Qed.
 
 
-Lemma glu_sort_elem_per_subtyp_typ_escape : forall {i a a' P P' El El' Γ A A'},
-    {{ Sub a <: a' at i }} ->
-    {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }} ->
-    {{ DG a' ∈ glu_sort_elem i ↘ P' ↘ El' }} ->
-    {{ Γ ⊢ A ® P }} ->
-    {{ Γ ⊢ A' ® P' }} ->
-    {{ Γ ⊢ A ⊆ A' }}.
-Proof.
-  intros * Hsubtyp Hglu Hglu' HA HA'.
-  gen A' A Γ. gen El' El P' P.
-  induction Hsubtyp using per_subtyp_ind; intros; subst;
-    saturate_refl_for per_sort_elem;
-    try solve [simpl in *; bulky_rewrite; mauto 3];
-    invert_glu_sort_elem Hglu;
-    handle_functional_glu_sort_elem;
-    handle_per_sort_elem_irrel;
-    destruct_by_head pi_glu_typ_pred;
-    saturate_glu_by_per;
-    invert_glu_sort_elem Hglu';
-    handle_functional_glu_sort_elem.
-  - bulky_rewrite.
-    mauto 3.
-  - destruct_by_head pi_glu_typ_pred.
-    rename x into IP. rename x0 into IEl. rename x1 into OP. rename x2 into OEl.
-    rename A0 into A'. rename IT0 into IT'. rename OT0 into OT'.
-    rename x3 into OP'. rename x4 into OEl'.
-    assert {{ Γ ⊢ IT ® IP }}.
-    {
-      assert {{ Γ ⊢ IT[Id] ® IP }} by mauto 4.
-      simpl in *.
-      autorewrite with mcpts in *; mauto 3.
-    }
-    assert {{ Γ ⊢ IT' ® IP }}.
-    {
-      assert {{ Γ ⊢ IT'[Id] ® IP }} by mauto 4.
-      simpl in *.
-      autorewrite with mcpts in *; mauto 3.
-    }
-    do 2 bulky_rewrite1.
-    assert {{ Γ ⊢ IT ≈ IT' : Type@i }} by mauto 4.
-    enough {{ Γ, IT' ⊢ OT ⊆ OT' }} by mauto 3.
-    assert {{ Dom ⇑! a (length Γ) ≈ ⇑! a' (length Γ) ∈ in_rel }} as equiv_len_len' by (eapply per_bot_then_per_elem; mauto 4).
-    assert {{ Dom ⇑! a (length Γ) ≈ ⇑! a (length Γ) ∈ in_rel }} as equiv_len_len by (eapply per_bot_then_per_elem; mauto 4).
-    assert {{ Dom ⇑! a' (length Γ) ≈ ⇑! a' (length Γ) ∈ in_rel }} as equiv_len'_len' by (eapply per_bot_then_per_elem; mauto 4).
-    handle_per_sort_elem_irrel.
-    match_by_head per_sort_elem ltac:(fun H => directed invert_per_sort_elem H).
-    apply_relation_equivalence.
-    destruct_rel_mod_eval.
-    handle_per_sort_elem_irrel.
-    match goal with
-    | _: {{ ⟦ B ⟧ ρ ↦ ⇑! a (length Γ) ↘ ^?a0 }},
-        _: {{ ⟦ B' ⟧ ρ' ↦ ⇑! a' (length Γ) ↘ ^?a0' }} |- _ =>
-        rename a0 into b;
-        rename a0' into b'
-    end.
-    assert {{ DG b ∈ glu_sort_elem i ↘ OP d{{{ ⇑! a (length Γ) }}} equiv_len_len ↘ OEl d{{{ ⇑! a (length Γ) }}} equiv_len_len }} by mauto 4.
-    assert {{ DG b' ∈ glu_sort_elem i ↘ OP' d{{{ ⇑! a' (length Γ) }}} equiv_len'_len' ↘ OEl' d{{{ ⇑! a' (length Γ) }}} equiv_len'_len' }} by mauto 4.
-    assert {{ Γ, IT' ⊢ OT ® OP d{{{ ⇑! a (length Γ) }}} equiv_len_len }}.
-    {
-      assert {{ Γ, IT ⊢ #0 : IT[Wk] ® ⇑! a (length Γ) ∈ IEl }} by (eapply var0_glu_elem; mauto 3).
-      assert {{ ⊢ Γ, IT' ≈ Γ, IT }} as -> by mauto.
-      assert {{ Γ, IT ⊢ OT[Wk,,#0] ≈ OT : Type@i }} as <- by (bulky_rewrite1; mauto 2).
-      mauto 4.
-    }
-    assert {{ Γ, IT' ⊢ OT' ® OP' d{{{ ⇑! a' (length Γ) }}} equiv_len'_len' }}.
-    {
-      assert {{ Γ, IT' ⊢ #0 : IT'[Wk] ® ⇑! a' (length Γ) ∈ IEl }} by (eapply var0_glu_elem; mauto 3).
-      assert {{ Γ, IT' ⊢ OT'[Wk,,#0] ® OP' d{{{ ⇑! a' (length Γ) }}} equiv_len'_len' }} by mauto 4.
-      assert {{ Γ, IT' ⊢ OT'[Wk,,#0] ≈ OT' : Type@i }} as <- by (bulky_rewrite1; mauto 2).
-      mauto 4.
-    }
-    mauto 3.
-  - match_by_head (per_bot b b') ltac:(fun H => specialize (H (length Γ)) as [V []]).
-    simpl in *.
-    destruct_conjs.
-    assert {{ Γ ⊢ A[Id] ≈ A : Type@i }} as <- by mauto 4.
-    assert {{ Γ ⊢ A'[Id] ≈ A' : Type@i }} as <- by mauto 3.
-    assert {{ Γ ⊢ A'[Id] ≈ V : Type@i }} as -> by mauto 4.
-    eapply wf_subtyp_refl'.
-    mauto 4.
-Qed.
+(* Lemma glu_sort_elem_per_subtyp_typ_escape : forall {i a a' P P' El El' Γ A A'}, *)
+(*     {{ Sub a <: a' at i }} -> *)
+(*     {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }} -> *)
+(*     {{ DG a' ∈ glu_sort_elem i ↘ P' ↘ El' }} -> *)
+(*     {{ Γ ⊢ A ® P }} -> *)
+(*     {{ Γ ⊢ A' ® P' }} -> *)
+(*     {{ Γ ⊢ A ⊆ A' }}. *)
+(* Proof. *)
+(*   intros * Hsubtyp Hglu Hglu' HA HA'. *)
+(*   gen A' A Γ. gen El' El P' P. *)
+(*   induction Hsubtyp using per_subtyp_ind; intros; subst; *)
+(*     saturate_refl_for per_sort_elem; *)
+(*     try solve [simpl in *; bulky_rewrite; mauto 3]; *)
+(*     invert_glu_sort_elem Hglu; *)
+(*     handle_functional_glu_sort_elem; *)
+(*     handle_per_sort_elem_irrel; *)
+(*     destruct_by_head pi_glu_typ_pred; *)
+(*     saturate_glu_by_per; *)
+(*     invert_glu_sort_elem Hglu'; *)
+(*     handle_functional_glu_sort_elem. *)
+(*   - bulky_rewrite. *)
+(*     mauto 3. *)
+(*   - destruct_by_head pi_glu_typ_pred. *)
+(*     rename x into IP. rename x0 into IEl. rename x1 into OP. rename x2 into OEl. *)
+(*     rename A0 into A'. rename IT0 into IT'. rename OT0 into OT'. *)
+(*     rename x3 into OP'. rename x4 into OEl'. *)
+(*     assert {{ Γ ⊢ IT ® IP }}. *)
+(*     { *)
+(*       assert {{ Γ ⊢ IT[Id] ® IP }} by mauto 4. *)
+(*       simpl in *. *)
+(*       autorewrite with mcpts in *; mauto 3. *)
+(*     } *)
+(*     assert {{ Γ ⊢ IT' ® IP }}. *)
+(*     { *)
+(*       assert {{ Γ ⊢ IT'[Id] ® IP }} by mauto 4. *)
+(*       simpl in *. *)
+(*       autorewrite with mcpts in *; mauto 3. *)
+(*     } *)
+(*     do 2 bulky_rewrite1. *)
+(*     assert {{ Γ ⊢ IT ≈ IT' : Type@i }} by mauto 4. *)
+(*     enough {{ Γ, IT' ⊢ OT ⊆ OT' }} by mauto 3. *)
+(*     assert {{ Dom ⇑! a (length Γ) ≈ ⇑! a' (length Γ) ∈ in_rel }} as equiv_len_len' by (eapply per_bot_then_per_elem; mauto 4). *)
+(*     assert {{ Dom ⇑! a (length Γ) ≈ ⇑! a (length Γ) ∈ in_rel }} as equiv_len_len by (eapply per_bot_then_per_elem; mauto 4). *)
+(*     assert {{ Dom ⇑! a' (length Γ) ≈ ⇑! a' (length Γ) ∈ in_rel }} as equiv_len'_len' by (eapply per_bot_then_per_elem; mauto 4). *)
+(*     handle_per_sort_elem_irrel. *)
+(*     match_by_head per_sort_elem ltac:(fun H => directed invert_per_sort_elem H). *)
+(*     apply_relation_equivalence. *)
+(*     destruct_rel_mod_eval. *)
+(*     handle_per_sort_elem_irrel. *)
+(*     match goal with *)
+(*     | _: {{ ⟦ B ⟧ ρ ↦ ⇑! a (length Γ) ↘ ^?a0 }}, *)
+(*         _: {{ ⟦ B' ⟧ ρ' ↦ ⇑! a' (length Γ) ↘ ^?a0' }} |- _ => *)
+(*         rename a0 into b; *)
+(*         rename a0' into b' *)
+(*     end. *)
+(*     assert {{ DG b ∈ glu_sort_elem i ↘ OP d{{{ ⇑! a (length Γ) }}} equiv_len_len ↘ OEl d{{{ ⇑! a (length Γ) }}} equiv_len_len }} by mauto 4. *)
+(*     assert {{ DG b' ∈ glu_sort_elem i ↘ OP' d{{{ ⇑! a' (length Γ) }}} equiv_len'_len' ↘ OEl' d{{{ ⇑! a' (length Γ) }}} equiv_len'_len' }} by mauto 4. *)
+(*     assert {{ Γ, IT' ⊢ OT ® OP d{{{ ⇑! a (length Γ) }}} equiv_len_len }}. *)
+(*     { *)
+(*       assert {{ Γ, IT ⊢ #0 : IT[Wk] ® ⇑! a (length Γ) ∈ IEl }} by (eapply var0_glu_elem; mauto 3). *)
+(*       assert {{ ⊢ Γ, IT' ≈ Γ, IT }} as -> by mauto. *)
+(*       assert {{ Γ, IT ⊢ OT[Wk,,#0] ≈ OT : Type@i }} as <- by (bulky_rewrite1; mauto 2). *)
+(*       mauto 4. *)
+(*     } *)
+(*     assert {{ Γ, IT' ⊢ OT' ® OP' d{{{ ⇑! a' (length Γ) }}} equiv_len'_len' }}. *)
+(*     { *)
+(*       assert {{ Γ, IT' ⊢ #0 : IT'[Wk] ® ⇑! a' (length Γ) ∈ IEl }} by (eapply var0_glu_elem; mauto 3). *)
+(*       assert {{ Γ, IT' ⊢ OT'[Wk,,#0] ® OP' d{{{ ⇑! a' (length Γ) }}} equiv_len'_len' }} by mauto 4. *)
+(*       assert {{ Γ, IT' ⊢ OT'[Wk,,#0] ≈ OT' : Type@i }} as <- by (bulky_rewrite1; mauto 2). *)
+(*       mauto 4. *)
+(*     } *)
+(*     mauto 3. *)
+(*   - match_by_head (per_bot b b') ltac:(fun H => specialize (H (length Γ)) as [V []]). *)
+(*     simpl in *. *)
+(*     destruct_conjs. *)
+(*     assert {{ Γ ⊢ A[Id] ≈ A : Type@i }} as <- by mauto 4. *)
+(*     assert {{ Γ ⊢ A'[Id] ≈ A' : Type@i }} as <- by mauto 3. *)
+(*     assert {{ Γ ⊢ A'[Id] ≈ V : Type@i }} as -> by mauto 4. *)
+(*     eapply wf_subtyp_refl'. *)
+(*     mauto 4. *)
+(* Qed. *)
 
-#[export]
-Hint Resolve glu_sort_elem_per_subtyp_typ_escape : mcpts.
+(* #[export] *)
+(* Hint Resolve glu_sort_elem_per_subtyp_typ_escape : mcpts. *)
 
-Lemma glu_sort_elem_per_subtyp_trm_if : forall {i a a' P P' El El' Γ A A' M m},
-    {{ Sub a <: a' at i }} ->
-    {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }} ->
-    {{ DG a' ∈ glu_sort_elem i ↘ P' ↘ El' }} ->
-    {{ Γ ⊢ A' ® P' }} ->
-    {{ Γ ⊢ M : A ® m ∈ El }} ->
-    {{ Γ ⊢ M : A' ® m ∈ El' }}.
-Proof.
-  intros * Hsubtyp Hglu Hglu' HA HA'.
-  assert {{ Γ ⊢ A ⊆ A' }} by (eapply glu_sort_elem_per_subtyp_typ_escape; only 4: eapply glu_sort_elem_trm_typ; mauto).
-  gen m M A' A. gen Γ. gen El' El P' P.
-  induction Hsubtyp using per_subtyp_ind; intros; subst;
-    saturate_refl_for per_sort_elem.
-  1-3,5:
-    invert_glu_sort_elem Hglu;
-  handle_functional_glu_sort_elem;
-  handle_per_sort_elem_irrel;
-  repeat invert_glu_rel1;
-  saturate_glu_by_per;
-  invert_glu_sort_elem Hglu';
-  handle_functional_glu_sort_elem;
-  repeat invert_glu_rel1;
-  try solve [simpl in *; intuition mauto 3].
-  - simpl in *.
-    destruct_conjs.
-    intuition mauto 3.
-    assert (exists P El, {{ DG m ∈ glu_sort_elem j ↘ P ↘ El }}) as [? [?]] by mauto 3.
-    do 2 eexists; split; mauto 3.
-    eapply glu_sort_elem_typ_cumu_ge; revgoals; mautosolve 3.
-  - rename A0 into A'.
-    rename IT0 into IT'. rename OT0 into OT'.
-    rename x into IP. rename x0 into IEl.
-    rename x1 into OP. rename x2 into OEl.
-    rename x3 into OP'. rename x4 into OEl'.
-    handle_per_sort_elem_irrel.
-    econstructor; mauto 3.
-    + enough {{ Sub Π a ρ B <: Π a' ρ' B' at i }} by (eapply per_elem_subtyping; try eassumption).
-      econstructor; mauto 3.
-    + intros.
-      assert {{ Γ ⊢w Id : Γ }} by mauto 3.
-      assert {{ Γ ⊢ IT ® IP }}.
-      {
-        assert {{ Γ ⊢ IT[Id] ® IP }} by mauto 3.
-        simpl in *.
-        autorewrite with mcpts in *; mauto 3.
-      }
-      assert {{ Γ ⊢ IT' ® IP }}.
-      {
-        assert {{ Γ ⊢ IT'[Id] ® IP }} by mauto 3.
-        simpl in *.
-        autorewrite with mcpts in *; mauto 3.
-      }
-      assert {{ Δ ⊢ IT'[σ] ≈ IT[σ] : Type@i }} by (symmetry; mauto 4 using glu_sort_elem_per_sort_typ_escape).
-      assert {{ Δ ⊢ N : IT'[σ] ® n ∈ IEl }} by (simpl; bulky_rewrite1; eassumption).
-      assert (exists mn : domain, {{ $| m & n |↘ mn }} /\ {{Δ ⊢ M[σ] N : OT'[σ,,N] ® mn ∈ OEl n equiv_n }}) by mauto 3.
-      destruct_conjs.
-      eexists; split; mauto 3.
-      match_by_head per_sort_elem ltac:(fun H => directed invert_per_sort_elem H).
-      destruct_rel_mod_eval.
-      handle_per_sort_elem_irrel.
-      match goal with
-      | _: {{ ⟦ B ⟧ ρ ↦ n ↘ ^?a }},
-          _: {{ ⟦ B' ⟧ ρ' ↦ n ↘ ^?a' }} |- _ =>
-          rename a into b;
-          rename a' into b'
-      end.
-      assert {{ DG b ∈ glu_sort_elem i ↘ OP n equiv_n ↘ OEl n equiv_n }} by mauto 3.
-      assert {{ DG b' ∈ glu_sort_elem i ↘ OP' n equiv_n ↘ OEl' n equiv_n }} by mauto 3.
-      assert {{ Δ ⊢ OT'[σ,,N] ® OP n equiv_n }} by (eapply glu_sort_elem_trm_typ; mauto 3).
-      assert {{ Sub b <: b' at i }} by mauto 3.
-      assert {{ Δ ⊢ OT'[σ,,N] ⊆ OT[σ,,N] }} by mauto 3.
-      intuition.
-  - match_by_head1 (per_bot b b') ltac:(fun H => destruct (H (length Γ)) as [V []]).
-    econstructor; mauto 3.
-    + econstructor; mauto 3.
-    + intros.
-      match_by_head1 (per_bot b b') ltac:(fun H => destruct (H (length Δ)) as [? []]).
-      functional_read_rewrite_clear.
-      assert {{ Δ ⊢ A[σ] ⊆ A'[σ] }} by mauto 3.
-      assert {{ Δ ⊢ M[σ] ≈ M' : A[σ] }} by mauto 3.
-      mauto 3.
-  - assert {{ Γ ⊢ A ® P }} by (eapply glu_sort_elem_trm_typ; eauto).
-    assert {{ Γ ⊢ A ≈ A' : Type@i }} by mauto 4.
-    rewrite H in *.
-    rewrite H4 in *.
-    handle_functional_glu_sort_elem.
-    trivial.
-Qed.
+(* Lemma glu_sort_elem_per_subtyp_trm_if : forall {i a a' P P' El El' Γ A A' M m}, *)
+(*     {{ Sub a <: a' at i }} -> *)
+(*     {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }} -> *)
+(*     {{ DG a' ∈ glu_sort_elem i ↘ P' ↘ El' }} -> *)
+(*     {{ Γ ⊢ A' ® P' }} -> *)
+(*     {{ Γ ⊢ M : A ® m ∈ El }} -> *)
+(*     {{ Γ ⊢ M : A' ® m ∈ El' }}. *)
+(* Proof. *)
+(*   intros * Hsubtyp Hglu Hglu' HA HA'. *)
+(*   assert {{ Γ ⊢ A ⊆ A' }} by (eapply glu_sort_elem_per_subtyp_typ_escape; only 4: eapply glu_sort_elem_trm_typ; mauto). *)
+(*   gen m M A' A. gen Γ. gen El' El P' P. *)
+(*   induction Hsubtyp using per_subtyp_ind; intros; subst; *)
+(*     saturate_refl_for per_sort_elem. *)
+(*   1-3,5: *)
+(*     invert_glu_sort_elem Hglu; *)
+(*   handle_functional_glu_sort_elem; *)
+(*   handle_per_sort_elem_irrel; *)
+(*   repeat invert_glu_rel1; *)
+(*   saturate_glu_by_per; *)
+(*   invert_glu_sort_elem Hglu'; *)
+(*   handle_functional_glu_sort_elem; *)
+(*   repeat invert_glu_rel1; *)
+(*   try solve [simpl in *; intuition mauto 3]. *)
+(*   - simpl in *. *)
+(*     destruct_conjs. *)
+(*     intuition mauto 3. *)
+(*     assert (exists P El, {{ DG m ∈ glu_sort_elem j ↘ P ↘ El }}) as [? [?]] by mauto 3. *)
+(*     do 2 eexists; split; mauto 3. *)
+(*     eapply glu_sort_elem_typ_cumu_ge; revgoals; mautosolve 3. *)
+(*   - rename A0 into A'. *)
+(*     rename IT0 into IT'. rename OT0 into OT'. *)
+(*     rename x into IP. rename x0 into IEl. *)
+(*     rename x1 into OP. rename x2 into OEl. *)
+(*     rename x3 into OP'. rename x4 into OEl'. *)
+(*     handle_per_sort_elem_irrel. *)
+(*     econstructor; mauto 3. *)
+(*     + enough {{ Sub Π a ρ B <: Π a' ρ' B' at i }} by (eapply per_elem_subtyping; try eassumption). *)
+(*       econstructor; mauto 3. *)
+(*     + intros. *)
+(*       assert {{ Γ ⊢w Id : Γ }} by mauto 3. *)
+(*       assert {{ Γ ⊢ IT ® IP }}. *)
+(*       { *)
+(*         assert {{ Γ ⊢ IT[Id] ® IP }} by mauto 3. *)
+(*         simpl in *. *)
+(*         autorewrite with mcpts in *; mauto 3. *)
+(*       } *)
+(*       assert {{ Γ ⊢ IT' ® IP }}. *)
+(*       { *)
+(*         assert {{ Γ ⊢ IT'[Id] ® IP }} by mauto 3. *)
+(*         simpl in *. *)
+(*         autorewrite with mcpts in *; mauto 3. *)
+(*       } *)
+(*       assert {{ Δ ⊢ IT'[σ] ≈ IT[σ] : Type@i }} by (symmetry; mauto 4 using glu_sort_elem_per_sort_typ_escape). *)
+(*       assert {{ Δ ⊢ N : IT'[σ] ® n ∈ IEl }} by (simpl; bulky_rewrite1; eassumption). *)
+(*       assert (exists mn : domain, {{ $| m & n |↘ mn }} /\ {{Δ ⊢ M[σ] N : OT'[σ,,N] ® mn ∈ OEl n equiv_n }}) by mauto 3. *)
+(*       destruct_conjs. *)
+(*       eexists; split; mauto 3. *)
+(*       match_by_head per_sort_elem ltac:(fun H => directed invert_per_sort_elem H). *)
+(*       destruct_rel_mod_eval. *)
+(*       handle_per_sort_elem_irrel. *)
+(*       match goal with *)
+(*       | _: {{ ⟦ B ⟧ ρ ↦ n ↘ ^?a }}, *)
+(*           _: {{ ⟦ B' ⟧ ρ' ↦ n ↘ ^?a' }} |- _ => *)
+(*           rename a into b; *)
+(*           rename a' into b' *)
+(*       end. *)
+(*       assert {{ DG b ∈ glu_sort_elem i ↘ OP n equiv_n ↘ OEl n equiv_n }} by mauto 3. *)
+(*       assert {{ DG b' ∈ glu_sort_elem i ↘ OP' n equiv_n ↘ OEl' n equiv_n }} by mauto 3. *)
+(*       assert {{ Δ ⊢ OT'[σ,,N] ® OP n equiv_n }} by (eapply glu_sort_elem_trm_typ; mauto 3). *)
+(*       assert {{ Sub b <: b' at i }} by mauto 3. *)
+(*       assert {{ Δ ⊢ OT'[σ,,N] ⊆ OT[σ,,N] }} by mauto 3. *)
+(*       intuition. *)
+(*   - match_by_head1 (per_bot b b') ltac:(fun H => destruct (H (length Γ)) as [V []]). *)
+(*     econstructor; mauto 3. *)
+(*     + econstructor; mauto 3. *)
+(*     + intros. *)
+(*       match_by_head1 (per_bot b b') ltac:(fun H => destruct (H (length Δ)) as [? []]). *)
+(*       functional_read_rewrite_clear. *)
+(*       assert {{ Δ ⊢ A[σ] ⊆ A'[σ] }} by mauto 3. *)
+(*       assert {{ Δ ⊢ M[σ] ≈ M' : A[σ] }} by mauto 3. *)
+(*       mauto 3. *)
+(*   - assert {{ Γ ⊢ A ® P }} by (eapply glu_sort_elem_trm_typ; eauto). *)
+(*     assert {{ Γ ⊢ A ≈ A' : Type@i }} by mauto 4. *)
+(*     rewrite H in *. *)
+(*     rewrite H4 in *. *)
+(*     handle_functional_glu_sort_elem. *)
+(*     trivial. *)
+(* Qed. *)
 
-Lemma glu_sort_elem_per_subtyp_trm_conv : forall {i j k a a' P P' El El' Γ A A' M m},
-    {{ Sub a <: a' at i }} ->
-    {{ DG a ∈ glu_sort_elem j ↘ P ↘ El }} ->
-    {{ DG a' ∈ glu_sort_elem k ↘ P' ↘ El' }} ->
-    {{ Γ ⊢ A' ® P' }} ->
-    {{ Γ ⊢ M : A ® m ∈ El }} ->
-    {{ Γ ⊢ M : A' ® m ∈ El' }}.
-Proof.
-  intros.
-  assert {{ Sub a <: a' at (max i (max j k)) }} by mauto using per_subtyp_cumu_left.
-  assert (j <= max i (max j k)) by lia.
-  assert (exists P El, {{ DG a ∈ glu_sort_elem (max i (max j k)) ↘ P ↘ El }}) as [Ptop [Eltop]] by mauto using glu_sort_elem_cumu_ge.
-  assert (k <= max i (max j k)) by lia.
-  assert (exists P El, {{ DG a' ∈ glu_sort_elem (max i (max j k)) ↘ P ↘ El }}) as [Ptop' [Eltop']] by mauto using glu_sort_elem_cumu_ge.
-  assert {{ Γ ⊢ A' ® Ptop' }} by (eapply glu_sort_elem_typ_cumu_ge; mauto).
-  assert {{ Γ ⊢ M : A ® m ∈ Eltop }} by (eapply @glu_sort_elem_exp_cumu_ge with (i := j); mauto).
-  assert {{ Γ ⊢ M : A' ® m ∈ Eltop' }} by (eapply glu_sort_elem_per_subtyp_trm_if; mauto).
-  eapply glu_sort_elem_exp_lower; mauto.
-Qed.
+(* Lemma glu_sort_elem_per_subtyp_trm_conv : forall {i j k a a' P P' El El' Γ A A' M m}, *)
+(*     {{ Sub a <: a' at i }} -> *)
+(*     {{ DG a ∈ glu_sort_elem j ↘ P ↘ El }} -> *)
+(*     {{ DG a' ∈ glu_sort_elem k ↘ P' ↘ El' }} -> *)
+(*     {{ Γ ⊢ A' ® P' }} -> *)
+(*     {{ Γ ⊢ M : A ® m ∈ El }} -> *)
+(*     {{ Γ ⊢ M : A' ® m ∈ El' }}. *)
+(* Proof. *)
+(*   intros. *)
+(*   assert {{ Sub a <: a' at (max i (max j k)) }} by mauto using per_subtyp_cumu_left. *)
+(*   assert (j <= max i (max j k)) by lia. *)
+(*   assert (exists P El, {{ DG a ∈ glu_sort_elem (max i (max j k)) ↘ P ↘ El }}) as [Ptop [Eltop]] by mauto using glu_sort_elem_cumu_ge. *)
+(*   assert (k <= max i (max j k)) by lia. *)
+(*   assert (exists P El, {{ DG a' ∈ glu_sort_elem (max i (max j k)) ↘ P ↘ El }}) as [Ptop' [Eltop']] by mauto using glu_sort_elem_cumu_ge. *)
+(*   assert {{ Γ ⊢ A' ® Ptop' }} by (eapply glu_sort_elem_typ_cumu_ge; mauto). *)
+(*   assert {{ Γ ⊢ M : A ® m ∈ Eltop }} by (eapply @glu_sort_elem_exp_cumu_ge with (i := j); mauto). *)
+(*   assert {{ Γ ⊢ M : A' ® m ∈ Eltop' }} by (eapply glu_sort_elem_per_subtyp_trm_if; mauto). *)
+(*   eapply glu_sort_elem_exp_lower; mauto. *)
+(* Qed. *)
+
 
 (** *** Lemmas for [glu_rel_typ_with_sub] and [glu_rel_exp_with_sub] *)
 
-Lemma mk_glu_rel_typ_with_sub' : forall {i Δ A σ ρ a},
+Lemma mk_glu_rel_typ_with_sub' {P} (pred_P : PredicativeSig P) : forall {s Δ A σ ρ a},
     {{ ⟦ A ⟧ ρ ↘ a }} ->
-    (exists P El, {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }}) ->
-    (forall P El, {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }} -> {{ Δ ⊢ A[σ] ® P }}) ->
-    glu_rel_typ_with_sub i Δ A σ ρ.
+    (exists typ_rel exp_rel, {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }}) ->
+    (forall typ_rel exp_rel, {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} -> {{ Δ ⊢ A[σ] ® typ_rel }}) ->
+    glu_rel_typ_with_sub pred_P s Δ A σ ρ.
 Proof.
   intros * ? [? []] HEl.
   econstructor; mauto.
@@ -692,26 +691,26 @@ Qed.
 #[export]
 Hint Resolve mk_glu_rel_typ_with_sub' : mcpts.
 
-Lemma mk_glu_rel_typ_with_sub'' : forall {i Δ A σ ρ a},
+Lemma mk_glu_rel_typ_with_sub'' {P} (pred_P : PredicativeSig P) : forall {s Δ A σ ρ a},
     {{ ⟦ A ⟧ ρ ↘ a }} ->
-    {{ Dom a ≈ a ∈ per_sort i }} ->
-    (forall P El, {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }} -> {{ Δ ⊢ A[σ] ® P }}) ->
-    glu_rel_typ_with_sub i Δ A σ ρ.
+    {{ Dom a ≈ a ∈ per_sort pred_P s }} ->
+    (forall typ_rel exp_rel, {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} -> {{ Δ ⊢ A[σ] ® typ_rel }}) ->
+    glu_rel_typ_with_sub pred_P s Δ A σ ρ.
 Proof.
   intros * ? [] ?.
-  assert (exists P El, {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }}) as [? []] by mauto.
+  assert (exists typ_rel exp_rel, {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }}) as [? []] by mauto.
   eapply mk_glu_rel_typ_with_sub'; mauto.
 Qed.
 
 #[export]
 Hint Resolve mk_glu_rel_typ_with_sub'' : mcpts.
 
-Lemma mk_glu_rel_exp_with_sub' : forall {i Δ A M σ ρ a m},
+Lemma mk_glu_rel_exp_with_sub' {P} (pred_P : PredicativeSig P) : forall {s Δ A M σ ρ a m},
     {{ ⟦ A ⟧ ρ ↘ a }} ->
     {{ ⟦ M ⟧ ρ ↘ m }} ->
-    (exists P El, {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }}) ->
-    (forall P El, {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }} -> {{ Δ ⊢ M[σ] : A[σ] ® m ∈ El }}) ->
-    glu_rel_exp_with_sub i Δ M A σ ρ.
+    (exists typ_rel exp_rel, {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }}) ->
+    (forall typ_rel exp_rel, {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} -> {{ Δ ⊢ M[σ] : A[σ] ® m ∈ exp_rel }}) ->
+    glu_rel_exp_with_sub pred_P s Δ M A σ ρ.
 Proof.
   intros * ? ? [? []] HEl.
   econstructor; mauto.
@@ -721,29 +720,30 @@ Qed.
 #[export]
 Hint Resolve mk_glu_rel_exp_with_sub' : mcpts.
 
-Lemma mk_glu_rel_exp_with_sub'' : forall {i Δ A M σ ρ a m},
+Lemma mk_glu_rel_exp_with_sub'' {P} (pred_P : PredicativeSig P) : forall {s Δ A M σ ρ a m},
     {{ ⟦ A ⟧ ρ ↘ a }} ->
     {{ ⟦ M ⟧ ρ ↘ m }} ->
-    {{ Dom a ≈ a ∈ per_sort i }} ->
-    (forall P El, {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }} -> {{ Δ ⊢ M[σ] : A[σ] ® m ∈ El }}) ->
-    glu_rel_exp_with_sub i Δ M A σ ρ.
+    {{ Dom a ≈ a ∈ per_sort pred_P s }} ->
+    (forall typ_rel exp_rel, {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} -> {{ Δ ⊢ M[σ] : A[σ] ® m ∈ exp_rel }}) ->
+    glu_rel_exp_with_sub pred_P s Δ M A σ ρ.
 Proof.
   intros * ? ? [] ?.
-  assert (exists P El, {{ DG a ∈ glu_sort_elem i ↘ P ↘ El }}) as [? []] by mauto.
+  assert (exists typ_rel exp_rel, {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }}) as [? []] by mauto.
   eapply mk_glu_rel_exp_with_sub'; mauto.
 Qed.
 
 #[export]
 Hint Resolve mk_glu_rel_exp_with_sub'' : mcpts.
 
-Lemma glu_rel_exp_with_sub_implies_glu_rel_exp_sub_with_typ : forall {i Δ A M σ Γ ρ},
-  {{ Δ ⊢s σ : Γ }} ->
-  glu_rel_exp_with_sub i Δ M A σ ρ ->
-  glu_rel_exp_with_sub (S i) Δ A {{{ Type@i }}} σ ρ.
+Lemma glu_rel_exp_with_sub_implies_glu_rel_exp_sub_with_typ {P} (pred_P : PredicativeSig P) : forall {s s' Δ A M σ Γ ρ},
+    Ax P s s' ->
+      {{ Δ ⊢s σ : Γ }} ->
+    glu_rel_exp_with_sub pred_P s Δ M A σ ρ ->
+    glu_rel_exp_with_sub pred_P s' Δ A {{{ Sort@s }}} σ ρ.
 Proof.
-  intros * ? [].
+  intros * ax ? [].
   econstructor; mauto.
-  assert {{ Δ ⊢ A[σ] : Type@i }} by mauto using glu_sort_elem_trm_sort_lvl.
+  assert {{ Δ ⊢ A[σ] : Sort@s }} by mauto using glu_sort_elem_trm_sort_lvl.
   repeat split; try do 2 eexists; mauto 3.
   split; mauto 4.
   eapply glu_sort_elem_trm_typ; mauto 3.
@@ -752,15 +752,16 @@ Qed.
 #[export]
 Hint Resolve glu_rel_exp_with_sub_implies_glu_rel_exp_sub_with_typ : mcpts.
 
-Lemma glu_rel_exp_with_sub_implies_glu_rel_typ_with_sub : forall {i Δ A j σ ρ},
-  glu_rel_exp_with_sub i Δ A {{{ Type@j }}} σ ρ ->
-  glu_rel_typ_with_sub j Δ A σ ρ.
+Lemma glu_rel_exp_with_sub_implies_glu_rel_typ_with_sub {P} (pred_P : PredicativeSig P) : forall {s Δ A s' σ ρ},
+  glu_rel_exp_with_sub pred_P s Δ A {{{ Sort@s' }}} σ ρ ->
+  glu_rel_typ_with_sub pred_P s' Δ A σ ρ.
 Proof.
   intros * [].
   simplify_evals.
-  match_by_head1 glu_sort_elem invert_glu_sort_elem.
+  match_by_head1 (@glu_sort_elem P) invert_glu_sort_elem.
   apply_predicate_equivalence.
   unfold sort_glu_exp_pred' in *.
+  unfold glu_sort_typ_rec in *.
   destruct_conjs.
   econstructor; mauto 3.
 Qed.
@@ -768,15 +769,16 @@ Qed.
 #[export]
 Hint Resolve glu_rel_exp_with_sub_implies_glu_rel_typ_with_sub : mcpts.
 
-Lemma glu_rel_typ_with_sub_implies_glu_rel_exp_with_sub : forall {Δ A j σ Γ ρ},
-  {{ Δ ⊢s σ : Γ }} ->
-  glu_rel_typ_with_sub j Δ A σ ρ ->
-  glu_rel_exp_with_sub (S j) Δ A {{{ Type@j }}} σ ρ.
+Lemma glu_rel_typ_with_sub_implies_glu_rel_exp_with_sub {P} (pred_P : PredicativeSig P) : forall {Δ A s s' σ Γ ρ},
+    Ax P s s' ->
+    {{ Δ ⊢s σ : Γ }} ->
+  glu_rel_typ_with_sub pred_P s Δ A σ ρ ->
+  glu_rel_exp_with_sub pred_P s' Δ A {{{ Sort@s }}} σ ρ.
 Proof.
-  intros * ? [].
+  intros * ax ? [].
   simplify_evals.
   econstructor; mauto.
-  assert {{ Δ ⊢ A[σ] : Type@j }} by mauto 4 using glu_sort_elem_sort_lvl.
+  assert {{ Δ ⊢ A[σ] : Sort@s }} by mauto 4 using glu_sort_elem_sort_lvl.
   repeat split; try do 2 eexists; mauto 3.
 Qed.
 
@@ -785,8 +787,8 @@ Hint Resolve glu_rel_typ_with_sub_implies_glu_rel_exp_with_sub : mcpts.
 
 (** *** Lemmas for [glu_ctx_env] *)
 
-Lemma glu_ctx_env_sub_resp_ctx_eq : forall {Γ Sb},
-    {{ EG Γ ∈ glu_ctx_env ↘ Sb }} ->
+Lemma glu_ctx_env_sub_resp_ctx_eq {P} (pred_P : PredicativeSig P) : forall {Γ Sb},
+    {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} ->
     forall {Δ Δ' σ ρ},
       {{ Δ ⊢s σ ® ρ ∈ Sb }} ->
       {{ ⊢ Δ ≈ Δ' }} ->
@@ -797,20 +799,20 @@ Proof.
     simpl in *;
     mauto 4.
 
-  destruct_by_head cons_glu_sub_pred.
+  destruct_by_head (@cons_glu_sub_pred P).
   econstructor; mauto 4.
   rewrite <- Hctxeq; eassumption.
 Qed.
 
-Add Parametric Morphism Sb Γ (H : glu_ctx_env Sb Γ) : Sb
+Add Parametric Morphism {P} (pred_P : PredicativeSig P) Sb Γ (H : glu_ctx_env pred_P Sb Γ) : Sb
     with signature wf_ctx_eq ==> eq ==> eq ==> iff as glu_ctx_env_sub_morphism_iff1.
 Proof.
   intros.
   split; intros; eapply glu_ctx_env_sub_resp_ctx_eq; mauto.
 Qed.
 
-Lemma glu_ctx_env_sub_resp_sub_eq : forall {Γ Sb},
-    {{ EG Γ ∈ glu_ctx_env ↘ Sb }} ->
+Lemma glu_ctx_env_sub_resp_sub_eq {P} (pred_P : PredicativeSig P) : forall {Γ Sb},
+    {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} ->
     forall {Δ σ σ' ρ},
       {{ Δ ⊢s σ ® ρ ∈ Sb }} ->
       {{ Δ ⊢s σ ≈ σ' : Γ }} ->
@@ -822,26 +824,27 @@ Proof.
     gen_presup Hsubeq;
     try eassumption.
   
-  destruct_by_head cons_glu_sub_pred.
+  destruct_by_head (@cons_glu_sub_pred P).
   econstructor; mauto 4.
   assert {{ Γ, A ⊢s Wk : Γ }} by mauto 3.
-  assert {{ Δ ⊢ A[Wk][σ] ≈ A[Wk][σ'] : Type@i }} as <- by mauto 3.
+  assert {{ Δ ⊢ A[Wk][σ] ≈ A[Wk][σ'] : Sort@s }} as <- by mauto 4.
   assert {{ Δ ⊢ #0[σ] ≈ #0[σ'] : A[Wk][σ] }} as <- by mauto 3.
   eassumption.
 Qed.
 
-Add Parametric Morphism Sb Γ (H : glu_ctx_env Sb Γ) Δ : (Sb Δ)
+Add Parametric Morphism {P} (pred_P : PredicativeSig P) Sb Γ (H : glu_ctx_env pred_P Sb Γ) Δ : (Sb Δ)
     with signature wf_sub_eq Δ Γ ==> eq ==> iff as glu_ctx_env_sub_morphism_iff2.
 Proof.
   split; intros; eapply glu_ctx_env_sub_resp_sub_eq; mauto.
 Qed.
 
-Lemma cons_glu_sub_pred_resp_wf_sub_eq : forall {i Γ A Sb Δ σ σ' ρ},
-    {{ EG Γ ∈ glu_ctx_env ↘ Sb }} ->
-    {{ Γ ⊢ A : Type@i }} ->
+
+Lemma cons_glu_sub_pred_resp_wf_sub_eq {P} (pred_P : PredicativeSig P) : forall {s Γ A Sb Δ σ σ' ρ},
+    {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} ->
+    {{ Γ ⊢ A : Sort@s }} ->
     {{ Δ ⊢s σ ≈ σ' : Γ, A }} ->
-    {{ Δ ⊢s σ ® ρ ∈ cons_glu_sub_pred i Γ A Sb }} ->
-    {{ Δ ⊢s σ' ® ρ ∈ cons_glu_sub_pred i Γ A Sb }}.
+    {{ Δ ⊢s σ ® ρ ∈ cons_glu_sub_pred pred_P s Γ A Sb }} ->
+    {{ Δ ⊢s σ' ® ρ ∈ cons_glu_sub_pred pred_P s Γ A Sb }}.
 Proof.
   intros * Hglu HA Heq Hσ.
   dependent destruction Hσ.
@@ -850,20 +853,24 @@ Proof.
   assert {{ Δ ⊢s Wk∘σ' : Γ }} by mauto 3.
   assert {{ Δ ⊢s Wk∘σ ≈ Wk∘σ' : Γ }} by mauto 3.
   econstructor; mauto 3.
-  - assert {{ Δ ⊢ A[Wk][σ] ≈ A[Wk][σ'] : Type@i }} as <- by mauto 4.
+  - assert {{ Δ ⊢ A[Wk∘σ] ≈ A[Wk∘σ'] : Sort@s }} by mauto 3.
+    assert {{ Δ ⊢ A[Wk∘σ] ≈ A[Wk][σ] : Sort@s }} by mauto 4.
+    assert {{ Δ ⊢ A[Wk∘σ'] ≈ A[Wk][σ'] : Sort@s }} by mauto 4.
+    assert {{ Δ ⊢ A[Wk][σ] ≈ A[Wk][σ'] : Sort@s }} as <- by mauto 4.
     assert {{ Δ ⊢ #0[σ] ≈ #0[σ'] : A[Wk][σ] }} as <-; mauto 3.
   - assert {{ Δ ⊢s Wk∘σ ≈ Wk∘σ' : Γ }} as <-; eassumption.
 Qed.
 
-Add Parametric Morphism i Γ A Sb Δ (Hglu : {{ EG Γ ∈ glu_ctx_env ↘ Sb }}) (HA : {{ Γ ⊢ A : Type@i }}) : (cons_glu_sub_pred i Γ A Sb Δ)
+Add Parametric Morphism {P} (pred_P : PredicativeSig P) s Γ A Sb Δ (Hglu : {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }}) (HA : {{ Γ ⊢ A : Sort@s }}) : (cons_glu_sub_pred pred_P s Γ A Sb Δ)
     with signature wf_sub_eq Δ {{{ Γ, A }}} ==> eq ==> iff as cons_glu_sub_pred_morphism_iff.
 Proof.
   split; mauto using cons_glu_sub_pred_resp_wf_sub_eq.
 Qed.
 
-Lemma glu_ctx_env_per_env : forall {Γ Sb env_rel Δ σ ρ},
-    {{ EG Γ ∈ glu_ctx_env ↘ Sb }} ->
-    {{ EF Γ ≈ Γ ∈ per_ctx_env ↘ env_rel }} ->
+(* STOPPED HERE *)
+Lemma glu_ctx_env_per_env {P} (pred_P : PredicativeSig P) : forall {Γ Sb env_rel Δ σ ρ},
+    {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} ->
+    {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }} ->
     {{ Δ ⊢s σ ® ρ ∈ Sb }} ->
     {{ Dom ρ ≈ ρ ∈ env_rel }}.
 Proof.
@@ -875,13 +882,22 @@ Proof.
     handle_per_ctx_env_irrel;
     mauto 3.
 
-  rename i0 into j.
-  inversion_clear_by_head cons_glu_sub_pred.
+  (* rename i0 into j. *)
+  inversion_clear_by_head (@cons_glu_sub_pred P).
   assert {{ Dom ρ ↯ ≈ ρ ↯ ∈ tail_rel }} by intuition.
-  destruct_rel_typ.
+  destruct_rel_typ_unsorted.
+  handle_per_typ_elem_irrel.
   handle_per_sort_elem_irrel.
-  assert (exists P' El', {{ DG a ∈ glu_sort_elem (max i j) ↘ P' ↘ El' }}) as [? []] by mauto 3 using glu_sort_elem_cumu_max_left.
-  eexists; eapply glu_sort_elem_per_elem; mauto using per_sort_elem_cumu_max_right.
+  
+  assert (exists typ_rel' exp_rel', {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel' ↘ exp_rel' }}) as [? []] by mauto 3.
+  (* econstructor; mauto 2. *)
+  eexists; [eassumption | eassumption |].
+
+  eapply glu_sort_elem_per_elem; mauto.
+  assert (El <∙> x0) by mauto.
+  
+  eapply glu_sort_elem_exp_conv'; mauto.
+  
   eapply glu_sort_elem_exp_cumu_max_left; [| | eassumption]; eassumption.
 Qed.
 
