@@ -543,67 +543,63 @@ Lemma exp_eq_typ_q_sigma_then_weak_weak_extend_succ_var_1 {P} : forall {Γ : ctx
     {{ Δ, ℕ, A[q σ] ⊢ A[q σ][Wk∘Wk,,succ #1] ≈ A[Wk∘Wk,,succ #1][q (q σ)] }}.
 Proof.
   intros.
-  assert {{ Δ, ℕ ⊢s q σ : Γ, ℕ }} by (econstructor; mauto).
-  assert {{ Δ, ℕ, A[q σ] ⊢s Wk∘Wk,,succ #1 : Δ, ℕ }} by (eapply @sub_weak_compose_weak_extend_succ_var_1 with (P := P); mauto).
-  assert {{ Δ, ℕ, A[q σ] ⊢ A[q σ][Wk∘Wk,,succ #1] ≈ A[q σ∘(Wk∘Wk,,succ #1)] }} by mauto 3.
+  assert {{ Δ, ℕ ⊢s q σ : Γ, ℕ }} by (econstructor; mauto 3).
+  assert {{ Δ, ℕ, A[q σ] ⊢s Wk∘Wk,,succ #1 : Δ, ℕ }} by (eapply @sub_weak_compose_weak_extend_succ_var_1 with (P := P); mauto 3).
+  assert {{ Δ, ℕ, A[q σ] ⊢ A[q σ][Wk∘Wk,,succ #1] ≈ A[q σ∘(Wk∘Wk,,succ #1)] }} as ->  by mauto 3.
+  
   assert {{ Δ, ℕ, A[q σ] ⊢s q (q σ) : Γ, ℕ, A }} by mauto 3.
-  assert {{ Δ, ℕ, A[q σ] ⊢ A[Wk∘Wk,,succ #1][q (q σ)] ≈ A[(Wk∘Wk,,succ #1)∘q (q σ)] }} by (econstructor; mautosolve).
-  rewrite -> @sub_eq_q_sigma_compose_weak_weak_extend_succ_var_1; mauto 2.
-  eapply exp_eq_refl.
-  eapply exp_sub_typ; mauto 2.
-  econstructor; mauto 3.
+  assert   {{ Γ,ℕ,A ⊢s Wk∘Wk,,succ #1 : Γ,ℕ }} by (eapply @sub_weak_compose_weak_extend_succ_var_1 with (P := P); mauto 3).
+  assert {{ Δ, ℕ, A[q σ] ⊢ A[Wk∘Wk,,succ #1][q (q σ)] ≈ A[(Wk∘Wk,,succ #1)∘q (q σ)] }} by (symmetry; eapply wf_typ_eq_sub_compose; mauto 3).
+  mauto 5.
 Qed.
 
-Lemma wf_exp_eq_eqrec_Aσwkwk_Aσwkwk : forall {Γ σ Δ i A},
+Lemma wf_exp_eq_eqrec_Aσwkwk_Aσwkwk {P} : forall {Γ : ctx P} {σ Δ A s} {r : Ru_nat P s},
   {{ Γ ⊢s σ : Δ }} ->
-  {{ Δ ⊢ A : Type@i }} ->
-  {{ Γ, A[σ], A[σ][Wk] ⊢ A[σ][Wk∘Wk] ≈ A[σ][Wk][Wk] : Type@i }}.
+  {{ Δ ⊢ A }} ->
+  {{ Γ, A[σ], A[σ][Wk] ⊢ A[σ][Wk∘Wk] ≈ A[σ][Wk][Wk] }}.
 Proof.
   intros.
   assert {{ ⊢ Γ, A[σ] }} by mauto 3.
-  assert {{ Γ, A[σ] ⊢ A[σ][Wk] : Type@i }} by mauto 4.
+  assert {{ Γ, A[σ] ⊢ A[σ][Wk] }} by mauto 4.
   assert {{ ⊢ Γ, A[σ], A[σ][Wk] }} by mauto 3.
-  eapply wf_exp_eq_conv' with (i:=1+i); [eapply @exp_eq_compose_typ with (i:=i)|]; mauto 3.
+  mauto.
 Qed.
 
-Lemma wf_exp_eq_eqrec_Aσwkwkwkτ1 : forall {Γ Δ Ψ σ τ i A B},
+Lemma wf_exp_eq_eqrec_Aσwkwkwkτ1 {P} : forall {Γ : ctx P} {Δ Ψ σ τ A B s} {r : Ru_nat P s},
   {{ Γ ⊢s σ : Δ }} ->
-  {{ Δ ⊢ A : Type@i }} ->
+  {{ Δ ⊢ A }} ->
   {{ Ψ ⊢s τ : Γ, A[σ], A[σ][Wk], B }} ->
-  {{ Ψ ⊢ A[σ][Wk][Wk][Wk][τ] ≈ A[σ][Wk][Wk][Wk∘τ] : Type@i }}.
+  {{ Ψ ⊢ A[σ][Wk][Wk][Wk][τ] ≈ A[σ][Wk][Wk][Wk∘τ] }}.
 Proof.
   intros. symmetry.
   gen_presups.
-  eapply wf_exp_eq_conv'; [eapply wf_exp_eq_sub_compose with (A:={{{ Type@i }}})|]; mauto 4.
-  eapply exp_sub_typ; mauto 3.
-  eapply exp_sub_typ; mauto 3.
+  mauto.
 Qed.
 
-Lemma wf_exp_eq_eqrec_Aσwkwkwkτ2 : forall {Γ Δ Ψ σ τ i A B},
+Lemma wf_exp_eq_eqrec_Aσwkwkwkτ2 {P} : forall {Γ : ctx P} {Δ Ψ σ τ A B s} {r : Ru_nat P s},
   {{ Γ ⊢s σ : Δ }} ->
-  {{ Δ ⊢ A : Type@i }} ->
+  {{ Δ ⊢ A }} ->
   {{ Ψ ⊢s τ : Γ, A[σ], A[σ][Wk], B }} ->
-  {{ Ψ ⊢ A[σ][Wk][Wk][Wk][τ] ≈ A[σ][Wk][Wk∘Wk∘τ] : Type@i }}.
+  {{ Ψ ⊢ A[σ][Wk][Wk][Wk][τ] ≈ A[σ][Wk][Wk∘Wk∘τ] }}.
 Proof.
   intros. symmetry.
   gen_presups.
-  erewrite wf_exp_eq_eqrec_Aσwkwkwkτ1; mauto 3.
+  erewrite @wf_exp_eq_eqrec_Aσwkwkwkτ1 with (P := P); mauto 3.
   inversion HΓ2.
-  eapply @exp_eq_compose_typ with (A':={{{ A[σ][Wk] }}}); mauto 4.
+  mauto.
 Qed.
 
-Lemma wf_exp_eq_eqrec_Aσwkwkwkτ3 : forall {Γ Δ Ψ σ τ i A B},
+Lemma wf_exp_eq_eqrec_Aσwkwkwkτ3 {P} : forall {Γ : ctx P} {Δ Ψ σ τ A B s} {r : Ru_nat P s},
   {{ Γ ⊢s σ : Δ }} ->
-  {{ Δ ⊢ A : Type@i }} ->
+  {{ Δ ⊢ A }} ->
   {{ Ψ ⊢s τ : Γ, A[σ], A[σ][Wk], B }} ->
-  {{ Ψ ⊢ A[σ][Wk][Wk][Wk][τ] ≈ A[σ][Wk∘Wk∘Wk∘τ] : Type@i }}.
+  {{ Ψ ⊢ A[σ][Wk][Wk][Wk][τ] ≈ A[σ][Wk∘Wk∘Wk∘τ] }}.
 Proof.
   intros. symmetry.
   gen_presups.
-  erewrite wf_exp_eq_eqrec_Aσwkwkwkτ2; mauto 3.
-  eapply @exp_eq_compose_typ with (Ψ:=Γ); mauto 3.
-  econstructor; mauto 3.
+  assert {{ Ψ ⊢s Wk∘Wk∘τ : Γ, A[σ] }} by mauto.
+  erewrite @wf_exp_eq_eqrec_Aσwkwkwkτ2 with (P := P); mauto.
 Qed.
 
 #[export]
-Hint Resolve exp_eq_typ_q_sigma_then_weak_weak_extend_succ_var_1 : mctt.
+Hint Resolve exp_eq_typ_q_sigma_then_weak_weak_extend_succ_var_1 : mcpts.
