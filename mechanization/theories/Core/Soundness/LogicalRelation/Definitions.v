@@ -354,22 +354,19 @@ End GluingInduction.
 
 
 (** Gluing model for untyped judgments *)
-Definition sort_glu_typ_pred_unsorted {P} (pred_P : PredicativeSig P) (s : P) : glu_typ_pred P :=
+Definition unsorted_glu_typ_pred {P} (pred_P : PredicativeSig P) (s : P) : glu_typ_pred P :=
   fun Γ A => {{ Γ ⊢ A ≈ Sort@s }}.
-Arguments sort_glu_typ_pred_unsorted {P} pred_P s Γ A/.
-Transparent sort_glu_typ_pred_unsorted.
+Arguments unsorted_glu_typ_pred {P} pred_P s Γ A/.
+Transparent unsorted_glu_typ_pred.
 
-Definition unsorted_glu_exp_pred {P} (pred_P : PredicativeSig P) (s : P) : glu_exp_pred P :=
-  fun Γ A M m =>
-    {{ Γ ⊢ M : A }} /\ {{ Γ ⊢ A ≈ Sort@s }} /\
-      (exists typ_rel exp_rel, forall a,
-          ({{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} /\  {{ Γ ⊢ A ® typ_rel }}) ->
-          {{ Γ ⊢ M : A ® m ∈ exp_rel }}).
 
-(* Definition unsorted_glu_exp_pred {P} (pred_P : PredicativeSig P) (s : P) : glu_exp_pred P := *)
-(*   fun Γ A M m => *)
-(*     {{ Γ ⊢ M : A }} /\ {{ Γ ⊢ A ≈ Sort@s }} /\ *)
-(*       {{ Γ ⊢ M : A ® m ∈ unsorted_glu_typ_pred pred_P s }}. *)
+Definition unsorted_glu_exp_pred {P} (pred_P : PredicativeSig P) s : glu_exp_pred P :=
+    fun Γ A M m =>
+      {{ Γ ⊢ M : A }} /\ {{ Γ ⊢ A ≈ Sort@s }} /\
+        {{ Γ ⊢ M ® glu_sort_typ pred_P s m }}.
+Arguments unsorted_glu_exp_pred {P} pred_P s Γ A M m/.
+
+
 
 Inductive glu_typ_unsorted_elem {P} (pred_P : PredicativeSig P) : glu_typ_pred P -> glu_exp_pred P -> domain P -> Prop :=
 | glu_typ_unsorted_sort :
@@ -395,7 +392,21 @@ Variant glu_elem_bot {P} (pred_P : PredicativeSig P) s a Γ A M m : Prop :=
       {{ Γ ⊢ M : A ® m ∈ glu_elem_bot pred_P s a }}.
 
 #[export]
-Hint Constructors glu_elem_bot : mcpts.
+  Hint Constructors glu_elem_bot : mcpts.
+
+
+Variant glu_elem_bot_unsorted {P} (pred_P : PredicativeSig P) a Γ A M m : Prop :=
+  | glu_elem_bot_unsorted_make : forall typ_rel exp_rel,
+      {{ Γ ⊢ M : A }} ->
+      {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} ->
+      {{ Γ ⊢ A ® typ_rel }} ->
+      {{ Dom m ≈ m ∈ per_bot }} ->
+      (forall Δ σ M', {{ Δ ⊢w σ : Γ }} -> {{ Rne m in length Δ ↘ M' }} -> {{ Δ ⊢ M[σ] ≈ M' : A[σ] }}) ->
+      {{ Γ ⊢ M : A ® m ∈ glu_elem_bot_unsorted pred_P a }}.
+
+#[export]
+Hint Constructors glu_elem_bot_unsorted : mcpts.
+
 
 Variant glu_elem_top {P} (pred_P : PredicativeSig P) s a Γ A M m : Prop :=
 | glu_elem_top_make : forall P El,
@@ -408,6 +419,19 @@ Variant glu_elem_top {P} (pred_P : PredicativeSig P) s a Γ A M m : Prop :=
 #[export]
 Hint Constructors glu_elem_top : mcpts.
 
+
+Variant glu_elem_top_unsorted {P} (pred_P : PredicativeSig P) a Γ A M m : Prop :=
+| glu_elem_top_unsorted_make : forall P El,
+    {{ Γ ⊢ M : A }} ->
+    {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ P ↘ El }} ->
+    {{ Γ ⊢ A ® P }} ->
+    {{ Dom ⇓ a m ≈ ⇓ a m ∈ per_top }} ->
+    (forall Δ σ w, {{ Δ ⊢w σ : Γ }} -> {{ Rnf ⇓ a m in length Δ ↘ w }} -> {{ Δ ⊢ M[σ] ≈ w : A[σ] }}) ->
+    {{ Γ ⊢ M : A ® m ∈ glu_elem_top_unsorted pred_P a }}.
+#[export]
+Hint Constructors glu_elem_top_unsorted : mcpts.
+
+
 Variant glu_typ_top {P} (pred_P : PredicativeSig P) (s : P) a Γ A : Prop :=
 | glu_typ_top_make :
     {{ Γ ⊢ A : Sort@s }} ->
@@ -416,6 +440,17 @@ Variant glu_typ_top {P} (pred_P : PredicativeSig P) (s : P) a Γ A : Prop :=
     {{ Γ ⊢ A ® glu_typ_top pred_P s a }}.
 #[export]
 Hint Constructors glu_typ_top : mcpts.
+
+
+Variant glu_typ_top_unsorted {P} (pred_P : PredicativeSig P) (a : domain P) Γ A : Prop :=
+| glu_typ_top_unsorted_make :
+    {{ Γ ⊢ A }} ->
+    {{ Dom a ≈ a ∈ per_top_typ }} ->
+    (forall Δ σ A', {{ Δ ⊢w σ : Γ }} -> {{ Rtyp a in length Δ ↘ A' }} -> {{ Δ ⊢ A[σ] ≈ A' }}) ->
+    {{ Γ ⊢ A ® glu_typ_top_unsorted pred_P a }}.
+#[export]
+Hint Constructors glu_typ_top_unsorted : mcpts.
+
 
 Variant glu_rel_typ_with_sub {P} (pred_P : PredicativeSig P) (s : P) Δ A σ ρ : Prop :=
 | mk_glu_rel_typ_with_sub :
@@ -442,12 +477,12 @@ Arguments nil_glu_sub_pred {P} Δ σ ρ/.
 
 (** The parameters are ordered differently from the Agda version
     so that we can return [glu_sub_pred]. *)
-Variant cons_glu_sub_pred {P} (pred_P : PredicativeSig P) (s : P) Γ A (TSb : glu_sub_pred P) : glu_sub_pred P :=
+Variant cons_glu_sub_pred {P} (pred_P : PredicativeSig P) Γ A (TSb : glu_sub_pred P) : glu_sub_pred P :=
 | mk_cons_glu_sub_pred :
   `{ forall P El,
         {{ Δ ⊢s σ : Γ, A }} ->
         {{ ⟦ A ⟧ ρ ↯ ↘ a }} ->
-        {{ DG a ∈ glu_sort_elem pred_P s ↘ P ↘ El }} ->
+        {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ P ↘ El }} ->
         (env_lookup ρ 0 m) ->
         (* I don't understand why this notation does not work, it is imported *)
         (* {{ ρ[0] ↘ m }} -> *)
@@ -456,7 +491,7 @@ Variant cons_glu_sub_pred {P} (pred_P : PredicativeSig P) (s : P) Γ A (TSb : gl
             a more direct consequence of [{{ Γ, A ⊢ #0 : A[Wk] }}] *)
         {{ Δ ⊢ #0[σ] : A[Wk][σ] ® m ∈ El }} ->
         {{ Δ ⊢s Wk ∘ σ ® ρ ↯ ∈ TSb }} ->
-        {{ Δ ⊢s σ ® ρ ∈ cons_glu_sub_pred pred_P s Γ A TSb }} }.
+        {{ Δ ⊢s σ ® ρ ∈ cons_glu_sub_pred pred_P Γ A TSb }} }.
 
 Variant cons_glu_sub_pred_unsorted {P} (pred_P : PredicativeSig P) Γ A (TSb : glu_sub_pred P) : glu_sub_pred P :=
 | mk_cons_glu_sub_pred_unsorted :
@@ -481,13 +516,13 @@ Inductive glu_ctx_env {P} (pred_P : PredicativeSig P) : glu_sub_pred P -> ctx P 
         Sb <∙> nil_glu_sub_pred ->
         {{ EG ⋅ ∈ glu_ctx_env pred_P ↘ Sb }} }
 | glu_ctx_env_cons :
-  `{ forall s TSb Sb,
+  `{ forall TSb Sb,
         {{ EG Γ ∈ glu_ctx_env pred_P ↘ TSb }} ->
-        {{ Γ ⊢ A : Sort@s }} ->
+        {{ Γ ⊢ A }} ->
         (forall Δ σ ρ,
             {{ Δ ⊢s σ ® ρ ∈ TSb }} ->
-            glu_rel_typ_with_sub pred_P s Δ A σ ρ) ->
-        Sb <∙> cons_glu_sub_pred pred_P s Γ A TSb ->
+            glu_rel_typ_with_sub_unsorted pred_P Δ A σ ρ) ->
+        Sb <∙> cons_glu_sub_pred pred_P Γ A TSb ->
         {{ EG Γ, A ∈ glu_ctx_env pred_P ↘ Sb }} }.
 
 Inductive glu_ctx_env_unsorted {P} (pred_P : PredicativeSig P) : glu_sub_pred P -> ctx P -> Prop :=
@@ -497,7 +532,7 @@ Inductive glu_ctx_env_unsorted {P} (pred_P : PredicativeSig P) : glu_sub_pred P 
         {{ EG ⋅ ∈ glu_ctx_env_unsorted pred_P ↘ Sb }} }
 | glu_ctx_env_unsorted_cons :
   `{ forall TSb Sb,
-        {{ EG Γ ∈ glu_ctx_env pred_P ↘ TSb }} ->
+        {{ EG Γ ∈ glu_ctx_env_unsorted pred_P ↘ TSb }} ->
         {{ Γ ⊢ A }} ->
         (forall Δ σ ρ,
             {{ Δ ⊢s σ ® ρ ∈ TSb }} ->

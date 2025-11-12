@@ -232,7 +232,7 @@ with wf_exp_eq {P : PtsSig} : ctx P -> typ P -> exp P -> exp P -> Prop :=
   `( {{ Γ ⊢ M ≈ M' : A }} ->
      {{ Γ ⊢ A' }} ->
      (** This extra argument is here to be consistent with
-         [wf_exp_subtyp].
+         [wf_exp_conv].
       *)
      {{ Γ ⊢ A ≈ A' }} ->
      {{ Γ ⊢ M ≈ M' : A' }} )
@@ -432,6 +432,20 @@ Add Parametric Morphism {P : PtsSig} (Γ : ctx P) T : (wf_exp_eq Γ T)
 Proof.
   split; mauto.
 Qed.
+
+
+Add Parametric Morphism {P : PtsSig} (Γ : ctx P) : (wf_typ_eq Γ)
+    with signature wf_typ_eq Γ ==> eq ==> iff as wf_typ_eq_morphism_iff1.
+Proof.
+  split; mauto.
+Qed.
+
+Add Parametric Morphism {P : PtsSig} (Γ : ctx P) : (wf_typ_eq Γ)
+    with signature eq ==> wf_typ_eq Γ ==> iff as wf_typ_eq_morphism_iff2.
+Proof.
+  split; mauto.
+Qed.
+
 
 Add Parametric Morphism {P : PtsSig} (Γ : ctx P) Δ : (wf_sub_eq Γ Δ)
     with signature wf_sub_eq Γ Δ ==> eq ==> iff as wf_sub_eq_morphism_iff1.

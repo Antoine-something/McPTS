@@ -38,7 +38,7 @@ Section completeness_fundamental.
   Theorem completeness_fundamental_ctx : forall Γ, {{ ⊢ Γ }} -> {{ ⟪ pred_P ⟫ ⊨ Γ }}.
   Proof using Type. solve_it. Qed.
 
-  Theorem completeness_fundamental_ctx_subtyp : forall Γ Γ', {{ ⊢ Γ ≈ Γ' }} -> {{ ⟪ pred_P ⟫ ⊨ Γ ≈ Γ' }}.
+  Theorem completeness_fundamental_ctx_eq : forall Γ Γ', {{ ⊢ Γ ≈ Γ' }} -> {{ ⟪ pred_P ⟫ ⊨ Γ ≈ Γ' }}.
   Proof using Type. solve_it. Qed.
 
   Theorem completeness_fundamental_exp : forall Γ M A, {{ Γ ⊢ M : A }} -> {{ ⟪ pred_P ⟫ Γ ⊨u M : A }}.

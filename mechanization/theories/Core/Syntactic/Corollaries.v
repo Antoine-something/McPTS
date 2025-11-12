@@ -432,4 +432,95 @@ Qed.
 #[export]
 Hint Resolve sub_eq_q_compose : mcpts.
 #[export]
-Hint Rewrite -> @sub_eq_q_compose using mauto 4 : mcpts.    
+Hint Rewrite -> @sub_eq_q_compose using mauto 4 : mcpts.
+
+
+
+(** Lemmas need to go from untyped judgment back to typed judgments *)
+Lemma wf_exp_sub_sort_implies_wf_exp_sort {P} : forall {Γ Δ : ctx P} {σ A s},
+    {{ Γ ⊢s σ : Δ }} ->
+    {{ Γ ⊢ A[σ] : Sort@s }} ->
+    {{ Δ ⊢ A : Sort@s }}.
+Proof.
+  intros * Hσ.
+  dependent induction Hσ; intros; mauto 3.
+  - admit.
+  - admit.
+  - admit.
+Admitted.
+
+(* Lemma wf_exp_sort_wf_exp_eq_sort_implies_wf_exp_eq_sort {P} : forall {Γ : ctx P} {A A' s s'}, *)
+(*     {{ Γ ⊢ A : Sort@s }} -> *)
+(*     {{ Γ ⊢ A ≈ A' : Sort@s' }} -> *)
+(*     {{ Γ ⊢ A ≈ A' : Sort@s }}. *)
+(* Proof. *)
+(*   intros * HA. *)
+(*   gen s' A'. *)
+(*   induction HA. *)
+  
+(*   induction HAA'; intros s HA; mauto 3. *)
+(*   - econstructor; mauto 3. *)
+(*   - admit. *)
+(*   -  *)
+  
+Lemma wf_exp_sort_wf_typ_eq_implies_wf_exp_eq_sort_right {P} : forall {Γ : ctx P} {A A' s},
+    {{ Γ ⊢ A : Sort@s }} ->
+    {{ Γ ⊢ A ≈ A' }} ->
+    {{ Γ ⊢ A ≈ A' : Sort@s }}.
+Proof.
+  
+  intros * HA HAA'.
+  gen HA s.
+  dependent induction HAA'; intros s' HA; mauto 3.
+  - admit.
+  - admit.
+  - gen_presup H.
+    assert {{ Δ ⊢ A : Sort@s' }} by (eapply (wf_exp_sub_sort_implies_wf_exp_sort Hσ HA); mauto).
+    assert {{ Δ ⊢ A ≈ A' : Sort@s' }} by mauto.
+    econstructor; mauto 3.
+  - assert {{ Γ ⊢s σ∘τ : Γ'' }} by mauto 3.
+    assert {{ Γ'' ⊢ A : Sort@s' }} by (eapply wf_exp_sub_sort_implies_wf_exp_sort; mauto).
+    econstructor; mauto 3.
+  - admit.
+  - assert {{ Γ ⊢ A1 ≈ A2 : Sort@s' }} by mauto.
+    gen_presups.
+    assert {{ Γ ⊢ A2 ≈ A3 : Sort@s' }} by mauto.
+    etransitivity; mauto 2.
+Admitted.
+
+#[export]
+Hint Resolve wf_exp_sort_wf_typ_eq_implies_wf_exp_eq_sort_right : mcpts.
+
+
+Lemma wf_exp_sort_wf_typ_eq_implies_wf_exp_eq_sort_left {P} : forall {Γ : ctx P} {A A' s},
+    {{ Γ ⊢ A' : Sort@s }} ->
+    {{ Γ ⊢ A ≈ A' }} ->
+    {{ Γ ⊢ A ≈ A' : Sort@s }}.
+Proof. mauto. Qed.
+
+#[export]
+Hint Resolve wf_exp_sort_wf_typ_eq_implies_wf_exp_eq_sort_left : mcpts.
+
+
+Lemma wf_exp_sort_wf_typ_eq_implies_wf_exp_sort_left {P} : forall {Γ : ctx P} {A A' s},
+    {{ Γ ⊢ A' : Sort@s }} ->
+    {{ Γ ⊢ A ≈ A' }} ->
+    {{ Γ ⊢ A : Sort@s }}.
+Proof. 
+  intros.
+  assert {{ Γ ⊢ A ≈ A' : Sort@s }} by mauto.
+  gen_presups.
+  eassumption.  
+Qed.
+
+#[export]
+Hint Resolve wf_exp_sort_wf_typ_eq_implies_wf_exp_sort_left : mcpts.
+  
+Lemma wf_exp_sort_wf_typ_eq_implies_wf_exp_sort_right {P} : forall {Γ : ctx P} {A A' s},
+    {{ Γ ⊢ A : Sort@s }} ->
+    {{ Γ ⊢ A ≈ A' }} ->
+    {{ Γ ⊢ A' : Sort@s }}.
+Proof. mauto. Qed.
+  
+#[export]
+Hint Resolve wf_exp_sort_wf_typ_eq_implies_wf_exp_sort_right : mcpts.

@@ -1,4 +1,4 @@
-From Coq Require Import Lia PeanoNat Relations.
+From Coq Require Import Lia PeanoNat Relations Logic.
 
 From McPTS Require Import PtsSignature LibTactics.
 From McPTS.Core Require Import Base.
@@ -37,7 +37,7 @@ Section functional_eval.
     apply eval_mut_ind; intros.
     1,5,6,9-12:
       progressive_inversion; do 2 f_equal; try reflexivity...
-    
+
     - progressive_inversion.
       eapply env_lookup_functional; mauto 2.
 
@@ -46,6 +46,7 @@ Section functional_eval.
     - progressive_invert H0.
       assert (a = a0) by mauto.
       subst.
+      
       reflexivity.
     - progressive_invert H.
       reflexivity.
