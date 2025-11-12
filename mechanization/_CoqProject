@@ -1,4 +1,4 @@
--R theories McPTS
+roj	-R theories McPTS
 
 -arg -w -arg -cast-in-pattern,-notation-overridden
 
@@ -17,8 +17,8 @@ theories/Core/Syntactic/Presup.v
 theories/Core/Syntactic/SystemOpt.v
 theories/Core/Syntactic/Corollaries.v
 
-# theories/Core/Semantic/Domain.v
-# theories/Core/Semantic/Evaluation/Definitions.v
+theories/Core/Semantic/Domain.v
+theories/Core/Semantic/Evaluation/Definitions.v
 # theories/Core/Semantic/Evaluation/Lemmas.v
 # theories/Core/Semantic/Evaluation/Tactics.v
 # theories/Core/Semantic/Evaluation.v
