@@ -376,7 +376,7 @@ Proof.
       symmetry.
       rewrite <- wf_exp_eq_pi_sub; mauto 4.
 
-  - assert (per_top_typ d{{{ ⇑ a b }}} d{{{ ⇑ a b }}}) by mauto.
+  - assert (per_top_typ d{{{ ⇑ Sort@s b }}} d{{{ ⇑ Sort@s b }}}) by mauto.
     econstructor; eauto.
     intros.
     progressive_inversion.
@@ -451,4 +451,181 @@ Proof.
   intros.
   eapply realize_glu_elem_bot; mauto 4.
   eauto using var_glu_elem_bot.
+Qed.
+
+
+
+(** Realizability for unsorted gluing model *)
+Theorem realize_glu_typ_unsorted_elem_gen {P} (pred_P : PredicativeSig P) : forall a typ_rel exp_rel,
+    {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} ->
+    (forall Γ A R,
+        {{ DF a ≈ a ∈ per_typ_elem pred_P ↘ R }} ->
+        (typ_rel Γ A) ->
+        (* {{ Γ ⊢ A ® P }} -> *)
+        (* {{ Γ ⊢ A ® glu_typ_top i a }} *)
+          (glu_typ_top_unsorted pred_P a Γ A)) /\
+      (forall Γ M A m,
+          (** We repeat this to get the relation between [a] and [P]
+              more easily after applying [induction 1.] *)
+          {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} ->
+          (glu_elem_bot_unsorted pred_P a Γ A M m) ->
+          (* {{ Γ ⊢ M : A ® m ∈ glu_elem_bot i a }} -> *)
+          (* {{ Γ ⊢ M : A ® ⇑ a m ∈ El }} *)
+          (exp_rel Γ A M d{{{ ⇑ a m }}})) /\
+      (forall Γ M A m R,
+          (** We repeat this to get the relation between [a] and [P]
+              more easily after applying [induction 1.] *)
+          {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} ->
+          (exp_rel Γ A M m) ->
+          (* {{ Γ ⊢ M : A ® m ∈ El }} -> *)
+          {{ DF a ≈ a ∈ per_typ_elem pred_P ↘ R }} ->
+          {{ Dom m ≈ m ∈ R }} ->
+          (* {{ Γ ⊢ M : A ® m ∈ glu_elem_top i a }} *)
+          (glu_elem_top_unsorted pred_P a Γ A M m)).
+Proof.
+  intros * Hglu.
+  inversion Hglu; subst.
+  - repeat split.
+    + rewrite H in H2.
+      unfold unsorted_glu_typ_pred in H2.
+      gen_presup H2.
+      eassumption.
+    + mauto.
+    + intros.
+      rewrite H in H2.
+      unfold unsorted_glu_typ_pred in H2.
+      inversion_clear H4.
+      transitivity {{{ Sort@s[σ] }}}; mauto 3.
+    + intros.
+      inversion H2.
+      handle_functional_glu_typ_unsorted_elem P.
+      unfold unsorted_glu_exp_pred.
+      unfold unsorted_glu_typ_pred in H5.
+      repeat split; mauto 2.
+      unfold glu_sort_typ.
+      do 2 eexists; split.
+      * glu_sort_elem_econstructor; mauto 2; reflexivity.
+      * econstructor; mauto 2.
+        intros.
+        eapply wf_exp_eq_conv' with (A:= {{{ A[σ] }}}); mauto 2.
+        transitivity {{{ Sort@s[σ] }}}; mauto 3.
+    + intros.
+      rewrite H0 in H2.
+      unfold unsorted_glu_exp_pred in H2.
+      unfold glu_sort_typ in H2.
+      destruct_conjs.
+      assert (per_sort pred_P s m m) by mauto.
+      unfold per_sort in H10; destruct_conjs.
+      assert (glu_typ_top pred_P s m Γ M) by mauto 2.
+      inversion_clear H12.
+      assert (glu_typ_unsorted_elem pred_P H6 H7 m) by (econstructor; mauto 2).
+      handle_functional_glu_typ_unsorted_elem P.
+      econstructor; mauto 2.
+      intros.
+      inversion_clear H0.
+      eapply wf_exp_eq_conv' with (A := {{{ Sort@s }}}); mauto 3.
+      symmetry.
+      transitivity {{{ Sort@s[σ] }}}; mauto 3.
+
+  - repeat split.
+    + assert (glu_typ_top pred_P s a Γ A) by mauto 2.
+      inversion_clear H2.
+      econstructor; mauto 2.
+    + mauto 2.
+    + assert (glu_typ_top pred_P s a Γ A) by mauto 2.
+      inversion_clear H2.
+      intros.
+      econstructor; mauto 2.
+    + intros.
+      assert (glu_elem_bot pred_P s a Γ A M m).
+      {
+        inversion_clear H1.
+        handle_functional_glu_typ_unsorted_elem P.
+        econstructor; mauto 2.        
+      }
+      eapply realize_glu_elem_bot; mauto 2.
+    + intros.
+      assert (glu_elem_top pred_P s a Γ A M m) by (eapply realize_glu_elem_top; mauto 2).
+      inversion_clear H4.
+      handle_functional_glu_sort_elem P.
+      econstructor; mauto 2.
+Qed.
+
+
+Corollary realize_glu_typ_top_unsorted {P} (pred_P : PredicativeSig P) : forall a typ_rel exp_rel,
+    {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} ->
+    forall Γ A,
+      (typ_rel Γ A) ->
+      (glu_typ_top_unsorted pred_P a Γ A).
+      (* {{ Γ ⊢ A ® P }} -> *)
+      (* {{ Γ ⊢ A ® glu_typ_top i a }}. *)
+Proof.
+  intros.
+  pose proof H.
+  eapply glu_typ_unsorted_elem_per_typ in H.
+  simpl in *. destruct_all.
+  eapply realize_glu_typ_unsorted_elem_gen; eauto.
+Qed.
+
+Theorem realize_glu_elem_bot_unsorted {P} (pred_P : PredicativeSig P) : forall a typ_rel exp_rel,
+    {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} ->
+    forall Γ A M m,
+      (glu_elem_bot_unsorted pred_P a Γ A M m) ->
+      (exp_rel Γ A M d{{{ ⇑ a m }}}).
+      (* {{ Γ ⊢ M : A ® m ∈ glu_elem_bot i a }} -> *)
+      (* {{ Γ ⊢ M : A ® ⇑ a m ∈ El }}. *)
+Proof.
+  intros.
+  eapply realize_glu_typ_unsorted_elem_gen; eauto.
+Qed.
+
+Theorem realize_glu_elem_top_unsorted {P} (pred_P : PredicativeSig P) : forall a typ_rel exp_rel,
+    {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} ->
+    forall Γ A M m,
+      (exp_rel Γ A M m) ->
+      (glu_elem_top_unsorted pred_P a Γ A M m).
+      (* {{ Γ ⊢ M : A ® m ∈ El }} -> *)
+      (* {{ Γ ⊢ M : A ® m ∈ glu_elem_top i a }}. *)
+Proof.
+  intros.
+  pose proof H.
+  eapply glu_typ_unsorted_elem_per_typ in H.
+  simpl in *. destruct_all.
+  eapply realize_glu_typ_unsorted_elem_gen; eauto.
+  eapply glu_typ_unsorted_elem_per_typ_elem; eauto.
+Qed.
+
+#[export]
+Hint Resolve realize_glu_typ_top_unsorted realize_glu_elem_top_unsorted : mcpts.
+
+Lemma var_glu_elem_bot_unsorted {P} (pred_P : PredicativeSig P) : forall a typ_rel exp_rel Γ A,
+    {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} ->
+    typ_rel Γ A ->
+    (* {{ Γ ⊢ A ® P }} -> *)
+    glu_elem_bot_unsorted pred_P a {{{ Γ, A }}} {{{ A[Wk] }}} {{{ #0 }}} (d_var (length Γ) ).
+    (* {{ Γ, A ⊢ #0 : A[Wk] ® !(length Γ) ∈ glu_elem_bot pred_P s a }}. *)
+Proof.
+  intros. saturate_glu_unsorted_info.
+  econstructor; mauto 4.
+  - assert (wf_typ Γ A) by (eapply glu_typ_unsorted_elem_sort_lvl; mauto 2).
+    econstructor; mauto 3.
+    
+  - eapply glu_typ_unsorted_elem_typ_monotone; eauto.
+    assert (wf_typ Γ A) by (eapply glu_typ_unsorted_elem_sort_lvl; mauto 2).
+    assert {{ ⊢ Γ, A }} by mauto 3.
+    eapply weakening_wk; mauto 3.
+  - intros. progressive_inversion.
+    exact (var_weaken_gen _ _ _ H1 nil _ _ eq_refl).
+Qed.
+
+Corollary var0_glu_elem_unsorted {P} (pred_P : PredicativeSig P) : forall {a typ_rel exp_rel Γ A},
+    {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} ->
+    (typ_rel Γ A) ->
+    (exp_rel {{{ Γ, A }}} {{{ A[Wk] }}} {{{ #0 }}} d{{{ ⇑! a (length Γ) }}}).
+    (* {{ Γ ⊢ A ® P }} -> *)
+    (* {{ Γ, A ⊢ #0 : A[Wk] ® ⇑! a (length Γ) ∈ El }}. *)
+Proof.
+  intros.
+  eapply realize_glu_elem_bot_unsorted; mauto 4.
+  eauto using var_glu_elem_bot_unsorted.
 Qed.

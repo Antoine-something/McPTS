@@ -147,7 +147,7 @@ Section Gluing.
           {{ Dom b ≈ b ∈ per_bot }} ->
           typ_rel <∙> neut_glu_typ_pred s b ->
           el_rel <∙> neut_glu_exp_pred s b ->
-          {{ DG ⇑ a b ∈ glu_sort_elem_core ↘ typ_rel ↘ el_rel }} }
+          {{ DG ⇑ Sort@s b ∈ glu_sort_elem_core ↘ typ_rel ↘ el_rel }} }
   .
 
 
@@ -182,12 +182,12 @@ Section Gluing.
           motive typ_rel el_rel d{{{ Π r a ρ B }}} )
 
       (case_neut :
-        forall {a b}
+        forall {b}
           typ_rel el_rel,
           {{ Dom b ≈ b ∈ per_bot }} ->
           typ_rel <∙> neut_glu_typ_pred s b ->
           el_rel <∙> neut_glu_exp_pred s b ->
-          motive typ_rel el_rel d{{{ ⇑ a b }}} ).
+          motive typ_rel el_rel d{{{ ⇑ Sort@s b }}} ).
           
   (* Instance Glu_sort_elem_core_def_wf : WellFounded (pred_rel pred_P) := (wf_rel pred_P). *)
 
@@ -280,13 +280,13 @@ Section GluingInduction.
           motive s3 typ_rel exp_rel d{{{ Π r a ρ B }}} )
 
       (case_neut :
-        forall s a b
+        forall s b
           (typ_rel : glu_typ_pred P)
           (exp_rel : glu_exp_pred P),
           {{ Dom b ≈ b ∈ per_bot }} ->
           typ_rel <∙> neut_glu_typ_pred s b ->
           exp_rel <∙> neut_glu_exp_pred s b ->
-          motive s typ_rel exp_rel d{{{ ⇑ a b }}}).
+          motive s typ_rel exp_rel d{{{ ⇑ Sort@s b }}}).
 
   #[local]
   Ltac def_simp := simp glu_sort_elem in *; mauto 3.

@@ -108,7 +108,7 @@ Section Per_sort_elem_core_def.
     `{ forall (elem_rel : relation dom),
           {{ Dom e ≈ e' ∈ per_bot }} ->
           (elem_rel <~> per_ne) ->
-          {{ DF ⇑ a e ≈ ⇑ a' e' ∈ per_sort_elem_core ↘ elem_rel }} }
+          {{ DF ⇑ Sort@s_elem e ≈ ⇑ Sort@s_elem e' ∈ per_sort_elem_core ↘ elem_rel }} }
   .
 
   Hypothesis
@@ -132,11 +132,11 @@ Section Per_sort_elem_core_def.
           (elem_rel <~> fun f f' => forall n n' (equiv_n_n' : (in_rel n n')), rel_mod_app f n f' n' (out_rel equiv_n_n')) ->
           motive elem_rel d{{{ Π r a ρ B }}} d{{{ Π r a' ρ' B' }}})
       (case_ne :
-        forall {a b a' b'}
+        forall {b b'}
           {elem_rel : relation dom},
           (per_bot b b') ->
           (elem_rel <~> per_ne) ->
-          motive elem_rel (d_neut a b) (d_neut a' b'))
+          motive elem_rel (d_neut d{{{ Sort@s_elem }}} b) (d_neut d{{{ Sort@s_elem }}} b'))
   .
 
   #[derive(equations=no, eliminator=no)]
@@ -226,10 +226,10 @@ Section Per_sort_elem_ind_def.
           (elem_rel <~> fun f f' => forall n n' (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}), rel_mod_app f n f' n' (out_rel equiv_n_n')) ->
           motive s_elem elem_rel d{{{ Π r a ρ B }}} d{{{ Π r a' ρ' B' }}})
       (case_ne :
-        forall s_elem {a b a' b' elem_rel},
+        forall s_elem {b b' elem_rel},
           {{ Dom b ≈ b' ∈ per_bot }} ->
           (elem_rel <~> per_ne) ->
-          motive s_elem elem_rel d{{{ ⇑ a b }}} d{{{ ⇑ a' b' }}}).
+          motive s_elem elem_rel d{{{ ⇑ Sort@s_elem b }}} d{{{ ⇑ Sort@s_elem b' }}}).
 
   #[local]
   Ltac def_simp := simp per_sort_elem in *; solve [mauto 3 using ord_ax, ord_ru].
@@ -263,9 +263,14 @@ Section Per_sort_elem_ind_def.
                 | or_introl lt_out_s => mk_rel_mod_eval _ _ evb evb' (conj _ _)
                 | or_intror eq => let 'conj _ _ := Heq eq in _
                 end))
-        (fun _ _ _ _ _ => case_ne _)
+        (fun _ _ _ _ _ => case_ne _ _ _)
         R a b.
-
+  Next Obligation.
+    unfold pointwise_lifting.
+    rewrite -> r0.
+    reflexivity.
+  Qed.
+  
   #[derive(equations=no, eliminator=no), tactic="def_simp"]
   Equations per_sort_elem_ind s a b R (H : per_sort_elem pred_P s a b R) : motive s a b R :=
   | s, a, b, R, _ := per_sort_elem_ind' s a b R _.
