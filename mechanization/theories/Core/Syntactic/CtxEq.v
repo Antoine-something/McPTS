@@ -209,6 +209,19 @@ Proof.
 Qed.
 
 
+Add Parametric Morphism {P} : (@wf_typ P)
+  with signature wf_ctx_eq ==> eq ==> iff as ctxeq_typ_morphism.
+Proof.
+  intros. split; mauto 3.
+Qed.
+
+Add Parametric Morphism {P : PtsSig} : (@wf_typ_eq P)
+  with signature wf_ctx_eq ==> eq ==> eq ==> iff as ctxeq_typ_eq_morphism.
+Proof.
+  intros. split; mauto 3.
+Qed.
+
+
 Add Parametric Morphism {P : PtsSig} : (@wf_sub P)
   with signature wf_ctx_eq ==> eq ==> eq ==> iff as ctxeq_sub_morphism.
 Proof.

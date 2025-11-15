@@ -225,7 +225,7 @@ Qed.
 #[export]
 Hint Resolve ctx_eq_refl : mcpts.
 
-(** *** Lemmas for [exp] of [{{{ Type@i }}}] *)
+(** *** Lemmas for [exp] of [{{{ Sort@s }}}] *)
 
 Lemma exp_sub_typ {P : PtsSig} : forall {Δ : ctx P} {Γ A σ s},
     {{ Δ ⊢ A : Sort@s }} ->

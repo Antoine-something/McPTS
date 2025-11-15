@@ -433,7 +433,6 @@ Proof.
   split; mauto.
 Qed.
 
-
 Add Parametric Morphism {P : PtsSig} (Γ : ctx P) : (wf_typ_eq Γ)
     with signature wf_typ_eq Γ ==> eq ==> iff as wf_typ_eq_morphism_iff1.
 Proof.
@@ -446,7 +445,18 @@ Proof.
   split; mauto.
 Qed.
 
+Add Parametric Morphism {P} (Γ : ctx P) s : (wf_typ_eq Γ)
+  with signature eq ==> wf_exp_eq Γ {{{ Sort@s }}} ==> iff as wf_typ_eq_morphism_iff3.
+Proof.
+  split; mauto.
+Qed.
 
+Add Parametric Morphism {P} (Γ : ctx P) s : (wf_typ_eq Γ)
+  with signature wf_exp_eq Γ {{{ Sort@s }}} ==> eq ==> iff as wf_typ_eq_morphism_iff4.
+Proof.
+  split; mauto.
+Qed.
+  
 Add Parametric Morphism {P : PtsSig} (Γ : ctx P) Δ : (wf_sub_eq Γ Δ)
     with signature wf_sub_eq Γ Δ ==> eq ==> iff as wf_sub_eq_morphism_iff1.
 Proof.

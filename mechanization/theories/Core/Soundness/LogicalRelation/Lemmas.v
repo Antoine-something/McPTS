@@ -46,6 +46,50 @@ Proof.
 Qed.
 
 
+
+
+Add Parametric Morphism {P} (pred_P : PredicativeSig P) a Γ A M : (glu_elem_bot_unsorted pred_P a Γ A M)
+    with signature per_bot ==> iff as glu_elem_bot_unsorted_morphism_iff4.
+Proof.
+  intros m m' Hmm' *.
+  split; intros []; econstructor; mauto 3;
+    try (etransitivity; mauto 4);
+    intros;
+    specialize (Hmm' (length Δ)) as [? []];
+    functional_read_rewrite_clear;
+    mauto.
+Qed.
+
+Add Parametric Morphism {P} (pred_P : PredicativeSig P) s a Γ A M R (H : per_sort_elem pred_P s R a a) : (glu_elem_top pred_P s a Γ A M)
+    with signature R ==> iff as glu_elem_top_morphism_iff4.
+Proof.
+  intros m m' Hmm' *.
+  split; intros []; econstructor; mauto 3;
+    pose proof (per_elem_then_per_top H Hmm') as Hmm'';
+    try (etransitivity; mauto 4);
+    intros;
+    specialize (Hmm'' (length Δ)) as [? []];
+    functional_read_rewrite_clear;
+    mauto.
+Qed.
+
+Add Parametric Morphism {P} (pred_P : PredicativeSig P) s a Γ A M R (H : per_sort_elem pred_P s R a a) : (glu_elem_top pred_P s a Γ A M)
+    with signature R ==> iff as glu_elem_top_morphism_iff4.
+Proof.
+  intros m m' Hmm' *.
+  split; intros []; econstructor; mauto 3;
+    pose proof (per_elem_then_per_top H Hmm') as Hmm'';
+    try (etransitivity; mauto 4);
+    intros;
+    specialize (Hmm'' (length Δ)) as [? []];
+    functional_read_rewrite_clear;
+    mauto.
+Qed.
+
+
+
+
+
 Lemma glu_sort_elem_typ_unique_upto_exp_eq {P} (pred_P : PredicativeSig P) : forall {s s' a typ_rel typ_rel' exp_rel exp_rel' Γ A A'},
     {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
     {{ DG a ∈ glu_sort_elem pred_P s' ↘ typ_rel' ↘ exp_rel' }} ->
