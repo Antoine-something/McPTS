@@ -148,6 +148,7 @@ Qed.
 #[local]
 Hint Resolve wf_exp_pi_sub_wf_exp_eq_pi : mcpts.
 
+
 Lemma wf_exp_pi_wf_exp_pi_sub_helper {P} : forall {Γ : ctx P} {A B K σ s1 s2 s3} {r : Ru P s1 s2 s3},
     {{ Γ ⊢ Π r A[σ] B[q σ] : K }} ->
     exists Δ K', {{ Γ ⊢s σ : Δ }} /\ {{ Δ ⊢ Π r A B : K' }} /\ {{ Γ ⊢ K'[σ] ≈ K }}.
@@ -192,6 +193,23 @@ Hint Resolve wf_exp_pi_wf_exp_pi_sub : mcpts.
 
 
 (** Main theorem *)
+#[local]
+Ltac gen_heteq_IH wf_exp_eq_escape wf_typ_eq_escape wf_sub_eq_escape H :=
+  match type of H with
+  | {{ ^?Γ ⊢ ^?A ≈ ^?B : ^?K }} =>
+      let IHexp := fresh "IHexp" in
+      pose proof wf_exp_eq_escape _ _ _ _ _ H
+  | {{ ^?Γ ⊢ ^?A ≈ ^?B }} =>
+      let HAK' := fresh "HAK'" in
+      let HBK' := fresh "HBK'" in
+      pose proof wf_typ_eq_escape _ _ _ _ H
+  | {{ ^?Γ ⊢s ^?σ ≈ ^?τ : ^?Δ }} =>
+      let Hσ' := fresh "Hσ'" in
+      let Hτ' := fresh "Hτ'" in
+      pose proof wf_sub_eq_escape _ _ _ _ H
+  end.
+
+ 
 Theorem wf_exp_eq_escape {P} : forall {Γ : ctx P} {A B K},
     {{ Γ ⊢ A ≈ B : K }} ->
     forall K',
@@ -210,11 +228,12 @@ with wf_sub_eq_escape {P} : forall {Γ Δ : ctx P} {σ τ},
       ({{ Γ' ⊢s σ : Δ' }} -> {{ Γ' ⊢s τ : Δ' }} /\ {{ Γ' ⊢s σ ≈ τ : Δ' }}) /\
         ({{ Γ' ⊢s τ : Δ' }} -> {{ Γ' ⊢s σ : Δ' }} /\ {{ Γ' ⊢s σ ≈ τ : Δ' }}).
 Proof.
-  all: clear wf_exp_eq_escape wf_typ_eq_escape wf_sub_eq_escape;
-    intros * H;
-    dependent induction H; intros; mauto 2;
-    split; intros; split; mauto 3.
+  all: inversion_clear 1;
+    (on_all_hyp: gen_heteq_IH wf_exp_eq_escape wf_typ_eq_escape wf_sub_eq_escape);
+    clear wf_exp_eq_escape wf_typ_eq_escape wf_sub_eq_escape;
+    intros; split; intros; split; mauto 3.
 
+  
 Admitted.
  
 Corollary wf_typ_eq_het_wf_exp_left {P} : forall {Γ : ctx P} {A B K},
