@@ -922,6 +922,9 @@ Ltac saturate_glu_info :=
 Hint Rewrite -> @sub_decompose_q using solve [mauto 4] : mcpts.
 
 
+
+
+
 Lemma glu_sort_elem_mut_monotone {P} (pred_P : PredicativeSig P) : forall s a typ_rel exp_rel,
     {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
     forall Δ σ Γ,
@@ -1038,6 +1041,7 @@ Proof.
       assert (exists mn : domain P, {{ $| m & n |↘ mn }} /\ OEL n equiv_n Δ0 {{{ OT[σ∘σ0,,N] }}} {{{ M[σ∘σ0] N }}} mn).
       {
         eapply H12; mauto.
+        assert {{ Δ0 ⊢ IT[σ∘σ0] ≈ IT[σ][σ0] : Sort@s1 }} by mauto 3.
         enough (IEL Δ0 {{{ IT[σ][σ0] }}} N n) by (eapply glu_sort_elem_trm_resp_typ_exp_eq; mauto 3).
         eassumption.
       }

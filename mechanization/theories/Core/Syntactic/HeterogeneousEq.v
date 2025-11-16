@@ -192,6 +192,65 @@ Qed.
 Hint Resolve wf_exp_pi_wf_exp_pi_sub : mcpts.
 
 
+Lemma wf_exp_pi_wf_exp_eq_pi_cong {P} : forall {Γ : ctx P} {A A' B B' K s1 s2 s3} {r : Ru P s1 s2 s3},
+   {{ Γ ⊢ A ≈ A' : Sort@s1 }} ->
+   {{ Γ, A ⊢ B ≈ B' : Sort@s2 }} ->
+   {{ Γ ⊢ Π r A B : K }} ->
+   {{ Γ ⊢ Π r A B ≈ Π r A' B' : K }}.
+Proof.
+  intros.
+  assert {{ Γ ⊢ Sort@s3 ≈ K }} by mauto 2.
+  eapply wf_exp_eq_conv'; mauto 2.
+Qed.
+
+#[local]
+Hint Resolve wf_exp_pi_wf_exp_eq_pi_cong : mcpts.
+
+Corollary wf_exp_pi_wf_exp_pi_cong {P} : forall {Γ : ctx P} {A A' B B' K s1 s2 s3} {r : Ru P s1 s2 s3},
+   {{ Γ ⊢ A ≈ A' : Sort@s1 }} ->
+   {{ Γ, A ⊢ B ≈ B' : Sort@s2 }} ->
+   {{ Γ ⊢ Π r A B : K }} ->
+   {{ Γ ⊢ Π r A' B' : K }}.
+Proof.
+  intros.
+  assert {{ Γ ⊢ Π r A B ≈ Π r A' B' : K }} by mauto 2.
+  gen_presups.
+  eassumption.
+Qed.
+
+Corollary wf_exp_pi_wf_exp_eq_pi_cong' {P} : forall {Γ : ctx P} {A A' B B' K s1 s2 s3} {r : Ru P s1 s2 s3},
+   {{ Γ ⊢ A ≈ A' : Sort@s1 }} ->
+   {{ Γ, A ⊢ B ≈ B' : Sort@s2 }} ->
+   {{ Γ ⊢ Π r A' B' : K }} ->
+   {{ Γ ⊢ Π r A B ≈ Π r A' B' : K }}.
+Proof.
+  intros.
+  symmetry in H.
+  symmetry in H0.
+  symmetry.
+  gen_presups.
+  assert {{ ⊢ Γ, A' ≈ Γ, A }} by mauto 4.
+  rewrite <- H2 in H0.
+  mauto 2.
+Qed.
+
+Corollary wf_exp_pi_wf_exp_pi_cong' {P} : forall {Γ : ctx P} {A A' B B' K s1 s2 s3} {r : Ru P s1 s2 s3},
+   {{ Γ ⊢ A ≈ A' : Sort@s1 }} ->
+   {{ Γ, A ⊢ B ≈ B' : Sort@s2 }} ->
+   {{ Γ ⊢ Π r A' B' : K }} ->
+   {{ Γ ⊢ Π r A B : K }}.
+Proof.
+  intros.
+  assert {{ Γ ⊢ Π r A B ≈ Π r A' B' : K }} by (eapply wf_exp_pi_wf_exp_eq_pi_cong'; mauto 2).
+  gen_presups.
+  eassumption.  
+Qed.
+
+#[local]
+Hint Resolve wf_exp_pi_wf_exp_pi_cong wf_exp_pi_wf_exp_eq_pi_cong' wf_exp_pi_wf_exp_pi_cong' : mcpts.
+
+
+
 (** Main theorem *)
 #[local]
 Ltac gen_heteq_IH wf_exp_eq_escape wf_typ_eq_escape wf_sub_eq_escape H :=
@@ -230,10 +289,33 @@ with wf_sub_eq_escape {P} : forall {Γ Δ : ctx P} {σ τ},
 Proof.
   all: inversion_clear 1;
     (on_all_hyp: gen_heteq_IH wf_exp_eq_escape wf_typ_eq_escape wf_sub_eq_escape);
-    clear wf_exp_eq_escape wf_typ_eq_escape wf_sub_eq_escape;
-    intros; split; intros; split; mauto 3.
+    clear wf_exp_eq_escape wf_typ_eq_escape wf_sub_eq_escape.
+    (* intros; split; intros; split; mauto 3.     *)
+  - intros; split; intros; split; mauto 3.
+  - intros; split; intros; split; mauto 3.    
+  - intros; split; intros; split; mauto 3.
+  - intros; split; intros.
+    + assert (exists B', {{ Γ, A0 ⊢ M : B' }} /\ {{ Γ ⊢ Π r A0 B' ≈ K' }}) by mauto 2. 
+      destruct H6 as [B' []].
+      gen_presups.
+      assert ({{ Γ ⊢ A0 : Sort@s1 }} /\ {{ Γ, A0 ⊢ B' : Sort@s2 }}) by mauto 2.
+      destruct_conjs.
+      assert {{ ⊢ Γ, A0 ≈ Γ, A' }} by mauto 4.
+      assert {{ Γ, A0 ⊢ M' : B' }} by (eapply H; mauto 3).
+      rewrite H9 in *.
+      assert {{ Γ ⊢ Π r A' B' ≈ Π r A0 B' }} by (do 2 econstructor; mauto 2).
+      
+      split; [eapply wf_conv | eapply wf_exp_eq_conv']; mauto 2.
+      
 
-  
+      
+    eapply wf_conv; mauto 2.
+    transitivity {{{ Π r A0 B' }}}; mauto 2.
+    econstructor; mauto 2.
+    econstructor; mauto 
+    
+    
+    
 Admitted.
  
 Corollary wf_typ_eq_het_wf_exp_left {P} : forall {Γ : ctx P} {A B K},

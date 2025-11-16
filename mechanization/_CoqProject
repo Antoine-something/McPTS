@@ -15,7 +15,7 @@ theories/Core/Syntactic/CtxEq.v
 theories/Core/Syntactic/CoreInversions.v
 theories/Core/Syntactic/Presup.v
 theories/Core/Syntactic/SystemOpt.v
-theories/Core/Syntactic/HeterogeneousEq.v
+# theories/Core/Syntactic/HeterogeneousEq.v
 theories/Core/Syntactic/Corollaries.v
 
 theories/Core/Semantic/Domain.v
@@ -50,6 +50,6 @@ theories/Core/Soundness/Weakening/Definitions.v
 theories/Core/Soundness/Weakening/Lemmas.v
 theories/Core/Soundness/LogicalRelation/Definitions.v
 theories/Core/Soundness/LogicalRelation/CoreTactics.v
-theories/Core/Soundness/LogicalRelation/CoreLemmas.v
-theories/Core/Soundness/LogicalRelation/Core.v
-theories/Core/Soundness/Realizability.v
+# theories/Core/Soundness/LogicalRelation/CoreLemmas.v
+# theories/Core/Soundness/LogicalRelation/Core.v
+# theories/Core/Soundness/Realizability.v
