@@ -35,6 +35,7 @@ Notation "'EG' A ∈ R ↘ Sb " := (R Sb A : ((Prop : (Type : Type)) : (Type : T
 
 Definition neut_glu_typ_pred {P : PtsSig} (s : P) a : glu_typ_pred P :=
   fun Γ A => {{ Γ ⊢ A : Sort@s }} /\
+            (forall Δ σ A', {{ Δ ⊢w σ : Γ }} -> {{ Δ ⊢ A[σ] ≈ A' }} -> {{ Δ ⊢ A[σ] ≈ A' : Sort@s }}) /\
             (forall Δ σ A', {{ Δ ⊢w σ : Γ }} -> {{ Rne a in length Δ ↘ A' }} -> {{ Δ ⊢ A[σ] ≈ A' : Sort@s }}).
 Arguments neut_glu_typ_pred {P} s a Γ A/.
 
@@ -57,6 +58,7 @@ Variant pi_glu_typ_pred {P : PtsSig} {s1 s2} (s : P) (r : Ru P s1 s2 s)
   `{ {{ Γ ⊢ A ≈ Π r IT OT : Sort@s }} ->
      {{ Γ ⊢ IT : Sort@s1 }} ->
      {{ Γ , IT ⊢ OT : Sort@s2 }} ->
+     (forall Δ σ A', {{ Δ ⊢w σ : Γ }} -> {{ Δ ⊢ A[σ] ≈ A' }} -> {{ Δ ⊢ A[σ] ≈ A' : Sort@s }}) ->
      (forall Δ σ, {{ Δ ⊢w σ : Γ }} -> {{ Δ ⊢ IT[σ] ® IP }}) ->
      (forall Δ σ M m,
          {{ Δ ⊢w σ : Γ }} ->
@@ -77,6 +79,7 @@ Variant pi_glu_exp_pred {P : PtsSig} {s1 s2} (s : P) (r : Ru P s1 s2 s)
      {{ Γ ⊢ A ≈ Π r IT OT : Sort@s }} ->
      {{ Γ ⊢ IT : Sort@s1 }} ->
      {{ Γ , IT ⊢ OT : Sort@s2 }} ->
+     (forall Δ σ A', {{ Δ ⊢w σ : Γ }} -> {{ Δ ⊢ A[σ] ≈ A' }} -> {{ Δ ⊢ A[σ] ≈ A' : Sort@s }}) ->
      (forall Δ σ, {{ Δ ⊢w σ : Γ }} -> {{ Δ ⊢ IT[σ] ® IP }}) ->
      (forall Δ σ N n,
          {{ Δ ⊢w σ : Γ }} ->
@@ -88,7 +91,9 @@ Variant pi_glu_exp_pred {P : PtsSig} {s1 s2} (s : P) (r : Ru P s1 s2 s)
 #[export]
 Hint Constructors neut_glu_exp_pred pi_glu_typ_pred pi_glu_exp_pred : mcpts.
 
-Definition sort_glu_typ_pred {P : PtsSig} (pred_P : PredicativeSig P) (s1 s2 : P) : glu_typ_pred P := fun Γ A => {{ Γ ⊢ A ≈ Sort@s1 : Sort@s2 }}.
+Definition sort_glu_typ_pred {P : PtsSig} (pred_P : PredicativeSig P) (s1 s2 : P) : glu_typ_pred P :=
+  fun Γ A => {{ Γ ⊢ A ≈ Sort@s1 : Sort@s2 }} /\
+            (forall Δ σ A', {{ Δ ⊢w σ : Γ}} -> {{ Δ ⊢ A[σ] ≈ A' }} -> {{ Δ ⊢ A' ≈ Sort@s1 : Sort@s2 }}).
 Arguments sort_glu_typ_pred {P} pred_P s1 s2 Γ A/.
 Transparent sort_glu_typ_pred.
 
@@ -109,6 +114,7 @@ Section Gluing.
     fun Γ A M m =>
       {{ Γ ⊢ M : A }} /\
         {{ Γ ⊢ A ≈ Sort@s' : Sort@s }} /\
+        (forall Δ σ A', {{Δ ⊢w σ : Γ }} ->  {{ Δ ⊢ A[σ] ≈ A' }} -> {{ Δ ⊢ A' ≈ Sort@s' : Sort@s }}) /\
         {{ Γ ⊢ M ® glu_sort_typ_rec lt_s'_s m }}.
 
   #[global]
@@ -236,6 +242,7 @@ Arguments glu_sort_typ {P} pred_P s a Γ A/.
 Definition sort_glu_exp_pred {P} (pred_P : PredicativeSig P) s' s : glu_exp_pred P :=
     fun Γ A M m =>
       {{ Γ ⊢ M : A }} /\ {{ Γ ⊢ A ≈ Sort@s' : Sort@s }} /\
+        (forall Δ σ A', {{ Δ ⊢w σ : Γ }} -> {{ Δ ⊢ A[σ] ≈ A' }} -> {{ Δ ⊢ A' ≈ Sort@s' : Sort@s }}) /\
         {{ Γ ⊢ M ® glu_sort_typ pred_P s' m }}.
 Arguments sort_glu_exp_pred {P} pred_P s' s Γ A M m/.
 
