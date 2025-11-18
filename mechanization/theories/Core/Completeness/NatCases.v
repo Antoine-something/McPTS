@@ -23,22 +23,22 @@ Proof.
   eassumption.
 Qed.
 
-Lemma rel_exp_of_nat {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M M'},
+Lemma rel_exp_of_nat {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M M' s} {r : Ru_nat P s},
     (exists env_rel (_ : {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }}),
       forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_rel }}),
         rel_exp M ρ M' ρ' per_nat) ->
-    {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ M' : ℕ }}.
+    {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : ℕ }}.
 Proof.
-  intros * [env_relΓ].
+  intros * Hru [env_relΓ].
   destruct_conjs.
-  unshelve eexists; [eassumption|].
+  eexists. 
   split.
   eassumption.
-  eexists.
   intros.
   eexists; split; mauto.
   econstructor; mauto.
+  econstructor; mauto.
   per_sort_elem_econstructor; mauto.
+  
   reflexivity.
-  Unshelve.
 Qed.
