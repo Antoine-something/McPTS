@@ -59,7 +59,19 @@ Arguments per_top_typ /.
 #[export]
 Hint Transparent per_top_typ : mcpts.
 #[export]
-Hint Unfold per_top_typ : mcpts.
+  Hint Unfold per_top_typ : mcpts.
+
+Inductive per_nat {P : PtsSig} : relation (domain P):=
+| per_nat_zero : {{ Dom zero ≈ zero ∈ per_nat }}
+| per_nat_succ :
+  `{ {{ Dom m ≈ m' ∈ per_nat }} ->
+     {{ Dom succ m ≈ succ m' ∈ per_nat }} }
+| per_nat_neut :
+  `{ {{ Dom m ≈ m' ∈ per_bot }} ->
+     {{ Dom ⇑ a m ≈ ⇑ a' m' ∈ per_nat }} }
+.
+#[export]
+Hint Constructors per_nat : mcpts.
 
 Variant per_ne {P : PtsSig} : relation (domain P) :=
 | per_ne_neut :
@@ -104,6 +116,10 @@ Section Per_sort_elem_core_def.
               rel_mod_eval (fun R b b' => (s_out = s_elem -> {{ DF b ≈ b' ∈ per_sort_elem_core ↘ R }}) /\ (forall (lt_out_elem : pred_rel pred_P s_out s_elem), {{ DF b ≈ b' ∈ per_sort_elem_rec lt_out_elem ↘ R }})) B d{{{ ρ ↦ n }}} B' d{{{ ρ' ↦ n' }}} (out_rel equiv_n_n')) ->
           (elem_rel <~> fun f f' => forall n n' (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}), rel_mod_app f n f' n' (out_rel equiv_n_n')) ->
           {{ DF Π r a ρ B ≈ Π r a' ρ' B' ∈ per_sort_elem_core ↘ elem_rel }} }
+  | per_sort_elem_core_nat :
+    forall (elem_rel : relation dom),
+      (elem_rel <~> per_nat) ->
+      {{ DF ℕ ≈ ℕ ∈ per_sort_elem_core ↘ elem_rel }}
   | per_sort_elem_core_neut :
     `{ forall (elem_rel : relation dom),
           {{ Dom e ≈ e' ∈ per_bot }} ->
@@ -131,6 +147,10 @@ Section Per_sort_elem_core_def.
               rel_mod_eval (fun R b b' => (s_out = s_elem -> {{ DF b ≈ b' ∈ per_sort_elem_core ↘ R }} /\ motive R b b') /\ (forall (lt_out_elem : pred_rel pred_P s_out s_elem), {{ DF b ≈ b' ∈ per_sort_elem_rec lt_out_elem ↘ R }})) B d{{{ ρ ↦ n }}} B' d{{{ ρ' ↦ n' }}} (out_rel equiv_n_n')) ->
           (elem_rel <~> fun f f' => forall n n' (equiv_n_n' : (in_rel n n')), rel_mod_app f n f' n' (out_rel equiv_n_n')) ->
           motive elem_rel d{{{ Π r a ρ B }}} d{{{ Π r a' ρ' B' }}})
+      (case_nat :
+        forall {elem_rel : relation dom},
+          (elem_rel <~> per_nat) ->
+          motive elem_rel d{{{ ℕ }}} d{{{ ℕ }}})
       (case_ne :
         forall {a b a' b'}
           {elem_rel : relation dom},
@@ -152,6 +172,7 @@ Section Per_sort_elem_core_def.
            let 'mk_rel_mod_eval b b' evb evb' (conj HB _) := HT _ _ equiv_n_n' in
            mk_rel_mod_eval b b' evb evb' (conj (fun eq => conj _ (per_sort_elem_core_strong_ind _ _ _ (HB eq))) _))
         HE;
+  | R, a, b, (per_sort_elem_core_nat _ HE) => case_nat HE;
   | R, a, b, (per_sort_elem_core_neut _ equiv_e_e' HE) => case_ne equiv_e_e' HE
   .
 End Per_sort_elem_core_def.
@@ -225,6 +246,9 @@ Section Per_sort_elem_ind_def.
               rel_mod_eval (fun R x y => {{ DF x ≈ y ∈ per_sort_elem pred_P s_out ↘ R }} /\ motive s_out R x y) B d{{{ ρ ↦ n }}} B' d{{{ ρ' ↦ n' }}} (out_rel equiv_n_n')) ->
           (elem_rel <~> fun f f' => forall n n' (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}), rel_mod_app f n f' n' (out_rel equiv_n_n')) ->
           motive s_elem elem_rel d{{{ Π r a ρ B }}} d{{{ Π r a' ρ' B' }}})
+      (case_N : forall s_elem {elem_rel},
+          (elem_rel <~> per_nat) ->
+          motive s_elem elem_rel d{{{ ℕ }}} d{{{ ℕ }}})
       (case_ne :
         forall s_elem {a b a' b' elem_rel},
           {{ Dom b ≈ b' ∈ per_bot }} ->
@@ -263,6 +287,7 @@ Section Per_sort_elem_ind_def.
                 | or_introl lt_out_s => mk_rel_mod_eval _ _ evb evb' (conj _ _)
                 | or_intror eq => let 'conj _ _ := Heq eq in _
                 end))
+        (fun _ => case_N _)
         (fun _ _ _ _ _ => case_ne _)
         R a b.
 
