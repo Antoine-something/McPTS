@@ -117,7 +117,8 @@ Section Per_sort_elem_core_def.
           (elem_rel <~> fun f f' => forall n n' (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}), rel_mod_app f n f' n' (out_rel equiv_n_n')) ->
           {{ DF Π r a ρ B ≈ Π r a' ρ' B' ∈ per_sort_elem_core ↘ elem_rel }} }
   | per_sort_elem_core_nat :
-    forall (elem_rel : relation dom),
+    forall (r : Ru_nat P s_elem)
+      (elem_rel : relation dom),
       (elem_rel <~> per_nat) ->
       {{ DF ℕ ≈ ℕ ∈ per_sort_elem_core ↘ elem_rel }}
   | per_sort_elem_core_neut :
@@ -148,7 +149,8 @@ Section Per_sort_elem_core_def.
           (elem_rel <~> fun f f' => forall n n' (equiv_n_n' : (in_rel n n')), rel_mod_app f n f' n' (out_rel equiv_n_n')) ->
           motive elem_rel d{{{ Π r a ρ B }}} d{{{ Π r a' ρ' B' }}})
       (case_nat :
-        forall {elem_rel : relation dom},
+        forall (r : Ru_nat P s_elem)
+          {elem_rel : relation dom},
           (elem_rel <~> per_nat) ->
           motive elem_rel d{{{ ℕ }}} d{{{ ℕ }}})
       (case_ne :
@@ -172,7 +174,7 @@ Section Per_sort_elem_core_def.
            let 'mk_rel_mod_eval b b' evb evb' (conj HB _) := HT _ _ equiv_n_n' in
            mk_rel_mod_eval b b' evb evb' (conj (fun eq => conj _ (per_sort_elem_core_strong_ind _ _ _ (HB eq))) _))
         HE;
-  | R, a, b, (per_sort_elem_core_nat _ HE) => case_nat HE;
+  | R, a, b, (per_sort_elem_core_nat _ _ HE) => case_nat _ HE;
   | R, a, b, (per_sort_elem_core_neut _ equiv_e_e' HE) => case_ne equiv_e_e' HE
   .
 End Per_sort_elem_core_def.
@@ -246,7 +248,7 @@ Section Per_sort_elem_ind_def.
               rel_mod_eval (fun R x y => {{ DF x ≈ y ∈ per_sort_elem pred_P s_out ↘ R }} /\ motive s_out R x y) B d{{{ ρ ↦ n }}} B' d{{{ ρ' ↦ n' }}} (out_rel equiv_n_n')) ->
           (elem_rel <~> fun f f' => forall n n' (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}), rel_mod_app f n f' n' (out_rel equiv_n_n')) ->
           motive s_elem elem_rel d{{{ Π r a ρ B }}} d{{{ Π r a' ρ' B' }}})
-      (case_N : forall s_elem {elem_rel},
+      (case_N : forall s_elem (r : Ru_nat P s_elem) {elem_rel},
           (elem_rel <~> per_nat) ->
           motive s_elem elem_rel d{{{ ℕ }}} d{{{ ℕ }}})
       (case_ne :
@@ -287,7 +289,7 @@ Section Per_sort_elem_ind_def.
                 | or_introl lt_out_s => mk_rel_mod_eval _ _ evb evb' (conj _ _)
                 | or_intror eq => let 'conj _ _ := Heq eq in _
                 end))
-        (fun _ => case_N _)
+        (fun _ _ => case_N _ _)
         (fun _ _ _ _ _ => case_ne _)
         R a b.
 
