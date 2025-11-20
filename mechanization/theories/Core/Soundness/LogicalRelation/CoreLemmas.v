@@ -15,27 +15,31 @@ Ltac simpl_glu_rel :=
   destruct_all;
   gen_presups.
 
+Lemma glu_sort_elem_sort_wf_exp_sort {P} (pred_P : PredicativeSig P) : forall s typ_rel exp_rel a,
+    {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
+    forall Γ A,
+      {{ Γ ⊢ A ® typ_rel }} ->
+      {{ Γ ⊢ A : Sort@s }}.
+Proof.
+  simpl.
+  induction 1 using glu_sort_elem_ind; intros;
+    simpl_glu_rel; mauto 2.
+
+  assert {{ Γ ⊢ A[Id] ≈ Sort@s' : Sort@s }} by (eapply H3; mauto 3).
+  gen_presup H4.
+  mauto 2.
+Qed.
+
 Lemma glu_sort_elem_sort_lvl {P} (pred_P : PredicativeSig P) : forall s typ_rel exp_rel a,
     {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
     forall Γ A,
       {{ Γ ⊢ A ® typ_rel }} ->
       {{ Γ ⊢ A }}.
 Proof.
-  simpl.
-  induction 1 using glu_sort_elem_ind; intros;
-    simpl_glu_rel; mauto 2.
+  intros.
+  assert {{ Γ ⊢ A : Sort@s }} by (eapply glu_sort_elem_sort_wf_exp_sort; mauto 2).
+  mauto 2.
 Qed.
-
-(* Lemma glu_sort_elem_sort_lvl {P} (pred_P : PredicativeSig P) : forall s typ_rel exp_rel a, *)
-(*     {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} -> *)
-(*     forall Γ A, *)
-(*       {{ Γ ⊢ A ® typ_rel }} -> *)
-(*       {{ Γ ⊢ A : Sort@s }}. *)
-(* Proof. *)
-(*   simpl.   *)
-(*   induction 1 using glu_sort_elem_ind; intros; *)
-(*     simpl_glu_rel; trivial. *)
-(* Qed. *)
 
 Lemma glu_sort_elem_typ_resp_typ_eq {P} (pred_P : PredicativeSig P) : forall s typ_rel exp_rel a,
     {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
@@ -47,9 +51,81 @@ Proof.
   simpl.
   induction 1 using glu_sort_elem_ind; intros;
     simpl_glu_rel; mauto 4.
-  split; [trivial |].
-  intros.
-  transitivity {{{ A[σ] }}}; mauto 4.
+  - assert {{ Γ ⊢ A : Sort@s }}.
+    {
+      assert {{ Γ ⊢ Sort@s' : Sort@s }} by mauto 2.
+      assert {{ Γ ⊢ A[Id] ≈ Sort@s' : Sort@s }} by (eapply H4; mauto 3).
+      gen_presup H6.
+      mauto 2.
+    }
+    repeat split.
+    + etransitivity; mauto 3.      
+    + intros.
+      assert {{ Δ ⊢ A[σ] ≈ A'[σ] }} by mauto 3.
+      assert {{ Δ ⊢ A[σ] ≈ A'[σ] : K }} by (eapply H4; mauto 3).
+      assert {{ Δ ⊢ A[σ] ≈ A'0 }} by (etransitivity; mauto 2).
+      gen_presup H10.
+      assert ({{ Δ ⊢ A[σ] : K }} -> {{ Δ ⊢ A[σ] ≈ A'0 : K }}) by (eapply H4; mauto 4).
+      assert {{ Δ ⊢ A[σ] ≈ A'0 : K }} by mauto 2.
+      etransitivity; mauto 3.
+    + intros.
+      assert {{ Δ ⊢ A[σ] ≈ A'[σ] }} by mauto 3.
+      assert {{ Δ ⊢ A[σ] ≈ A'0 }} by (etransitivity; mauto 2).
+      assert {{ Δ ⊢ A[σ] ≈ A'0 : K }} by (eapply H4; mauto 4).
+      gen_presup H11.
+      assert ({{ Δ ⊢ A[σ] : K }} -> {{ Δ ⊢ A[σ] ≈ A'[σ] : K }}) by (eapply H4; mauto 4).
+      assert {{ Δ ⊢ A[σ] ≈ A'[σ] : K }} by mauto 2.
+      etransitivity; mauto 2.
+      
+  - econstructor; mauto 2.
+    + assert {{ Γ ⊢ A ≈ A[Id] : Sort@s3 }} by (symmetry; mauto 2).
+      gen_presup H13.
+      assert ({{ Γ ⊢ A[Id] : Sort@s3 }} -> {{ Γ ⊢ A[Id] ≈ A' : Sort@s3 }}) by (eapply H10; mauto 4).
+      assert {{ Γ ⊢ A[Id] ≈ A' : Sort@s3 }} by mauto 2.
+      assert {{ Γ ⊢ A ≈ A' : Sort@s3 }} by (etransitivity; mauto 2).
+      etransitivity; mauto 2.
+    + intros.
+      assert {{ Δ ⊢ A[σ] ≈ A'[σ] }} by mauto 3.
+      assert {{ Δ ⊢ A[σ] ≈ A'0 }} by (etransitivity; mauto 2).
+      split; intros.
+      * assert {{ Δ ⊢ A[σ] ≈ A'[σ] : K }} by (eapply H10; mauto 3).
+        gen_presup H18.
+        assert ({{ Δ ⊢ A[σ] : K }} -> {{ Δ ⊢ A[σ] ≈ A'0 : K }}) by (eapply H10; mauto 3).
+        assert {{ Δ ⊢ A[σ] ≈ A'0 : K }} by mauto 2.
+        etransitivity; mauto 3.
+      * assert {{ Δ ⊢ A[σ] ≈ A'0 : K }} by (eapply H10; mauto 3).
+        gen_presup H18.
+        assert ({{ Δ ⊢ A[σ] : K }} -> {{ Δ ⊢ A[σ] ≈ A'[σ] : K }}) by (eapply H10; mauto 3).
+        assert {{ Δ ⊢ A[σ] ≈ A'[σ] : K }} by mauto 2.
+        etransitivity; mauto 3.
+        
+  - repeat split.
+    + assert {{ Γ ⊢ A[Id] : Sort@s }} by mauto 3.
+      assert ({{ Γ ⊢ A[Id] : Sort@s }} -> {{ Γ ⊢ A[Id] ≈ A' : Sort@s }}) by (eapply H4; mauto 3).
+      assert {{ Γ ⊢ A[Id] ≈ A' : Sort@s }} by mauto 2.
+      assert {{ Γ ⊢ A ≈ A[Id] : Sort@s }} by (symmetry; mauto 2).
+      assert {{ Γ ⊢ A ≈ A' : Sort@s }} by (etransitivity; mauto 2).
+      gen_presup H8; eassumption.
+    + intros.
+      assert {{ Δ ⊢ A[σ] ≈ A'[σ] }} by mauto 3.
+      assert {{ Δ ⊢ A[σ] ≈ A'0 }} by (etransitivity; mauto 2).
+      assert {{ Δ ⊢ A[σ] ≈ A'[σ] : K }} by (eapply H4; mauto 3).
+      gen_presup H11.
+      assert ({{ Δ ⊢ A[σ] : K }} -> {{ Δ ⊢ A[σ] ≈ A'0 : K }}) by (eapply H4; mauto 3).
+      assert {{ Δ ⊢ A[σ] ≈ A'0 : K }} by mauto 2.
+      etransitivity; mauto 3.
+    + intros.
+      assert {{ Δ ⊢ A'[σ] ≈ A[σ] }} by (symmetry; mauto 3).
+      assert {{ Δ ⊢ A[σ] ≈ A'0 }} by (etransitivity; mauto 2).
+      assert {{ Δ ⊢ A[σ] ≈ A'0 : K}} by (eapply H4; mauto 3).
+      gen_presup H11.
+      assert ({{ Δ ⊢ A[σ] : K }} -> {{ Δ ⊢ A[σ] ≈ A'[σ] : K }}) by (eapply H4; mauto 3).
+      assert {{ Δ ⊢ A[σ] ≈ A'[σ] : K }} by mauto 2.
+      etransitivity; mauto 3.      
+    + intros.
+      assert {{ Δ ⊢ A'[σ] ≈ A[σ] }} by (symmetry; mauto 3).
+      assert {{ Δ ⊢ A[σ] ≈ A'0 }} by (eapply H5; mauto 2).
+      etransitivity; mauto 2.
 Qed.
 
 Add Parametric Morphism {P} (pred_P : PredicativeSig P) s typ_rel exp_rel a (H : glu_sort_elem pred_P s typ_rel exp_rel a) Γ : (typ_rel Γ)
@@ -89,9 +165,70 @@ Proof.
   simpl.
   induction 1 using glu_sort_elem_ind; intros;
     simpl_glu_rel; repeat split; intros; mauto 3.
+  
+  - assert {{ Δ ⊢ A[σ] ≈ A'[σ] }} by mauto 3.
+    assert {{ Δ ⊢ A[σ] ≈ A'0 }} by (etransitivity; mauto 2).
+    assert {{ Δ ⊢ A[σ] ≈ A'[σ] : K }} by (eapply H5; mauto 3).
+    gen_presup H13.
+    assert ({{ Δ ⊢ A[σ] : K }} -> {{ Δ ⊢ A[σ] ≈ A'0 : K }}) by (eapply H5; mauto 3).
+    assert {{ Δ ⊢ A[σ] ≈ A'0 : K }} by mauto 2.
+    etransitivity; mauto 3.
+  - assert {{ Δ ⊢ A[σ] ≈ A'[σ] }} by mauto 3.
+    assert {{ Δ ⊢ A[σ] ≈ A'0 }} by (etransitivity; mauto 2).
+    assert {{ Δ ⊢ A[σ] ≈ A'0 : K }} by (eapply H5; mauto 2).
+    gen_presup H13.
+    assert ({{ Δ ⊢ A[σ] : K }} -> {{ Δ ⊢ A[σ] ≈ A'[σ] : K }}) by (eapply H5; mauto 3).
+    assert {{ Δ ⊢ A[σ] ≈ A'[σ] : K }} by mauto 2.
+    etransitivity; mauto 3.
+  (* - assert ({{ Δ ⊢ M[σ] : B }} -> {{ Δ ⊢ M[σ] ≈ M' : B}}) by (eapply H6; mauto 3). *)
+  (*   mauto 2. *)
+  (* - eapply H6; mauto 3. *)
   - firstorder.
+
   - econstructor; mauto 3.
-  - transitivity {{{ A[σ] }}}; mauto 4.
+    + assert {{ Γ ⊢ A ≈ A[Id] : Sort@s3 }} by (symmetry; mauto 2).
+      gen_presup H15.
+      assert ({{ Γ ⊢ A[Id] : Sort@s3 }} -> {{ Γ ⊢ A[Id] ≈ A' : Sort@s3 }}) by (eapply H12; mauto 3).
+      assert {{ Γ ⊢ A[Id] ≈ A' : Sort@s3 }} by mauto 2.
+      assert {{ Γ ⊢ A ≈ A' : Sort@s3 }} by (etransitivity; mauto 2).
+      etransitivity; mauto 2.
+    + intros.
+      assert {{ Δ ⊢ A[σ] ≈ A'[σ] }} by mauto 3.
+      assert {{ Δ ⊢ A[σ] ≈ A'0 }} by (etransitivity; mauto 2).
+      split; intros.
+      * assert {{ Δ ⊢ A'[σ] ≈ A[σ] : K }} by (symmetry; eapply H12; mauto 2).
+        gen_presup H20.
+        assert ({{ Δ ⊢ A[σ] : K }} -> {{ Δ ⊢ A[σ] ≈ A'0 : K }}) by (eapply H12; mauto 2).
+        assert {{ Δ ⊢ A[σ] ≈ A'0 : K }} by mauto 2.
+        etransitivity; mauto 2.
+      * assert {{ Δ ⊢ A'0 ≈ A[σ] : K }} by (symmetry; eapply H12; mauto 2).
+        gen_presup H20.
+        assert ({{ Δ ⊢ A[σ] : K }} -> {{ Δ ⊢ A[σ] ≈ A'[σ] : K }}) by (eapply H12; mauto 2).
+        assert {{ Δ ⊢ A[σ] ≈ A'[σ] : K }} by mauto 2.
+        etransitivity; mauto 2.
+      
+  - assert ({{ Γ ⊢ A[Id] : Sort@s }} -> {{ Γ ⊢ A[Id] ≈ A' : Sort@s }}) by (eapply H4; mauto 3).
+    assert {{ Γ ⊢ A[Id] : Sort@s }} by mauto 3.
+    assert {{ Γ ⊢ A[Id] ≈ A' : Sort@s }} by mauto 3.
+    gen_presup H11; eassumption.
+  - assert {{ Δ ⊢ A[σ] ≈ A'[σ] }} by mauto 3.
+    assert {{ Δ ⊢ A[σ] ≈ A'0 }} by (etransitivity; mauto 2).
+    assert {{ Δ ⊢ A'[σ] ≈ A[σ] : K }} by (symmetry; eapply H4; mauto 2).
+    gen_presup H14.
+    assert ({{ Δ ⊢ A[σ] : K }} -> {{ Δ ⊢ A[σ] ≈ A'0 : K }}) by (eapply H4; mauto 2).
+    assert {{ Δ ⊢ A[σ] ≈ A'0 : K }} by mauto 2.
+    etransitivity; mauto 2.
+  - assert {{ Δ ⊢ A[σ] ≈ A'[σ] }} by mauto 3.
+    assert {{ Δ ⊢ A[σ] ≈ A'0 }} by (etransitivity; mauto 2).
+    assert {{ Δ ⊢ A'0 ≈ A[σ] : K }} by (symmetry; eapply H4; mauto 2).
+    gen_presup H14.
+    assert ({{ Δ ⊢ A[σ] : K }} -> {{ Δ ⊢ A[σ] ≈ A'[σ] : K }}) by (eapply H4; mauto 2).
+    assert {{ Δ ⊢ A[σ] ≈ A'[σ] : K }} by mauto 2.
+    etransitivity; mauto 2.
+    
+  - assert {{ Δ ⊢ A'[σ] ≈ A[σ] }} by (symmetry; mauto 3).
+    assert {{ Δ ⊢ A[σ] ≈ A'0 }} by (eapply H8; mauto 2).
+    etransitivity; mauto 2.
   - assert {{ Δ ⊢ M[σ] ≈ M' : A[σ] }} by mauto 2.
     eapply wf_exp_eq_conv'; mauto 3.
 Qed.
@@ -137,9 +274,9 @@ Proof.
   induction 1 using glu_sort_elem_ind; intros;
     simpl_glu_rel; mauto 2;
     econstructor; mauto 4.
-
-  assert {{ ⊢ Γ, IT ≈ Δ, IT }} by mauto 4.
-  mauto 2.
+  - assert {{ ⊢ Γ, IT ≈ Δ, IT }} by mauto 4.
+    mauto 2.
+  - split; intros; mauto 4.
 Qed.
 
 Add Parametric Morphism {P} (pred_P : PredicativeSig P) s typ_rel exp_rel a (H : glu_sort_elem pred_P s typ_rel exp_rel a) : typ_rel
@@ -175,11 +312,26 @@ Proof.
   induction 1 using glu_sort_elem_ind; intros;
     simpl_glu_rel; mauto 2.
   - repeat split; mauto 3.
-    do 2 eexists; split; mauto 4.    
-    eapply glu_sort_elem_typ_resp_ctx_eq; mauto 2.
+    + assert {{ Δ0 ⊢w σ : Γ }} by mauto 3.
+      eapply H5; mauto 3.
+    + assert {{ Δ0 ⊢w σ : Γ }} by mauto 3.
+      eapply H5; mauto 3.
+    (* + eapply H6; mauto 3. *)
+    (* + eapply H6; mauto 3. *)
+    + do 2 eexists; split; mauto 4.    
+      eapply glu_sort_elem_typ_resp_ctx_eq; mauto 2.
+
   - eapply glu_sort_elem_trm_resp_ctx_eq_pi_helper; mauto.
   - econstructor; mauto 4.
-    repeat split; mauto 4.
+    repeat split; mauto 2; intros.
+    + intros.
+      assert {{ Δ0 ⊢w σ : Γ }} by mauto 3.
+      assert ({{ Δ0 ⊢ A[σ] : K }} -> {{ Δ0 ⊢ A[σ] ≈ A' : K }}) by (eapply H4; mauto 3).
+      mauto 2.
+    + intros.
+      assert {{ Δ0 ⊢w σ : Γ }} by mauto 3.
+      eapply H4; mauto 3.
+    + mauto 4.
 Qed.
 
 Add Parametric Morphism {P} (pred_P : PredicativeSig P) s typ_rel exp_rel a (H : glu_sort_elem pred_P s typ_rel exp_rel a) : exp_rel
@@ -249,7 +401,8 @@ Proof.
     do_per_sort_elem_irrel_assert.
     apply_relation_equivalence.
     assert (rel_mod_app m n m n' (x0 n n' equiv_n_n')) by mauto.
-    rewrite -> H22 in H8.
+    simplify_evals.
+    rewrite -> H23 in H8.
     eassumption.    
 Qed.
 
@@ -281,7 +434,7 @@ Proof.
   induction 1 using glu_sort_elem_ind; intros;
     simpl_glu_rel;
     mauto 4.
-
+    
   econstructor; eauto.
   match_by_head (@per_sort_elem P) ltac:(fun H => directed invert_per_sort_elem H).
   intros ? ? N n ? ? equiv_n.
@@ -310,6 +463,26 @@ Proof.
     simpl_glu_rel;
     repeat split; mauto 3.
 
+  - eapply H5; mauto 3.
+  - eapply H5; mauto 3.
+  (* - intros. *)
+  (*   assert {{ Γ ⊢ M ≈ M' }} by mauto 4. *)
+  (*   assert {{ Δ ⊢ M[σ] ≈ M'[σ] }} by mauto 3. *)
+  (*   assert {{ Δ ⊢ M[σ] ≈ M'[σ] : B }} by (eapply H6; mauto 3). *)
+  (*   gen_presup H13. *)
+  (*   assert {{ Δ ⊢ M[σ] ≈ M'0 }} by (transitivity {{{ M'[σ] }}}; mauto 3). *)
+  (*   assert ({{ Δ ⊢ M[σ] : B }} -> {{ Δ ⊢ M[σ] ≈ M'0 : B }}) by (eapply H6; mauto 3). *)
+  (*   assert {{ Δ ⊢ M[σ] ≈ M'0 : B }} by mauto 2. *)
+  (*   transitivity {{{ M[σ] }}}; mauto 2. *)
+  (* - intros. *)
+  (*   assert {{ Γ ⊢ M ≈ M' }} by mauto 4. *)
+  (*   assert {{ Δ ⊢ M[σ] ≈ M'[σ] }} by mauto 3. *)
+  (*   assert {{ Δ ⊢ M[σ] ≈ M'0 }} by (transitivity {{{ M'[σ] }}}; mauto 3). *)
+  (*   assert {{ Δ ⊢ M[σ] ≈ M'0 : B }} by (eapply H6; mauto 3). *)
+  (*   gen_presup H14.     *)
+  (*   assert ({{ Δ ⊢ M[σ] : B }} -> {{ Δ ⊢ M[σ] ≈ M'[σ] : B }}) by (eapply H6; mauto 3). *)
+  (*   assert {{ Δ ⊢ M[σ] ≈ M'[σ] : B }} by mauto 2. *)
+  (*   transitivity {{{ M[σ] }}}; mauto 2. *)
   - repeat eexists; try split; eauto.
     eapply glu_sort_elem_typ_resp_typ_eq; mauto.
 
@@ -333,6 +506,13 @@ Proof.
     + assert {{ Δ, IT[σ] ⊢s q σ : Γ, IT }} by mauto 4.
       eapply wf_conv with (A := {{{ Sort@s2[q σ] }}}); mauto 4.
     + mauto.
+
+  - intros.
+    assert ({{ Δ ⊢ A[σ] : K }} -> {{ Δ ⊢ A[σ] ≈ A' : K }}) by (eapply H4; mauto 3).
+    mauto 2.    
+  - intros.
+    eapply H4; mauto 3.
+
   - intros.
     enough {{ Δ ⊢ M[σ] ≈ M'[σ] : A[σ] }}; mauto 4.
 Qed.
@@ -416,7 +596,7 @@ Proof with mautosolve.
 Qed.
 
 (** *** Morphism instances for [neut_glu_*_pred]s *)
-Add Parametric Morphism {P : PtsSig} : (@neut_glu_typ_pred P)
+Add Parametric Morphism {P : PtsSig} (s : P) : (neut_glu_typ_pred s)
     with signature per_bot ==> eq ==> eq ==> iff as neut_glu_typ_pred_morphism_iff.
 Proof with mautosolve.
   split; intros []; econstructor; intuition;
@@ -424,13 +604,13 @@ Proof with mautosolve.
     functional_read_rewrite_clear; intuition.
 Qed.
 
-Add Parametric Morphism {P : PtsSig} : (@neut_glu_typ_pred P)
+Add Parametric Morphism {P : PtsSig} (s : P) : (neut_glu_typ_pred s)
     with signature per_bot ==> glu_typ_pred_equivalence P as neut_glu_typ_pred_morphism_glu_typ_pred_equivalence.
 Proof with mautosolve.
   split; apply neut_glu_typ_pred_morphism_iff; mauto.
 Qed.
 
-Add Parametric Morphism {P : PtsSig} : (@neut_glu_exp_pred P)
+Add Parametric Morphism {P : PtsSig} (s : P) : (neut_glu_exp_pred s)
     with signature per_bot ==> eq ==> eq ==> eq ==> eq ==> iff as neut_glu_exp_pred_morphism_iff.
 Proof with mautosolve.
   split; intros []; econstructor; intuition;
@@ -439,7 +619,7 @@ Proof with mautosolve.
     match_by_head (@per_bot P) ltac:(fun H => rewrite H in *); eassumption.
 Qed.
 
-Add Parametric Morphism {P : PtsSig} : (@neut_glu_exp_pred P)
+Add Parametric Morphism {P : PtsSig} (s : P) : (neut_glu_exp_pred s)
     with signature per_bot ==> glu_exp_pred_equivalence P as neut_glu_exp_pred_morphism_glu_exp_pred_equivalence.
 Proof with mautosolve.
   split; apply neut_glu_exp_pred_morphism_iff; mauto.
@@ -507,7 +687,7 @@ Proof.
          assert ((s2 = s3 -> glu_sort_elem pred_P s3 (OP0 m equiv0_m) (OEL0 m equiv0_m) a0) /\
                    (pred_rel pred_P s2 s3 -> glu_sort_elem pred_P s2 (OP0 m equiv0_m) (OEL0 m equiv0_m) a0)) by mauto;
          destruct_conjs;
-         destruct H20;
+         destruct H21;
          [
            assert (glu_sort_elem pred_P s2 (OP0 m equiv0_m) (OEL0 m equiv0_m) a0) by mauto;
            eapply H2; mauto
@@ -531,7 +711,7 @@ Proof.
           assert ((s2 = s3 -> glu_sort_elem pred_P s3 (OP0 n equiv0_n) (OEL0 n equiv0_n) a0) /\
                     (pred_rel pred_P s2 s3 -> glu_sort_elem pred_P s2 (OP0 n equiv0_n) (OEL0 n equiv0_n) a0)) by mauto;
           destruct_conjs;
-          destruct H25;
+          destruct H26;
           [
             assert (glu_sort_elem pred_P s2 (OP0 n equiv0_n) (OEL0 n equiv0_n) a0) by mauto;
             eapply H2; mauto
@@ -546,7 +726,7 @@ Lemma glu_sort_elem_sort_irrel {P} (pred_P : PredicativeSig P) : forall {s s' a 
     {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
     {{ DG a ∈ glu_sort_elem pred_P s' ↘ typ_rel' ↘ exp_rel' }} ->
     {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel' ↘ exp_rel' }}.
-Proof.
+Proof.  
   intros * Hglu Hglu';
     basic_invert_glu_sort_elem Hglu;
     basic_invert_glu_sort_elem Hglu';
@@ -554,7 +734,7 @@ Proof.
     glu_sort_elem_econstructor; mauto 3.
 Qed.  
   
-Corollary functional_glu_sort_elem {P} (pred_P : PredicativeSig P) : forall s s' a typ_rel typ_rel' exp_rel exp_rel',
+Lemma functional_glu_sort_elem {P} (pred_P : PredicativeSig P) : forall s s' a typ_rel typ_rel' exp_rel exp_rel',
     {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
     {{ DG a ∈ glu_sort_elem pred_P s' ↘ typ_rel' ↘ exp_rel' }} ->
     (typ_rel <∙> typ_rel') /\ (exp_rel <∙> exp_rel').
@@ -803,10 +983,14 @@ Proof.
     mauto 3.
 
   - repeat split; eauto.
-    unfold glu_sort_typ_rec in *.
-    destruct_conjs.
-    do 2 eexists; split; mauto.
-    resp_per_IH.
+    + eapply H3; mauto 3.
+    + eapply H3; mauto 3.
+    (* + eapply H4; mauto 3. *)
+    (* + eapply H4; mauto 3. *)
+    + unfold glu_sort_typ_rec in *.
+      destruct_conjs.
+      do 2 eexists; split; mauto.
+      resp_per_IH.
   - resp_per_IH.
     subst.
     mauto.
@@ -821,31 +1005,31 @@ Proof.
   - simpl_glu_rel.
     invert_per_sort_elem H10.
     econstructor; mauto 3.
-    + eapply H17.
-      pose proof (proj1 (H17 _ _) H16).
+    + eapply H18.
+      pose proof (proj1 (H18 _ _) H17).
       simpl in *.
 
       intros.
       saturate_refl_for in_rel.
-      pose proof (H18 _ _ equiv_n_n') as [].
-      pose proof (H18 _ _ H19) as [].
+      pose proof (H19 _ _ equiv_n_n') as [].
+      pose proof (H19 _ _ H20) as [].
       pose proof (H10 _ _ equiv_n_n') as [].
-      pose proof (H10 _ _ H19) as [].
+      pose proof (H10 _ _ H20) as [].
       simplify_evals.
       econstructor; eauto.
       symmetry.
       etransitivity.
       * symmetry. eassumption.
       * handle_per_sort_elem_irrel.
-        eapply H24.
+        eapply H25.
         eassumption.
     + resp_per_IH.
       destruct_rel_mod_eval.
       handle_per_sort_elem_irrel.
-      pose proof (H9 _ equiv_n _ H22).
-      eapply H28 in H25 as []; eauto.
-      destruct (H15 _ _ _ _ H20 H21 equiv_n) as [? []].
-      destruct (H16 _ _ equiv_n) as [].
+      pose proof (H9 _ equiv_n _ H23).
+      eapply H29 in H26 as []; eauto.
+      destruct (H16 _ _ _ _ H21 H22 equiv_n) as [? []].
+      destruct (H17 _ _ equiv_n) as [].
       simplify_evals.
       eauto.
   
@@ -858,7 +1042,7 @@ Proof.
     econstructor; unfold neut_glu_typ_pred; mauto 3.
 
     intros.
-    specialize (H1 (length Δ)).    
+    specialize (H9 (length Δ)).    
     destruct_all.
     functional_read_rewrite_clear.
     mauto.
@@ -1018,16 +1202,73 @@ Proof.
     simpl in *;
     destruct_all;
     try solve [bulky_rewrite].
-  - transitivity {{{ Sort@s'[σ] }}}; mauto 3.
-
+  - repeat split; intros; [transitivity {{{ Sort@s'[σ] }}}; mauto 2 | |];
+      assert {{ Δ0 ⊢w σ∘σ0 : Γ }} by mauto 2.      
+    + gen_presup H0.
+      assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] }} by mauto 3.
+      assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] : K }} by (eapply H1; mauto 3).
+      gen_presup H9.
+      assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' }} by (transitivity {{{ A[σ][σ0] }}}; mauto 3).
+      assert ({{ Δ0 ⊢ A[σ∘σ0] : K }} -> {{ Δ0 ⊢ A[σ∘σ0] ≈ A' : K }}) by (eapply H1; mauto 3).
+      transitivity {{{ A[σ∘σ0] }}}; mauto 3.
+    + gen_presup H0.
+      assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] }} by mauto 3.
+      assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' }} by (transitivity {{{ A[σ][σ0] }}}; mauto 3).
+      assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' : K }} by (eapply H1; mauto 3).
+      gen_presup H10.
+      assert ({{ Δ0 ⊢ A[σ∘σ0] : K }} -> {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] : K }}) by (eapply H1; mauto 3).
+      transitivity {{{ A[σ∘σ0] }}}; mauto 3.
+      
   - repeat split; intros; mauto 4.
-    repeat eexists; mauto 2; bulky_rewrite.
-    resp_per_IH.
+    + gen_presup H0.
+      assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] }} by mauto 3.
+      assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] : K }} by (eapply H3; mauto 3).
+      gen_presup H11.
+      assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' }} by (transitivity {{{ A[σ][σ0] }}}; mauto 3).
+      assert ({{ Δ0 ⊢ A[σ∘σ0] : K }} -> {{ Δ0 ⊢ A[σ∘σ0] ≈ A' : K }}) by (eapply H3; mauto 3).
+      transitivity {{{ A[σ∘σ0] }}}; mauto 3.
+    + gen_presup H0.
+      assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] }} by mauto 3.
+      assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' }} by (transitivity {{{ A[σ][σ0] }}}; mauto 3).
+      assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' : K }} by (eapply H3; mauto 3).
+      gen_presup H12.
+      assert ({{ Δ0 ⊢ A[σ∘σ0] : K }} -> {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] : K }}) by (eapply H3; mauto 3).
+      transitivity {{{ A[σ∘σ0] }}}; mauto 3.
+    (* + assert {{ Γ ⊢ M }} by mauto 3. *)
+    (*   assert {{ Δ0 ⊢ M[σ∘σ0] ≈ M[σ][σ0] }} by mauto 3. *)
+    (*   assert {{ Δ0 ⊢ M[σ∘σ0] ≈ M[σ][σ0] : B }} by (eapply H5; mauto 3). *)
+    (*   gen_presup H13. *)
+    (*   assert {{ Δ0 ⊢ M[σ∘σ0] ≈ M' }} by (transitivity {{{ M[σ][σ0] }}}; mauto 3). *)
+    (*   assert ({{ Δ0 ⊢ M[σ∘σ0] : B }} -> {{ Δ0 ⊢ M[σ∘σ0] ≈ M' : B }}) by (eapply H5; mauto 3). *)
+    (*   transitivity {{{ M[σ∘σ0] }}}; mauto 3. *)
+    (* + assert {{ Γ ⊢ M }} by mauto 3. *)
+    (*   assert {{ Δ0 ⊢ M[σ∘σ0] ≈ M[σ][σ0] }} by mauto 3. *)
+    (*   assert {{ Δ0 ⊢ M[σ∘σ0] ≈ M' : B }} by (eapply H5; mauto 3). *)
+    (*   gen_presup H13. *)
+    (*   assert {{ Δ0 ⊢ M[σ∘σ0] ≈ M' }} by (transitivity {{{ M[σ][σ0] }}}; mauto 3). *)
+    (*   assert ({{ Δ0 ⊢ M[σ∘σ0] : B }} -> {{ Δ0 ⊢ M[σ∘σ0] ≈ M[σ][σ0] : B }}) by (eapply H5; mauto 3). *)
+    (*   transitivity {{{ M[σ∘σ0] }}}; mauto 3. *)
+    + repeat eexists; mauto 2; bulky_rewrite.
+      resp_per_IH.
 
   - destruct H7.
     simpl_glu_rel.
     econstructor; eauto; try solve [bulky_rewrite]; mauto 4.
-    + transitivity {{{ (Π r IT OT)[σ] }}}; mauto 3.
+    + repeat split; intros.
+      * assert {{ Γ ⊢ A }} by mauto 2.
+        assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] }} by mauto 3.
+        assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] : K }} by (eapply H9; mauto 3).
+        gen_presup H17.
+        assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' }} by (transitivity {{{ A[σ][σ0] }}}; mauto 3).
+        assert ({{ Δ0 ⊢ A[σ∘σ0] : K }} -> {{ Δ0 ⊢ A[σ∘σ0] ≈ A' : K }}) by (eapply H9; mauto 3).
+        transitivity {{{ A[σ∘σ0] }}}; mauto 3.
+      * assert {{ Γ ⊢ A }} by mauto 2.
+        assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] }} by mauto 3.
+        assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' }} by (transitivity {{{ A[σ][σ0] }}}; mauto 3).
+        assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' : K }} by (eapply H9; mauto 3).
+        gen_presup H18.
+        assert ({{ Δ0 ⊢ A[σ∘σ0] : K }} -> {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] : K }}) by (eapply H9; mauto 3).
+        transitivity {{{ A[σ∘σ0] }}}; mauto 3.      
     + intros.
       eapply IHglu_sort_elem; eauto.
     + intros.
@@ -1049,7 +1290,7 @@ Proof.
       assert {{ Δ0 ⊢ OT[q σ][σ0,,M] ≈ OT[σ∘σ0,,M] : Sort@s2 }} by mauto.
       
       enough (OP m equiv_m Δ0 {{{ OT[σ∘σ0,,M] }}}) by (eapply glu_sort_elem_typ_resp_typ_eq; mauto 3).
-      eapply H10; mauto.
+      eapply H11; mauto.
       assert {{ Δ0 ⊢ IT[σ∘σ0] ≈ IT[σ][σ0] : Sort@s1[σ∘σ0] }} by mauto.
       assert {{ Δ0 ⊢ IT[σ∘σ0] ≈ IT[σ][σ0] : Sort@s1 }} by mauto 4.
       
@@ -1061,7 +1302,22 @@ Proof.
     econstructor; mauto 4;
       intros;
       saturate_weakening_escape.
-    + transitivity {{{ (Π r IT OT)[σ] }}}; mauto 3.
+    + split; intros.
+      * assert {{ Γ ⊢ A }} by mauto 2.
+        assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] }} by mauto 3.
+        assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] : K }} by (eapply H11; mauto 3).
+        gen_presup H20.
+        assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' }} by (transitivity {{{ A[σ][σ0] }}}; mauto 3).
+        assert ({{ Δ0 ⊢ A[σ∘σ0] : K }} -> {{ Δ0 ⊢ A[σ∘σ0] ≈ A' : K }}) by (eapply H11; mauto 3).
+        transitivity {{{ A[σ∘σ0] }}}; mauto 3.
+      * assert {{ Γ ⊢ A }} by mauto 2.
+        assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] }} by mauto 3.
+        assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' }} by (transitivity {{{ A[σ][σ0] }}}; mauto 3).
+        assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' : K }} by (eapply H11; mauto 3).
+        gen_presup H21.
+        assert ({{ Δ0 ⊢ A[σ∘σ0] : K }} -> {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] : K }}) by (eapply H11; mauto 3).
+        transitivity {{{ A[σ∘σ0] }}}; mauto 3.
+        
     + eapply IHglu_sort_elem; eauto.
     + saturate_glu_info.
       invert_per_sort_elem H3.
@@ -1121,17 +1377,43 @@ Proof.
       simplify_evals.
       eassumption.
       
-  - destruct_conjs.
-    split; [mauto 3 |].
-    intros; mauto 3.
-    transitivity {{{ A[σ∘σ0] }}}; mauto 4.
+  - split; [mauto 3 |].
+    repeat split; intros.
+    + assert {{ Γ ⊢ A }} by mauto 2.
+      assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] }} by mauto 3.
+      assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] : K }} by (eapply H1; mauto 3).
+      gen_presup H10.
+      assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' }} by (transitivity {{{ A[σ][σ0] }}}; mauto 3).
+      assert ({{ Δ0 ⊢ A[σ∘σ0] : K }} -> {{ Δ0 ⊢ A[σ∘σ0] ≈ A' : K }}) by (eapply H1; mauto 3).
+      transitivity {{{ A[σ∘σ0] }}}; mauto 3.
+    + assert {{ Γ ⊢ A }} by mauto 2.
+      assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] }} by mauto 3.
+      assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' }} by (transitivity {{{ A[σ][σ0] }}}; mauto 3).
+      assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' : K }} by (eapply H1; mauto 3).
+      gen_presup H11.
+      assert ({{ Δ0 ⊢ A[σ∘σ0] : K }} -> {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] : K }}) by (eapply H1; mauto 3).
+      transitivity {{{ A[σ∘σ0] }}}; mauto 3.
+    + intros; mauto 3.
+      transitivity {{{ A[σ∘σ0] }}}; mauto 4.
     
   - simpl_glu_rel.
     econstructor; repeat split; mauto 3;
       intros;
       saturate_weakening_escape.
+    + assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] }} by mauto 3.
+      assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] : K }} by (eapply H1; mauto 3).
+      gen_presup H13.
+      assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' }} by (transitivity {{{ A[σ][σ0] }}}; mauto 3).
+      assert ({{ Δ0 ⊢ A[σ∘σ0] : K }} -> {{ Δ0 ⊢ A[σ∘σ0] ≈ A' : K }}) by (eapply H1; mauto 3).
+      transitivity {{{ A[σ∘σ0] }}}; mauto 3.
+    + assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] }} by mauto 3.
+      assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' }} by (transitivity {{{ A[σ][σ0] }}}; mauto 3).
+      assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' : K }} by (eapply H1; mauto 3).
+      gen_presup H14.
+      assert ({{ Δ0 ⊢ A[σ∘σ0] : K }} -> {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] : K }}) by (eapply H1; mauto 3).
+      transitivity {{{ A[σ∘σ0] }}}; mauto 3.    
     + transitivity {{{ A[σ∘σ0] }}}; mauto 4.      
-    + transitivity {{{ M[σ∘σ0] }}}; [symmetry|]; mauto.      
+    + transitivity {{{ M[σ∘σ0] }}}; [symmetry|]; mauto 5.
 Qed.
 
 
@@ -1171,10 +1453,35 @@ Proof.
   split; intros []; econstructor; mauto 3;
     [rewrite <- HAA' | | rewrite -> HAA' |];
     try eassumption;
-    intros;
+    try split; intros;
     assert {{ Δ ⊢ A[σ] ≈ A'[σ] }} as HAσA'σ by mauto 4;
     eapply wf_exp_eq_conv';
     mauto 2.
+  
+  (* - assert {{ Δ ⊢ y0[σ] ≈ M' : A[σ] }}. *)
+  (*   { *)
+  (*     eapply wf_exp_eq_conv'; mauto 3. *)
+  (*     symmetry; mauto 3. *)
+  (*   } *)
+  (*   assert ({{ Δ ⊢ y0[σ] : B }} -> {{ Δ ⊢ y0[σ] ≈ M' : B }}) by (eapply H4; mauto 3). *)
+  (*   mauto 2. *)
+  (* - assert {{ Δ ⊢ y0[σ] ≈ M' : A[σ] }}. *)
+  (*   { *)
+  (*     eapply wf_exp_eq_conv'; mauto 3. *)
+  (*     symmetry; mauto 3. *)
+  (*   } *)
+  (*   eapply H4; mauto 3. *)
+  (* - assert {{ Δ ⊢ y0[σ] ≈ M' : A'[σ] }}. *)
+  (*   { *)
+  (*     eapply wf_exp_eq_conv'; mauto 3. *)
+  (*   } *)
+  (*   assert ({{ Δ ⊢ y0[σ] : B }} -> {{ Δ ⊢ y0[σ] ≈ M' : B }}) by (eapply H4; mauto 3). *)
+  (*   mauto 2. *)
+  (* - assert {{ Δ ⊢ y0[σ] ≈ M' : A'[σ] }}. *)
+  (*   { *)
+  (*     eapply wf_exp_eq_conv'; mauto 3. *)
+  (*   } *)
+  (*   eapply H4; mauto 3.   *)
 Qed.
 
 Add Parametric Morphism {P} (pred_P : PredicativeSig P) s a Γ A : (glu_elem_bot pred_P s a Γ A)
@@ -1184,8 +1491,34 @@ Proof.
   split; intros []; econstructor; mauto 3; try (gen_presup HMM'; eassumption);
     intros;
     assert {{ Δ ⊢ M[σ] ≈ M'[σ] : A[σ] }} as HMσM'σ by mauto 4;
-    [rewrite <- HMσM'σ | rewrite -> HMσM'σ];
-    mauto.
+    [rewrite <- HMσM'σ | rewrite -> HMσM'σ ];
+    mauto 3.
+    
+    (* [assert {{ Δ ⊢ M[σ] ≈ M'[σ] : A[σ] }} as HMσM'σ by mauto 4; rewrite <- HMσM'σ | | assert {{ Δ ⊢ M[σ] ≈ M'[σ] : A[σ] }} as HMσM'σ by mauto 4; rewrite -> HMσM'σ |]; *)
+  (*   destruct_conjs; try split; intros; mauto 3. *)
+  (* - assert {{ Δ ⊢ M[σ] ≈ M'[σ] : A[σ] }} by mauto 4. *)
+  (*   assert {{ Δ ⊢ M'[σ] ≈ M[σ] : B }} by (symmetry; eapply H4; mauto 3). *)
+  (*   assert {{ Δ ⊢ M[σ] : B }} by (gen_presup H9; eassumption). *)
+  (*   assert {{ Δ ⊢ M[σ] ≈ M'0 : A[σ] }} by mauto 3. *)
+  (*   assert ({{ Δ ⊢ M[σ] : B }} -> {{ Δ ⊢ M[σ] ≈ M'0 : B }}) by (eapply H4; mauto 3). *)
+  (*   transitivity {{{ M[σ] }}}; mauto 3. *)
+  (* - assert {{ Δ ⊢ M[σ] ≈ M'[σ] : A[σ] }} by mauto 4. *)
+  (*   assert {{ Δ ⊢ M[σ] ≈ M'0 : B }} by (eapply H4; mauto 3). *)
+  (*   assert {{ Δ ⊢ M[σ] : B }} by (gen_presup H9; eassumption). *)
+  (*   assert ({{ Δ ⊢ M[σ] : B }} -> {{ Δ ⊢ M[σ] ≈ M'[σ] : B }}) by (eapply H4; mauto 3). *)
+  (*   transitivity {{{ M[σ] }}}; mauto 3. *)
+    
+  (* - assert {{ Δ ⊢ M'[σ] ≈ M[σ] : A[σ] }} by (symmetry; mauto 4). *)
+  (*   assert {{ Δ ⊢ M'[σ] ≈ M[σ] : B }} by (eapply H4; mauto 3). *)
+  (*   assert {{ Δ ⊢ M'[σ] : B }} by (gen_presup H9; eassumption). *)
+  (*   assert {{ Δ ⊢ M'[σ] ≈ M'0 : A[σ] }} by mauto 3. *)
+  (*   assert ({{ Δ ⊢ M'[σ] : B }} -> {{ Δ ⊢ M'[σ] ≈ M'0 : B }}) by (eapply H4; mauto 3). *)
+  (*   transitivity {{{ M'[σ] }}}; mauto 3. *)
+  (* - assert {{ Δ ⊢ M'[σ] ≈ M[σ] : A[σ] }} by (symmetry; mauto 4). *)
+  (*   assert {{ Δ ⊢ M'[σ] ≈ M'0 : B }} by (eapply H4; mauto 3). *)
+  (*   assert {{ Δ ⊢ M'[σ] : B }} by (gen_presup H9; eassumption). *)
+  (*   assert ({{ Δ ⊢ M'[σ] : B }} -> {{ Δ ⊢ M'[σ] ≈ M[σ] : B }}) by (eapply H4; mauto 3). *)
+  (*   transitivity {{{ M'[σ] }}}; mauto 3. *)
 Qed.
 
 Add Parametric Morphism {P} (pred_P : PredicativeSig P) s a : (glu_elem_top pred_P s a)
@@ -1251,7 +1584,6 @@ Qed.
 
 
 
-
 (** Lemmas relevant to untyped judgments *)
 Lemma glu_typ_unsorted_elem_sort_lvl {P} (pred_P : PredicativeSig P) : forall typ_rel exp_rel a,
     {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} ->
@@ -1275,6 +1607,17 @@ Proof.
   simpl.
   inversion_clear 1; intros; [| eapply glu_sort_elem_typ_resp_typ_eq; mauto 2];
     simpl_glu_rel; mauto 3.
+  repeat split; mauto 3; intros.
+  - assert {{ Δ ⊢ A[σ] ≈ A'[σ] }} by mauto 3.
+    assert {{ Δ ⊢ A[σ] ≈ A'[σ] : K }} by (eapply H3; mauto 3).
+    gen_presup H8.
+    assert ({{ Δ ⊢ A[σ] : K }} -> {{ Δ ⊢ A[σ] ≈ A'0 : K }}) by (eapply H3; mauto 3).
+    transitivity {{{ A[σ] }}}; mauto 3.
+  - assert {{ Δ ⊢ A[σ] ≈ A'[σ] }} by mauto 3.
+    assert {{ Δ ⊢ A[σ] ≈ A'0 : K }} by (eapply H3; mauto 3).
+    gen_presup H8.
+    assert ({{ Δ ⊢ A[σ] : K }} -> {{ Δ ⊢ A[σ] ≈ A'[σ] : K }}) by (eapply H3; mauto 3).
+    transitivity {{{ A[σ] }}}; mauto 3.
 Qed.
 
 Add Parametric Morphism {P} (pred_P : PredicativeSig P) typ_rel exp_rel a (H : glu_typ_unsorted_elem pred_P typ_rel exp_rel a) Γ : (typ_rel Γ)
@@ -1294,7 +1637,21 @@ Proof.
   inversion_clear 1; intros; [| eapply glu_sort_elem_trm_resp_typ_eq; mauto 3];
     simpl_glu_rel; mauto 3.
   repeat split; mauto 3.
-  do 2 eexists; split; mauto 3. 
+  - intros.
+    assert {{ Δ ⊢ A[σ] ≈ A'[σ] }} by mauto 3.
+    assert {{ Δ ⊢ A[σ] ≈ A'[σ] : K }} by (eapply H4; mauto 3).
+    gen_presup H11.
+    assert ({{ Δ ⊢ A[σ] : K }} -> {{ Δ ⊢ A[σ] ≈ A'0 : K }}) by (eapply H4; mauto 3).
+    transitivity {{{ A[σ] }}}; mauto 3.
+  - intros.
+    assert {{ Δ ⊢ A[σ] ≈ A'[σ] }} by mauto 3.
+    assert {{ Δ ⊢ A[σ] ≈ A'0 : K }} by (eapply H4; mauto 3).
+    gen_presup H11.
+    assert ({{ Δ ⊢ A[σ] : K }} -> {{ Δ ⊢ A[σ] ≈ A'[σ] : K }}) by (eapply H4; mauto 3).
+    transitivity {{{ A[σ] }}}; mauto 3.
+  (* - eapply H5; mauto 3. *)
+  (* - eapply H5; mauto 3. *)
+  - do 2 eexists; split; mauto 3. 
 Qed.
 
 Add Parametric Morphism {P} (pred_P : PredicativeSig P) typ_rel exp_rel a (H : glu_typ_unsorted_elem pred_P typ_rel exp_rel a) Γ : (exp_rel Γ)
@@ -1316,6 +1673,12 @@ Proof.
   simpl.
   inversion_clear 1; intros; [| eapply glu_sort_elem_typ_resp_ctx_eq; mauto 2];
     simpl_glu_rel; mauto 2.
+  repeat split; mauto 3; intros.
+  - intros.
+    assert ({{ Δ0 ⊢ A[σ] : K }} -> {{ Δ0 ⊢ A[σ] ≈ A' : K }}) by (eapply H3; mauto 3).
+    mauto 2.
+  - intros.
+    eapply H3; mauto 3.
 Qed.
 
 Add Parametric Morphism {P} (pred_P : PredicativeSig P) typ_rel exp_rel a (H : glu_typ_unsorted_elem pred_P typ_rel exp_rel a) : typ_rel
@@ -1325,7 +1688,6 @@ Proof.
     eapply glu_typ_unsorted_elem_typ_resp_ctx_eq;
     mauto 2.
 Qed.
-
 
 Lemma glu_typ_unsorted_elem_trm_resp_ctx_eq {P} (pred_P : PredicativeSig P) : forall typ_rel exp_rel a,
     {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} ->
@@ -1338,8 +1700,12 @@ Proof.
   inversion_clear 1; intros; [| eapply glu_sort_elem_trm_resp_ctx_eq; mauto 2];
     simpl_glu_rel.
   repeat split; mauto 3.
-  do 2 eexists; split; mauto 3.
-  eapply glu_sort_elem_typ_resp_ctx_eq; mauto 2.
+  - eapply H4; mauto 3.
+  - eapply H4; mauto 3.
+  (* - eapply H5; mauto 3. *)
+  (* - eapply H5; mauto 3. *)
+  - do 2 eexists; split; mauto 3.
+    eapply glu_sort_elem_typ_resp_ctx_eq; mauto 2.
 Qed.
 
 Add Parametric Morphism {P} (pred_P : PredicativeSig P) typ_rel exp_rel a (H : glu_typ_unsorted_elem pred_P typ_rel exp_rel a) : exp_rel
@@ -1431,8 +1797,26 @@ Proof.
   inversion_clear 1; intros; [| eapply glu_sort_elem_trm_resp_exp_eq; mauto 2];
     simpl_glu_rel; mauto 2.
   repeat split; mauto 2.
-  do 2 eexists; split; mauto 3.
-  eapply glu_sort_elem_typ_resp_typ_eq; mauto 3.
+  - eapply H4; mauto 3.
+  - eapply H4; mauto 3.
+  (* - intros. *)
+  (*   assert {{ Γ ⊢ M ≈ M' }} by mauto 3. *)
+  (*   assert {{ Δ ⊢ M[σ] ≈ M'[σ] }} by mauto 3. *)
+  (*   assert {{ Δ ⊢ M[σ] ≈ M'0 }} by (etransitivity; mauto 2). *)
+  (*   assert {{ Δ ⊢ M[σ] ≈ M'[σ] : B }} by (eapply H5; mauto 3). *)
+  (*   gen_presup H13. *)
+  (*   assert ({{ Δ ⊢ M[σ] : B }} -> {{ Δ ⊢ M[σ] ≈ M'0 : B }}) by (eapply H5; mauto 3). *)
+  (*   transitivity {{{ M[σ] }}}; mauto 3. *)
+  (* - intros. *)
+  (*   assert {{ Γ ⊢ M ≈ M' }} by mauto 3. *)
+  (*   assert {{ Δ ⊢ M[σ] ≈ M'[σ] }} by mauto 3. *)
+  (*   assert {{ Δ ⊢ M[σ] ≈ M'0 }} by (etransitivity; mauto 2). *)
+  (*   assert {{ Δ ⊢ M[σ] ≈ M'0 : B }} by (eapply H5; mauto 3). *)
+  (*   gen_presup H13. *)
+  (*   assert ({{ Δ ⊢ M[σ] : B }} -> {{ Δ ⊢ M[σ] ≈ M'[σ] : B }}) by (eapply H5; mauto 3). *)
+  (*   transitivity {{{ M[σ] }}}; mauto 3. *)
+  - do 2 eexists; split; mauto 3.
+    eapply glu_sort_elem_typ_resp_typ_eq; mauto 3.
 Qed.
 
 Add Parametric Morphism {P} (pred_P : PredicativeSig P) typ_rel exp_rel a (H : glu_typ_unsorted_elem pred_P typ_rel exp_rel a) Γ T : (exp_rel Γ T)
@@ -1441,8 +1825,7 @@ Proof.
   split; intros;
     eapply glu_typ_unsorted_elem_trm_resp_exp_eq;
     mauto 2.
-Qed.  
-  
+Qed.
 
     
 Lemma functional_glu_typ_unsorted_elem {P} (pred_P : PredicativeSig P) : forall a typ_rel typ_rel' exp_rel exp_rel',
@@ -1461,7 +1844,15 @@ Proof.
     unfold glu_sort_typ_rec.
     split; intros; destruct_conjs; repeat split; mauto 3.
     unfold glu_sort_typ.
-    do 2 eexists; split; mauto 3.
+    + eapply H7; mauto 3.
+    + eapply H7; mauto 3.
+    (* + eapply H8; mauto 3. *)
+    (* + eapply H8; mauto 3. *)
+    + eapply H7; mauto 3.
+    + eapply H7; mauto 3.
+    (* + eapply H8; mauto 3. *)
+    (* + eapply H8; mauto 3. *)
+    + do 2 eexists; split; mauto 3.
   - invert_glu_sort_elem H0.
     rewrite H0.
     rewrite H1.
@@ -1470,8 +1861,16 @@ Proof.
     unfold sort_glu_exp_pred'.
     unfold glu_sort_typ_rec.
     split; intros; destruct_conjs; repeat split; mauto 3.
-    unfold glu_sort_typ.
-    do 2 eexists; split; mauto 3.
+    + eapply H7; mauto 3.
+    + eapply H7; mauto 3.
+    (* + eapply H8; mauto 3. *)
+    (* + eapply H8; mauto 3.       *)
+    + do 2 eexists; split; mauto 3.
+    + eapply H7; mauto 3.
+    + eapply H7; mauto 3.
+    (* + eapply H8; mauto 3. *)
+    (* + eapply H8; mauto 3.       *)
+
   - handle_functional_glu_sort_elem P.
     split; reflexivity.
 Qed.    
@@ -1530,8 +1929,12 @@ Proof.
     unfold glu_sort_typ in *.
     destruct_conjs.
     repeat split; mauto 2.
-    do 2 eexists; split; mauto 2.
-    eapply (glu_sort_elem_resp_per_sort_elem pred_P s m m' H2 H6 H5 H7 H8); mauto 2.
+    + eapply H5; mauto 3.
+    + eapply H5; mauto 3.
+    (* + eapply H6; mauto 3. *)
+    (* + eapply H6; mauto 3. *)
+    + do 2 eexists; split; mauto 2.
+      eapply (glu_sort_elem_resp_per_sort_elem pred_P s m m' H2 H7 H6 H8 H9); mauto 2.
   - invert_per_sort_elem H4.
     split; [econstructor; mauto 2| ].
     intros.
@@ -1542,8 +1945,12 @@ Proof.
     unfold glu_sort_typ in *.
     destruct_conjs.
     repeat split; mauto 2.
-    do 2 eexists; split; mauto 2.
-    eapply (glu_sort_elem_resp_per_sort_elem pred_P s m m' H3 H6 H5 H7 H8); mauto 2.
+    + eapply H5; mauto 3.
+    + eapply H5; mauto 3.
+    (* + eapply H6; mauto 3. *)
+    (* + eapply H6; mauto 3. *)
+    + do 2 eexists; split; mauto 2.
+      eapply (glu_sort_elem_resp_per_sort_elem pred_P s m m' H3 H7 H6 H8 H9); mauto 2.
   - split; [eassumption|].
     intros.
     invert_glu_sort_elem H.
@@ -1554,8 +1961,12 @@ Proof.
     unfold per_sort in H2.
     destruct_conjs.
     repeat split; mauto 2.
-    do 2 eexists; split; mauto 2.
-    eapply (glu_sort_elem_resp_per_sort_elem pred_P s0 m m' H2 H6 H5 H7 H8); mauto 2.
+    + eapply H5; mauto 3.    
+    + eapply H5; mauto 3.
+    (* + eapply H6; mauto 3. *)
+    (* + eapply H6; mauto 3.     *)
+    + do 2 eexists; split; mauto 2.
+      eapply (glu_sort_elem_resp_per_sort_elem pred_P s0 m m' H2 H7 H6 H8 H9); mauto 2.
   - assert (per_sort pred_P s a a) by mauto.
     assert (per_sort pred_P s0 a a') by mauto.
     assert (per_sort pred_P s a a') by (eapply per_sort_trans'; mauto 2).
@@ -1709,14 +2120,59 @@ Proof.
     split; intros.
     + rewrite H in *.
       unfold sort_glu_typ_pred in *.
-      transitivity {{{ Sort@s[σ] }}}; mauto 3.
+      destruct_conjs.
+      repeat split; mauto 3; intros.
+      * transitivity {{{ Sort@s[σ] }}}; mauto 3.
+      * gen_presup H2.
+        assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] }} by mauto 4.
+        assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] : K }} by (eapply H3; mauto 3).
+        gen_presup H8.
+        assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' }} by (transitivity {{{ A[σ][σ0] }}}; mauto 3).
+        assert ({{ Δ0 ⊢ A[σ∘σ0] : K }} -> {{ Δ0 ⊢ A[σ∘σ0] ≈ A' : K }}) by (eapply H3; mauto 3).
+        transitivity {{{ A[σ∘σ0] }}}; mauto 3.
+      * gen_presup H2.
+        assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] }} by mauto 4.
+        assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' }} by (transitivity {{{ A[σ][σ0] }}}; mauto 3).
+        assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' : K }} by (eapply H3; mauto 3).
+        gen_presup H9.
+        assert ({{ Δ0 ⊢ A[σ∘σ0] : K }} -> {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] : K }}) by (eapply H3; mauto 3).
+        transitivity {{{ A[σ∘σ0] }}}; mauto 3.    
+
     + rewrite H0 in *.
       unfold sort_glu_exp_pred in *.
       unfold glu_sort_typ in *.
       destruct_conjs.
-      repeat split; [mauto 3 | transitivity {{{ Sort@s[σ] }}}; mauto 3 |].
-      do 2 eexists; split; mauto 3.
-      eapply (glu_sort_elem_mut_monotone pred_P s m H4 H5 H6 Δ σ Γ); mauto 3.
+      repeat split; [mauto 3 | transitivity {{{ Sort@s[σ] }}}; mauto 3 | | |]; intros.
+      * gen_presup H2.
+        assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] }} by mauto 4.
+        assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] : K }} by (eapply H4; mauto 3).
+        gen_presup H13.
+        assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' }} by (transitivity {{{ A[σ][σ0] }}}; mauto 3).
+        assert ({{ Δ0 ⊢ A[σ∘σ0] : K }} -> {{ Δ0 ⊢ A[σ∘σ0] ≈ A' : K }}) by (eapply H4; mauto 3).
+        transitivity {{{ A[σ∘σ0] }}}; mauto 3.
+      * gen_presup H2.
+        assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] }} by mauto 4.
+        assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' }} by (transitivity {{{ A[σ][σ0] }}}; mauto 3).
+        assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' : K }} by (eapply H4; mauto 3).
+        gen_presup H14.
+        assert ({{ Δ0 ⊢ A[σ∘σ0] : K }} -> {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] : K }}) by (eapply H4; mauto 3).
+        transitivity {{{ A[σ∘σ0] }}}; mauto 3.
+      (* * assert {{ Γ ⊢ M }} by mauto 3. *)
+      (*   assert {{ Δ0 ⊢ M[σ∘σ0] ≈ M[σ][σ0] }} by mauto 4. *)
+      (*   assert {{ Δ0 ⊢ M[σ∘σ0] ≈ M[σ][σ0] : B }} by (eapply H5; mauto 3). *)
+      (*   gen_presup H15. *)
+      (*   assert {{ Δ0 ⊢ M[σ∘σ0] ≈ M' }} by (transitivity {{{ M[σ][σ0] }}}; mauto 3). *)
+      (*   assert ({{ Δ0 ⊢ M[σ∘σ0] : B }} -> {{ Δ0 ⊢ M[σ∘σ0] ≈ M' : B }}) by (eapply H5; mauto 3). *)
+      (*   transitivity {{{ M[σ∘σ0] }}}; mauto 3. *)
+      (* * assert {{ Γ ⊢ M }} by mauto 3. *)
+      (*   assert {{ Δ0 ⊢ M[σ∘σ0] ≈ M[σ][σ0] }} by mauto 4. *)
+      (*   assert {{ Δ0 ⊢ M[σ∘σ0] ≈ M' : B }} by (eapply H5; mauto 3). *)
+      (*   gen_presup H15. *)
+      (*   (* assert {{ Δ0 ⊢ M[σ∘σ0] ≈ M' }} by (transitivity {{{ M[σ][σ0] }}}; mauto 3). *) *)
+      (*   assert ({{ Δ0 ⊢ M[σ∘σ0] : B }} -> {{ Δ0 ⊢ M[σ∘σ0] ≈ M[σ][σ0] : B }}) by (eapply H5; mauto 3). *)
+      (*   transitivity {{{ M[σ∘σ0] }}}; mauto 3. *)
+      * do 2 eexists; split; mauto 3.
+        eapply (glu_sort_elem_mut_monotone pred_P s m H5 H6 H7 Δ σ Γ); mauto 3.
   - eapply glu_sort_elem_mut_monotone; eassumption.
 Qed.
 

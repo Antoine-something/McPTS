@@ -34,8 +34,8 @@ Notation "'EG' A ∈ R ↘ Sb " := (R Sb A : ((Prop : (Type : Type)) : (Type : T
 
 
 Definition neut_glu_typ_pred {P : PtsSig} (s : P) a : glu_typ_pred P :=
-  fun Γ A => {{ Γ ⊢ A }} /\
-            (forall Δ σ A', {{ Δ ⊢w σ : Γ }} -> {{ Δ ⊢ A' : Sort@s }} -> {{ Δ ⊢ A[σ] ≈ A' }} -> {{ Δ ⊢ A[σ] ≈ A' : Sort@s }}) /\
+  fun Γ A => {{ Γ ⊢ A : Sort@s }} /\
+            (forall Δ σ A' K, {{ Δ ⊢w σ : Γ }} -> {{ Δ ⊢ A[σ] ≈ A' }} -> ({{ Δ ⊢ A[σ] : K }} -> {{ Δ ⊢ A[σ] ≈ A' : K }}) /\ ({{ Δ ⊢ A' : K }} -> {{ Δ ⊢ A[σ] ≈ A' : K }})) /\
             (forall Δ σ A', {{ Δ ⊢w σ : Γ }} -> {{ Rne a in length Δ ↘ A' }} -> {{ Δ ⊢ A[σ] ≈ A' }}).
 Arguments neut_glu_typ_pred {P} s a Γ A/.
 
@@ -55,10 +55,10 @@ Variant pi_glu_typ_pred {P : PtsSig} {s1 s2} (s : P) (r : Ru P s1 s2 s)
   (IEl : glu_exp_pred P)
   (OP : forall c (equiv_c : {{ Dom c ≈ c ∈ IR }}), glu_typ_pred P) : glu_typ_pred P :=
 | mk_pi_glu_typ_pred :
-  `{ {{ Γ ⊢ A ≈ Π r IT OT }} ->
+  `{ {{ Γ ⊢ A ≈ Π r IT OT : Sort@s }} ->
      {{ Γ ⊢ IT : Sort@s1 }} ->
      {{ Γ , IT ⊢ OT : Sort@s2 }} ->
-     (forall Δ σ A', {{ Δ ⊢w σ : Γ }} -> {{ Δ ⊢ A' : Sort@s }} -> {{ Δ ⊢ A[σ] ≈ A' }} -> {{ Δ ⊢ A[σ] ≈ A' : Sort@s }}) ->
+     (forall Δ σ A' K, {{ Δ ⊢w σ : Γ }} -> {{ Δ ⊢ A[σ] ≈ A' }} -> ({{ Δ ⊢ A[σ] : K }} -> {{ Δ ⊢ A[σ] ≈ A' : K }}) /\ ({{ Δ ⊢ A' : K }} -> {{ Δ ⊢ A[σ] ≈ A' : K }})) ->
      (forall Δ σ, {{ Δ ⊢w σ : Γ }} -> {{ Δ ⊢ IT[σ] ® IP }}) ->
      (forall Δ σ M m,
          {{ Δ ⊢w σ : Γ }} ->
@@ -76,10 +76,10 @@ Variant pi_glu_exp_pred {P : PtsSig} {s1 s2} (s : P) (r : Ru P s1 s2 s)
 | mk_pi_glu_exp_pred :
   `{ {{ Γ ⊢ M : A }} ->
      {{ Dom m ≈ m ∈ elem_rel }} ->
-     {{ Γ ⊢ A ≈ Π r IT OT }} ->
+     {{ Γ ⊢ A ≈ Π r IT OT : Sort@s }} ->
      {{ Γ ⊢ IT : Sort@s1 }} ->
      {{ Γ , IT ⊢ OT : Sort@s2 }} ->
-     (forall Δ σ A', {{ Δ ⊢w σ : Γ }} -> {{ Δ ⊢ A' : Sort@s }} -> {{ Δ ⊢ A[σ] ≈ A' }} -> {{ Δ ⊢ A[σ] ≈ A' : Sort@s }}) ->
+     (forall Δ σ A' K, {{ Δ ⊢w σ : Γ }} -> {{ Δ ⊢ A[σ] ≈ A' }} -> ({{ Δ ⊢ A[σ] : K }} -> {{ Δ ⊢ A[σ] ≈ A' : K }}) /\ ({{ Δ ⊢ A' : K }} -> {{ Δ ⊢ A[σ] ≈ A' : K }})) ->     
      (forall Δ σ, {{ Δ ⊢w σ : Γ }} -> {{ Δ ⊢ IT[σ] ® IP }}) ->
      (forall Δ σ N n,
          {{ Δ ⊢w σ : Γ }} ->
@@ -91,10 +91,10 @@ Variant pi_glu_exp_pred {P : PtsSig} {s1 s2} (s : P) (r : Ru P s1 s2 s)
 #[export]
 Hint Constructors neut_glu_exp_pred pi_glu_typ_pred pi_glu_exp_pred : mcpts.
 
-Definition sort_glu_typ_pred {P : PtsSig} (pred_P : PredicativeSig P) (s1 s2 : P) : glu_typ_pred P :=
-  fun Γ A => {{ Γ ⊢ A ≈ Sort@s1 }} /\
-            (forall Δ σ A', {{ Δ ⊢w σ : Γ}} -> {{ Δ ⊢ A' : Sort@s2 }} -> {{ Δ ⊢ A[σ] ≈ A' }} -> {{ Δ ⊢ A' ≈ Sort@s1 : Sort@s2 }}).
-Arguments sort_glu_typ_pred {P} pred_P s1 s2 Γ A/.
+Definition sort_glu_typ_pred {P : PtsSig} (pred_P : PredicativeSig P) (s : P) : glu_typ_pred P :=
+  fun Γ A => {{ Γ ⊢ A ≈ Sort@s }} /\
+            (forall Δ σ A' K, {{ Δ ⊢w σ : Γ }} -> {{ Δ ⊢ A[σ] ≈ A' }} -> ({{ Δ ⊢ A[σ] : K }} -> {{ Δ ⊢ A[σ] ≈ A' : K }}) /\ ({{ Δ ⊢ A' : K }} -> {{ Δ ⊢ A[σ] ≈ A' : K }})).
+Arguments sort_glu_typ_pred {P} pred_P s Γ A/.
 Transparent sort_glu_typ_pred.
 
 
@@ -114,7 +114,8 @@ Section Gluing.
     fun Γ A M m =>
       {{ Γ ⊢ M : A }} /\
         {{ Γ ⊢ A ≈ Sort@s' }} /\
-        (forall Δ σ A', {{Δ ⊢w σ : Γ }} -> {{ Δ ⊢ A' : Sort@s }} -> {{ Δ ⊢ A[σ] ≈ A' }} -> {{ Δ ⊢ A[σ] ≈ A' : Sort@s }}) /\
+        (forall Δ σ A' K, {{ Δ ⊢w σ : Γ }} -> {{ Δ ⊢ A[σ] ≈ A' }} -> ({{ Δ ⊢ A[σ] : K }} -> {{ Δ ⊢ A[σ] ≈ A' : K }}) /\ ({{ Δ ⊢ A' : K }} -> {{ Δ ⊢ A[σ] ≈ A' : K }})) /\
+        (* (forall Δ σ M' B, {{ Δ ⊢w σ : Γ }} -> {{ Δ ⊢ M[σ] ≈ M' }} -> ({{ Δ ⊢ M[σ] : B }} -> {{ Δ ⊢ M[σ] ≈ M' : B }}) /\ ({{ Δ ⊢ M' : B }} -> {{ Δ ⊢ M[σ] ≈ M' : B }})) /\ *)
         {{ Γ ⊢ M ® glu_sort_typ_rec lt_s'_s m }}.
 
   #[global]
@@ -125,7 +126,7 @@ Section Gluing.
     `{ forall typ_rel
          el_rel
          (ax_s'_s : Ax P s' s),
-          typ_rel <∙> sort_glu_typ_pred pred_P s' s ->
+          typ_rel <∙> sort_glu_typ_pred pred_P s' ->
           el_rel <∙> sort_glu_exp_pred' (ord_ax pred_P ax_s'_s) ->
           {{ DG Sort@s' ∈ glu_sort_elem_core ↘ typ_rel ↘ el_rel }} }
 
@@ -163,7 +164,7 @@ Section Gluing.
       (case_sort :
         forall {s'} typ_rel el_rel
           (ax_s'_s : Ax P s' s),
-          typ_rel <∙> sort_glu_typ_pred pred_P s' s ->
+          typ_rel <∙> sort_glu_typ_pred pred_P s' ->
           el_rel <∙> sort_glu_exp_pred' (ord_ax pred_P ax_s'_s) ->
           motive typ_rel el_rel d{{{ Sort@s' }}})
 
@@ -239,12 +240,13 @@ Definition glu_sort_typ {P} (pred_P : PredicativeSig P) (s : P) (a : domain P) :
   fun Γ A => exists typ_rel exp_rel, {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} /\ {{ Γ ⊢ A ® typ_rel }}.
 Arguments glu_sort_typ {P} pred_P s a Γ A/.
 
-Definition sort_glu_exp_pred {P} (pred_P : PredicativeSig P) s1 s2 : glu_exp_pred P :=
+Definition sort_glu_exp_pred {P} (pred_P : PredicativeSig P) s : glu_exp_pred P :=
     fun Γ A M m =>
-      {{ Γ ⊢ M : A }} /\ {{ Γ ⊢ A ≈ Sort@s1 }} /\
-        (forall Δ σ A', {{ Δ ⊢w σ : Γ }} -> {{ Δ ⊢ A' : Sort@s2 }} -> {{ Δ ⊢ A[σ] ≈ A' }} -> {{ Δ ⊢ A[σ] ≈ A' : Sort@s2 }}) /\
-        {{ Γ ⊢ M ® glu_sort_typ pred_P s1 m }}.
-Arguments sort_glu_exp_pred {P} pred_P s1 s2 Γ A M m/.
+      {{ Γ ⊢ M : A }} /\ {{ Γ ⊢ A ≈ Sort@s }} /\
+        (forall Δ σ A' K, {{ Δ ⊢w σ : Γ }} -> {{ Δ ⊢ A[σ] ≈ A' }} -> ({{ Δ ⊢ A[σ] : K }} -> {{ Δ ⊢ A[σ] ≈ A' : K }}) /\ ({{ Δ ⊢ A' : K }} -> {{ Δ ⊢ A[σ] ≈ A' : K }})) /\
+        (* (forall Δ σ M' B, {{ Δ ⊢w σ : Γ }} -> {{ Δ ⊢ M[σ] ≈ M' }} -> ({{ Δ ⊢ M[σ] : B }} -> {{ Δ ⊢ M[σ] ≈ M' : B }}) /\ ({{ Δ ⊢ M' : B }} -> {{ Δ ⊢ M[σ] ≈ M' : B }})) /\ *)
+        {{ Γ ⊢ M ® glu_sort_typ pred_P s m }}.
+Arguments sort_glu_exp_pred {P} pred_P s Γ A M m/.
 
 
 Section GluingInduction.
@@ -261,8 +263,8 @@ Section GluingInduction.
         forall s s'
           (typ_rel : glu_typ_pred P) (exp_rel : glu_exp_pred P) (ax_s'_s : Ax P s' s),
           (forall typ_rel' exp_rel' a, {{ DG a ∈ glu_sort_elem pred_P s' ↘ typ_rel' ↘ exp_rel' }} -> motive s' typ_rel' exp_rel' a) ->
-          typ_rel <∙> sort_glu_typ_pred pred_P s' s ->
-          exp_rel <∙> sort_glu_exp_pred pred_P s' s ->
+          typ_rel <∙> sort_glu_typ_pred pred_P s' ->
+          exp_rel <∙> sort_glu_exp_pred pred_P s' ->
           motive s typ_rel exp_rel d{{{ Sort@s' }}})
 
       (case_pi :
@@ -361,24 +363,24 @@ End GluingInduction.
 
 
 (** Gluing model for untyped judgments *)
-Definition unsorted_glu_typ_pred {P} (pred_P : PredicativeSig P) (s : P) : glu_typ_pred P :=
-  fun Γ A => {{ Γ ⊢ A ≈ Sort@s }}.
-Arguments unsorted_glu_typ_pred {P} pred_P s Γ A/.
-Transparent unsorted_glu_typ_pred.
+(* Definition unsorted_glu_typ_pred {P} (pred_P : PredicativeSig P) (s : P) : glu_typ_pred P := *)
+(*   fun Γ A => {{ Γ ⊢ A ≈ Sort@s }}. *)
+(* Arguments unsorted_glu_typ_pred {P} pred_P s Γ A/. *)
+(* Transparent unsorted_glu_typ_pred. *)
 
 
-Definition unsorted_glu_exp_pred {P} (pred_P : PredicativeSig P) s : glu_exp_pred P :=
-    fun Γ A M m =>
-      {{ Γ ⊢ M : A }} /\ {{ Γ ⊢ A ≈ Sort@s }} /\
-        {{ Γ ⊢ M ® glu_sort_typ pred_P s m }}.
-Arguments unsorted_glu_exp_pred {P} pred_P s Γ A M m/.
+(* Definition unsorted_glu_exp_pred {P} (pred_P : PredicativeSig P) s : glu_exp_pred P := *)
+(*     fun Γ A M m => *)
+(*       {{ Γ ⊢ M : A }} /\ {{ Γ ⊢ A ≈ Sort@s }} /\ *)
+(*         {{ Γ ⊢ M ® glu_sort_typ pred_P s m }}. *)
+(* Arguments unsorted_glu_exp_pred {P} pred_P s Γ A M m/. *)
 
 
 
 Inductive glu_typ_unsorted_elem {P} (pred_P : PredicativeSig P) : glu_typ_pred P -> glu_exp_pred P -> domain P -> Prop :=
 | glu_typ_unsorted_sort :
-  `( typ_rel <∙> unsorted_glu_typ_pred pred_P s ->
-     exp_rel <∙> unsorted_glu_exp_pred pred_P s ->
+  `( typ_rel <∙> sort_glu_typ_pred pred_P s ->
+     exp_rel <∙> sort_glu_exp_pred pred_P s ->
      {{ DG Sort@s ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} )
 | glu_typ_unsorted_type :
   `( {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
@@ -396,6 +398,7 @@ Variant glu_elem_bot {P} (pred_P : PredicativeSig P) s a Γ A M m : Prop :=
       {{ Γ ⊢ A ® typ_rel }} ->
       {{ Dom m ≈ m ∈ per_bot }} ->
       (forall Δ σ M', {{ Δ ⊢w σ : Γ }} -> {{ Rne m in length Δ ↘ M' }} -> {{ Δ ⊢ M[σ] ≈ M' : A[σ] }}) ->
+      (* (forall Δ σ M' B, {{ Δ ⊢w σ : Γ }} -> {{ Δ ⊢ M[σ] ≈ M' : A[σ] }} -> ({{ Δ ⊢ M[σ] : B }} -> {{ Δ ⊢ M[σ] ≈ M' : B }}) /\ ({{ Δ ⊢ M' : B }} -> {{ Δ ⊢ M[σ] ≈ M' : B }})) -> *)
       {{ Γ ⊢ M : A ® m ∈ glu_elem_bot pred_P s a }}.
 
 #[export]

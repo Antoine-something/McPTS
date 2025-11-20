@@ -197,4 +197,3 @@ Qed.
 
 #[export]
 Hint Resolve wf_sub_extend_inversion : mcpts.
-  
