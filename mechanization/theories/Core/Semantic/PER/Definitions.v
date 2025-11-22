@@ -237,7 +237,7 @@ Section Per_sort_elem_ind_def.
   Instance Per_sort_elem_ind_def_wf : WellFounded (pred_rel pred_P) := (wf_rel pred_P).
 
   #[local]
-  Ltac impl_tac := simpl in *; program_simplify; CoreTactics.equations_simpl; try program_solve_wf; def_simp.
+  Ltac impl_tac := simpl in *; program_simplify; CoreTactics.equations_simpl; try program_solve_wf; try def_simp.
 
   #[derive(equations=no, eliminator=no), tactic="impl_tac"]
   Equations per_sort_elem_ind' (s : P) (R : relation dom) (a b : dom)
@@ -335,7 +335,7 @@ Section Per_ctx_env_def.
   Variant cons_per_ctx_env tail_rel (head_rel : forall {ρ ρ'} (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ tail_rel }}), relation dom) : relation (env P) :=
     | mk_cons_per_ctx_env :
       `{ forall (equiv_ρ_drop_ρ'_drop : {{ Dom ρ ↯ ≈ ρ' ↯ ∈ tail_rel }}),
-            {{ ρ[0] ↘ n }} -> {{ ρ'[0] ↘ n' }} ->
+            {{ #| ρ[0] |↘ n }} -> {{ #| ρ'[0] |↘ n' }} ->
             {{ Dom n ≈ n' ∈ head_rel equiv_ρ_drop_ρ'_drop }} ->
             {{ Dom ρ ≈ ρ' ∈ cons_per_ctx_env tail_rel (@head_rel) }} }.
 

@@ -493,9 +493,7 @@ Variant cons_glu_sub_pred {P} (pred_P : PredicativeSig P) Γ A (TSb : glu_sub_pr
         {{ Δ ⊢s σ : Γ, A }} ->
         {{ ⟦ A ⟧ ρ ↯ ↘ a }} ->
         {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ P ↘ El }} ->
-        (env_lookup ρ 0 m) ->
-        (* I don't understand why this notation does not work, it is imported *)
-        (* {{ ρ[0] ↘ m }} -> *)
+        {{ #| ρ[0] |↘ m }} ->
         (** Here we use [{{{ A[Wk][σ] }}}] instead of [{{{ A[Wk∘σ] }}}]
             as syntactic judgement derived from that is
             a more direct consequence of [{{ Γ, A ⊢ #0 : A[Wk] }}] *)

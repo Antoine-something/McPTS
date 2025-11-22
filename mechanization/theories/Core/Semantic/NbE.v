@@ -38,7 +38,7 @@ Hint Resolve functional_initial_env : mcpts.
 Lemma initial_env_spec {P : PtsSig} : forall x (Γ : ctx P) ρ A,
     initial_env Γ ρ ->
     {{ #x : A ∈ Γ }} ->
-    exists m a, {{ ρ[x] ↘ m }} /\ m = d{{{ ⇑! a (length Γ - x - 1) }}}.
+    exists m a, {{ #| ρ[x] |↘ m }} /\ m = d{{{ ⇑! a (length Γ - x - 1) }}}.
 Proof.
   induction x; intros * Hinit Hlookup;
     dependent destruction Hlookup; dependent destruction Hinit; simpl; mauto.
@@ -47,7 +47,7 @@ Proof.
     rewrite -> H0.
     econstructor; mauto.
   - 
-    assert (exists m a, {{ ρ0[x] ↘ m}} /\ (m = d{{{ ⇑! a (length Γ0 - x - 1) }}})) by mauto.
+    assert (exists m a, {{ #| ρ0[x] |↘ m}} /\ (m = d{{{ ⇑! a (length Γ0 - x - 1) }}})) by mauto.
     destruct_conjs.
     subst.
     assert (length Γ0 - x - 1 = length Γ0 - (S x)) by lia.

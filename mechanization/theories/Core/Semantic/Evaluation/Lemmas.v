@@ -7,9 +7,9 @@ Import Domain_Notations.
 
 Section functional_eval.
   Lemma env_lookup_functional {P : PtsSig} : forall (ρ : env P) x m1,
-      {{ ρ[x] ↘ m1 }} ->
+      {{ #| ρ[x] |↘ m1 }} ->
       forall m2,
-        {{ ρ[x] ↘ m2 }} ->
+        {{ #| ρ[x] |↘ m2 }} ->
         m1 = m2.
   Proof with ((on_all_hyp: fun H => erewrite H in *; eauto); solve [eauto]) using.
     intros * H1.
@@ -89,8 +89,8 @@ Hint Resolve env_lookup_functional functional_eval_exp functional_eval_app funct
 Ltac functional_eval_rewrite_clear1 :=
   let tactic_error o1 o2 := fail 3 "functional_eval equality between" o1 "and" o2 "cannot be solved by mauto" in
   match goal with
-  | H1 : {{ ^?ρ[?n] ↘ ^?m1 }},
-      H2 : {{ ^?ρ[?n] ↘ ^?m2 }} |- _ =>
+  | H1 : {{ #| ^?ρ[?n] |↘ ^?m1 }},
+      H2 : {{ #| ^?ρ[?n] |↘ ^?m2 }} |- _ =>
       clean replace m2 with m1 by first [solve [mauto 2] | tactic_error m2 m1]; clear H2
   | H1 : {{ ⟦ ^?M ⟧ ^?ρ ↘ ^?m1 }},
       H2 : {{ ⟦ ^?M ⟧ ^?ρ ↘ ^?m2 }} |- _ =>

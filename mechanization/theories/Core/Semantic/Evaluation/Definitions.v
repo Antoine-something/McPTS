@@ -7,22 +7,22 @@ Reserved Notation "'⟦' M '⟧' ρ '↘' r" (in custom judg at level 80, M cust
 Reserved Notation "'$|' m '&' n '|↘' r" (in custom judg at level 80, m custom domain at level 99, n custom domain at level 99, r custom domain at level 99).
 Reserved Notation "'⟦' σ '⟧s' ρ '↘' ρσ" (in custom judg at level 80, σ custom exp at level 99, ρ custom domain at level 99, ρσ custom domain at level 99).
 (* Since environments are lists and not functions, we need to explicitly define lookups *)
-Reserved Notation "ρ '[' n ']' ↘ m" (in custom judg at level 80, ρ custom domain, n constr at level 0, m custom domain at level 99). 
+Reserved Notation "'#|' ρ '[' n ']' '|↘' m" (in custom judg at level 80, ρ custom domain, n constr at level 0, m custom domain at level 99). 
 
 
 Generalizable All Variables.
 
 Inductive env_lookup {P : PtsSig} : env P -> nat -> domain P -> Prop :=
-| el_here : `({{ (ρ ↦ m)[0] ↘ m }})
-| el_there : `({{ ρ[i] ↘ m }} ->
-               {{ (ρ ↦ n)[S i] ↘ m }})
-where "ρ '[' n ']' ↘ m" := (env_lookup ρ n m) (in custom judg).
+| el_here : `({{ #| (ρ ↦ m)[0] |↘ m }})
+| el_there : `({{ #| ρ[i] |↘ m }} ->
+               {{ #| (ρ ↦ n)[S i] |↘ m }})
+where "'#|' ρ '[' n ']' '|↘' m" := (env_lookup ρ n m) (in custom judg).
 
 Inductive eval_exp {P : PtsSig} : exp P -> env P -> domain P -> Prop :=
 | eval_exp_typ :
   `( {{ ⟦ Sort@s ⟧ ρ ↘ Sort@s }} )
 | eval_exp_var :
-  `({{ ρ[x] ↘ m }} ->
+  `({{ #| ρ[x] |↘ m }} ->
     {{ ⟦ #x ⟧ ρ ↘ m }} )
 | eval_exp_pi :
   `( forall r : Ru P s1 s2 s3,
