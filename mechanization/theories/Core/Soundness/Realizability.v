@@ -17,9 +17,7 @@ Lemma wf_ctx_sub_ctx_lookup {P} : forall n (A : typ P) Γ,
           n = length Δ1 /\
           A' = iter (S n) (fun A => {{{ A[Wk] }}}) A0 /\
           {{ #n : A' ∈ Δ }} /\
-          (wf_typ_eq Δ A' A).
-  (* I don't understand why this notation does not work *)
-  (* {{ Δ ⊢ A' ≈ A }}. *)
+          {{ Δ ⊢ A' ≈ A }}.
 Proof.
   induction 1; intros; progressive_inversion.
   - exists nil.
@@ -38,20 +36,17 @@ Proof.
 Qed.
 
 Lemma var_weaken_gen {P} : forall (Δ : ctx P) (σ : sub P) (Γ : ctx P),
-  (* Again, I don't understand why notation does not work *)
-  (* {{ Δ ⊢w σ : Γ }} -> *)
-    (weakening Δ σ Γ) ->
+    {{ Δ ⊢w σ : Γ }} ->
     forall Γ1 Γ2 A0,
       Γ = Γ1 ++ A0 :: Γ2 ->
-      wf_exp_eq Δ (a_sub (iter (S (length Γ1)) (fun A => {{{ A[Wk] }}}) A0) σ) (a_sub (a_var (length Γ1)) σ) (a_var (length Δ - length Γ2 - 1)).
-      (* {{ Δ ⊢ #(length Γ1)[σ] ≈ #(length Δ - length Γ2 - 1) : ^(iter (S (length Γ1)) (fun A => {{{ A[Wk] }}}) A0)[σ] }}. *)
+      {{ Δ ⊢ #(length Γ1)[σ] ≈ #(length Δ - length Γ2 - 1) : ^(iter (S (length Γ1)) (fun A => {{{ A[Wk] }}}) A0)[σ] }}.
 Proof.  
   induction 1; intros; subst; gen_presups.
   - pose proof (app_ctx_vlookup _ _ _ _ ltac:(eassumption) eq_refl) as Hvar.
 
     (* gen_presup Hvar. *)
     assert {{ ⊢ ^ (app Γ1 {{{ Γ2, A0 }}}) }} by mauto.
-    assert (wf_typ (app Γ1 {{{ Γ2, A0 }}}) (iter (S (length Γ1)) (fun T : exp P => {{{ T[Wk] }}}) A0)) by (eapply presup_exp_typ; mauto).    
+    assert {{ ^(app Γ1 {{{ Γ2, A0 }}}) ⊢ ^(iter (S (length Γ1)) (fun T : exp P => {{{ T[Wk] }}}) A0) }} by (eapply presup_exp_typ; mauto).   
     clear_dups.
     apply wf_sub_id_inversion in Hτ.
     pose proof (wf_ctx_sub_length _ _ Hτ).
@@ -67,7 +62,7 @@ Proof.
     gen_presup Hvar.
     clear_dups.
     assert {{ ⊢ Δ', A }} by mauto 3.
-    assert (wf_sub {{{ Δ', A }}} (Γ1 ++ {{{ Γ2, A0 }}}) (@a_weaken P)) by mauto 3.
+    assert {{ Δ', A ⊢s Wk : ^(Γ1 ++ {{{ Γ2, A0 }}}) }} by mauto 3.
     transitivity {{{ #(length Γ1)[Wk∘τ] }}}; [mauto 3 |].
     eapply wf_exp_eq_conv' with (A := {{{ ^ (iter (S (length Γ1)) (fun A1 : exp P => {{{ A1[Wk] }}}) A0)[Wk∘τ] }}}); mauto 3.
     
@@ -104,7 +99,6 @@ Proof.
   intros. saturate_glu_info.
   econstructor; mauto 4.
   - eapply glu_sort_elem_typ_monotone; eauto.
-    assert (wf_typ Γ A) by mauto 2.
     assert {{ ⊢ Γ, A }} by mauto 3.
     eapply weakening_wk; mauto 3.
   - intros. progressive_inversion.
@@ -119,28 +113,22 @@ Theorem realize_glu_sort_elem_gen {P} (pred_P : PredicativeSig P) : forall a s t
     {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
     (forall Γ A R,
         {{ DF a ≈ a ∈ per_sort_elem pred_P s ↘ R }} ->
-        (typ_rel Γ A) ->
-        (* {{ Γ ⊢ A ® P }} -> *)
-        (* {{ Γ ⊢ A ® glu_typ_top i a }} *)
-          (glu_typ_top pred_P s a Γ A)) /\
+        {{ Γ ⊢ A ® typ_rel }} ->
+        {{ Γ ⊢ A ® glu_typ_top pred_P s a }}) /\
       (forall Γ M A m,
           (** We repeat this to get the relation between [a] and [P]
               more easily after applying [induction 1.] *)
           {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
-          (glu_elem_bot pred_P s a Γ A M m) ->
-          (* {{ Γ ⊢ M : A ® m ∈ glu_elem_bot i a }} -> *)
-          (* {{ Γ ⊢ M : A ® ⇑ a m ∈ El }} *)
-          (exp_rel Γ A M d{{{ ⇑ a m }}})) /\
+          {{ Γ ⊢ M : A ® m ∈ glu_elem_bot pred_P s a }} ->
+          {{ Γ ⊢ M : A ® ⇑ a m ∈ exp_rel }}) /\
       (forall Γ M A m R,
           (** We repeat this to get the relation between [a] and [P]
               more easily after applying [induction 1.] *)
           {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
-          (exp_rel Γ A M m) ->
-          (* {{ Γ ⊢ M : A ® m ∈ El }} -> *)
+          {{ Γ ⊢ M : A ® m ∈ exp_rel }} ->
           {{ DF a ≈ a ∈ per_sort_elem pred_P s ↘ R }} ->
           {{ Dom m ≈ m ∈ R }} ->
-          (* {{ Γ ⊢ M : A ® m ∈ glu_elem_top i a }} *)
-          (glu_elem_top pred_P s a Γ A M m)).
+          {{ Γ ⊢ M : A ® m ∈ glu_elem_top pred_P s a }}).
 Proof.
   simpl. induction 1 using glu_sort_elem_ind.
   all:split; [| split]; intros;
