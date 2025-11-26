@@ -95,10 +95,16 @@ Proof.
   eassumption.
 Qed.
 
-Ltac invert_rel_exp_unsorted H :=
-  (unshelve (epose proof (rel_exp_unsorted_clean_inversion _ H); deex); shelve_unifiable; [eassumption |]; clear H)
+Ltac invert_rel_exp_unsorted_clean H :=
+  (unshelve (epose proof (rel_exp_unsorted_clean_inversion _ H); deex); shelve_unifiable; [eassumption |]; clear H).
+
+Tactic Notation "invert_rel_exp_unsorted" hyp(H) :=
+  invert_rel_exp_unsorted_clean H
   + dependent destruction H.
 
+Tactic Notation "invert_rel_exp_unsorted" hyp(H) simple_intropattern(l) :=
+  invert_rel_exp_unsorted_clean H
+  + (destruct H as [l [? H]]; deex_in H).
 
 Lemma rel_exp_implies_rel_exp_unsorted {P} {pred_P : PredicativeSig P} : forall {Γ M M' A},
     {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ M' : A }} ->
@@ -118,3 +124,137 @@ Qed.
 #[export]
 Hint Resolve rel_exp_implies_rel_exp_unsorted : mcpts.
 
+Lemma rel_sub_clean_inversion1_left {P} {pred_P : PredicativeSig P} : forall {Γ Γ' env_relΓ σ σ' Δ},
+    {{ EF Γ ≈ Γ' ∈ per_ctx_env pred_P ↘ env_relΓ }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Δ }} ->
+    exists env_relΔ,
+      {{ EF Δ ≈ Δ ∈ per_ctx_env pred_P ↘ env_relΔ }} /\
+        (forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}),
+            rel_sub σ ρ σ' ρ' env_relΔ).
+Proof.
+  intros * ? [].
+  destruct_conjs.
+  handle_per_ctx_env_irrel.
+  eexists; eexists; [eassumption |].
+  eassumption.
+Qed.
+
+Lemma rel_sub_clean_inversion1_right {P} {pred_P : PredicativeSig P} : forall {Γ Γ' env_relΓ σ σ' Δ},
+    {{ EF Γ' ≈ Γ ∈ per_ctx_env pred_P ↘ env_relΓ }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Δ }} ->
+    exists env_relΔ,
+      {{ EF Δ ≈ Δ ∈ per_ctx_env pred_P ↘ env_relΔ }} /\
+        (forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}),
+            rel_sub σ ρ σ' ρ' env_relΔ).
+Proof.
+  intros * ? [].
+  destruct_conjs.
+  handle_per_ctx_env_irrel.
+  eexists; eexists; [eassumption |].
+  eassumption.
+Qed.
+
+Lemma rel_sub_clean_inversion2_left {P} {pred_P : PredicativeSig P} : forall {Γ σ σ' Δ Δ' env_relΔ},
+    {{ EF Δ ≈ Δ' ∈ per_ctx_env pred_P ↘ env_relΔ }} ->
+    {{ ⟪ pred_P ⟫  Γ ⊨s σ ≈ σ' : Δ }} ->
+    exists env_relΓ,
+      {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_relΓ }} /\
+        (forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}),
+            rel_sub σ ρ σ' ρ' env_relΔ).
+Proof.
+  intros * ? [].
+  destruct_conjs.
+  handle_per_ctx_env_irrel.
+  eexists; eexists; [eassumption |].
+  eassumption.
+Qed.
+
+Lemma rel_sub_clean_inversion2_right {P} {pred_P : PredicativeSig P} : forall {Γ σ σ' Δ Δ' env_relΔ},
+    {{ EF Δ' ≈ Δ ∈ per_ctx_env pred_P ↘ env_relΔ }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Δ }} ->
+    exists env_relΓ,
+      {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_relΓ }} /\
+        (forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}),
+            rel_sub σ ρ σ' ρ' env_relΔ).
+Proof.
+  intros * ? [].
+  destruct_conjs.
+  handle_per_ctx_env_irrel.
+  eexists; eexists; [eassumption |].
+  eassumption.
+Qed.
+
+Lemma rel_sub_clean_inversion3_left_left {P} {pred_P : PredicativeSig P} : forall {Γ Γ' env_relΓ σ σ' Δ Δ' env_relΔ},
+    {{ EF Γ ≈ Γ' ∈ per_ctx_env pred_P ↘ env_relΓ }} ->
+    {{ EF Δ ≈ Δ' ∈ per_ctx_env pred_P ↘ env_relΔ }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Δ }} ->
+    forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}),
+      rel_sub σ ρ σ' ρ' env_relΔ.
+Proof.
+  intros * HΓ ?.
+  intros []%(rel_sub_clean_inversion1_left HΓ).
+  destruct_conjs.
+  handle_per_ctx_env_irrel.
+  eassumption.
+Qed.
+
+Lemma rel_sub_clean_inversion3_left_right {P} {pred_P : PredicativeSig P} : forall {Γ Γ' env_relΓ σ σ' Δ Δ' env_relΔ},
+    {{ EF Γ ≈ Γ' ∈ per_ctx_env pred_P ↘ env_relΓ }} ->
+    {{ EF Δ' ≈ Δ ∈ per_ctx_env pred_P ↘ env_relΔ }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Δ }} ->
+    forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}),
+      rel_sub σ ρ σ' ρ' env_relΔ.
+Proof.
+  intros * HΓ ?.
+  intros []%(rel_sub_clean_inversion1_left HΓ).
+  destruct_conjs.
+  handle_per_ctx_env_irrel.
+  eassumption.
+Qed.
+
+Lemma rel_sub_clean_inversion3_right_left {P} {pred_P : PredicativeSig P}  : forall {Γ Γ' env_relΓ σ σ' Δ Δ' env_relΔ},
+    {{ EF Γ' ≈ Γ ∈ per_ctx_env pred_P ↘ env_relΓ }} ->
+    {{ EF Δ ≈ Δ' ∈ per_ctx_env pred_P ↘ env_relΔ }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Δ }} ->
+    forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}),
+      rel_sub σ ρ σ' ρ' env_relΔ.
+Proof.
+  intros * HΓ ?.
+  intros []%(rel_sub_clean_inversion1_right HΓ).
+  destruct_conjs.
+  handle_per_ctx_env_irrel.
+  eassumption.
+Qed.
+
+Lemma rel_sub_clean_inversion3_right_right {P} {pred_P : PredicativeSig P} : forall {Γ Γ' env_relΓ σ σ' Δ Δ' env_relΔ},
+    {{ EF Γ' ≈ Γ ∈ per_ctx_env pred_P ↘ env_relΓ }} ->
+    {{ EF Δ' ≈ Δ ∈ per_ctx_env pred_P ↘ env_relΔ }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Δ }} ->
+    forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}),
+      rel_sub σ ρ σ' ρ' env_relΔ.
+Proof.
+  intros * HΓ ?.
+  intros []%(rel_sub_clean_inversion1_right HΓ).
+  destruct_conjs.
+  handle_per_ctx_env_irrel.
+  eassumption.
+Qed.
+
+Ltac invert_rel_sub_clean H :=
+  let H' := fresh "H" in
+  (unshelve (epose proof (rel_sub_clean_inversion3_left_left _ _ H) as H'); shelve_unifiable; [eassumption | eassumption |]; clear H)
+  + (unshelve (epose proof (rel_sub_clean_inversion3_left_right _ _ H) as H'); shelve_unifiable; [eassumption | eassumption |]; clear H)
+  + (unshelve (epose proof (rel_sub_clean_inversion3_right_left _ _ H) as H'); shelve_unifiable; [eassumption | eassumption |]; clear H)
+  + (unshelve (epose proof (rel_sub_clean_inversion3_right_right _ _ H) as H'); shelve_unifiable; [eassumption | eassumption |]; clear H)
+  + (unshelve (epose proof (rel_sub_clean_inversion2_left _ H) as H'; deex_in H'; destruct H'); shelve_unifiable; [eassumption |]; clear H)
+  + (unshelve (epose proof (rel_sub_clean_inversion2_right _ H) as H'; deex_in H'; destruct H'); shelve_unifiable; [eassumption |]; clear H)
+  + (unshelve (epose proof (rel_sub_clean_inversion1_left _ H) as H'; deex_in H'; destruct H'); shelve_unifiable; [eassumption |]; clear H)
+  + (unshelve (epose proof (rel_sub_clean_inversion1_right _ H) as H'; deex_in H'; destruct H'); shelve_unifiable; [eassumption |]; clear H).
+
+Tactic Notation "invert_rel_sub" hyp(H) :=
+  invert_rel_sub_clean H
+  + (simpl in H; unfold rel_sub_under_ctx in H; do 2 (deex_in H; destruct H as [? H])).
+
+Tactic Notation "invert_rel_sub" hyp(H) simple_intropattern(l) :=
+  invert_rel_sub_clean H
+  + (destruct H as [l [? H]]; deex_in H; destruct H as []).

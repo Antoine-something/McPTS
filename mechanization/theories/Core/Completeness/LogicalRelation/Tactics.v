@@ -8,6 +8,10 @@ Ltac eexists_rel_exp :=
   split; [eassumption |];
   eexists.
 
+Ltac eexists_rel_exp_untyped :=
+  eexists;
+  split; [eassumption |].
+
 Ltac eexists_rel_exp_with s :=
   eexists;
   split; [eassumption |];
