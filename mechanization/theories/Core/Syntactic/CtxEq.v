@@ -7,7 +7,7 @@ Import Syntax_Notations.
 Lemma ctx_eq_refl {P : PtsSig} : forall {Γ : ctx P}, {{ ⊢ Γ }} -> {{ ⊢ Γ ≈ Γ }}.
 Proof with mautosolve.
   induction 1; mauto 2.
-  econstructor; mauto 2.
+  econstructor; mauto 3.
 Qed.
 
 #[export]
@@ -63,7 +63,7 @@ Proof with mautosolve.
     
   
   (** Variable case *)
-  - assert (exists B, {{ #x : B ∈ Δ }} /\ {{ Γ ⊢ A ≈ B }} /\ {{ Δ ⊢ A ≈ B }} /\ {{ Δ ⊢ A }}) by mauto.
+  - assert (exists B s, {{ #x : B ∈ Δ }} /\ {{ Γ ⊢ A ≈ B }} /\ {{ Δ ⊢ A ≈ B }} /\ {{ Δ ⊢ A : Sort@s }}) by mauto.
     destruct_conjs.
     eapply wf_exp_conv; mauto 3.
 
@@ -113,14 +113,14 @@ Proof with mautosolve.
     mauto 2.
 
   (** Variable reflexivity case *)
-  - assert (exists B, {{ #x : B ∈ Δ }} /\ {{ Γ ⊢ A ≈ B }} /\ {{ Δ ⊢ A ≈ B }} /\ {{ Δ ⊢ A }}) by mauto.
+  - assert (exists B s, {{ #x : B ∈ Δ }} /\ {{ Γ ⊢ A ≈ B }} /\ {{ Δ ⊢ A ≈ B }} /\ {{ Δ ⊢ A : Sort@s }}) by mauto.
     destruct_conjs.
     eapply wf_exp_eq_conv; mauto.
 
   (** Variable weakening case *)
   - inversion_clear HΓΔ.
     assert {{ ⊢ Γ1, A0 }} by (econstructor; mauto 3).
-    assert (exists B1, {{ #x : B1 ∈ Γ1 }} /\ {{ Γ0 ⊢ B ≈ B1 }} /\ {{ Γ1 ⊢ B ≈ B1 }} /\ {{ Γ1 ⊢ B }}) by mauto.
+    assert (exists B1 s', {{ #x : B1 ∈ Γ1 }} /\ {{ Γ0 ⊢ B ≈ B1 }} /\ {{ Γ1 ⊢ B ≈ B1 }} /\ {{ Γ1 ⊢ B : Sort@s' }}) by mauto.
     destruct_conjs.
     eapply wf_exp_eq_conv; mauto 4.
 
@@ -174,11 +174,14 @@ Lemma ctx_eq_trans {P : PtsSig} : forall {Γ0 Γ1 Γ2 : ctx P}, {{ ⊢ Γ0 ≈ �
 Proof with mautosolve.
   intros * HΓ01.
   gen Γ2.  
-  induction HΓ01 as [|Γ0 ? T0 T1]; mauto.
-  inversion_clear 1 as [|? Γ2' ? T2].
+  induction HΓ01 as [|Γ0 ? s01 T0 s01' T1]; mauto.
+  inversion_clear 1 as [|? Γ2' s12 ? s12' T2].
   clear Γ2; rename Γ2' into Γ2.
-  assert {{ ⊢ Γ0 ≈ Γ2 }} by mauto. 
-  assert {{ Γ0 ⊢ T0 ≈ T2 }} by (transitivity {{{ T1 }}}; mauto 3).
+  assert {{ ⊢ Γ0 ≈ Γ2 }} by mauto.
+  assert {{ Γ0 ⊢ T2 : Sort@s12' }} by mauto 3.
+  assert {{ Γ2 ⊢ T0 : Sort@s01 }} by mauto 3.
+  assert {{ Γ0 ⊢ T0 ≈ T2 }} by (transitivity T1; mauto 4).
+  assert {{ Γ2 ⊢ T0 ≈ T2 }} by (transitivity T1; mauto 4).
   econstructor; mauto 3.
 Qed.
 

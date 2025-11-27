@@ -26,9 +26,10 @@ Section completeness_fundamental.
   Proof using Type.
     apply syntactic_wf_mut_ind;
       mauto 3.
+    
     intros.
     eapply valid_exp_var;
-      mauto.
+      mauto.      
   Qed.
 
   #[local]

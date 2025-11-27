@@ -49,9 +49,9 @@ Qed.
 #[export]
 Hint Resolve rel_sub_compose_cong : mcpts.
 
-Lemma rel_sub_extend_cong {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M M' σ σ' Δ A},
+Lemma rel_sub_extend_cong {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M M' σ σ' Δ A s},
     {{ ⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Δ }} ->
-    {{ ⟪ pred_P ⟫ Δ ⊨ A }} ->
+    {{ ⟪ pred_P ⟫ Δ ⊨u A : Sort@s }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : A[σ] }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨s σ ,, M ≈ σ' ,, M' : Δ, A }}.
 Proof with mautosolve.
@@ -85,42 +85,42 @@ Qed.
 Hint Resolve rel_sub_extend_cong : mcpts.
 
 
-(* Lemma rel_sub_extend_cong_unsorted {P : PtsSig} {pred_P : PredicativeSig P} : forall {s Γ M M' σ σ' Δ A}, *)
-(*     {{ ⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Δ }} -> *)
-(*     {{ ⟪ pred_P ⟫ Δ ⊨ A }} -> *)
-(*     {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : A[σ] }} -> *)
-(*     {{ ⟪ pred_P ⟫ Γ ⊨s σ ,, M ≈ σ' ,, M' : Δ, A::Sort@s }}. *)
-(* Proof with mautosolve. *)
-(*   intros * [env_relΓ [? [env_relΔ]]] HA []. *)
-(*   destruct_conjs. *)
-(*   pose env_relΓ. *)
-(*   pose env_relΔ. *)
-(*   assert {{ ⟪ pred_P ⟫ ⊨ Δ, A::Sort@s }} as [] by (eapply rel_ctx_extend_unsorted; eauto; eexists; mauto). *)
-(*   handle_per_ctx_env_irrel. *)
-(*   eexists_rel_sub. *)
-(*   invert_per_ctx_envs_unsorted. *)
-(*   handle_per_ctx_env_irrel. *)
-(*   intros. *)
-(*   (on_all_hyp: destruct_rel_by_assumption env_relΓ). *)
-(*   (on_all_hyp: destruct_rel_by_assumption env_relΔ). *)
-(*   destruct_by_head (@rel_typ_unsorted P). *)
+Lemma rel_sub_extend_cong_sorted {P : PtsSig} {pred_P : PredicativeSig P} : forall {s Γ M M' σ σ' Δ A},
+    {{ ⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Δ }} ->
+    {{ ⟪ pred_P ⟫ Δ ⊨u A : Sort@s }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : A[σ] }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨s σ ,, M ≈ σ' ,, M' : Δ, A }}.
+Proof with mautosolve.
+  intros * [env_relΓ [? [env_relΔ]]] [] [].
+  destruct_conjs.
+  pose env_relΓ.
+  pose env_relΔ.
+  assert {{ ⟪ pred_P ⟫ ⊨ Δ, A }} as [] by (eapply rel_ctx_extend; eauto; eexists; mauto).
+  handle_per_ctx_env_irrel.
+  eexists_rel_sub.
+  invert_per_ctx_envs_unsorted.
+  handle_per_ctx_env_irrel.
+  intros.
+  (on_all_hyp: destruct_rel_by_assumption env_relΓ).
+  (on_all_hyp: destruct_rel_by_assumption env_relΔ).
+  destruct_by_head (@rel_typ_unsorted P).
 
-(*   simplify_evals. *)
-(*   match_by_head (@per_typ_elem P) ltac:(fun H => directed inversion_clear H); subst. *)
-(*   clear_dups. *)
-(*   clear_refl_eqs. *)
-(*   handle_per_typ_elem_irrel. *)
-(*   clear_dups. *)
+  simplify_evals.
+  match_by_head (@per_typ_elem P) ltac:(fun H => directed inversion_clear H); subst.
+  clear_dups.
+  clear_refl_eqs.
+  handle_per_typ_elem_irrel.
+  clear_dups.
   
-(*   destruct_by_head (@rel_exp P). *)
-(*   econstructor; mauto. *)
-(*   econstructor; mauto; *)
-(*     econstructor; mauto; *)
-(*     econstructor; mauto. *)
-(* Qed. *)
+  destruct_by_head (@rel_exp P).
+  econstructor; mauto.
+  econstructor; mauto;
+    econstructor; mauto;
+    econstructor; mauto.
+Qed.
 
-(* #[export] *)
-(* Hint Resolve rel_sub_extend_cong_unsorted : mcpts. *)
+#[export]
+Hint Resolve rel_sub_extend_cong_sorted : mcpts.
 
 
 Lemma rel_sub_id_compose_right {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ σ Δ},
@@ -173,9 +173,9 @@ Qed.
 #[export]
 Hint Resolve rel_sub_compose_assoc : mcpts.
 
-Lemma rel_sub_extend_compose {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ τ Γ' M σ Γ'' A},
+Lemma rel_sub_extend_compose {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ τ Γ' M σ Γ'' A s},
     {{ ⟪ pred_P ⟫ Γ' ⊨s σ : Γ'' }} ->
-    {{ ⟪ pred_P ⟫ Γ'' ⊨ A }} ->
+    {{ ⟪ pred_P ⟫ Γ'' ⊨u A : Sort@s }} ->
     {{ ⟪ pred_P ⟫ Γ' ⊨u M : A[σ] }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨s τ : Γ' }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨s (σ ,, M) ∘ τ ≈ (σ ∘ τ) ,, M[τ] : Γ'', A }}.

@@ -52,12 +52,12 @@ Hint Resolve rel_ctx_empty : mcpts.
 (* Qed. *)
 
 
-Lemma rel_ctx_extend {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ Γ' A A'},
+Lemma rel_ctx_extend {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ Γ' A A' s},
     {{ ⟪ pred_P ⟫ ⊨ Γ ≈ Γ' }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊨ A ≈ A' }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨u A ≈ A' : Sort@s }} ->
     {{ ⟪ pred_P ⟫ ⊨ Γ, A ≈ Γ', A' }}.
 Proof with intuition.
-  intros * [] [env_relΓ]%rel_exp_of_typ_unsorted_inversion1.
+  intros * [] [env_relΓ]%rel_exp_unsorted_of_typ_inversion1.
   pose env_relΓ.
   destruct_conjs.
   handle_per_ctx_env_irrel.
@@ -71,16 +71,58 @@ Proof with intuition.
     (on_all_hyp: destruct_rel_by_assumption env_relΓ).
     match_by_head (@per_typ P) ltac:(fun H => destruct H as [elem_relA]).
     econstructor; eauto.
+    destruct H4.
+    assert (per_typ_elem pred_P x m m') by mauto 4.
     apply -> per_typ_elem_morphism_iff; eauto.
     split; intros; destruct_by_head (@rel_typ_unsorted P); handle_per_typ_elem_irrel...
-    assert (rel_typ_unsorted pred_P A ρ A' ρ' elem_relA) by mauto.
+    assert (rel_typ_unsorted pred_P A ρ A' ρ' x) by mauto.
     intuition.
   - apply Equivalence_Reflexive.
 Qed.
 
+Lemma rel_ctx_extend_het {P} {pred_P : PredicativeSig P} : forall {Γ Δ A A' s s'},
+    {{ ⟪ pred_P ⟫ ⊨ Γ ≈ Δ }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨u A : Sort@s }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨u A' : Sort@s' }} ->
+    {{ ⟪ pred_P ⟫ Δ ⊨u A : Sort@s }} ->
+    {{ ⟪ pred_P ⟫ Δ ⊨u A' : Sort@s' }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨ A ≈ A' }} ->
+    {{ ⟪ pred_P ⟫ Δ ⊨ A ≈ A' }} ->
+    {{ ⟪ pred_P ⟫ ⊨ Γ,A ≈ Δ,A' }}.
+Proof.
+  intros * [] [env_relΓ]%rel_exp_unsorted_of_typ_inversion1 []%rel_exp_unsorted_of_typ_inversion1
+             [env_relΔ]%rel_exp_unsorted_of_typ_inversion1 []%rel_exp_unsorted_of_typ_inversion1
+             []%rel_exp_of_typ_unsorted_inversion1 []%rel_exp_of_typ_unsorted_inversion1.
+  destruct_conjs.
+  handle_per_ctx_env_irrel.
+  eexists.
+  per_ctx_env_econstructor; eauto.
+  - instantiate (1 := fun ρ ρ' (equiv_ρ_ρ' : x ρ ρ') m m' =>
+                        forall R,
+                          rel_typ_unsorted pred_P A ρ A' ρ' R ->
+                          R m m').
+    intros.
+    (on_all_hyp: destruct_rel_by_assumption x).
+    match_by_head (@per_typ P) ltac:(fun H => destruct H as [elem_relA]).
+    econstructor; eauto.
+    destruct_by_head (@per_sort P).
+    simplify_evals.
+    assert (per_typ_elem pred_P x1 m0 m') by mauto 3.
+    assert (per_typ_elem pred_P x0 m m'1) by mauto 3.
+    handle_per_typ_elem_irrel.
+    apply -> per_typ_elem_morphism_iff; [apply H2 | reflexivity | reflexivity |].
+    
+    (* apply -> per_typ_elem_morphism_iff; eauto. *)
+    split; intros; destruct_by_head (@rel_typ_unsorted P); handle_per_typ_elem_irrel;
+      assert (rel_typ_unsorted pred_P A ρ A' ρ' elem_relA) by mauto;
+      intuition.
+    
+  - apply Equivalence_Reflexive.
+Qed.
 
-Lemma rel_ctx_extend' {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ A},
-    {{ ⟪ pred_P ⟫ Γ ⊨ A }} ->
+Lemma rel_ctx_extend' {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ A s},
+      
+    {{ ⟪ pred_P ⟫ Γ ⊨u A : Sort@s }} ->
     {{ ⟪ pred_P ⟫ ⊨ Γ, A }}.
 Proof.
   intros.
@@ -90,4 +132,4 @@ Proof.
 Qed.
 
 #[export]
-Hint Resolve rel_ctx_extend rel_ctx_extend' : mcpts.
+Hint Resolve rel_ctx_extend rel_ctx_extend_het rel_ctx_extend' : mcpts.

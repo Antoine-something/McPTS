@@ -16,7 +16,6 @@ Proof with mautosolve.
   destruct_conjs.
   functional_initial_env_rewrite_clear.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head (@rel_typ P).
   destruct_by_head (@rel_typ_unsorted P).
   functional_eval_rewrite_clear.
   destruct_by_head (@rel_exp P).  
@@ -29,4 +28,21 @@ Lemma completeness_ty {P} {pred_P : PredicativeSig P} : forall {Γ : ctx P} {s A
 Proof.
   intros * [? [?%nbe_type_to_nbe_ty ?%nbe_type_to_nbe_ty]]%(@completeness P pred_P).
   mauto 3.
+Qed.
+
+Lemma completeness_typ_unsorted {P} {pred_P : PredicativeSig P} : forall {Γ : ctx P} {A A'},
+    {{ Γ ⊢ A ≈ A' }} ->
+    exists W, nbe_ty Γ A W /\ nbe_ty Γ A' W.
+Proof.
+  intros * [env_relΓ]%(@completeness_fundamental_typ_eq P pred_P).
+  destruct_conjs.
+  assert (exists p p', initial_env Γ p /\ initial_env Γ p' /\ {{ Dom p ≈ p' ∈ env_relΓ }}) as [p] by (eauto using per_ctx_then_per_env_initial_env).  
+  destruct_conjs.
+  functional_initial_env_rewrite_clear.
+  (on_all_hyp: destruct_rel_by_assumption env_relΓ).
+  destruct_by_head (@rel_typ_unsorted P).
+  assert (per_top_typ a a') by mauto 2.
+  destruct (H6 (length Γ)) as [W []].
+  exists W.
+  split; econstructor; mauto.
 Qed.

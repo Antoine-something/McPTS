@@ -53,14 +53,14 @@ Hint Resolve wf_exp_eq_conv' : mcpts.
 Remove Hints wf_exp_eq_conv : mcpts.
 
 
-Corollary wf_ctx_eq_extend' {P : PtsSig} : forall {Γ : ctx P} {Δ A A'},
+Corollary wf_ctx_eq_extend' {P : PtsSig} : forall {Γ : ctx P} {Δ A A' s},
     {{ ⊢ Γ ≈ Δ }} ->
-    {{ Γ ⊢ A ≈ A' }} ->
+    {{ Γ ⊢ A ≈ A' : Sort@s }} ->
     {{ ⊢ Γ, A ≈ Δ, A' }}.
 Proof.
   intros.
   gen_presups.
-  econstructor; mauto 2.
+  econstructor; mauto 3.
 Qed.
 
 #[export]
