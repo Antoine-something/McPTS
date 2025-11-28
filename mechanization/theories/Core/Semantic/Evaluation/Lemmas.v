@@ -76,6 +76,7 @@ Section functional_eval.
       e1 = e2.
   Proof.
     pose proof @functional_eval P; intuition.
+    eapply H; mauto 2.
   Qed.
 
   Corollary functional_eval_natrec {P : PtsSig} : forall (A : exp P) MZ MS m ρ e1 e2,

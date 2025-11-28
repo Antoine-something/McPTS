@@ -70,8 +70,8 @@ Proof with mautosolve.
   (** Natural recursion case **)
   - assert {{ Δ ⊢ MZ : B[Id,,zero] }} by mauto.
     assert {{ Δ ⊢ M0 : ℕ }} by mauto.
-    assert {{ ⊢ Δ, ℕ ≈ Γ, ℕ }} by (econstructor; mauto).
-    assert {{ ⊢ Δ, ℕ, B ≈ Γ, ℕ, B }} by (econstructor; mauto).
+    assert {{ ⊢ Δ, ℕ ≈ Γ, ℕ }} by (econstructor; mauto 4).
+    assert {{ ⊢ Δ, ℕ, B ≈ Γ, ℕ, B }} by (econstructor; mauto 4).
     assert {{ Δ, ℕ, B ⊢ MS : B[Wk∘Wk,,succ #1] }} by mauto.
     mauto.
 
@@ -123,22 +123,22 @@ Proof with mautosolve.
   (** Natural recursion congruence case **)
   - assert {{ Δ ⊢ MZ ≈ MZ' : B[Id,,zero] }} by mauto.
     assert {{ Δ ⊢ M0 ≈ M'0 : ℕ }} by mauto.
-    assert {{ ⊢ Δ, ℕ ≈ Γ, ℕ }} by (econstructor; mauto).
-    assert {{ ⊢ Δ, ℕ, B ≈ Γ, ℕ, B }} by (econstructor; mauto).
+    assert {{ ⊢ Δ, ℕ ≈ Γ, ℕ }} by (econstructor; mauto 4).
+    assert {{ ⊢ Δ, ℕ, B ≈ Γ, ℕ, B }} by (econstructor; mauto 4).
     assert {{ Δ, ℕ, B ⊢ MS ≈ MS' : B[Wk∘Wk,,succ #1] }} by mauto.
     mauto.
 
   (** Natural recursion base case **)
-  - assert {{ ⊢ Δ, ℕ ≈ Γ, ℕ }} by (econstructor; mauto).
-    assert {{ ⊢ Δ, ℕ, B ≈ Γ, ℕ, B }} by (econstructor; mauto).
-    assert {{ Δ, ℕ ⊢ B }} by mauto.
+  - assert {{ ⊢ Δ, ℕ ≈ Γ, ℕ }} by (econstructor; mauto 4).
+    assert {{ ⊢ Δ, ℕ, B ≈ Γ, ℕ, B }} by (econstructor; mauto 4).
+    assert {{ Δ, ℕ ⊢ B : Sort@s' }} by mauto.
     assert {{ Δ ⊢ M' : B[Id,,zero] }} by mauto.
     assert {{ Δ, ℕ, B ⊢ MS : B[Wk∘Wk,,succ #1] }} by mauto.
     mauto.
 
   (** Natural recursion succ case **)
-  - assert {{ ⊢ Δ, ℕ ≈ Γ, ℕ }} by (econstructor; mauto).
-    assert {{ ⊢ Δ, ℕ, B ≈ Γ, ℕ, B }} by (econstructor; mauto).
+  - assert {{ ⊢ Δ, ℕ ≈ Γ, ℕ }} by (econstructor; mauto 4).
+    assert {{ ⊢ Δ, ℕ, B ≈ Γ, ℕ, B }} by (econstructor; mauto 4).
     assert {{ Δ ⊢ M0 : ℕ }} by mauto.
     assert {{ Δ, ℕ, B ⊢ MS : B[Wk∘Wk,,succ #1] }} by mauto.
     mauto.
@@ -168,8 +168,6 @@ Proof with mautosolve.
   (** Id expansion cases (only weakening reflexivity) *)
   - inversion_clear HΓΔ.
     mauto.
-
-  (** Natural recursion **)
 Qed.  (* I don't know why this Qed takes so long to check *)
 
 

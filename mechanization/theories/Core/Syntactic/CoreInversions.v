@@ -153,13 +153,13 @@ Proof with mautosolve.
   intros * H.
   dependent induction H.
   - do 3 (eexists; mauto).
-    eapply wf_typ_eq_refl. mauto.
+    eapply wf_typ_eq_refl.
+    assert {{ Γ, ℕ ⊢ A' }}; mauto 2.
+    assert {{ Γ ⊢s Id,,M : Γ, ℕ }} by mauto 4.
+    mauto 2.
   - specialize (IHwf_exp A0 M A' MZ MS ltac:(reflexivity) ltac:(reflexivity)).
     destruct_conjs.
-    eexists. mauto.
-    eexists. mauto.
-    eexists. mauto.
-    mauto.
+    repeat split; mauto.
 Qed.
     
 #[export]

@@ -564,7 +564,7 @@ Proof.
     + eapply rel_exp_pi_core; mauto; [|reflexivity].
       intros.
       eapply H2; mauto.
-      econstructor; mauto; [econstructor; mauto | econstructor; mauto |].
+      econstructor; mauto.
       assert (per_typ_elem pred_P x m m') by mauto.
       handle_per_typ_elem_irrel.
       eassumption.
@@ -664,8 +664,6 @@ Proof with mautosolve.
       assert (exists R'', per_sort_elem pred_P s1 R'' a a') by mauto.
       destruct_conjs.
       econstructor; mauto.
-      econstructor; mauto.
-      econstructor; mauto.
       simpl; mauto.
       handle_per_sort_elem_irrel.
       handle_per_typ_elem_irrel.
@@ -696,8 +694,6 @@ Proof with mautosolve.
   - intros.
     assert (Hequiv : {{ Dom ρ ↦ c ≈ ρ' ↦ c' ∈ (cons_per_ctx_env env_relΓ elem_relA) }}).
     {
-      econstructor; mauto.
-      econstructor; mauto.
       econstructor; mauto.
       simpl; mauto.
       handle_per_sort_elem_irrel.
@@ -773,7 +769,7 @@ Proof with mautosolve.
     assert (Hequiv : {{ Dom ρσ ↦ c ≈ ρ'σ' ↦ c' ∈ env_relΔA }}).
     {
       apply_relation_equivalence.
-      econstructor; mauto; [econstructor; mauto | econstructor; mauto|].
+      econstructor; mauto.
       simpl; mauto.
       handle_per_typ_elem_irrel.
       eapply H17; mauto.      
@@ -787,13 +783,7 @@ Proof with mautosolve.
                        
     econstructor; eauto.
     
-    assert (rel_exp B d{{{ ρσ ↦ c }}} B d{{{ ρ'σ' ↦ c' }}} (per_sort pred_P s2)).
-    {
-      eapply H4; mauto.
-      apply_relation_equivalence.
-      econstructor; mauto;
-        econstructor; mauto.
-    }
+    assert (rel_exp B d{{{ ρσ ↦ c }}} B d{{{ ρ'σ' ↦ c' }}} (per_sort pred_P s2)) by mauto.
     destruct_by_head (@rel_exp P).
     functional_eval_rewrite_clear.
     assumption.
@@ -804,7 +794,7 @@ Proof with mautosolve.
     assert (Hequiv : {{ Dom ρσ ↦ c ≈ ρ'σ' ↦ c' ∈ env_relΔA }}).
     {
       apply_relation_equivalence.
-      econstructor; mauto; [econstructor; mauto | econstructor; mauto|].
+      econstructor; mauto.
       simpl; mauto.
       handle_per_sort_elem_irrel.
       apply_relation_equivalence.

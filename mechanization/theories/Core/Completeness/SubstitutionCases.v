@@ -71,7 +71,7 @@ Proof with mautosolve.
   invert_rel_typ_body.
   destruct_by_head (@rel_exp P).
   econstructor; mauto.
-  econstructor; mauto; [econstructor; mauto | econstructor; mauto|].
+  econstructor; mauto.
   assert (rel_typ_unsorted pred_P A ρ'0 A ρ'σ' (head_rel ρ'0 ρ'σ' H10)) by mauto.
   destruct_by_head (@rel_typ_unsorted P).
   simplify_evals.
@@ -206,10 +206,6 @@ Proof with mautosolve.
   
   destruct_by_head (@rel_exp P).
   econstructor; mauto.
-
-  econstructor; mauto;
-    econstructor; mauto;
-    econstructor; mauto.
 Qed.
 
 #[export]

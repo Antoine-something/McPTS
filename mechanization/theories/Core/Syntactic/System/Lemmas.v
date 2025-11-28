@@ -1356,7 +1356,8 @@ Lemma presup_exp_typ {P : PtsSig} : forall {Γ : ctx P} {M A},
     {{ Γ ⊢ A }}.
 Proof.
   induction 1; assert {{ ⊢ Γ }} by mauto 3; destruct_conjs; mauto 3.
-  enough {{ Γ ⊢s Id,,N : Γ, A }}; mauto 3.
+  - enough {{ Γ ⊢s Id,,N : Γ, A }}; mauto 3.
+  - enough {{ Γ ⊢s Id,,M : Γ, ℕ }}; mauto 3.
 Qed.
 
 Lemma presup_exp {P : PtsSig} : forall {Γ : ctx P} {M A},

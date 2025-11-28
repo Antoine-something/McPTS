@@ -19,6 +19,9 @@ Inductive env_lookup {P : PtsSig} : env P -> nat -> domain P -> Prop :=
                {{ (ρ ↦ n)[S i] ↘ m }})
 where "ρ '[' n ']' ↘ m" := (env_lookup ρ n m) (in custom judg).
 
+#[export]
+Hint Constructors env_lookup : mcpts.
+
 Inductive eval_exp {P : PtsSig} : exp P -> env P -> domain P -> Prop :=
 | eval_exp_typ :
   `( {{ ⟦ Sort@s ⟧ ρ ↘ Sort@s }} )

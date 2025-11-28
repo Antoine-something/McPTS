@@ -77,7 +77,7 @@ with wf_exp {P : PtsSig} : ctx P -> typ P -> exp P -> Prop :=
         {{ Γ ⊢ succ M : ℕ}} )
 | wf_natrec :
   `( forall (r : Ru_nat P s),
-        {{ Γ, ℕ ⊢ A }} ->
+        {{ Γ, ℕ ⊢ A : Sort@s' }} ->
         {{ Γ ⊢ MZ : A[Id,,zero] }} ->
         {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
         {{ Γ ⊢ M : ℕ}} ->
@@ -237,7 +237,8 @@ with wf_exp_eq {P : PtsSig} : ctx P -> typ P -> exp P -> exp P -> Prop :=
         {{ Γ ⊢ succ M ≈ succ M' : ℕ}} )
 | wf_exp_eq_natrec_cong :
   `( forall (r : Ru_nat P s),
-        {{ Γ, ℕ ⊢ A }} ->
+        {{ Γ, ℕ ⊢ A : Sort@s' }} ->
+        {{ Γ, ℕ ⊢ A' : Sort@s' }} -> 
         {{ Γ, ℕ ⊢ A ≈ A' }} ->
         {{ Γ ⊢ MZ ≈ MZ' : A[Id,,zero] }} ->
         {{ Γ, ℕ, A ⊢ MS ≈ MS' : A[Wk∘Wk,,succ #1] }} ->
@@ -246,20 +247,20 @@ with wf_exp_eq {P : PtsSig} : ctx P -> typ P -> exp P -> exp P -> Prop :=
 | wf_exp_eq_natrec_sub :
   `( forall (r : Ru_nat P s),
        {{ Γ ⊢s σ : Δ }} ->
-       {{ Δ, ℕ ⊢ A }} ->
+       {{ Δ, ℕ ⊢ A : Sort@s' }} ->
        {{ Δ ⊢ MZ : A[Id,,zero] }} ->
        {{ Δ, ℕ, A ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
        {{ Δ ⊢ M : ℕ}} ->
        {{ Γ ⊢ rec M return A | zero -> MZ | succ -> MS end[σ] ≈ rec M[σ] return A[q σ] | zero -> MZ[σ] | succ -> MS[q (q σ)] end : A[σ,,M[σ]] }} )
 | wf_exp_eq_nat_beta_zero :
   `( forall (r : Ru_nat P s),
-        {{ Γ, ℕ ⊢ A }} ->
+        {{ Γ, ℕ ⊢ A : Sort@s' }} ->
         {{ Γ ⊢ MZ : A[Id,,zero] }} ->
         {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
         {{ Γ ⊢ rec zero return A | zero -> MZ | succ -> MS end ≈ MZ : A[Id,,zero] }} )
 | wf_exp_eq_nat_beta_succ :
   `( forall (r : Ru_nat P s),
-        {{ Γ, ℕ ⊢ A }} ->
+        {{ Γ, ℕ ⊢ A : Sort@s' }} ->
         {{ Γ ⊢ MZ : A[Id,,zero] }} ->
         {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
         {{ Γ ⊢ M : ℕ}} ->

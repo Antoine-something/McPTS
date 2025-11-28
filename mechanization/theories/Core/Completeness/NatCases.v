@@ -322,7 +322,7 @@ Ltac invert_rel_exp_of_typ_unsorted_2 H l :=
 Lemma eval_natrec_sub_neut {P} {pred_P : PredicativeSig P} : forall {Γ env_relΓ σ Δ env_relΔ MZ MZ' MS MS' A A' s m m' },
     {{ DF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_relΓ }} ->
     {{ DF Δ ≈ Δ ∈ per_ctx_env pred_P ↘ env_relΔ }} ->
-    {{ ⟪ pred_P ⟫ Δ, ℕ ⊨ A ≈ A' : Sort@s }} ->
+    {{ ⟪ pred_P ⟫ Δ, ℕ ⊨u A ≈ A' : Sort@s }} ->
     {{ ⟪ pred_P ⟫ Δ ⊨u MZ ≈ MZ' : A[Id,,zero] }} ->
     {{ ⟪ pred_P ⟫ Δ, ℕ, A ⊨u MS ≈ MS' : A[Wk∘Wk,,succ(#1)] }} ->
     {{ Dom m ≈ m' ∈ per_bot }} ->
@@ -364,15 +364,39 @@ Proof.
   end.
   intro t.
   assert {{ Dom ⇑! ℕ t ≈ ⇑! ℕ t ∈ (@per_nat P) }} by mauto.
-  assert {{ Dom ρσ ↦ ⇑! ℕ t ≈ ρ'σ ↦ ⇑! ℕ t ∈ env_relΔℕ }} as HinΔℕs by (admit).
+  
+  invert_per_sort_elem H12.   (* This line gets you the assumption that head_rel0 <~> per_nat *)
+  
+  assert {{ Dom ρσ ↦ ⇑! ℕ t ≈ ρ'σ ↦ ⇑! ℕ t ∈ env_relΔℕ }} as HinΔℕs.
+  {
+    (* This block seems to solve all the problematic admits *)
+    apply_relation_equivalence; econstructor; mauto 2.
+    eapply H11; mauto.  (* Not sure why the relation equivalence is not applied directly by mauto *)
+  }
   (on_all_hyp: fun H => destruct (H _ _ HinΔℕs)).
   assert {{ Dom succ (⇑! ℕ t) ≈ succ (⇑! ℕ t) ∈ per_nat }} by mauto.
-  assert {{ Dom ρσ ↦ succ (⇑! ℕ t) ≈ ρ'σ ↦ succ (⇑! ℕ t) ∈ env_relΔℕ }} as HinΔℕsuccs by (admit).
+  assert {{ Dom ρσ ↦ succ (⇑! ℕ t) ≈ ρ'σ ↦ succ (⇑! ℕ t) ∈ env_relΔℕ }} as HinΔℕsuccs.
+  {
+    apply_relation_equivalence; econstructor; mauto 2.
+    eapply H11; mauto.
+  }
   (on_all_hyp: fun H => destruct (H _ _ HinΔℕsuccs)).
-  assert {{ Dom ρσ ↦ ⇑! ℕ t ≈ ρ'σ ↦ ⇑! ℕ t ∈ env_relΔℕ }} as HinΔℕs' by (admit).
-  assert {{ Dom ρσ ↦ succ (⇑! ℕ t) ≈ ρ'σ ↦ succ (⇑! ℕ t) ∈ env_relΔℕ }} as HinΔℕsuccs' by (admit).
+  assert {{ Dom ρσ ↦ ⇑! ℕ t ≈ ρ'σ ↦ ⇑! ℕ t ∈ env_relΔℕ }} as HinΔℕs'.
+  {
+    apply_relation_equivalence; econstructor; mauto 2.
+    eapply H11; mauto.
+  }
+  assert {{ Dom ρσ ↦ succ (⇑! ℕ t) ≈ ρ'σ ↦ succ (⇑! ℕ t) ∈ env_relΔℕ }} as HinΔℕsuccs'.
+  {
+    apply_relation_equivalence; econstructor; mauto 2.
+    eapply H11; mauto.
+  }
   assert {{ Dom zero ≈ zero ∈ (@per_nat P) }}  by econstructor.
-  assert {{ Dom ρσ ↦ zero ≈ ρ'σ ↦ zero ∈ env_relΔℕ }} as HinΔℕz by (admit).
+  assert {{ Dom ρσ ↦ zero ≈ ρ'σ ↦ zero ∈ env_relΔℕ }} as HinΔℕz.
+  {
+    apply_relation_equivalence; econstructor; mauto 2.
+    eapply H11; mauto.
+  }
   apply_relation_equivalence.
   (on_all_hyp: fun H => destruct (H _ _ HinΔℕs')).
   (on_all_hyp: fun H => destruct (H _ _ HinΔℕsuccs')).

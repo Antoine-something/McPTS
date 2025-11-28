@@ -191,7 +191,7 @@ Proof.
     apply_relation_equivalence.
     (* eexists. *)
     
-    econstructor; mauto;[ econstructor; mauto | econstructor; mauto |].
+    econstructor; mauto.
     
     eapply per_bot_then_per_typ_elem; eauto.
     erewrite per_ctx_respects_length; mauto.

@@ -1089,7 +1089,7 @@ Proof with (destruct_rel_typ; handle_per_sort_elem_irrel; eexists; intuition).
     inversion_clear H8.
     simplify_evals.
     handle_per_typ_elem_irrel.
-    econstructor; mauto; [econstructor; mauto | econstructor; mauto |].
+    econstructor; mauto.
     eapply H1.
     eassumption.
 
@@ -1100,7 +1100,7 @@ Proof with (destruct_rel_typ; handle_per_sort_elem_irrel; eexists; intuition).
     inversion_clear H8.
     simplify_evals.
     handle_per_typ_elem_irrel.
-    econstructor; mauto; [econstructor; mauto | econstructor; mauto |].
+    econstructor; mauto.
     eapply H1.
     eassumption.
 Qed.

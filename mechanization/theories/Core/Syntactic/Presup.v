@@ -309,10 +309,10 @@ Qed.
 #[local]
   Hint Resolve presup_exp_eq_sub_compose_right : mcpts.
 
-Lemma presup_exp_eq_natrec_cong_right {P} : forall {Γ : ctx P} {A A' MZ' MS' M M' s} {r : Ru_nat P s},
+Lemma presup_exp_eq_natrec_cong_right {P} : forall {Γ : ctx P} {A A' MZ' MS' M M' s s'} {r : Ru_nat P s},
     {{ ⊢ Γ, ℕ }} ->
-    {{ Γ, ℕ ⊢ A }} ->
-    {{ Γ, ℕ ⊢ A' }} ->
+    {{ Γ, ℕ ⊢ A : Sort@s' }} ->
+    {{ Γ, ℕ ⊢ A' : Sort@s' }} ->
     {{ Γ, ℕ ⊢ A ≈ A' }} ->
     {{ ⊢ Γ }} ->
     {{ Γ ⊢ MZ' : A[Id,,zero] }} ->
@@ -325,17 +325,18 @@ Lemma presup_exp_eq_natrec_cong_right {P} : forall {Γ : ctx P} {A A' MZ' MS' M 
     {{ Γ ⊢ rec M' return A' | zero -> MZ' | succ -> MS' end : A[Id,,M] }}.
 Proof.
   intros.
+  assert {{ Γ, ℕ ⊢ A }} by mauto 3.
+  assert {{ Γ, ℕ ⊢ A' }} by mauto 3.
   assert {{ Γ ⊢s Id,,M : Γ, ℕ }} by mauto 3.
   assert {{ Γ ⊢s Id,,M' : Γ, ℕ }} by mauto 3.
   assert {{ Γ ⊢s Id,,M ≈ Id,,M' : Γ, ℕ }} by mauto 3.
   assert {{ Γ ⊢ A[Id,,M] ≈ A'[Id,,M'] }} by (transitivity {{{ A[Id,,M'] }}}; mauto).
   assert {{ Γ ⊢s Id,,zero : Γ, ℕ }} by mauto 4.
   assert {{ Γ ⊢ MZ' : A'[Id,,zero] }} by mauto 4.
-  assert {{ Γ,ℕ ⊢ A }} by mauto.
   assert {{ Γ, ℕ, A ⊢s Wk∘Wk,,succ #1 : Γ, ℕ }} by (eapply @sub_weak_compose_weak_extend_succ_var_1 with (P := P); mauto).
     
   assert {{ Γ, ℕ, A ⊢ MS' : A'[Wk∘Wk,,succ #1] }} by mauto 4.
-  assert {{ ⊢ Γ, ℕ, A ≈ Γ, ℕ, A' }} by mauto 4.
+  assert {{ ⊢ Γ, ℕ, A ≈ Γ, ℕ, A' }} by mauto 3.
   assert {{ Γ, ℕ, A' ⊢ MS' : A'[Wk∘Wk,,succ #1] }} by mauto 3.
   eapply wf_conv; mauto 2.
 Qed.
@@ -344,12 +345,12 @@ Qed.
   Hint Resolve presup_exp_eq_natrec_cong_right : mcpts.
 
 
-Lemma presup_exp_eq_natrec_sub_left {P} : forall {Γ : ctx P}  {σ Δ A MZ MS M s} {r : Ru_nat P s},
+Lemma presup_exp_eq_natrec_sub_left {P} : forall {Γ : ctx P}  {σ Δ A MZ MS M s s'} {r : Ru_nat P s},
     {{ ⊢ Γ }} ->
     {{ ⊢ Δ }} ->
     {{ Γ ⊢s σ : Δ }} ->
     {{ ⊢ Δ, ℕ }} ->
-    {{ Δ, ℕ ⊢ A }} ->
+    {{ Δ, ℕ ⊢ A : Sort@s' }} ->
     {{ Δ ⊢ MZ : A[Id,,zero] }} ->
     {{ ⊢ Δ, ℕ, A }} ->
     {{ Δ, ℕ, A ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
@@ -357,6 +358,7 @@ Lemma presup_exp_eq_natrec_sub_left {P} : forall {Γ : ctx P}  {σ Δ A MZ MS M 
     {{ Γ ⊢ rec M return A | zero -> MZ | succ -> MS end[σ] : A[σ,,M[σ]] }}.
 Proof.
   intros.
+  assert {{ Δ, ℕ ⊢ A }} by mauto 2.
   assert {{ Γ ⊢s σ,,M[σ] : Δ, ℕ }} by mauto 3.
   assert {{ Γ ⊢ A[σ,,M[σ]] }} by mauto 2.
   assert {{ Δ ⊢s Id,,M : Δ, ℕ }} by mauto 3.
@@ -371,12 +373,12 @@ Qed.
 
 
 
-Lemma presup_exp_eq_natrec_sub_right {P} : forall {Γ : ctx P} {σ Δ A MZ MS M s} {r : Ru_nat P s},
+Lemma presup_exp_eq_natrec_sub_right {P} : forall {Γ : ctx P} {σ Δ A MZ MS M s s'} {r : Ru_nat P s},
     {{ ⊢ Γ }} ->
     {{ ⊢ Δ }} ->
     {{ Γ ⊢s σ : Δ }} ->
     {{ ⊢ Δ, ℕ }} ->
-    {{ Δ, ℕ ⊢ A }} ->
+    {{ Δ, ℕ ⊢ A : Sort@s' }} ->
     {{ Δ ⊢ MZ : A[Id,,zero] }} ->
     {{ ⊢ Δ, ℕ, A }} ->
     {{ Δ, ℕ, A ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
@@ -384,6 +386,7 @@ Lemma presup_exp_eq_natrec_sub_right {P} : forall {Γ : ctx P} {σ Δ A MZ MS M 
     {{ Γ ⊢ rec M[σ] return A[q σ] | zero -> MZ[σ] | succ -> MS[q (q σ)] end : A[σ,,M[σ]] }}.
 Proof.
   intros.
+  assert {{ Δ, ℕ ⊢ A }} by mauto 2.
   assert {{ Γ, ℕ ⊢s q σ : Δ, ℕ }} by mauto 2.
   assert {{ Γ, ℕ, A[q σ] ⊢s q (q σ) : Δ, ℕ, A }} by mauto 2.
   assert {{ Γ, ℕ ⊢ A[q σ] }} by mauto 3.
@@ -426,9 +429,9 @@ Qed.
 Hint Resolve presup_exp_eq_natrec_sub_right : mcpts.
 
 
-Lemma presup_exp_eq_beta_succ_right {P} : forall {Γ : ctx P} {A MZ MS M s} {r : Ru_nat P s},
+Lemma presup_exp_eq_beta_succ_right {P} : forall {Γ : ctx P} {A MZ MS M s s'} {r : Ru_nat P s},
     {{ ⊢ Γ, ℕ }} ->
-    {{ Γ, ℕ ⊢ A }} ->
+    {{ Γ, ℕ ⊢ A : Sort@s' }} ->
     {{ ⊢ Γ }} ->
     {{ Γ ⊢ MZ : A[Id,,zero] }} ->
     {{ ⊢ Γ, ℕ, A }} ->
@@ -437,6 +440,7 @@ Lemma presup_exp_eq_beta_succ_right {P} : forall {Γ : ctx P} {A MZ MS M s} {r :
     {{ Γ ⊢ MS[Id,,M,,rec M return A | zero -> MZ | succ -> MS end] : A[Id,,succ M] }}.
 Proof.
   intros.
+  assert {{ Γ, ℕ ⊢ A }} by mauto 2.
   (** Coq was having trouble inferring P here, expanded definition for now **)
   (** set (WkWksucc := {{{ Wk∘Wk,,succ #1 }}}). **)
   set (recM := {{{ rec M return A | zero -> MZ | succ -> MS end }}}).

@@ -235,7 +235,9 @@ Hint Resolve wf_exp_eq_nat_sub' : mcpts.
 Remove Hints wf_exp_eq_nat_sub : mcpts.
 
 
-Corollary wf_exp_eq_natrec_cong' {P} : forall {Γ : ctx P} {A A' MZ MZ' MS MS' M M' s} {r : Ru_nat P s},
+Corollary wf_exp_eq_natrec_cong' {P} : forall {Γ : ctx P} {A A' MZ MZ' MS MS' M M' s s'} {r : Ru_nat P s},
+    {{ Γ, ℕ ⊢ A : Sort@s' }} ->
+    {{ Γ, ℕ ⊢ A' : Sort@s' }} ->
     {{ Γ, ℕ ⊢ A ≈ A' }} ->
     {{ Γ ⊢ MZ ≈ MZ' : A[Id,,zero] }} ->
     {{ Γ, ℕ, A ⊢ MS ≈ MS' : A[Wk∘Wk,,succ #1] }} ->
@@ -250,8 +252,9 @@ Hint Resolve wf_exp_eq_natrec_cong' : mcpts.
 #[export]
 Remove Hints wf_exp_eq_natrec_cong : mcpts.
 
-Corollary wf_exp_eq_natrec_sub' {P} : forall {Γ : ctx P} {σ Δ A MZ MS M s} {r : Ru_nat P s},
+Corollary wf_exp_eq_natrec_sub' {P} : forall {Γ : ctx P} {σ Δ A MZ MS M s s'} {r : Ru_nat P s},
     {{ Γ ⊢s σ : Δ }} ->
+    {{ Δ, ℕ ⊢ A : Sort@s' }} ->
     {{ Δ ⊢ MZ : A[Id,,zero] }} ->
     {{ Δ, ℕ, A ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
     {{ Δ ⊢ M : ℕ }} ->
@@ -265,7 +268,8 @@ Hint Resolve wf_exp_eq_natrec_sub' : mcpts.
 #[export]
 Remove Hints wf_exp_eq_natrec_sub : mcpts.
 
-Corollary wf_exp_eq_nat_beta_zero' {P} : forall {Γ : ctx P} {A MZ MS s} {r : Ru_nat P s},
+Corollary wf_exp_eq_nat_beta_zero' {P} : forall {Γ : ctx P} {A MZ MS s s'} {r : Ru_nat P s},
+    {{ Γ, ℕ ⊢ A : Sort@s' }} ->
     {{ Γ ⊢ MZ : A[Id,,zero] }} ->
     {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
     {{ Γ ⊢ rec zero return A | zero -> MZ | succ -> MS end ≈ MZ : A[Id,,zero] }}.
@@ -279,7 +283,8 @@ Hint Resolve wf_exp_eq_nat_beta_zero' : mcpts.
 Remove Hints wf_exp_eq_nat_beta_zero : mcpts.
 
 
-Corollary wf_exp_eq_nat_beta_succ' {P} : forall {Γ : ctx P} {A MZ MS M s} {r : Ru_nat P s},
+Corollary wf_exp_eq_nat_beta_succ' {P} : forall {Γ : ctx P} {A MZ MS M s s'} {r : Ru_nat P s},
+    {{ Γ, ℕ ⊢ A : Sort@s' }} ->
     {{ Γ ⊢ MZ : A[Id,,zero] }} ->
     {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
     {{ Γ ⊢ M : ℕ }} ->
