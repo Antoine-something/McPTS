@@ -4,9 +4,9 @@ From McPTS.Core.Semantic Require Import Evaluation.
 From McPTS.Core.Semantic Require Export Domain.
 Import Domain_Notations.
 
-Reserved Notation "'Rnf' m 'in' s ↘ M" (in custom judg at level 80, m custom domain, s constr, M custom nf).
-Reserved Notation "'Rne' m 'in' s ↘ M" (in custom judg at level 80, m custom domain, s constr, M custom nf).
-Reserved Notation "'Rtyp' a 'in' s ↘ A" (in custom judg at level 80, a custom domain, s constr, A custom nf).
+Reserved Notation "'Rnf' m 'in' i ↘ M" (in custom judg at level 80, m custom domain, i constr, M custom nf).
+Reserved Notation "'Rne' m 'in' i ↘ M" (in custom judg at level 80, m custom domain, i constr, M custom nf).
+Reserved Notation "'Rtyp' a 'in' i ↘ A" (in custom judg at level 80, a custom domain, i constr, A custom nf).
 
 Generalizable All Variables.
 

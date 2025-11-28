@@ -33,21 +33,22 @@ Notation "'EG' A ∈ R ↘ Sb " := (R Sb A : ((Prop : (Type : Type)) : (Type : T
 
 
 
-Definition neut_glu_typ_pred {P : PtsSig} a : glu_typ_pred P :=
-  fun Γ A => {{ Γ ⊢ A }} /\
+Definition neut_glu_typ_pred {P : PtsSig} a s : glu_typ_pred P :=
+  fun Γ A => {{ Γ ⊢ A : Sort@s }} /\
             (* (forall Δ σ A' K, {{ Δ ⊢w σ : Γ }} -> {{ Δ ⊢ A[σ] ≈ A' }} -> {{ Δ ⊢ A[σ] : K }} -> {{ Δ ⊢ A : K }} -> {{ Δ ⊢ A[σ] ≈ A' : K }}) /\ *)
-            (forall Δ σ A', {{ Δ ⊢w σ : Γ }} -> {{ Rne a in length Δ ↘ A' }} -> {{ Δ ⊢ A[σ] ≈ A' }}).
-Arguments neut_glu_typ_pred {P} a Γ A/.
+            (forall Δ σ A', {{ Δ ⊢w σ : Γ }} -> {{ Rne a in length Δ ↘ A' }} -> {{ Δ ⊢ A[σ] ≈ A' : Sort@s }}).
+Arguments neut_glu_typ_pred {P} a s Γ A/.
 
-Variant neut_glu_exp_pred {P : PtsSig} a : glu_exp_pred P :=
+Variant neut_glu_exp_pred {P : PtsSig} a s : glu_exp_pred P :=
 | mk_neut_glu_exp_pred :
-  `{ {{ Γ ⊢ A ® neut_glu_typ_pred a }} ->
+  `{ {{ Γ ⊢ A ® neut_glu_typ_pred a s }} ->
      {{ Γ ⊢ M : A }} ->
      {{ Dom m ≈ m ∈ per_bot }} ->
      (forall Δ σ M', {{ Δ ⊢w σ : Γ }} ->
                    {{ Rne m in length Δ ↘ M' }} ->
                    {{ Δ ⊢ M[σ] ≈ M' : A[σ] }}) ->
-     {{ Γ ⊢ M : A ® ⇑ b m ∈ neut_glu_exp_pred a }} }.
+     {{ Γ ⊢ M : A ® ⇑ b m ∈ neut_glu_exp_pred a s }} }.
+
 
 Variant pi_glu_typ_pred {P : PtsSig} {s1 s2 s3} (r : Ru P s1 s2 s3)
   (IR : relation (domain P))
