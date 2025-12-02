@@ -78,7 +78,7 @@ Section SignatureExtension.
 
   Inductive eRu : eSt -> eSt -> eSt -> Set :=
   | ru_P : forall {s1 s2 s3 : St P}, Ru P s1 s2 s3 -> eRu (st_P s1) (st_P s2) (st_P s3).
-
+  
   Definition eP : PtsSig := mkPtsSig eSt eAx eRu.
 
 
@@ -200,3 +200,14 @@ Section SignatureExtension.
   Definition epred_P : PredicativeSig eP :=
     mkPredicativeSig eP epred_rel eord_rel epred_rel_wf eord_ax eord_ru.
 End SignatureExtension.
+
+Arguments st_P {P} s.
+Arguments st_ext {P} i.
+Arguments ax_P {P} {s1} {s2} ax.
+Arguments ax_ext {P} {n}.
+Arguments ax_cross {P} {s}.
+Arguments ru_P {P} {s1} {s2} {s3} ru.
+
+Arguments pr_P {P} {pred_P} {s1} {s2} pr.
+Arguments pr_ext {P} {pred_P} {i} {j} lt.
+Arguments pr_cross {P} {pred_P} {s} {i}.
