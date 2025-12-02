@@ -115,10 +115,60 @@ Section SignatureExtension.
         econstructor; auto.
   Qed.
 
+  Lemma wf_acc_orig : forall (s : P), Acc (pred_rel pred_P) s -> Acc epred_rel (st_P s).
+  Proof using Type.
+    intros.
+    induction H.
+    constructor.
+    intros.
+    assert (exists s' : P, y = (st_P s') /\ pred_rel pred_P s' x).
+    {
+      inversion H1; subst.
+      exists s1; split; auto.
+    }
+    destruct H2 as [s' []].
+    rewrite H2.
+    apply H0.
+    assumption.
+  Qed.
+
+  Lemma wf_acc_nat : forall (i : nat), Acc lt i -> Acc epred_rel (st_ext i).
+  Proof using Type.
+    intros.
+    induction H.
+    constructor.
+    intros.
+    inversion H1; subst.
+    - apply H0; auto.
+    - apply wf_acc_orig.
+      apply (wf_rel pred_P).
+  Qed.
+  
+  Lemma wf_acc_lt : forall (i : nat), Acc lt i.
+  Proof using Type.
+    intros i.
+    induction i;
+      constructor; intros.
+    - unfold lt in H.
+      inversion H.
+    - inversion H; auto.
+      destruct IHi; auto.
+  Qed.
+  
   Lemma epred_rel_wf : well_founded epred_rel.
-  Proof.
-    (* Don't understand how to prove this *)
-  Admitted.
+  Proof using Type.
+    assert (Hwf : well_founded (pred_rel pred_P)) by (apply wf_rel).
+    intros a.
+    constructor.
+    intros b H.
+    inversion_clear H.
+    - apply wf_acc_orig.
+      apply Hwf.
+    - apply wf_acc_nat.
+      apply wf_acc_lt.
+    - apply wf_acc_orig.
+      apply Hwf.
+  Qed.
   
   Lemma eord_ax : forall (s1 s2 : eP), Ax eP s1 s2 -> epred_rel s1 s2.
   Proof using Type.
