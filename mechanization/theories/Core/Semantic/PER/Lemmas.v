@@ -1397,7 +1397,7 @@ Ltac invert_per_ctx_env_unsorted H :=
   + (inversion H; subst).
 
 Ltac invert_per_ctx_envs_unsorted := match_by_head per_ctx_env ltac:(fun H => directed invert_per_ctx_env_unsorted H).
-
+Ltac invert_per_ctx_envs_unsorted_of pred_P rel := match_by_head (per_ctx_env pred_P rel) ltac:(fun H => directed invert_per_ctx_env_unsorted H).
 
 Lemma per_typ_elem_and_per_sort_elem_implies_per_sort_elem {P} (pred_P : PredicativeSig P) : forall { a b c R R' s},
     {{ DF a ≈ b ∈ per_typ_elem pred_P ↘ R }} ->
