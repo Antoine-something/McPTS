@@ -45,13 +45,6 @@ Section Translation.
       tr_ctx Γ Γ' -> tr_exp A A' ->
       tr_ctx {{{ Γ, A }}} {{{ Γ', A' }}}.
 
-
-  Scheme tr_exp_mut_ind := Induction for tr_exp Sort Prop
-  with tr_sub_mut_ind := Induction for tr_sub Sort Prop.
-  Combined Scheme tr_mut_ind from
-    tr_exp_mut_ind,
-    tr_sub_mut_ind.
-  
   #[local]
   Hint Constructors tr_exp tr_sub tr_ctx : mcpts.
 
@@ -105,7 +98,36 @@ Section Translation.
   Proof using Type. intros; eapply tr_injective; eauto. Qed.
   Corollary tr_ctx_injective : forall Γ1 Γ2 Γ, tr_ctx Γ1 Γ -> tr_ctx Γ2 Γ -> Γ1 = Γ2.
   Proof using Type. intros; eapply tr_injective_ctx; eauto. Qed.
+
+  Scheme exp_mut_ind := Induction for exp Sort Prop
+  with sub_mut_ind := Induction for sub Sort Prop.
+  Combined Scheme syntax_mut_ind from
+    exp_mut_ind,
+    sub_mut_ind.
+
+  
+  Lemma tr_total :
+    (forall M, exists M', tr_exp M M') /\
+      (forall σ, exists σ', tr_sub σ σ').
+  Proof using Type.
+    apply syntax_mut_ind.
+    all: intros; destruct_conjs; eexists; econstructor; mauto 2.
+  Qed.
+
+  Corollary tr_exp_total : forall M, exists M', tr_exp M M'.
+  Proof using Type. eapply tr_total. Qed.
+  Corollary tr_sub_total : forall σ, exists σ', tr_sub σ σ'.
+  Proof using Type. eapply tr_total. Qed.
+  Corollary tr_total_ctx : forall Γ, exists Γ', tr_ctx Γ Γ'.
+  Proof using Type.
+    intros Γ; induction Γ.
+    - eexists; econstructor; mauto 2.
+    - destruct_conjs.
+      destruct (tr_exp_total a).
+      eexists; econstructor; mauto 2.
+  Qed.
     
+  
   (* Fixpoint translate_exp (M : exp P) : exp eSig := *)
   (*   match M with *)
   (*   | a_st s => @a_st eSig (st_P s) *)
@@ -224,6 +246,33 @@ Qed.
 #[export]
 Hint Resolve tr_wf_ctx_lookup : mcpts.
 
+Ltac apply_tr_IH :=
+  match goal with
+  (* Cases for contexts *)
+  | H1 : forall Γ', tr_ctx ?Γ Γ' -> {{ ⊢ Γ' }},
+    H2 : {{ ⊢ ^?Γ }} |- {{ ⊢ ^?Γ' }} => (eapply H1; try econstructor; mauto 2)
+  | H1 : forall Γ' Δ', tr_ctx ?Γ Γ' -> tr_ctx ?Δ Δ' -> {{ ⊢ Γ' ≈ Δ' }},
+    H2 : {{ ⊢ ^?Γ ≈ ^?Δ }} |- {{ ⊢ ^?Γ' ≈ ^?Δ' }} => eapply H1; try econstructor; mauto 2
+  (* Cases for terms *)
+  | H1 : forall Γ' A' M', tr_ctx ?Γ Γ' -> tr_exp ?M M' -> tr_exp ?A A' -> {{ Γ' ⊢ M' : A' }},
+    H2 : {{ ^?Γ ⊢ ^?M : ^?A }},
+    H3 : tr_ctx ?Γ ?Γ', H4 : tr_exp ?M ?M', H5 : tr_exp ?A ?A'
+    |- {{ ^?Γ' ⊢ ^?M' : ^?A' }} => eapply H1; try econstructor; mauto 2
+| H1 : forall Γ' A' M' N', tr_ctx ?Γ Γ' -> tr_exp ?M M' -> tr_exp ?N N' -> tr_exp ?A A' -> {{ Γ' ⊢ M' ≈ N' : A' }},
+       H2 : {{ ^?Γ ⊢ ^?M ≈ ^?N : ^?A }} |- {{ ^?Γ' ⊢ ^?M' ≈ ^?N' : ^?A' }} => eapply H1; try econstructor; mauto 2
+    (* Cases for types *)
+     | H1 : forall Γ' A', tr_ctx ?Γ Γ' -> tr_exp ?A A' -> {{ Γ' ⊢ A' }},
+       H2 : {{ ^?Γ ⊢ ^?A }} |- {{ ^?Γ' ⊢ ^?A' }} => eapply H1; try econstructor; mauto 2
+     | H1 : forall Γ' A' B', tr_ctx ?Γ Γ' -> tr_exp ?A A' -> tr_exp ?B B' -> {{ Γ' ⊢ A' ≈ B' }},
+       H2 : {{ ^?Γ ⊢ ^?A ≈ ^?B }} |- {{ ^?Γ' ⊢ ^?A' ≈ ^?B' }} => eapply H1; try econstructor; mauto 2
+    (* Cases for substitutions *)
+     | H1 : forall Γ' Δ' σ',  tr_ctx ?Γ Γ' -> tr_sub ?σ σ' -> tr_ctx ?Δ Δ' -> {{ Γ' ⊢s σ' : Δ' }},
+       H2 : {{ ^?Γ ⊢ ^?σ : ^?Δ }} |- {{ ^?Γ' ⊢s ^?σ' : ^?Δ' }} => eapply H1; try econstructor; mauto 2
+     | H1 : forall Γ' Δ' σ' τ',  tr_ctx ?Γ Γ' -> tr_sub ?σ σ' -> tr_sub ?τ τ' -> tr_ctx ?Δ Δ' -> {{ Γ' ⊢s σ' ≈ τ' : Δ' }},
+       H2 : {{ ^?Γ ⊢ ^?σ ≈ ^?τ : ^?Δ }} |- {{ ^?Γ' ⊢s ^?σ' ≈ ^?τ' : ^?Δ' }} => eapply H1; try econstructor; mauto 2
+     | _ => simpl
+     end.
+
 Lemma tr_judg {P} :
   (forall (Γ : ctx P), {{ ⊢ Γ }} ->
                   forall Γ',
@@ -234,7 +283,7 @@ Lemma tr_judg {P} :
                     tr_ctx Γ Γ' -> tr_ctx Δ Δ' ->
                     {{ ⊢ Γ' ≈ Δ' }}) /\
     (forall (Γ : ctx P) A M, {{ Γ ⊢ M : A }} ->
-                        forall A' Γ' M',
+                        forall Γ' A' M',
                           tr_ctx Γ Γ' -> tr_exp M M' -> tr_exp A A' ->
                           {{ Γ' ⊢ M' : A' }}) /\
     (forall (Γ : ctx P) A M N, {{ Γ ⊢ M ≈ N : A }} ->
@@ -258,11 +307,61 @@ Lemma tr_judg {P} :
                           tr_ctx Γ Γ' -> tr_sub σ σ' -> tr_sub τ τ' -> tr_ctx Δ Δ' ->
                           {{ Γ' ⊢s σ' ≈ τ' : Δ' }}).
 Proof.
-  (* apply syntactic_wf_mut_ind. *)
-  (* all: intros; *)
-  (*   (on_all_hyp: destruct_tr); *)
-  (*   econstructor; mauto 2. *)
+  apply syntactic_wf_mut_ind.
+  all: intros;
+    (on_all_hyp: destruct_tr).
+  all: (on_all_hyp: ltac:(fun s => match type of s with
+                             | St ?P => assert (tr_exp {{{ Sort@s }}} (@a_st (eP P) (st_P s))) by (econstructor; mauto 3)
+                             | _ => mauto 0 (* do nothing *)
+                                end)).  
+  all: econstructor; mauto 2; apply_tr_IH.
 
+  1: econstructor; mauto 2.
+  1-3: assert (tr_ctx {{{ Γ, A }}} {{{ Γ', A' }}}) by (econstructor; mauto 2); apply_tr_IH.
+
+  - 
+  - econstructor; apply_tr_IH.
+  - 
+  - apply_tr_IH.
+    admit.
+  - (on_all_hyp: ltac:(fun s => match type of s with
+                             | St P => assert (tr_exp {{{ Sort@s }}} (@a_st (eP P) (st_P s))) by econstructor; mauto 2
+                             | _ => mauto 0 (* do nothing *)
+                             end)).
+    match goal with
+    | s : St P |- _ => 
+        assert (tr_exp {{{ Sort@s }}} (@a_st (eP P) (st_P s))) by econstructor; mauto 2
+    end.
+    apply_tr_IH.
+
+    
+  1-2:
+    (match goal with
+     (* Cases for contexts *)
+     | H1 : forall Γ', tr_ctx ?Γ Γ' -> {{ ⊢ Γ' }},
+       H2 : {{ ⊢ ^?Γ }} |- {{ ⊢ ^?Γ' }} => eapply H1; try econstructor; mauto 2
+     | H1 : forall Γ' Δ', tr_ctx ?Γ Γ' -> tr_ctx ?Δ Δ' -> {{ ⊢ Γ' ≈ Δ' }},
+       H2 : {{ ⊢ ^?Γ ≈ ^?Δ }} |- {{ ⊢ ^?Γ' ≈ ^?Δ' }} => eapply H1; try econstructor; mauto 2
+    (* Cases for terms *)
+     | H1 : forall Γ' A' M', tr_ctx ?Γ Γ' -> tr_exp ?M M' -> tr_exp ?A A' -> {{ Γ' ⊢ M' : A' }},
+       H2 : {{ ^?Γ ⊢ ^?M : ^?A }} |- {{ ^?Γ' ⊢ ^?M' : ^?A' }} => eapply H1; try econstructor; mauto 2
+     | H1 : forall Γ' A' M' N', tr_ctx ?Γ Γ' -> tr_exp ?M M' -> tr_exp ?N N' -> tr_exp ?A A' -> {{ Γ' ⊢ M' ≈ N' : A' }},
+       H2 : {{ ^?Γ ⊢ ^?M ≈ ^?N : ^?A }} |- {{ ^?Γ' ⊢ ^?M' ≈ ^?N' : ^?A' }} => eapply H1; try econstructor; mauto 2
+    (* Cases for types *)
+     | H1 : forall Γ' A', tr_ctx ?Γ Γ' -> tr_exp ?A A' -> {{ Γ' ⊢ A' }},
+       H2 : {{ ^?Γ ⊢ ^?A }} |- {{ ^?Γ' ⊢ ^?A' }} => eapply H1; try econstructor; mauto 2
+     | H1 : forall Γ' A' B', tr_ctx ?Γ Γ' -> tr_exp ?A A' -> tr_exp ?B B' -> {{ Γ' ⊢ A' ≈ B' }},
+       H2 : {{ ^?Γ ⊢ ^?A ≈ ^?B }} |- {{ ^?Γ' ⊢ ^?A' ≈ ^?B' }} => eapply H1; try econstructor; mauto 2
+    (* Cases for substitutions *)
+     | H1 : forall Γ' Δ' σ',  tr_ctx ?Γ Γ' -> tr_sub ?σ σ' -> tr_ctx ?Δ Δ' -> {{ Γ' ⊢s σ' : Δ' }},
+       H2 : {{ ^?Γ ⊢ ^?σ : ^?Δ }} |- {{ ^?Γ' ⊢s ^?σ' : ^?Δ' }} => eapply H1; try econstructor; mauto 2
+     | H1 : forall Γ' Δ' σ' τ',  tr_ctx ?Γ Γ' -> tr_sub ?σ σ' -> tr_sub ?τ τ' -> tr_ctx ?Δ Δ' -> {{ Γ' ⊢s σ' ≈ τ' : Δ' }},
+       H2 : {{ ^?Γ ⊢ ^?σ ≈ ^?τ : ^?Δ }} |- {{ ^?Γ' ⊢s ^?σ' ≈ ^?τ' : ^?Δ' }} => eapply H1; try econstructor; mauto 2
+     | _ => simpl
+     end).
+
+  
+  - 
   (* - eapply H0; mauto 2; *)
   (*     econstructor; mauto 2. *)
 

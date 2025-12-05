@@ -57,6 +57,12 @@ Notation typ := (fun P => exp P).
 Notation ctx := (fun P => list (typ P)).
 
 
+Scheme exp_mut_ind := Induction for exp Sort Prop
+with sub_mut_ind := Induction for sub Sort Prop.
+Combined Scheme syntax_mut_ind from
+  exp_mut_ind,
+  sub_mut_ind.
+
 (** ** Syntactic Normal/Neutral Form *)
 Inductive nf (P : PtsSig) : Set :=
 | nf_st : P -> nf P
