@@ -5,7 +5,8 @@ From McPTS.Core.Completeness Require Import
   SubstitutionCases
   TermStructureCases
   SortCases
-  VariableCases.
+  VariableCases
+  NatCases.
 From McPTS.Core.Completeness Require Export LogicalRelation.
 From McPTS.Core.Syntactic Require Export SystemOpt.
 Import Domain_Notations.
@@ -26,9 +27,30 @@ Section completeness_fundamental.
   Proof using Type.
     apply syntactic_wf_mut_ind;
       mauto 3.
-    intros.
-    eapply valid_exp_var;
-      mauto.
+
+    - intros.
+      eapply (@rel_exp_unsorted_natrec_cong _ _ _ _ _ _ _ _ _ _ _ _ _ r); eauto.
+      destruct H.
+      econstructor.
+      destruct_conjs.
+      split; eauto.
+      intros.
+      assert (exists elem_rel : relation (domain P),
+                 rel_typ_unsorted pred_P {{{ Sort@s' }}} ρ {{{ Sort@s' }}} ρ' elem_rel /\
+                   rel_exp A ρ A ρ' elem_rel) by mauto 2.
+      destruct_conjs.
+      destruct H3.
+      simplify_evals.
+      assert (per_typ_elem pred_P (per_sort pred_P s') d{{{ Sort@s' }}} d{{{ Sort@s' }}}) by (eapply per_typ_sort; reflexivity).
+      handle_per_typ_elem_irrel.
+      destruct H4.
+      destruct H5.
+      eexists.
+      econstructor; mauto.
+      
+    - intros.
+      eapply valid_exp_var;
+        mauto.
   Qed.
 
   #[local]
