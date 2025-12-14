@@ -52,9 +52,39 @@ Section Translation.
     (forall M M1, tr_exp M M1 -> forall M2, tr_exp M M2 -> M1 = M2) /\
       (forall σ σ1, tr_sub σ σ1 -> forall σ2, tr_sub σ σ2 -> σ1 = σ2).
   Proof using Type.
-    apply tr_mut_ind.
-    1,5,7,8: intros; dependent destruction H; reflexivity.
-    all: intros; dependent destruction H1; (on_all_hyp: fun H => erewrite H in *; eauto).
+    apply syntax_mut_ind.
+    1,5,7,8: intros; dependent destruction H; dependent destruction H0; reflexivity.
+    all: intros; dependent destruction H2; dependent destruction H1.
+    
+    - assert (A' = A'0) by mauto 2.
+      assert (B' = B'0) by mauto 2.
+      subst.
+      reflexivity.
+
+    - assert (A' = A'0) by mauto 2.
+      assert (M' = M'0) by mauto 2.
+      subst.
+      reflexivity.
+
+    - assert (M' = M'0) by mauto 2.
+      assert (N' = N'0) by mauto 2.
+      subst.
+      reflexivity.
+
+    - assert (M' = M'0) by mauto 2.
+      assert (σ' = σ'0) by mauto 2.
+      subst.
+      reflexivity.
+
+    - assert (σ' = σ'0) by mauto 2.
+      assert (τ' = τ'0) by mauto 2.
+      subst.
+      reflexivity.
+
+    - assert (σ' = σ'0) by mauto 2.
+      assert (M' = M'0) by mauto 2.
+      subst.
+      reflexivity.
   Qed.
   Lemma tr_functional_ctx : forall Γ Γ1, tr_ctx Γ Γ1 -> forall Γ2, tr_ctx Γ Γ2 -> Γ1 = Γ2.
   Proof using Type.
@@ -79,9 +109,9 @@ Section Translation.
     (forall M1 M, tr_exp M1 M -> forall M2, tr_exp M2 M -> M1 = M2) /\
       (forall σ1 σ, tr_sub σ1 σ -> forall σ2, tr_sub σ2 σ -> σ1 = σ2).
   Proof using Type.
-    apply tr_mut_ind.
-    1,5,7,8: intros; dependent destruction H; reflexivity.
-    all: intros; dependent destruction H1; (on_all_hyp: fun H => erewrite H in *; eauto).  
+    apply syntax_mut_ind.
+    1,5,7,8: intros; dependent destruction H; dependent destruction H0; reflexivity.
+    all: intros; dependent destruction H2; dependent destruction H1; (on_all_hyp: fun H => erewrite H in *; eauto).  
   Qed.
   Lemma tr_injective_ctx : forall Γ1 Γ, tr_ctx Γ1 Γ -> forall Γ2, tr_ctx Γ2 Γ -> Γ1 = Γ2.
   Proof using Type.
@@ -224,6 +254,24 @@ Ltac destruct_tr H :=
   end;
   functional_tr_rewrite_clear.
 
+Ltac invert_tr H :=
+  match type of H with
+  | tr_exp {{{ Sort@?s }}} ?M' => directed inversion H
+  | tr_exp {{{ Π ?r ^?A ^?B }}} ?M' => directed inversion H
+  | tr_exp {{{ λ ?r ^?A ^?M }}} ?M' => directed inversion H
+  | tr_exp {{{ ^?M ^?N }}} ?M' => directed inversion H
+  | tr_exp {{{ #?n }}} ?M' => directed inversion H
+  | tr_exp {{{ ^?M[^?σ] }}} ?M' => directed inversion H
+  | tr_sub {{{ Id }}} ?σ' => directed inversion H
+  | tr_sub {{{ Wk }}} ?σ' => directed inversion H
+  | tr_sub {{{ ^?σ ∘ ^?τ }}} ?σ' => directed inversion H
+  | tr_sub {{{ ^?σ,,^?M }}} ?M' => directed inversion H
+  | tr_ctx {{{ ⋅ }}} ?Γ' => directed inversion H
+  | tr_ctx {{{ ^?Γ, ^?A }}} ?Γ' => directed inversion H
+  end;
+  subst.
+
+
 Lemma tr_wf_ctx_lookup {P} : forall {A : typ P} {n Γ A' Γ'},
     tr_exp A A' ->
     tr_ctx Γ Γ' ->
@@ -270,8 +318,36 @@ Ltac apply_tr_IH :=
        H2 : {{ ^?Γ ⊢ ^?σ : ^?Δ }} |- {{ ^?Γ' ⊢s ^?σ' : ^?Δ' }} => eapply H1; try econstructor; mauto 2
      | H1 : forall Γ' Δ' σ' τ',  tr_ctx ?Γ Γ' -> tr_sub ?σ σ' -> tr_sub ?τ τ' -> tr_ctx ?Δ Δ' -> {{ Γ' ⊢s σ' ≈ τ' : Δ' }},
        H2 : {{ ^?Γ ⊢ ^?σ ≈ ^?τ : ^?Δ }} |- {{ ^?Γ' ⊢s ^?σ' ≈ ^?τ' : ^?Δ' }} => eapply H1; try econstructor; mauto 2
-     | _ => simpl
+     | _ => idtac
      end.
+
+Ltac apply_tr_IH' :=
+  match goal with
+  (* Cases for contexts *)
+  | H1 : forall Γ', tr_ctx ?Γ Γ' -> {{ ⊢ Γ' }},
+    H2 : {{ ⊢ ^?Γ }} |- {{ ⊢ ^?Γ' }} => (eapply H1; try econstructor; mauto 2)
+  | H1 : forall Γ' Δ', tr_ctx ?Γ Γ' -> tr_ctx ?Δ Δ' -> {{ ⊢ Γ' ≈ Δ' }},
+    H2 : {{ ⊢ ^?Γ ≈ ^?Δ }} |- {{ ⊢ ^?Γ' ≈ ^?Δ' }} => eapply H1; try econstructor; mauto 2
+  (* Cases for terms *)
+  | H1 : forall Γ' A' M', tr_ctx ?Γ Γ' -> tr_exp ?M M' -> tr_exp ?A A' -> {{ Γ' ⊢ M' : A' }},
+    H2 : {{ ^?Γ ⊢ ^?M : ^?A }},
+    H3 : tr_ctx ?Γ ?Γ', H4 : tr_exp ?M ?M', H5 : tr_exp ?A ?A'
+                                            |- _ => try (assert {{ ^?Γ' ⊢ ^?M' : ^?A' }} by (eapply H1; mauto 2))
+| H1 : forall Γ' A' M' N', tr_ctx ?Γ Γ' -> tr_exp ?M M' -> tr_exp ?N N' -> tr_exp ?A A' -> {{ Γ' ⊢ M' ≈ N' : A' }},
+       H2 : {{ ^?Γ ⊢ ^?M ≈ ^?N : ^?A }} |- {{ ^?Γ' ⊢ ^?M' ≈ ^?N' : ^?A' }} => eapply H1; try econstructor; mauto 2
+    (* Cases for types *)
+     | H1 : forall Γ' A', tr_ctx ?Γ Γ' -> tr_exp ?A A' -> {{ Γ' ⊢ A' }},
+       H2 : {{ ^?Γ ⊢ ^?A }} |- {{ ^?Γ' ⊢ ^?A' }} => eapply H1; try econstructor; mauto 2
+     | H1 : forall Γ' A' B', tr_ctx ?Γ Γ' -> tr_exp ?A A' -> tr_exp ?B B' -> {{ Γ' ⊢ A' ≈ B' }},
+       H2 : {{ ^?Γ ⊢ ^?A ≈ ^?B }} |- {{ ^?Γ' ⊢ ^?A' ≈ ^?B' }} => eapply H1; try econstructor; mauto 2
+    (* Cases for substitutions *)
+     | H1 : forall Γ' Δ' σ',  tr_ctx ?Γ Γ' -> tr_sub ?σ σ' -> tr_ctx ?Δ Δ' -> {{ Γ' ⊢s σ' : Δ' }},
+       H2 : {{ ^?Γ ⊢ ^?σ : ^?Δ }} |- {{ ^?Γ' ⊢s ^?σ' : ^?Δ' }} => eapply H1; try econstructor; mauto 2
+     | H1 : forall Γ' Δ' σ' τ',  tr_ctx ?Γ Γ' -> tr_sub ?σ σ' -> tr_sub ?τ τ' -> tr_ctx ?Δ Δ' -> {{ Γ' ⊢s σ' ≈ τ' : Δ' }},
+       H2 : {{ ^?Γ ⊢ ^?σ ≈ ^?τ : ^?Δ }} |- {{ ^?Γ' ⊢s ^?σ' ≈ ^?τ' : ^?Δ' }} => eapply H1; try econstructor; mauto 2
+     | _ => idtac
+     end.
+
 
 Lemma tr_judg {P} :
   (forall (Γ : ctx P), {{ ⊢ Γ }} ->
@@ -309,88 +385,27 @@ Lemma tr_judg {P} :
 Proof.
   apply syntactic_wf_mut_ind.
   all: intros;
-    (on_all_hyp: destruct_tr).
-  all: (on_all_hyp: ltac:(fun s => match type of s with
-                             | St ?P => assert (tr_exp {{{ Sort@s }}} (@a_st (eP P) (st_P s))) by (econstructor; mauto 3)
-                             | _ => mauto 0 (* do nothing *)
-                                end)).  
-  all: econstructor; mauto 2; apply_tr_IH.
-
-  1: econstructor; mauto 2.
-  1-3: assert (tr_ctx {{{ Γ, A }}} {{{ Γ', A' }}}) by (econstructor; mauto 2); apply_tr_IH.
-
-  - 
-  - econstructor; apply_tr_IH.
-  - 
-  - apply_tr_IH.
-    admit.
-  - (on_all_hyp: ltac:(fun s => match type of s with
-                             | St P => assert (tr_exp {{{ Sort@s }}} (@a_st (eP P) (st_P s))) by econstructor; mauto 2
-                             | _ => mauto 0 (* do nothing *)
-                             end)).
-    match goal with
-    | s : St P |- _ => 
-        assert (tr_exp {{{ Sort@s }}} (@a_st (eP P) (st_P s))) by econstructor; mauto 2
-    end.
-    apply_tr_IH.
-
-    
-  1-2:
-    (match goal with
-     (* Cases for contexts *)
-     | H1 : forall Γ', tr_ctx ?Γ Γ' -> {{ ⊢ Γ' }},
-       H2 : {{ ⊢ ^?Γ }} |- {{ ⊢ ^?Γ' }} => eapply H1; try econstructor; mauto 2
-     | H1 : forall Γ' Δ', tr_ctx ?Γ Γ' -> tr_ctx ?Δ Δ' -> {{ ⊢ Γ' ≈ Δ' }},
-       H2 : {{ ⊢ ^?Γ ≈ ^?Δ }} |- {{ ⊢ ^?Γ' ≈ ^?Δ' }} => eapply H1; try econstructor; mauto 2
-    (* Cases for terms *)
-     | H1 : forall Γ' A' M', tr_ctx ?Γ Γ' -> tr_exp ?M M' -> tr_exp ?A A' -> {{ Γ' ⊢ M' : A' }},
-       H2 : {{ ^?Γ ⊢ ^?M : ^?A }} |- {{ ^?Γ' ⊢ ^?M' : ^?A' }} => eapply H1; try econstructor; mauto 2
-     | H1 : forall Γ' A' M' N', tr_ctx ?Γ Γ' -> tr_exp ?M M' -> tr_exp ?N N' -> tr_exp ?A A' -> {{ Γ' ⊢ M' ≈ N' : A' }},
-       H2 : {{ ^?Γ ⊢ ^?M ≈ ^?N : ^?A }} |- {{ ^?Γ' ⊢ ^?M' ≈ ^?N' : ^?A' }} => eapply H1; try econstructor; mauto 2
-    (* Cases for types *)
-     | H1 : forall Γ' A', tr_ctx ?Γ Γ' -> tr_exp ?A A' -> {{ Γ' ⊢ A' }},
-       H2 : {{ ^?Γ ⊢ ^?A }} |- {{ ^?Γ' ⊢ ^?A' }} => eapply H1; try econstructor; mauto 2
-     | H1 : forall Γ' A' B', tr_ctx ?Γ Γ' -> tr_exp ?A A' -> tr_exp ?B B' -> {{ Γ' ⊢ A' ≈ B' }},
-       H2 : {{ ^?Γ ⊢ ^?A ≈ ^?B }} |- {{ ^?Γ' ⊢ ^?A' ≈ ^?B' }} => eapply H1; try econstructor; mauto 2
-    (* Cases for substitutions *)
-     | H1 : forall Γ' Δ' σ',  tr_ctx ?Γ Γ' -> tr_sub ?σ σ' -> tr_ctx ?Δ Δ' -> {{ Γ' ⊢s σ' : Δ' }},
-       H2 : {{ ^?Γ ⊢ ^?σ : ^?Δ }} |- {{ ^?Γ' ⊢s ^?σ' : ^?Δ' }} => eapply H1; try econstructor; mauto 2
-     | H1 : forall Γ' Δ' σ' τ',  tr_ctx ?Γ Γ' -> tr_sub ?σ σ' -> tr_sub ?τ τ' -> tr_ctx ?Δ Δ' -> {{ Γ' ⊢s σ' ≈ τ' : Δ' }},
-       H2 : {{ ^?Γ ⊢ ^?σ ≈ ^?τ : ^?Δ }} |- {{ ^?Γ' ⊢s ^?σ' ≈ ^?τ' : ^?Δ' }} => eapply H1; try econstructor; mauto 2
-     | _ => simpl
-     end).
-
+    (on_all_hyp: invert_tr);
+    econstructor; mauto 2.  
   
-  - 
-  (* - eapply H0; mauto 2; *)
-  (*     econstructor; mauto 2. *)
+  - eapply H0;
+    try econstructor; mauto 2.
 
-  (* - eapply H0; mauto 2; *)
-  (*     econstructor; mauto 2. *)
-  (* - eapply H1; mauto 2; *)
-  (*     econstructor; mauto 2. *)
-  (* - eapply H2; mauto 2; *)
-  (*     econstructor; mauto 2. *)
-  (* - eapply H3; mauto 2; *)
-  (*     econstructor; mauto 2. *)
+  - eapply H0; mauto 2.
+    econstructor; mauto 2.
 
-  (* - econstructor; mauto 2. *)
+  - eapply H1; mauto 2.
+    econstructor; mauto 2.
+
+  - eapply H2; mauto 2.
+    econstructor; mauto 2.
+
+  - eapply H3; mauto 2.
+    econstructor; mauto 2.
+
+  - econstructor; mauto 2.
+
     
-  (* - eapply H; mauto 2;   *)
-  (*     econstructor; mauto 2. *)
-
-  (* - eapply H0; mauto 2; *)
-  (*     econstructor; mauto 2. *)
-
-  (* - eapply H; mauto 2; *)
-  (*     econstructor; mauto 2. *)
-  (* - eapply H0; mauto 2; *)
-  (*     econstructor; mauto 2. *)
-
-  (* - eapply H1; mauto 2; *)
-  (*     econstructor; mauto 2. *)
-
-  (* -  *)
 Admitted.
 
 
