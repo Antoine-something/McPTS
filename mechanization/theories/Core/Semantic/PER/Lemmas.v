@@ -145,6 +145,35 @@ Proof.
   - eauto using per_top_typ_trans.
 Qed.
 
+Lemma per_nat_sym {P} : forall m n : domain P,
+    {{ Dom m ≈ n ∈ per_nat }} ->
+    {{ Dom n ≈ m ∈ per_nat }}.
+Proof with mautosolve.
+  induction 1; econstructor...
+Qed.
+
+#[export]
+Hint Resolve per_nat_sym : mcpts.
+
+Lemma per_nat_trans {P} : forall m n l : domain P,
+    {{ Dom m ≈ n ∈ per_nat }} ->
+    {{ Dom n ≈ l ∈ per_nat }} ->
+    {{ Dom m ≈ l ∈ per_nat }}.
+Proof with mautosolve.
+  intros * H. gen l.
+  induction H; inversion_clear 1; econstructor...
+Qed.
+
+#[export]
+Hint Resolve per_nat_trans : mcpts.
+
+#[export]
+Instance per_nat_PER {P} : PER (@per_nat P).
+Proof.
+  split.
+  - eauto using per_nat_sym.
+  - eauto using per_nat_trans.
+Qed.
 
 Lemma per_ne_sym {P} : forall m n : domain P,
     {{ Dom m ≈ n ∈ per_ne }} ->
@@ -191,7 +220,7 @@ Proof with mautosolve.
     intros;
     destruct_rel_mod_eval;
     econstructor; mauto 3.
-  1-3: rewrite <- HRR'; mauto.
+  1-4: rewrite <- HRR'; mauto.
   all: rewrite HRR'; mauto.
 Qed.
 
@@ -209,7 +238,7 @@ Proof with mautosolve.
     intros;
     destruct_rel_mod_eval;
     econstructor; mauto 3.
-  1-3: rewrite <- HRR'; mauto.
+  1-4: rewrite <- HRR'; mauto.
   all: rewrite HRR'; mauto.
 Qed.
 
@@ -425,6 +454,8 @@ Proof with mautosolve.
       intuition.
   - destruct_conjs.
     split; [per_sort_elem_econstructor' | apply_relation_equivalence]; mauto 3.
+  - destruct_conjs.
+    split; [per_sort_elem_econstructor' | apply_relation_equivalence]; mauto 3.
 Qed.
 
 Corollary per_sort_sym {P} {pred_P : PredicativeSig P} : forall s R a b,
@@ -552,6 +583,8 @@ Proof with (per_sort_elem_econstructor'; mautosolve 4).
     econstructor; eauto.
     intuition.
   - (* neut case *)
+    idtac...
+- (* neut case *)
     idtac...
 Qed.
 
@@ -1057,7 +1090,7 @@ Proof with (destruct_rel_typ; handle_per_sort_elem_irrel; eexists; intuition).
     inversion_clear H8.
     simplify_evals.
     handle_per_typ_elem_irrel.
-    econstructor; mauto; [econstructor; mauto | econstructor; mauto |].
+    econstructor; mauto.
     eapply H1.
     eassumption.
 
@@ -1068,7 +1101,7 @@ Proof with (destruct_rel_typ; handle_per_sort_elem_irrel; eexists; intuition).
     inversion_clear H8.
     simplify_evals.
     handle_per_typ_elem_irrel.
-    econstructor; mauto; [econstructor; mauto | econstructor; mauto |].
+    econstructor; mauto.
     eapply H1.
     eassumption.
 Qed.
@@ -1365,7 +1398,7 @@ Ltac invert_per_ctx_env_unsorted H :=
   + (inversion H; subst).
 
 Ltac invert_per_ctx_envs_unsorted := match_by_head per_ctx_env ltac:(fun H => directed invert_per_ctx_env_unsorted H).
-
+Ltac invert_per_ctx_envs_unsorted_of pred_P rel := match_by_head (per_ctx_env pred_P rel) ltac:(fun H => directed invert_per_ctx_env_unsorted H).
 
 Lemma per_typ_elem_and_per_sort_elem_implies_per_sort_elem {P} (pred_P : PredicativeSig P) : forall { a b c R R' s},
     {{ DF a ≈ b ∈ per_typ_elem pred_P ↘ R }} ->

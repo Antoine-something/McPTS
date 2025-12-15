@@ -39,10 +39,8 @@ Proof with solve [split; mauto].
     + econstructor; mauto.
       * inversion H2; subst.
         econstructor; mauto.
-        econstructor; mauto.
       * inversion H3; subst.
         econstructor; mauto.        
-        econstructor; mauto.
 Qed.
 
 (* Lemma valid_exp_var {P} {pred_P : PredicativeSig P} : forall {Γ x A}, *)
@@ -145,7 +143,6 @@ Proof with mautosolve.
   functional_eval_rewrite_clear.
   eexists.
   split; mauto.
-  repeat (econstructor; mauto).
 Qed.
 
 #[export]

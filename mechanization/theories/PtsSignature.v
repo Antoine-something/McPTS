@@ -7,6 +7,7 @@ Record PtsSig : Type :=
       St :> Set;
       Ax : St -> St -> Set;
       Ru : St -> St -> St -> Set;
+      Ru_nat : St -> Set;
     }.
 
 Record PredicativeSig (P : PtsSig) : Type :=
@@ -78,8 +79,11 @@ Section SignatureExtension.
 
   Inductive eRu : eSt -> eSt -> eSt -> Set :=
   | ru_P : forall {s1 s2 s3 : St P}, Ru P s1 s2 s3 -> eRu (st_P s1) (st_P s2) (st_P s3).
-  
-  Definition eP : PtsSig := mkPtsSig eSt eAx eRu.
+
+  Inductive eRu_nat : eSt -> Set :=
+  | runat_P : forall {s : St P}, Ru_nat P s -> eRu_nat (st_P s).
+    
+  Definition eP : PtsSig := mkPtsSig eSt eAx eRu eRu_nat.
 
 
   (* Proof that the extended signature is still predicative *)

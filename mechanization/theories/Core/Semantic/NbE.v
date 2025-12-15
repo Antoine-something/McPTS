@@ -54,7 +54,6 @@ Proof.
     rewrite -> H0.
     rewrite -> H0 in H2.
     eexists; eexists; repeat f_equal; split; mauto.
-    econstructor; mauto.
 Qed.
 
 #[export]

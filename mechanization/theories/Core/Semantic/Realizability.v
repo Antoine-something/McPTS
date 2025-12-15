@@ -6,6 +6,18 @@ From McPTS.Core Require Import Base.
 From McPTS.Core.Semantic Require Export NbE PER.
 Import Domain_Notations.
 
+Lemma per_nat_then_per_top {P} : forall {n m : domain P},
+    {{ Dom n ≈ m ∈ per_nat }} ->
+    {{ Dom ⇓ ℕ n ≈ ⇓ ℕ m ∈ per_top }}.
+Proof with solve [destruct_conjs; eexists; repeat econstructor; eauto].
+  induction 1; simpl in *; intros s;
+    try specialize (IHper_nat s);
+    try specialize (H s)...
+Qed.
+
+#[export]
+Hint Resolve per_nat_then_per_top : mcpts.
+
 Lemma realize_per_sort_elem_gen {P : PtsSig} {pred_P : PredicativeSig P} : forall {s a a' R},
     {{ DF a ≈ a' ∈ per_sort_elem pred_P s ↘ R }} ->
     {{ Dom a ≈ a' ∈ per_top_typ }}
@@ -179,7 +191,7 @@ Proof.
     apply_relation_equivalence.
     (* eexists. *)
     
-    econstructor; mauto;[ econstructor; mauto | econstructor; mauto |].
+    econstructor; mauto.
     
     eapply per_bot_then_per_typ_elem; eauto.
     erewrite per_ctx_respects_length; mauto.
