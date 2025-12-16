@@ -1328,41 +1328,16 @@ Proof.
 Qed.
 
 Add Parametric Morphism {P} (pred_P : PredicativeSig P) s a Γ : (glu_elem_bot pred_P s a Γ)
-    with signature wf_typ_eq Γ ==> eq ==> eq ==> iff as glu_elem_bot_morphism_iff2.
+    with signature wf_exp_eq Γ {{{ Sort@s }}} ==> eq ==> eq ==> iff as glu_elem_bot_morphism_iff2.
 Proof.
   intros A A' HAA' *.
   split; intros []; econstructor; mauto 3;
-    [rewrite <- HAA' | | rewrite -> HAA' |];
+    [rewrite <- HAA' | | rewrite -> HAA' | rewrite -> HAA' |];
     try eassumption;
     try split; intros;
-    assert {{ Δ ⊢ A[σ] ≈ A'[σ] }} as HAσA'σ by mauto 4;
-    eapply wf_exp_eq_conv';
+    try assert {{ Δ ⊢ A[σ] ≈ A'[σ] }} as HAσA'σ by mauto 4;
+    try eapply wf_exp_eq_conv';
     mauto 2.
-  
-  (* - assert {{ Δ ⊢ y0[σ] ≈ M' : A[σ] }}. *)
-  (*   { *)
-  (*     eapply wf_exp_eq_conv'; mauto 3. *)
-  (*     symmetry; mauto 3. *)
-  (*   } *)
-  (*   assert ({{ Δ ⊢ y0[σ] : B }} -> {{ Δ ⊢ y0[σ] ≈ M' : B }}) by (eapply H4; mauto 3). *)
-  (*   mauto 2. *)
-  (* - assert {{ Δ ⊢ y0[σ] ≈ M' : A[σ] }}. *)
-  (*   { *)
-  (*     eapply wf_exp_eq_conv'; mauto 3. *)
-  (*     symmetry; mauto 3. *)
-  (*   } *)
-  (*   eapply H4; mauto 3. *)
-  (* - assert {{ Δ ⊢ y0[σ] ≈ M' : A'[σ] }}. *)
-  (*   { *)
-  (*     eapply wf_exp_eq_conv'; mauto 3. *)
-  (*   } *)
-  (*   assert ({{ Δ ⊢ y0[σ] : B }} -> {{ Δ ⊢ y0[σ] ≈ M' : B }}) by (eapply H4; mauto 3). *)
-  (*   mauto 2. *)
-  (* - assert {{ Δ ⊢ y0[σ] ≈ M' : A'[σ] }}. *)
-  (*   { *)
-  (*     eapply wf_exp_eq_conv'; mauto 3. *)
-  (*   } *)
-  (*   eapply H4; mauto 3.   *)
 Qed.
 
 Add Parametric Morphism {P} (pred_P : PredicativeSig P) s a Γ A : (glu_elem_bot pred_P s a Γ A)
@@ -1374,32 +1349,6 @@ Proof.
     assert {{ Δ ⊢ M[σ] ≈ M'[σ] : A[σ] }} as HMσM'σ by mauto 4;
     [rewrite <- HMσM'σ | rewrite -> HMσM'σ ];
     mauto 3.
-    
-    (* [assert {{ Δ ⊢ M[σ] ≈ M'[σ] : A[σ] }} as HMσM'σ by mauto 4; rewrite <- HMσM'σ | | assert {{ Δ ⊢ M[σ] ≈ M'[σ] : A[σ] }} as HMσM'σ by mauto 4; rewrite -> HMσM'σ |]; *)
-  (*   destruct_conjs; try split; intros; mauto 3. *)
-  (* - assert {{ Δ ⊢ M[σ] ≈ M'[σ] : A[σ] }} by mauto 4. *)
-  (*   assert {{ Δ ⊢ M'[σ] ≈ M[σ] : B }} by (symmetry; eapply H4; mauto 3). *)
-  (*   assert {{ Δ ⊢ M[σ] : B }} by (gen_presup H9; eassumption). *)
-  (*   assert {{ Δ ⊢ M[σ] ≈ M'0 : A[σ] }} by mauto 3. *)
-  (*   assert ({{ Δ ⊢ M[σ] : B }} -> {{ Δ ⊢ M[σ] ≈ M'0 : B }}) by (eapply H4; mauto 3). *)
-  (*   transitivity {{{ M[σ] }}}; mauto 3. *)
-  (* - assert {{ Δ ⊢ M[σ] ≈ M'[σ] : A[σ] }} by mauto 4. *)
-  (*   assert {{ Δ ⊢ M[σ] ≈ M'0 : B }} by (eapply H4; mauto 3). *)
-  (*   assert {{ Δ ⊢ M[σ] : B }} by (gen_presup H9; eassumption). *)
-  (*   assert ({{ Δ ⊢ M[σ] : B }} -> {{ Δ ⊢ M[σ] ≈ M'[σ] : B }}) by (eapply H4; mauto 3). *)
-  (*   transitivity {{{ M[σ] }}}; mauto 3. *)
-    
-  (* - assert {{ Δ ⊢ M'[σ] ≈ M[σ] : A[σ] }} by (symmetry; mauto 4). *)
-  (*   assert {{ Δ ⊢ M'[σ] ≈ M[σ] : B }} by (eapply H4; mauto 3). *)
-  (*   assert {{ Δ ⊢ M'[σ] : B }} by (gen_presup H9; eassumption). *)
-  (*   assert {{ Δ ⊢ M'[σ] ≈ M'0 : A[σ] }} by mauto 3. *)
-  (*   assert ({{ Δ ⊢ M'[σ] : B }} -> {{ Δ ⊢ M'[σ] ≈ M'0 : B }}) by (eapply H4; mauto 3). *)
-  (*   transitivity {{{ M'[σ] }}}; mauto 3. *)
-  (* - assert {{ Δ ⊢ M'[σ] ≈ M[σ] : A[σ] }} by (symmetry; mauto 4). *)
-  (*   assert {{ Δ ⊢ M'[σ] ≈ M'0 : B }} by (eapply H4; mauto 3). *)
-  (*   assert {{ Δ ⊢ M'[σ] : B }} by (gen_presup H9; eassumption). *)
-  (*   assert ({{ Δ ⊢ M'[σ] : B }} -> {{ Δ ⊢ M'[σ] ≈ M[σ] : B }}) by (eapply H4; mauto 3). *)
-  (*   transitivity {{{ M'[σ] }}}; mauto 3. *)
 Qed.
 
 Add Parametric Morphism {P} (pred_P : PredicativeSig P) s a : (glu_elem_top pred_P s a)
@@ -1410,11 +1359,11 @@ Proof.
 Qed.
 
 Add Parametric Morphism {P} (pred_P : PredicativeSig P) s a Γ : (glu_elem_top pred_P s a Γ)
-    with signature wf_typ_eq Γ ==> eq ==> eq ==> iff as glu_elem_top_morphism_iff2.
+    with signature wf_exp_eq Γ {{{ Sort@s }}} ==> eq ==> eq ==> iff as glu_elem_top_morphism_iff2.
 Proof.
   intros A A' HAA' *.
   split; intros []; econstructor; mauto 3;
-    [rewrite <- HAA' | | rewrite -> HAA' |];
+    [rewrite <- HAA' | | rewrite -> HAA' | rewrite -> HAA' |];
     try eassumption;
     intros;
     assert {{ Δ ⊢ A[σ] ≈ A'[σ] }} as HAσA'σ by mauto 4;
@@ -1465,701 +1414,702 @@ Qed.
 
 
 
-(** Lemmas relevant to untyped judgments *)
-Lemma glu_typ_unsorted_elem_sort_lvl {P} (pred_P : PredicativeSig P) : forall typ_rel exp_rel a,
-    {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} ->
-    forall Γ A,
-      {{ Γ ⊢ A ® typ_rel }} ->
-      {{ Γ ⊢ A }}.
-Proof.
-  simpl.
-  inversion_clear 1; intros; [| eapply glu_sort_elem_sort_lvl; mauto 2];
-    simpl_glu_rel; mauto 2.
-Qed.
+
+(* (** Lemmas relevant to untyped judgments *) *)
+(* Lemma glu_typ_unsorted_elem_sort_lvl {P} (pred_P : PredicativeSig P) : forall typ_rel exp_rel a, *)
+(*     {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} -> *)
+(*     forall Γ A, *)
+(*       {{ Γ ⊢ A ® typ_rel }} -> *)
+(*       {{ Γ ⊢ A }}. *)
+(* Proof. *)
+(*   simpl. *)
+(*   inversion_clear 1; intros; [| eapply glu_sort_elem_sort_lvl; mauto 2]; *)
+(*     simpl_glu_rel; mauto 2. *)
+(* Qed. *)
 
 
-Lemma glu_typ_unsorted_elem_typ_resp_exp_eq {P} (pred_P : PredicativeSig P) : forall typ_rel exp_rel a,
-    {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} ->
-    forall Γ A A',
-      {{ Γ ⊢ A ® typ_rel }} ->
-      {{ Γ ⊢ A ≈ A' }} ->
-      {{ Γ ⊢ A' ® typ_rel }}.
-Proof.
-  simpl.
-  inversion_clear 1; intros; [| eapply glu_sort_elem_typ_resp_typ_eq; mauto 2];
-    simpl_glu_rel; mauto 3.
-  (* repeat split; mauto 3; intros. *)
-  (* - assert {{ Δ ⊢ A[σ] ≈ A'[σ] }} by mauto 3. *)
-  (*   assert {{ Δ ⊢ A[σ] ≈ A'[σ] : K }} by (eapply H3; mauto 3). *)
-  (*   gen_presup H8. *)
-  (*   assert ({{ Δ ⊢ A[σ] : K }} -> {{ Δ ⊢ A[σ] ≈ A'0 : K }}) by (eapply H3; mauto 3). *)
-  (*   transitivity {{{ A[σ] }}}; mauto 3. *)
-  (* - assert {{ Δ ⊢ A[σ] ≈ A'[σ] }} by mauto 3. *)
-  (*   assert {{ Δ ⊢ A[σ] ≈ A'0 : K }} by (eapply H3; mauto 3). *)
-  (*   gen_presup H8. *)
-  (*   assert ({{ Δ ⊢ A[σ] : K }} -> {{ Δ ⊢ A[σ] ≈ A'[σ] : K }}) by (eapply H3; mauto 3). *)
-  (*   transitivity {{{ A[σ] }}}; mauto 3. *)
-Qed.
+(* Lemma glu_typ_unsorted_elem_typ_resp_exp_eq {P} (pred_P : PredicativeSig P) : forall typ_rel exp_rel a, *)
+(*     {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} -> *)
+(*     forall Γ A A', *)
+(*       {{ Γ ⊢ A ® typ_rel }} -> *)
+(*       {{ Γ ⊢ A ≈ A' }} -> *)
+(*       {{ Γ ⊢ A' ® typ_rel }}. *)
+(* Proof. *)
+(*   simpl. *)
+(*   inversion_clear 1; intros; [| eapply glu_sort_elem_typ_resp_typ_eq; mauto 2]; *)
+(*     simpl_glu_rel; mauto 3. *)
+(*   (* repeat split; mauto 3; intros. *) *)
+(*   (* - assert {{ Δ ⊢ A[σ] ≈ A'[σ] }} by mauto 3. *) *)
+(*   (*   assert {{ Δ ⊢ A[σ] ≈ A'[σ] : K }} by (eapply H3; mauto 3). *) *)
+(*   (*   gen_presup H8. *) *)
+(*   (*   assert ({{ Δ ⊢ A[σ] : K }} -> {{ Δ ⊢ A[σ] ≈ A'0 : K }}) by (eapply H3; mauto 3). *) *)
+(*   (*   transitivity {{{ A[σ] }}}; mauto 3. *) *)
+(*   (* - assert {{ Δ ⊢ A[σ] ≈ A'[σ] }} by mauto 3. *) *)
+(*   (*   assert {{ Δ ⊢ A[σ] ≈ A'0 : K }} by (eapply H3; mauto 3). *) *)
+(*   (*   gen_presup H8. *) *)
+(*   (*   assert ({{ Δ ⊢ A[σ] : K }} -> {{ Δ ⊢ A[σ] ≈ A'[σ] : K }}) by (eapply H3; mauto 3). *) *)
+(*   (*   transitivity {{{ A[σ] }}}; mauto 3. *) *)
+(* Qed. *)
 
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) typ_rel exp_rel a (H : glu_typ_unsorted_elem pred_P typ_rel exp_rel a) Γ : (typ_rel Γ)
-  with signature wf_typ_eq Γ ==> iff as glu_typ_unsorted_elem_typ_morphism_iff1.
-Proof.
-  split; intros; eapply glu_typ_unsorted_elem_typ_resp_exp_eq; mauto 2.
-Qed.
+(* Add Parametric Morphism {P} (pred_P : PredicativeSig P) typ_rel exp_rel a (H : glu_typ_unsorted_elem pred_P typ_rel exp_rel a) Γ : (typ_rel Γ) *)
+(*   with signature wf_typ_eq Γ ==> iff as glu_typ_unsorted_elem_typ_morphism_iff1. *)
+(* Proof. *)
+(*   split; intros; eapply glu_typ_unsorted_elem_typ_resp_exp_eq; mauto 2. *)
+(* Qed. *)
 
-Lemma glu_typ_unsorted_elem_trm_resp_typ_typ_eq {P} (pred_P : PredicativeSig P) : forall typ_rel exp_rel a,
-    {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} ->
-    forall Γ M A m A',
-      {{ Γ ⊢ M : A ® m ∈ exp_rel }} ->
-      {{ Γ ⊢ A ≈ A' }} ->
-      {{ Γ ⊢ M : A' ® m ∈ exp_rel }}.
-Proof.
-  simpl.
-  inversion_clear 1; intros; [| eapply glu_sort_elem_trm_resp_typ_eq; mauto 3];
-    simpl_glu_rel; mauto 3.
-  repeat split; mauto 3.
-  (* - intros. *)
-  (*   assert {{ Δ ⊢ A[σ] ≈ A'[σ] }} by mauto 3. *)
-  (*   assert {{ Δ ⊢ A[σ] ≈ A'[σ] : K }} by (eapply H4; mauto 3). *)
-  (*   gen_presup H11. *)
-  (*   assert ({{ Δ ⊢ A[σ] : K }} -> {{ Δ ⊢ A[σ] ≈ A'0 : K }}) by (eapply H4; mauto 3). *)
-  (*   transitivity {{{ A[σ] }}}; mauto 3. *)
-  (* - intros. *)
-  (*   assert {{ Δ ⊢ A[σ] ≈ A'[σ] }} by mauto 3. *)
-  (*   assert {{ Δ ⊢ A[σ] ≈ A'0 : K }} by (eapply H4; mauto 3). *)
-  (*   gen_presup H11. *)
-  (*   assert ({{ Δ ⊢ A[σ] : K }} -> {{ Δ ⊢ A[σ] ≈ A'[σ] : K }}) by (eapply H4; mauto 3). *)
-  (*   transitivity {{{ A[σ] }}}; mauto 3. *)
-  (* (* - eapply H5; mauto 3. *) *)
-  (* (* - eapply H5; mauto 3. *) *)
-  - do 2 eexists; split; mauto 3. 
-Qed.
+(* Lemma glu_typ_unsorted_elem_trm_resp_typ_typ_eq {P} (pred_P : PredicativeSig P) : forall typ_rel exp_rel a, *)
+(*     {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} -> *)
+(*     forall Γ M A m A', *)
+(*       {{ Γ ⊢ M : A ® m ∈ exp_rel }} -> *)
+(*       {{ Γ ⊢ A ≈ A' }} -> *)
+(*       {{ Γ ⊢ M : A' ® m ∈ exp_rel }}. *)
+(* Proof. *)
+(*   simpl. *)
+(*   inversion_clear 1; intros; [| eapply glu_sort_elem_trm_resp_typ_eq; mauto 3]; *)
+(*     simpl_glu_rel; mauto 3. *)
+(*   repeat split; mauto 3. *)
+(*   (* - intros. *) *)
+(*   (*   assert {{ Δ ⊢ A[σ] ≈ A'[σ] }} by mauto 3. *) *)
+(*   (*   assert {{ Δ ⊢ A[σ] ≈ A'[σ] : K }} by (eapply H4; mauto 3). *) *)
+(*   (*   gen_presup H11. *) *)
+(*   (*   assert ({{ Δ ⊢ A[σ] : K }} -> {{ Δ ⊢ A[σ] ≈ A'0 : K }}) by (eapply H4; mauto 3). *) *)
+(*   (*   transitivity {{{ A[σ] }}}; mauto 3. *) *)
+(*   (* - intros. *) *)
+(*   (*   assert {{ Δ ⊢ A[σ] ≈ A'[σ] }} by mauto 3. *) *)
+(*   (*   assert {{ Δ ⊢ A[σ] ≈ A'0 : K }} by (eapply H4; mauto 3). *) *)
+(*   (*   gen_presup H11. *) *)
+(*   (*   assert ({{ Δ ⊢ A[σ] : K }} -> {{ Δ ⊢ A[σ] ≈ A'[σ] : K }}) by (eapply H4; mauto 3). *) *)
+(*   (*   transitivity {{{ A[σ] }}}; mauto 3. *) *)
+(*   (* (* - eapply H5; mauto 3. *) *) *)
+(*   (* (* - eapply H5; mauto 3. *) *) *)
+(*   - do 2 eexists; split; mauto 3.  *)
+(* Qed. *)
 
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) typ_rel exp_rel a (H : glu_typ_unsorted_elem pred_P typ_rel exp_rel a) Γ : (exp_rel Γ)
-    with signature wf_typ_eq Γ ==> eq ==> eq ==> iff as glu_typ_unsorted_elem_trm_morphism_iff1.
-Proof.
-  split; intros;
-    eapply glu_typ_unsorted_elem_trm_resp_typ_typ_eq;
-    mauto 2.
-Qed.
-
-
-Lemma glu_typ_unsorted_elem_typ_resp_ctx_eq {P} (pred_P : PredicativeSig P) : forall typ_rel exp_rel a,
-    {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} ->
-    forall Γ A Δ,
-      {{ Γ ⊢ A ® typ_rel }} ->
-      {{ ⊢ Γ ≈ Δ }} ->
-      {{ Δ ⊢ A ® typ_rel }}.
-Proof.
-  simpl.
-  inversion_clear 1; intros; [| eapply glu_sort_elem_typ_resp_ctx_eq; mauto 2];
-    simpl_glu_rel; mauto 2.
-  (* repeat split; mauto 3; intros. *)
-  (* - intros. *)
-  (*   assert ({{ Δ0 ⊢ A[σ] : K }} -> {{ Δ0 ⊢ A[σ] ≈ A' : K }}) by (eapply H3; mauto 3). *)
-  (*   mauto 2. *)
-  (* - intros. *)
-  (*   eapply H3; mauto 3. *)
-Qed.
-
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) typ_rel exp_rel a (H : glu_typ_unsorted_elem pred_P typ_rel exp_rel a) : typ_rel
-    with signature wf_ctx_eq ==> eq ==> iff as glu_typ_unsorted_elem_typ_morphism_iff2.
-Proof.
-  intros. split; intros;
-    eapply glu_typ_unsorted_elem_typ_resp_ctx_eq;
-    mauto 2.
-Qed.
-
-Lemma glu_typ_unsorted_elem_trm_resp_ctx_eq {P} (pred_P : PredicativeSig P) : forall typ_rel exp_rel a,
-    {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} ->
-    forall Γ A M m Δ,
-      {{ Γ ⊢ M : A ® m ∈ exp_rel }} ->
-      {{ ⊢ Γ ≈ Δ }} ->
-      {{ Δ ⊢ M : A ® m ∈ exp_rel }}.
-Proof.
-  simpl.
-  inversion_clear 1; intros; [| eapply glu_sort_elem_trm_resp_ctx_eq; mauto 2];
-    simpl_glu_rel.
-  repeat split; mauto 3.
-  (* - eapply H4; mauto 3. *)
-  (* - eapply H4; mauto 3. *)
-  (* (* - eapply H5; mauto 3. *) *)
-  (* (* - eapply H5; mauto 3. *) *)
-  - do 2 eexists; split; mauto 3.
-    eapply glu_sort_elem_typ_resp_ctx_eq; mauto 2.
-Qed.
-
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) typ_rel exp_rel a (H : glu_typ_unsorted_elem pred_P typ_rel exp_rel a) : exp_rel
-    with signature wf_ctx_eq ==> eq ==> eq ==> eq ==> iff as glu_typ_unsorted_elem_trm_morphism_iff2.
-Proof.
-  intros. split; intros;
-    eapply glu_typ_unsorted_elem_trm_resp_ctx_eq;
-    mauto 2.
-Qed.
+(* Add Parametric Morphism {P} (pred_P : PredicativeSig P) typ_rel exp_rel a (H : glu_typ_unsorted_elem pred_P typ_rel exp_rel a) Γ : (exp_rel Γ) *)
+(*     with signature wf_typ_eq Γ ==> eq ==> eq ==> iff as glu_typ_unsorted_elem_trm_morphism_iff1. *)
+(* Proof. *)
+(*   split; intros; *)
+(*     eapply glu_typ_unsorted_elem_trm_resp_typ_typ_eq; *)
+(*     mauto 2. *)
+(* Qed. *)
 
 
-Lemma glu_typ_unsorted_elem_trm_escape {P} (pred_P : PredicativeSig P) : forall typ_rel exp_rel a,
-    {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} ->
-    forall Γ M A m,
-      {{ Γ ⊢ M : A ® m ∈ exp_rel }} ->
-      {{ Γ ⊢ M : A }}.
-Proof.
-  simpl.
-  inversion_clear 1; intros; [| eapply glu_sort_elem_trm_escape; mauto 2];
-    simpl_glu_rel; mauto 2.
-Qed.
+(* Lemma glu_typ_unsorted_elem_typ_resp_ctx_eq {P} (pred_P : PredicativeSig P) : forall typ_rel exp_rel a, *)
+(*     {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} -> *)
+(*     forall Γ A Δ, *)
+(*       {{ Γ ⊢ A ® typ_rel }} -> *)
+(*       {{ ⊢ Γ ≈ Δ }} -> *)
+(*       {{ Δ ⊢ A ® typ_rel }}. *)
+(* Proof. *)
+(*   simpl. *)
+(*   inversion_clear 1; intros; [| eapply glu_sort_elem_typ_resp_ctx_eq; mauto 2]; *)
+(*     simpl_glu_rel; mauto 2. *)
+(*   (* repeat split; mauto 3; intros. *) *)
+(*   (* - intros. *) *)
+(*   (*   assert ({{ Δ0 ⊢ A[σ] : K }} -> {{ Δ0 ⊢ A[σ] ≈ A' : K }}) by (eapply H3; mauto 3). *) *)
+(*   (*   mauto 2. *) *)
+(*   (* - intros. *) *)
+(*   (*   eapply H3; mauto 3. *) *)
+(* Qed. *)
+
+(* Add Parametric Morphism {P} (pred_P : PredicativeSig P) typ_rel exp_rel a (H : glu_typ_unsorted_elem pred_P typ_rel exp_rel a) : typ_rel *)
+(*     with signature wf_ctx_eq ==> eq ==> iff as glu_typ_unsorted_elem_typ_morphism_iff2. *)
+(* Proof. *)
+(*   intros. split; intros; *)
+(*     eapply glu_typ_unsorted_elem_typ_resp_ctx_eq; *)
+(*     mauto 2. *)
+(* Qed. *)
+
+(* Lemma glu_typ_unsorted_elem_trm_resp_ctx_eq {P} (pred_P : PredicativeSig P) : forall typ_rel exp_rel a, *)
+(*     {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} -> *)
+(*     forall Γ A M m Δ, *)
+(*       {{ Γ ⊢ M : A ® m ∈ exp_rel }} -> *)
+(*       {{ ⊢ Γ ≈ Δ }} -> *)
+(*       {{ Δ ⊢ M : A ® m ∈ exp_rel }}. *)
+(* Proof. *)
+(*   simpl. *)
+(*   inversion_clear 1; intros; [| eapply glu_sort_elem_trm_resp_ctx_eq; mauto 2]; *)
+(*     simpl_glu_rel. *)
+(*   repeat split; mauto 3. *)
+(*   (* - eapply H4; mauto 3. *) *)
+(*   (* - eapply H4; mauto 3. *) *)
+(*   (* (* - eapply H5; mauto 3. *) *) *)
+(*   (* (* - eapply H5; mauto 3. *) *) *)
+(*   - do 2 eexists; split; mauto 3. *)
+(*     eapply glu_sort_elem_typ_resp_ctx_eq; mauto 2. *)
+(* Qed. *)
+
+(* Add Parametric Morphism {P} (pred_P : PredicativeSig P) typ_rel exp_rel a (H : glu_typ_unsorted_elem pred_P typ_rel exp_rel a) : exp_rel *)
+(*     with signature wf_ctx_eq ==> eq ==> eq ==> eq ==> iff as glu_typ_unsorted_elem_trm_morphism_iff2. *)
+(* Proof. *)
+(*   intros. split; intros; *)
+(*     eapply glu_typ_unsorted_elem_trm_resp_ctx_eq; *)
+(*     mauto 2. *)
+(* Qed. *)
 
 
-Lemma glu_typ_unsorted_elem_per_typ {P} (pred_P : PredicativeSig P) : forall typ_rel exp_rel a,
-    {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} ->
-    {{ Dom a ≈ a ∈ per_typ pred_P }}.
-Proof.
-  simpl.
-  inversion_clear 1.
-  - eexists; econstructor; reflexivity.
-  - assert {{ Dom a ≈ a ∈ per_sort pred_P s }} by mauto.
-    destruct H as [R ?].
-    eexists; mauto.
-Qed.
-
-#[export]
-Hint Resolve glu_typ_unsorted_elem_per_typ : mcpts.
+(* Lemma glu_typ_unsorted_elem_trm_escape {P} (pred_P : PredicativeSig P) : forall typ_rel exp_rel a, *)
+(*     {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} -> *)
+(*     forall Γ M A m, *)
+(*       {{ Γ ⊢ M : A ® m ∈ exp_rel }} -> *)
+(*       {{ Γ ⊢ M : A }}. *)
+(* Proof. *)
+(*   simpl. *)
+(*   inversion_clear 1; intros; [| eapply glu_sort_elem_trm_escape; mauto 2]; *)
+(*     simpl_glu_rel; mauto 2. *)
+(* Qed. *)
 
 
-Lemma glu_typ_unsorted_elem_per_typ_elem {P} (pred_P : PredicativeSig P) : forall typ_rel exp_rel a,
-    {{ DG a ∈ glu_typ_unsorted_elem pred_P  ↘ typ_rel ↘ exp_rel }} ->
-    forall Γ M A m R,
-      {{ Γ ⊢ M : A ® m ∈ exp_rel }} ->
-      {{ DF a ≈ a ∈ per_typ_elem pred_P ↘ R }} ->
-      {{ Dom m ≈ m ∈ R }}.
-Proof.
-  simpl.
-  inversion_clear 1; intros;
-    simpl_glu_rel.
-  - assert (per_sort pred_P s m m) by mauto.
-    assert (per_typ_elem pred_P (per_sort pred_P s) d{{{ Sort@s }}} d{{{ Sort@s }}}) by (econstructor; reflexivity).
-    handle_per_typ_elem_irrel.
-    eassumption.
-  - eapply glu_sort_elem_per_typ_elem; mauto 2.
-Qed.
+(* Lemma glu_typ_unsorted_elem_per_typ {P} (pred_P : PredicativeSig P) : forall typ_rel exp_rel a, *)
+(*     {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} -> *)
+(*     {{ Dom a ≈ a ∈ per_typ pred_P }}. *)
+(* Proof. *)
+(*   simpl. *)
+(*   inversion_clear 1. *)
+(*   - eexists; econstructor; reflexivity. *)
+(*   - assert {{ Dom a ≈ a ∈ per_sort pred_P s }} by mauto. *)
+(*     destruct H as [R ?]. *)
+(*     eexists; mauto. *)
+(* Qed. *)
+
+(* #[export] *)
+(* Hint Resolve glu_typ_unsorted_elem_per_typ : mcpts. *)
 
 
-Lemma glu_typ_unsorted_elem_trm_typ {P} (pred_P : PredicativeSig P) : forall typ_rel exp_rel a,
-    {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} ->
-    forall Γ M A m,
-      {{ Γ ⊢ M : A ® m ∈ exp_rel }} ->
-      {{ Γ ⊢ A ® typ_rel }}.
-Proof.
-  simpl.
-  inversion_clear 1; intros; [| eapply glu_sort_elem_trm_typ; mauto 2];
-    simpl_glu_rel; mauto 2.
-Qed.
-
-Lemma glu_typ_unsorted_elem_trm_sort_lvl {P} (pred_P : PredicativeSig P) : forall typ_rel exp_rel a,
-    {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} ->
-    forall Γ M A m,
-      {{ Γ ⊢ M : A ® m ∈ exp_rel }} ->
-      {{ Γ ⊢ A }}.
-Proof.
-  simpl.
-  inversion_clear 1; intros; [| eapply glu_sort_elem_trm_sort_lvl; mauto 2];
-    simpl_glu_rel; mauto 2.
-Qed.
+(* Lemma glu_typ_unsorted_elem_per_typ_elem {P} (pred_P : PredicativeSig P) : forall typ_rel exp_rel a, *)
+(*     {{ DG a ∈ glu_typ_unsorted_elem pred_P  ↘ typ_rel ↘ exp_rel }} -> *)
+(*     forall Γ M A m R, *)
+(*       {{ Γ ⊢ M : A ® m ∈ exp_rel }} -> *)
+(*       {{ DF a ≈ a ∈ per_typ_elem pred_P ↘ R }} -> *)
+(*       {{ Dom m ≈ m ∈ R }}. *)
+(* Proof. *)
+(*   simpl. *)
+(*   inversion_clear 1; intros; *)
+(*     simpl_glu_rel. *)
+(*   - assert (per_sort pred_P s m m) by mauto. *)
+(*     assert (per_typ_elem pred_P (per_sort pred_P s) d{{{ Sort@s }}} d{{{ Sort@s }}}) by (econstructor; reflexivity). *)
+(*     handle_per_typ_elem_irrel. *)
+(*     eassumption. *)
+(*   - eapply glu_sort_elem_per_typ_elem; mauto 2. *)
+(* Qed. *)
 
 
-Lemma glu_typ_unsorted_elem_trm_resp_exp_eq {P} (pred_P : PredicativeSig P) : forall typ_rel exp_rel a,
-    {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} ->
-    forall Γ A M m M',
-      {{ Γ ⊢ M : A ® m ∈ exp_rel }} ->
-      {{ Γ ⊢ M ≈ M' : A }} ->
-      {{ Γ ⊢ M' : A ® m ∈ exp_rel }}.
-Proof.
-  simpl.
-  inversion_clear 1; intros; [| eapply glu_sort_elem_trm_resp_exp_eq; mauto 2];
-    simpl_glu_rel; mauto 2.
-  repeat split; mauto 2.
-  (* - eapply H4; mauto 3. *)
-  (* - eapply H4; mauto 3. *)
-  (* - intros. *)
-  (*   assert {{ Γ ⊢ M ≈ M' }} by mauto 3. *)
-  (*   assert {{ Δ ⊢ M[σ] ≈ M'[σ] }} by mauto 3. *)
-  (*   assert {{ Δ ⊢ M[σ] ≈ M'0 }} by (etransitivity; mauto 2). *)
-  (*   assert {{ Δ ⊢ M[σ] ≈ M'[σ] : B }} by (eapply H5; mauto 3). *)
-  (*   gen_presup H13. *)
-  (*   assert ({{ Δ ⊢ M[σ] : B }} -> {{ Δ ⊢ M[σ] ≈ M'0 : B }}) by (eapply H5; mauto 3). *)
-  (*   transitivity {{{ M[σ] }}}; mauto 3. *)
-  (* - intros. *)
-  (*   assert {{ Γ ⊢ M ≈ M' }} by mauto 3. *)
-  (*   assert {{ Δ ⊢ M[σ] ≈ M'[σ] }} by mauto 3. *)
-  (*   assert {{ Δ ⊢ M[σ] ≈ M'0 }} by (etransitivity; mauto 2). *)
-  (*   assert {{ Δ ⊢ M[σ] ≈ M'0 : B }} by (eapply H5; mauto 3). *)
-  (*   gen_presup H13. *)
-  (*   assert ({{ Δ ⊢ M[σ] : B }} -> {{ Δ ⊢ M[σ] ≈ M'[σ] : B }}) by (eapply H5; mauto 3). *)
-  (*   transitivity {{{ M[σ] }}}; mauto 3. *)
-  - do 2 eexists; split; mauto 3.
-    eapply glu_sort_elem_typ_resp_typ_eq; mauto 3.
-Qed.
+(* Lemma glu_typ_unsorted_elem_trm_typ {P} (pred_P : PredicativeSig P) : forall typ_rel exp_rel a, *)
+(*     {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} -> *)
+(*     forall Γ M A m, *)
+(*       {{ Γ ⊢ M : A ® m ∈ exp_rel }} -> *)
+(*       {{ Γ ⊢ A ® typ_rel }}. *)
+(* Proof. *)
+(*   simpl. *)
+(*   inversion_clear 1; intros; [| eapply glu_sort_elem_trm_typ; mauto 2]; *)
+(*     simpl_glu_rel; mauto 2. *)
+(* Qed. *)
 
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) typ_rel exp_rel a (H : glu_typ_unsorted_elem pred_P typ_rel exp_rel a) Γ T : (exp_rel Γ T)
-    with signature wf_exp_eq Γ T ==> eq ==> iff as glu_typ_unsorted_elem_trm_morphism_iff3.
-Proof.
-  split; intros;
-    eapply glu_typ_unsorted_elem_trm_resp_exp_eq;
-    mauto 2.
-Qed.
-
-    
-Lemma functional_glu_typ_unsorted_elem {P} (pred_P : PredicativeSig P) : forall a typ_rel typ_rel' exp_rel exp_rel',
-    {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} ->
-    {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel' ↘ exp_rel' }} ->
-    (typ_rel <∙> typ_rel') /\ (exp_rel <∙> exp_rel').
-Proof.
-  inversion 1; inversion 1; subst; apply_predicate_equivalence.
-  - split; reflexivity.
-  - invert_glu_sort_elem H6.
-    rewrite H2.
-    rewrite H3.
-    split; [reflexivity |].
-    unfold sort_glu_exp_pred.
-    unfold sort_glu_exp_pred'.
-    unfold glu_sort_typ_rec.
-    split; intros; destruct_conjs; repeat split; mauto 3.
-    unfold glu_sort_typ.
-    (* + eapply H7; mauto 3. *)
-    (* + eapply H7; mauto 3. *)
-    (* + eapply H8; mauto 3. *)
-    (* + eapply H8; mauto 3. *)
-    (* + eapply H7; mauto 3. *)
-    (* + eapply H7; mauto 3. *)
-    (* + eapply H8; mauto 3. *)
-    (* + eapply H8; mauto 3. *)
-    + do 2 eexists; split; mauto 3.
-  - invert_glu_sort_elem H0.
-    rewrite H0.
-    rewrite H1.
-    split; [reflexivity |].
-    unfold sort_glu_exp_pred.
-    unfold sort_glu_exp_pred'.
-    unfold glu_sort_typ_rec.
-    split; intros; destruct_conjs; repeat split; mauto 3.
-    (* + eapply H7; mauto 3. *)
-    (* + eapply H7; mauto 3. *)
-    (* + eapply H8; mauto 3. *)
-    (* + eapply H8; mauto 3.       *)
-    + do 2 eexists; split; mauto 3.
-    (* + eapply H7; mauto 3. *)
-    (* + eapply H7; mauto 3. *)
-    (* + eapply H8; mauto 3. *)
-    (* + eapply H8; mauto 3.       *)
-
-  - handle_functional_glu_sort_elem P.
-    split; reflexivity.
-Qed.    
+(* Lemma glu_typ_unsorted_elem_trm_sort_lvl {P} (pred_P : PredicativeSig P) : forall typ_rel exp_rel a, *)
+(*     {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} -> *)
+(*     forall Γ M A m, *)
+(*       {{ Γ ⊢ M : A ® m ∈ exp_rel }} -> *)
+(*       {{ Γ ⊢ A }}. *)
+(* Proof. *)
+(*   simpl. *)
+(*   inversion_clear 1; intros; [| eapply glu_sort_elem_trm_sort_lvl; mauto 2]; *)
+(*     simpl_glu_rel; mauto 2. *)
+(* Qed. *)
 
 
-Ltac apply_functional_glu_typ_unsorted_elem1 :=
-  let tactic_error o1 o2 := fail 2 "functional_glu_typ_unsorted_elem biconditional between" o1 "and" o2 "cannot be solved" in
-  match goal with
-  | H1 : {{ DG ^?a ∈ glu_typ_unsorted_elem ?pred_P ↘ ?typ_rel1 ↘ ?exp_rel1 }},
-      H2 : {{ DG ^?a ∈ glu_typ_unsorted_elem ?pred_P ↘ ?typ_rel2 ↘ ?exp_rel2 }} |- _ =>
-      (* assert_fails (unify typ_rel1 typ_rel2; unify exp_rel1 exp_rel2); *)
-      match goal with
-      | H : typ_rel1 <∙> typ_rel2, H0 : exp_rel1 <∙> exp_rel2 |- _ => fail 1
-      | H : typ_rel1 <∙> typ_rel2, H0 : exp_rel2 <∙> exp_rel1 |- _ => fail 1
-      | H : typ_rel2 <∙> typ_rel1, H0 : exp_rel1 <∙> exp_rel2 |- _ => fail 1
-      | H : typ_rel2 <∙> typ_rel1, H0 : exp_rel2 <∙> exp_rel1 |- _ => fail 1
-      | _ => assert ((typ_rel1 <∙> typ_rel2) /\ (exp_rel1 <∙> exp_rel2)) as [] by (eapply functional_glu_typ_unsorted_elem; [apply H1 | apply H2]) || tactic_error typ_rel1 typ_rel2
-      end
-  end.
+(* Lemma glu_typ_unsorted_elem_trm_resp_exp_eq {P} (pred_P : PredicativeSig P) : forall typ_rel exp_rel a, *)
+(*     {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} -> *)
+(*     forall Γ A M m M', *)
+(*       {{ Γ ⊢ M : A ® m ∈ exp_rel }} -> *)
+(*       {{ Γ ⊢ M ≈ M' : A }} -> *)
+(*       {{ Γ ⊢ M' : A ® m ∈ exp_rel }}. *)
+(* Proof. *)
+(*   simpl. *)
+(*   inversion_clear 1; intros; [| eapply glu_sort_elem_trm_resp_exp_eq; mauto 2]; *)
+(*     simpl_glu_rel; mauto 2. *)
+(*   repeat split; mauto 2. *)
+(*   (* - eapply H4; mauto 3. *) *)
+(*   (* - eapply H4; mauto 3. *) *)
+(*   (* - intros. *) *)
+(*   (*   assert {{ Γ ⊢ M ≈ M' }} by mauto 3. *) *)
+(*   (*   assert {{ Δ ⊢ M[σ] ≈ M'[σ] }} by mauto 3. *) *)
+(*   (*   assert {{ Δ ⊢ M[σ] ≈ M'0 }} by (etransitivity; mauto 2). *) *)
+(*   (*   assert {{ Δ ⊢ M[σ] ≈ M'[σ] : B }} by (eapply H5; mauto 3). *) *)
+(*   (*   gen_presup H13. *) *)
+(*   (*   assert ({{ Δ ⊢ M[σ] : B }} -> {{ Δ ⊢ M[σ] ≈ M'0 : B }}) by (eapply H5; mauto 3). *) *)
+(*   (*   transitivity {{{ M[σ] }}}; mauto 3. *) *)
+(*   (* - intros. *) *)
+(*   (*   assert {{ Γ ⊢ M ≈ M' }} by mauto 3. *) *)
+(*   (*   assert {{ Δ ⊢ M[σ] ≈ M'[σ] }} by mauto 3. *) *)
+(*   (*   assert {{ Δ ⊢ M[σ] ≈ M'0 }} by (etransitivity; mauto 2). *) *)
+(*   (*   assert {{ Δ ⊢ M[σ] ≈ M'0 : B }} by (eapply H5; mauto 3). *) *)
+(*   (*   gen_presup H13. *) *)
+(*   (*   assert ({{ Δ ⊢ M[σ] : B }} -> {{ Δ ⊢ M[σ] ≈ M'[σ] : B }}) by (eapply H5; mauto 3). *) *)
+(*   (*   transitivity {{{ M[σ] }}}; mauto 3. *) *)
+(*   - do 2 eexists; split; mauto 3. *)
+(*     eapply glu_sort_elem_typ_resp_typ_eq; mauto 3. *)
+(* Qed. *)
 
-Ltac apply_functional_glu_typ_unsorted_elem :=
-  repeat apply_functional_glu_typ_unsorted_elem1.
-
-
-Ltac handle_functional_glu_typ_unsorted_elem P :=
-  functional_eval_rewrite_clear;
-  fold (glu_typ_pred P) in *;
-  fold (glu_exp_pred P) in *;
-  apply_functional_glu_typ_unsorted_elem;
-  apply_predicate_equivalence;
-  clear_dups.
+(* Add Parametric Morphism {P} (pred_P : PredicativeSig P) typ_rel exp_rel a (H : glu_typ_unsorted_elem pred_P typ_rel exp_rel a) Γ T : (exp_rel Γ T) *)
+(*     with signature wf_exp_eq Γ T ==> eq ==> iff as glu_typ_unsorted_elem_trm_morphism_iff3. *)
+(* Proof. *)
+(*   split; intros; *)
+(*     eapply glu_typ_unsorted_elem_trm_resp_exp_eq; *)
+(*     mauto 2. *)
+(* Qed. *)
 
     
-Lemma glu_typ_unsorted_elem_resp_per_typ_elem {P} (pred_P : PredicativeSig P) : forall a a' R,
-    {{ DF a ≈ a' ∈ per_typ_elem pred_P ↘ R }} ->
-    forall typ_rel exp_rel,
-    {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} ->
-    {{ DG a' ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} /\
-      (forall Γ M A m m',
-          {{ Γ ⊢ M : A ® m ∈ exp_rel }} ->
-          {{ Dom m ≈ m' ∈ R }} ->
-          {{ Γ ⊢ M : A ® m' ∈ exp_rel }}).
-Proof.
-  simpl.  
-  intros * Hper * Hglu.
-  inversion Hglu; inversion Hper; subst.
-  - inversion H6.
-    rewrite H2 in *.
-    clear H2 H6.
-    split; [econstructor; mauto 2|].
-    intros.
-    rewrite H0 in *.
-    rewrite H4 in H2.
-    unfold per_sort in H2.
-    unfold sort_glu_exp_pred in *.
-    unfold glu_sort_typ in *.
-    destruct_conjs.
-    repeat split; mauto 2.
-    (* + eapply H5; mauto 3. *)
-    (* + eapply H5; mauto 3. *)
-    (* + eapply H6; mauto 3. *)
-    (* + eapply H6; mauto 3. *)
-    + do 2 eexists; split; mauto 2.
-      eapply (glu_sort_elem_resp_per_sort_elem pred_P s m m' H2 H6 H5 H7 H8); mauto 2.
-  - invert_per_sort_elem H4.
-    split; [econstructor; mauto 2| ].
-    intros.
-    rewrite H0 in *.
-    rewrite H2 in H3.
-    unfold per_sort_rec in H3.
-    unfold sort_glu_exp_pred in *.
-    unfold glu_sort_typ in *.
-    destruct_conjs.
-    repeat split; mauto 2.
-    (* + eapply H5; mauto 3. *)
-    (* + eapply H5; mauto 3. *)
-    (* + eapply H6; mauto 3. *)
-    (* + eapply H6; mauto 3. *)
-    + do 2 eexists; split; mauto 2.
-      eapply (glu_sort_elem_resp_per_sort_elem pred_P s m m' H3 H6 H5 H7 H8); mauto 2.
-  - split; [eassumption|].
-    intros.
-    invert_glu_sort_elem H.
-    unfold sort_glu_exp_pred' in H0.
-    unfold glu_sort_typ_rec in H0.
-    rewrite H0 in *.
-    rewrite H3 in H2.
-    unfold per_sort in H2.
-    destruct_conjs.
-    repeat split; mauto 2.
-    (* + eapply H5; mauto 3.     *)
-    (* + eapply H5; mauto 3. *)
-    (* + eapply H6; mauto 3. *)
-    (* + eapply H6; mauto 3.     *)
-    + do 2 eexists; split; mauto 2.
-      eapply (glu_sort_elem_resp_per_sort_elem pred_P s0 m m' H2 H6 H5 H7 H8); mauto 2.
-  - assert (per_sort pred_P s a a) by mauto.
-    assert (per_sort pred_P s0 a a') by mauto.
-    assert (per_sort pred_P s a a') by (eapply per_sort_trans'; mauto 2).
-    unfold per_sort in *.
-    destruct_conjs.
-    handle_per_sort_elem_irrel.
-    assert (glu_sort_elem pred_P s typ_rel exp_rel a').
-    {
-      eapply (glu_sort_elem_resp_per_sort_elem pred_P s a a' R H4 typ_rel exp_rel); mauto.
-    }
-    split; [econstructor; mauto 2 |].
-    intros.
-    eapply (glu_sort_elem_resp_per_sort_elem pred_P s a a' R H4 typ_rel exp_rel); mauto.
-Qed.
+(* Lemma functional_glu_typ_unsorted_elem {P} (pred_P : PredicativeSig P) : forall a typ_rel typ_rel' exp_rel exp_rel', *)
+(*     {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} -> *)
+(*     {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel' ↘ exp_rel' }} -> *)
+(*     (typ_rel <∙> typ_rel') /\ (exp_rel <∙> exp_rel'). *)
+(* Proof. *)
+(*   inversion 1; inversion 1; subst; apply_predicate_equivalence. *)
+(*   - split; reflexivity. *)
+(*   - invert_glu_sort_elem H6. *)
+(*     rewrite H2. *)
+(*     rewrite H3. *)
+(*     split; [reflexivity |]. *)
+(*     unfold sort_glu_exp_pred. *)
+(*     unfold sort_glu_exp_pred'. *)
+(*     unfold glu_sort_typ_rec. *)
+(*     split; intros; destruct_conjs; repeat split; mauto 3. *)
+(*     unfold glu_sort_typ. *)
+(*     (* + eapply H7; mauto 3. *) *)
+(*     (* + eapply H7; mauto 3. *) *)
+(*     (* + eapply H8; mauto 3. *) *)
+(*     (* + eapply H8; mauto 3. *) *)
+(*     (* + eapply H7; mauto 3. *) *)
+(*     (* + eapply H7; mauto 3. *) *)
+(*     (* + eapply H8; mauto 3. *) *)
+(*     (* + eapply H8; mauto 3. *) *)
+(*     + do 2 eexists; split; mauto 3. *)
+(*   - invert_glu_sort_elem H0. *)
+(*     rewrite H0. *)
+(*     rewrite H1. *)
+(*     split; [reflexivity |]. *)
+(*     unfold sort_glu_exp_pred. *)
+(*     unfold sort_glu_exp_pred'. *)
+(*     unfold glu_sort_typ_rec. *)
+(*     split; intros; destruct_conjs; repeat split; mauto 3. *)
+(*     (* + eapply H7; mauto 3. *) *)
+(*     (* + eapply H7; mauto 3. *) *)
+(*     (* + eapply H8; mauto 3. *) *)
+(*     (* + eapply H8; mauto 3.       *) *)
+(*     + do 2 eexists; split; mauto 3. *)
+(*     (* + eapply H7; mauto 3. *) *)
+(*     (* + eapply H7; mauto 3. *) *)
+(*     (* + eapply H8; mauto 3. *) *)
+(*     (* + eapply H8; mauto 3.       *) *)
+
+(*   - handle_functional_glu_sort_elem P. *)
+(*     split; reflexivity. *)
+(* Qed.     *)
 
 
-Lemma glu_typ_unsorted_elem_resp_per_typ {P} (pred_P : PredicativeSig P) : forall a a' typ_rel exp_rel,
-    {{ Dom a ≈ a' ∈ per_typ pred_P }} ->
-    {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} ->
-    {{ DG a' ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }}.
-Proof.
-  intros * [? H] ?.
-  eapply glu_typ_unsorted_elem_resp_per_typ_elem in H; eauto.
-  intuition.
-Qed.
+(* Ltac apply_functional_glu_typ_unsorted_elem1 := *)
+(*   let tactic_error o1 o2 := fail 2 "functional_glu_typ_unsorted_elem biconditional between" o1 "and" o2 "cannot be solved" in *)
+(*   match goal with *)
+(*   | H1 : {{ DG ^?a ∈ glu_typ_unsorted_elem ?pred_P ↘ ?typ_rel1 ↘ ?exp_rel1 }}, *)
+(*       H2 : {{ DG ^?a ∈ glu_typ_unsorted_elem ?pred_P ↘ ?typ_rel2 ↘ ?exp_rel2 }} |- _ => *)
+(*       (* assert_fails (unify typ_rel1 typ_rel2; unify exp_rel1 exp_rel2); *) *)
+(*       match goal with *)
+(*       | H : typ_rel1 <∙> typ_rel2, H0 : exp_rel1 <∙> exp_rel2 |- _ => fail 1 *)
+(*       | H : typ_rel1 <∙> typ_rel2, H0 : exp_rel2 <∙> exp_rel1 |- _ => fail 1 *)
+(*       | H : typ_rel2 <∙> typ_rel1, H0 : exp_rel1 <∙> exp_rel2 |- _ => fail 1 *)
+(*       | H : typ_rel2 <∙> typ_rel1, H0 : exp_rel2 <∙> exp_rel1 |- _ => fail 1 *)
+(*       | _ => assert ((typ_rel1 <∙> typ_rel2) /\ (exp_rel1 <∙> exp_rel2)) as [] by (eapply functional_glu_typ_unsorted_elem; [apply H1 | apply H2]) || tactic_error typ_rel1 typ_rel2 *)
+(*       end *)
+(*   end. *)
+
+(* Ltac apply_functional_glu_typ_unsorted_elem := *)
+(*   repeat apply_functional_glu_typ_unsorted_elem1. *)
 
 
-Lemma glu_typ_unsorted_elem_resp_per_elem {P} (pred_P : PredicativeSig P) : forall a a' R typ_rel exp_rel Γ M A m m',
-    {{ DF a ≈ a' ∈ per_typ_elem pred_P ↘ R }} ->
-    {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} ->
-    {{ Γ ⊢ M : A ® m ∈ exp_rel }} ->
-    {{ Dom m ≈ m' ∈ R }} ->
-    {{ Γ ⊢ M : A ® m' ∈ exp_rel }}.
-Proof.
-  intros * H ?.
-  eapply glu_typ_unsorted_elem_resp_per_typ_elem in H; eauto.
-  intuition.
-Qed.
+(* Ltac handle_functional_glu_typ_unsorted_elem P := *)
+(*   functional_eval_rewrite_clear; *)
+(*   fold (glu_typ_pred P) in *; *)
+(*   fold (glu_exp_pred P) in *; *)
+(*   apply_functional_glu_typ_unsorted_elem; *)
+(*   apply_predicate_equivalence; *)
+(*   clear_dups. *)
 
-
-(** *** Morphism instances for [glu_typ_unsorted_elem] *)
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) : (glu_typ_unsorted_elem pred_P)
-    with signature glu_typ_pred_equivalence P ==> glu_exp_pred_equivalence P ==> eq ==> iff as simple_glu_typ_unsorted_elem_morphism_iff.
-Proof with mautosolve.
-  intros typ_rel typ_rel' ? exp_rel exp_rel'.
-  split; intro Horig; [gen exp_rel' typ_rel' | gen exp_rel typ_rel];
-    inversion Horig; subst; unshelve econstructor;
-    try (etransitivity; [symmetry + idtac|]; eassumption); eauto;
-    apply_predicate_equivalence; eassumption.
-Qed.
-
-
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) : (glu_typ_unsorted_elem pred_P)
-    with signature glu_typ_pred_equivalence P ==> glu_exp_pred_equivalence P ==> per_typ pred_P ==> iff as glu_typ_unsorted_elem_morphism_iff.
-Proof with mautosolve.
-  intros typ_rel typ_rel' HPP' exp_rel exp_rel' HElEl' a a' Haa'.
-  rewrite HPP', HElEl'.
-  split; intros; eapply glu_typ_unsorted_elem_resp_per_typ; mauto.
-  symmetry; eassumption.
-Qed.
-
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) R : (glu_typ_unsorted_elem pred_P)
-    with signature glu_typ_pred_equivalence P ==> glu_exp_pred_equivalence P ==> per_typ_elem pred_P R ==> iff as glu_typ_unsorted_elem_morphism_iff'.
-Proof with mautosolve.
-  intros typ_rel typ_rel' HPP' exp_rel exp_rel' HElEl' **.
-  rewrite HPP', HElEl'.
-  split; intros; eapply glu_typ_unsorted_elem_resp_per_typ; mauto.
-  symmetry; mauto.
-Qed.
-
-Ltac saturate_glu_unsorted_by_per1 :=
-  match goal with
-  | H : glu_typ_unsorted_elem ?pred_P ?typ_rel ?exp_rel ?a,
-      H1 : per_typ_elem ?pred_P _ ?a ?a' |- _ =>
-      assert (glu_typ_unsorted_elem pred_P typ_rel exp_rel a') by (rewrite <- H1; eassumption);
-      fail_if_dup
-  | H : glu_typ_unsorted_elem ?pred_P ?typ_rel ?exp_rel ?a',
-      H1 : per_typ_elem ?pred_P _ ?a ?a' |- _ =>
-      assert (glu_typ_unsorted_elem pred_P typ_rel exp_rel a) by (rewrite H1; eassumption);
-      fail_if_dup
-  end.
-
-Ltac saturate_glu_unsorted_by_per :=
-  clear_dups;
-  repeat saturate_glu_unsorted_by_per1.
-
-Lemma per_typ_glu_typ_unsorted_elem {P} (pred_P : PredicativeSig P) : forall a,
-    {{ Dom a ≈ a ∈ per_typ pred_P }} ->
-    exists typ_rel exp_rel, {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }}.
-Proof.
-  simpl.
-  intros.
-  destruct_conjs.
-  inversion H0; subst.
-  - do 2 eexists.
-    econstructor; mauto 2; reflexivity.
-  - assert (per_sort pred_P s a a) by mauto.
-    assert (exists typ_rel exp_rel, {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }}) by (eapply per_sort_glu_sort_elem; mauto 2).
-    destruct_conjs.
-    do 2 eexists.
-    econstructor; mauto 2.
-Qed.
-
-#[export]
-Hint Resolve per_typ_glu_typ_unsorted_elem : mcpts.
-
-
-Corollary per_typ_elem_glu_typ_unsorted_elem {P} (pred_P : PredicativeSig P) : forall a R,
-    {{ DF a ≈ a ∈ per_typ_elem pred_P ↘ R }} ->
-    exists typ_rel exp_rel, {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }}.
-Proof.
-  intros.
-  apply per_typ_glu_typ_unsorted_elem; mauto.
-Qed.
-
-#[export]
-Hint Resolve per_typ_elem_glu_typ_unsorted_elem : mcpts.
-
-Ltac saturate_glu_unsorted_info1 :=
-  match goal with
-  | H : glu_typ_unsorted_elem _ ?typ_rel _ _,
-      H1 : ?typ_rel _ _ |- _ =>
-      pose proof (glu_typ_unsorted_elem_sort_lvl _ _ _ _ H _ _ H1);
-      fail_if_dup
-  | H : glu_typ_unsorted_elem _ _ ?exp_rel _,
-      H1 : ?exp_rel _ _ _ _ |- _ =>
-      pose proof (glu_typ_unsorted_elem_trm_escape _ _ _ _ H _ _ _ _ H1);
-      fail_if_dup
-  end.
-
-Ltac saturate_glu_unsorted_info :=
-  clear_dups;
-  repeat saturate_glu_info1.
-
-
-Lemma glu_typ_unsorted_elem_mut_monotone {P} (pred_P : PredicativeSig P) : forall a typ_rel exp_rel,
-    {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} ->
-    forall Δ σ Γ,
-      {{ Δ ⊢w σ : Γ }} ->
-      (forall A,
-        {{ Γ ⊢ A ® typ_rel }} ->
-        {{ Δ ⊢ A[σ] ® typ_rel }}) /\
-    (forall M A m,
-      {{ Γ ⊢ M : A ® m ∈ exp_rel }} ->
-      {{ Δ ⊢ M[σ] : A[σ] ® m ∈ exp_rel }}).
-Proof.
-  simpl.
-  intros * Hglu.
-  inversion Hglu; subst.
-  - intros.
-    split; intros.
-    + rewrite H in *.
-      unfold sort_glu_typ_pred in *.
-      destruct_conjs.
-      repeat split; mauto 3; intros.
-      * transitivity {{{ Sort@s[σ] }}}; mauto 3.
-      (* * gen_presup H2. *)
-      (*   assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] }} by mauto 4. *)
-      (*   assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] : K }} by (eapply H3; mauto 3). *)
-      (*   gen_presup H8. *)
-      (*   assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' }} by (transitivity {{{ A[σ][σ0] }}}; mauto 3). *)
-      (*   assert ({{ Δ0 ⊢ A[σ∘σ0] : K }} -> {{ Δ0 ⊢ A[σ∘σ0] ≈ A' : K }}) by (eapply H3; mauto 3). *)
-      (*   transitivity {{{ A[σ∘σ0] }}}; mauto 3. *)
-      (* * gen_presup H2. *)
-      (*   assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] }} by mauto 4. *)
-      (*   assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' }} by (transitivity {{{ A[σ][σ0] }}}; mauto 3). *)
-      (*   assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' : K }} by (eapply H3; mauto 3). *)
-      (*   gen_presup H9. *)
-      (*   assert ({{ Δ0 ⊢ A[σ∘σ0] : K }} -> {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] : K }}) by (eapply H3; mauto 3). *)
-      (*   transitivity {{{ A[σ∘σ0] }}}; mauto 3.     *)
-
-    + rewrite H0 in *.
-      unfold sort_glu_exp_pred in *.
-      unfold glu_sort_typ in *.
-      destruct_conjs.
-      repeat split; [mauto 3 | transitivity {{{ Sort@s[σ] }}}; mauto 3 | ]; intros.
-      (* * gen_presup H2. *)
-      (*   assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] }} by mauto 4. *)
-      (*   assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] : K }} by (eapply H4; mauto 3). *)
-      (*   gen_presup H13. *)
-      (*   assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' }} by (transitivity {{{ A[σ][σ0] }}}; mauto 3). *)
-      (*   assert ({{ Δ0 ⊢ A[σ∘σ0] : K }} -> {{ Δ0 ⊢ A[σ∘σ0] ≈ A' : K }}) by (eapply H4; mauto 3). *)
-      (*   transitivity {{{ A[σ∘σ0] }}}; mauto 3. *)
-      (* * gen_presup H2. *)
-      (*   assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] }} by mauto 4. *)
-      (*   assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' }} by (transitivity {{{ A[σ][σ0] }}}; mauto 3). *)
-      (*   assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' : K }} by (eapply H4; mauto 3). *)
-      (*   gen_presup H14. *)
-      (*   assert ({{ Δ0 ⊢ A[σ∘σ0] : K }} -> {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] : K }}) by (eapply H4; mauto 3). *)
-      (*   transitivity {{{ A[σ∘σ0] }}}; mauto 3. *)
-      (* * assert {{ Γ ⊢ M }} by mauto 3. *)
-      (*   assert {{ Δ0 ⊢ M[σ∘σ0] ≈ M[σ][σ0] }} by mauto 4. *)
-      (*   assert {{ Δ0 ⊢ M[σ∘σ0] ≈ M[σ][σ0] : B }} by (eapply H5; mauto 3). *)
-      (*   gen_presup H15. *)
-      (*   assert {{ Δ0 ⊢ M[σ∘σ0] ≈ M' }} by (transitivity {{{ M[σ][σ0] }}}; mauto 3). *)
-      (*   assert ({{ Δ0 ⊢ M[σ∘σ0] : B }} -> {{ Δ0 ⊢ M[σ∘σ0] ≈ M' : B }}) by (eapply H5; mauto 3). *)
-      (*   transitivity {{{ M[σ∘σ0] }}}; mauto 3. *)
-      (* * assert {{ Γ ⊢ M }} by mauto 3. *)
-      (*   assert {{ Δ0 ⊢ M[σ∘σ0] ≈ M[σ][σ0] }} by mauto 4. *)
-      (*   assert {{ Δ0 ⊢ M[σ∘σ0] ≈ M' : B }} by (eapply H5; mauto 3). *)
-      (*   gen_presup H15. *)
-      (*   (* assert {{ Δ0 ⊢ M[σ∘σ0] ≈ M' }} by (transitivity {{{ M[σ][σ0] }}}; mauto 3). *) *)
-      (*   assert ({{ Δ0 ⊢ M[σ∘σ0] : B }} -> {{ Δ0 ⊢ M[σ∘σ0] ≈ M[σ][σ0] : B }}) by (eapply H5; mauto 3). *)
-      (*   transitivity {{{ M[σ∘σ0] }}}; mauto 3. *)
-      * do 2 eexists; split; mauto 3.
-        eapply (glu_sort_elem_mut_monotone pred_P s m H4 H5 H6 Δ σ Γ); mauto 3.
-  - eapply glu_sort_elem_mut_monotone; eassumption.
-Qed.
-
-
-Lemma glu_typ_unsorted_elem_typ_monotone {P} (pred_P : PredicativeSig P) : forall a typ_rel exp_rel Δ σ Γ A,
-    {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} ->
-    {{ Γ ⊢ A ® typ_rel }} ->
-    {{ Δ ⊢w σ : Γ }} ->
-    {{ Δ ⊢ A[σ] ® typ_rel }}.
-Proof.
-  intros * H; intros.
-  eapply glu_typ_unsorted_elem_mut_monotone in H; eauto.
-  intuition.
-Qed.
-
-Lemma glu_typ_unsorted_elem_exp_monotone {P} (pred_P : PredicativeSig P) : forall a typ_rel exp_rel Δ σ Γ M A m,
-    {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} ->
-    {{ Γ ⊢ M : A ® m ∈ exp_rel }} ->
-    {{ Δ ⊢w σ : Γ }} ->
-    {{ Δ ⊢ M[σ] : A[σ] ® m ∈ exp_rel }}.
-Proof.
-  intros * H; intros.
-  eapply glu_typ_unsorted_elem_mut_monotone in H; eauto.
-  intuition.
-Qed.
-
-
-
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) a : (glu_elem_bot_unsorted pred_P a)
-    with signature wf_ctx_eq ==> eq ==> eq ==> eq ==> iff as glu_elem_bot_unsorted_morphism_iff1.
-Proof.
-  intros Γ Γ' HΓΓ' *.
-  split; intros []; econstructor; mauto 4; [rewrite <- HΓΓ' | rewrite -> HΓΓ']; eassumption.
-Qed.
-
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) a Γ : (glu_elem_bot_unsorted pred_P a Γ)
-    with signature wf_typ_eq Γ ==> eq ==> eq ==> iff as glu_elem_bot_unsorted_morphism_iff2.
-Proof.
-  intros A A' HAA' *.
-  split; intros []; econstructor; mauto 3;  
-    [rewrite <- HAA' | | rewrite -> HAA' |];
-    try eassumption;
-    intros; eapply wf_exp_eq_conv'; mauto 3.
-  symmetry; mauto 3.
-Qed.
-
-(* Not sure if we actually want to prove this with wf_typ_eq Γ instead, but it does not seem like that would hold, or at least not straightforwardly *)
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) a Γ A : (glu_elem_bot_unsorted pred_P a Γ A)
-    with signature wf_exp_eq Γ A ==> eq ==> iff as glu_elem_bot_unsorted_morphism_iff3.
-Proof.   
-  intros M M' HMM' *.
-  split; intros []; econstructor; mauto 3; try (gen_presup HMM'; eassumption);
-    intros.    
-  - assert {{ Δ ⊢ M[σ] ≈ M'0 : A[σ] }} as HMσM'σ by mauto 4.
-    transitivity {{{ M[σ] }}}; [symmetry |]; mauto 4.
     
-  - assert {{ Δ ⊢ M'[σ] ≈ M'0 : A[σ] }} as HMσM'σ by mauto 4.
-    transitivity {{{ M'[σ] }}}; mauto 4.
-Qed.
+(* Lemma glu_typ_unsorted_elem_resp_per_typ_elem {P} (pred_P : PredicativeSig P) : forall a a' R, *)
+(*     {{ DF a ≈ a' ∈ per_typ_elem pred_P ↘ R }} -> *)
+(*     forall typ_rel exp_rel, *)
+(*     {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} -> *)
+(*     {{ DG a' ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} /\ *)
+(*       (forall Γ M A m m', *)
+(*           {{ Γ ⊢ M : A ® m ∈ exp_rel }} -> *)
+(*           {{ Dom m ≈ m' ∈ R }} -> *)
+(*           {{ Γ ⊢ M : A ® m' ∈ exp_rel }}). *)
+(* Proof. *)
+(*   simpl.   *)
+(*   intros * Hper * Hglu. *)
+(*   inversion Hglu; inversion Hper; subst. *)
+(*   - inversion H6. *)
+(*     rewrite H2 in *. *)
+(*     clear H2 H6. *)
+(*     split; [econstructor; mauto 2|]. *)
+(*     intros. *)
+(*     rewrite H0 in *. *)
+(*     rewrite H4 in H2. *)
+(*     unfold per_sort in H2. *)
+(*     unfold sort_glu_exp_pred in *. *)
+(*     unfold glu_sort_typ in *. *)
+(*     destruct_conjs. *)
+(*     repeat split; mauto 2. *)
+(*     (* + eapply H5; mauto 3. *) *)
+(*     (* + eapply H5; mauto 3. *) *)
+(*     (* + eapply H6; mauto 3. *) *)
+(*     (* + eapply H6; mauto 3. *) *)
+(*     + do 2 eexists; split; mauto 2. *)
+(*       eapply (glu_sort_elem_resp_per_sort_elem pred_P s m m' H2 H6 H5 H7 H8); mauto 2. *)
+(*   - invert_per_sort_elem H4. *)
+(*     split; [econstructor; mauto 2| ]. *)
+(*     intros. *)
+(*     rewrite H0 in *. *)
+(*     rewrite H2 in H3. *)
+(*     unfold per_sort_rec in H3. *)
+(*     unfold sort_glu_exp_pred in *. *)
+(*     unfold glu_sort_typ in *. *)
+(*     destruct_conjs. *)
+(*     repeat split; mauto 2. *)
+(*     (* + eapply H5; mauto 3. *) *)
+(*     (* + eapply H5; mauto 3. *) *)
+(*     (* + eapply H6; mauto 3. *) *)
+(*     (* + eapply H6; mauto 3. *) *)
+(*     + do 2 eexists; split; mauto 2. *)
+(*       eapply (glu_sort_elem_resp_per_sort_elem pred_P s m m' H3 H6 H5 H7 H8); mauto 2. *)
+(*   - split; [eassumption|]. *)
+(*     intros. *)
+(*     invert_glu_sort_elem H. *)
+(*     unfold sort_glu_exp_pred' in H0. *)
+(*     unfold glu_sort_typ_rec in H0. *)
+(*     rewrite H0 in *. *)
+(*     rewrite H3 in H2. *)
+(*     unfold per_sort in H2. *)
+(*     destruct_conjs. *)
+(*     repeat split; mauto 2. *)
+(*     (* + eapply H5; mauto 3.     *) *)
+(*     (* + eapply H5; mauto 3. *) *)
+(*     (* + eapply H6; mauto 3. *) *)
+(*     (* + eapply H6; mauto 3.     *) *)
+(*     + do 2 eexists; split; mauto 2. *)
+(*       eapply (glu_sort_elem_resp_per_sort_elem pred_P s0 m m' H2 H6 H5 H7 H8); mauto 2. *)
+(*   - assert (per_sort pred_P s a a) by mauto. *)
+(*     assert (per_sort pred_P s0 a a') by mauto. *)
+(*     assert (per_sort pred_P s a a') by (eapply per_sort_trans'; mauto 2). *)
+(*     unfold per_sort in *. *)
+(*     destruct_conjs. *)
+(*     handle_per_sort_elem_irrel. *)
+(*     assert (glu_sort_elem pred_P s typ_rel exp_rel a'). *)
+(*     { *)
+(*       eapply (glu_sort_elem_resp_per_sort_elem pred_P s a a' R H4 typ_rel exp_rel); mauto. *)
+(*     } *)
+(*     split; [econstructor; mauto 2 |]. *)
+(*     intros. *)
+(*     eapply (glu_sort_elem_resp_per_sort_elem pred_P s a a' R H4 typ_rel exp_rel); mauto. *)
+(* Qed. *)
 
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) a : (glu_elem_top_unsorted pred_P a)
-    with signature wf_ctx_eq ==> eq ==> eq ==> eq ==> iff as glu_elem_top_unsorted_morphism_iff1.
-Proof.
-  intros Γ Γ' HΓΓ' *.
-  split; intros []; econstructor; mauto 4; [rewrite <- HΓΓ' | rewrite -> HΓΓ']; eassumption.
-Qed.
 
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) a Γ : (glu_elem_top_unsorted pred_P a Γ)
-    with signature wf_typ_eq Γ ==> eq ==> eq ==> iff as glu_elem_top_unsorted_morphism_iff2.
-Proof.
-  intros A A' HAA' *.
-  split; intros []; econstructor; mauto 3; [rewrite <- HAA' | | rewrite -> HAA' | ];
-    try eassumption;
-    intros;
-    assert {{ Δ ⊢ A[σ] ≈ A'[σ] }} as HAσA'σ by mauto 4;
-    [eapply wf_exp_eq_conv' with (A := {{{ A[σ] }}}) | eapply wf_exp_eq_conv' with (A := {{{ A'[σ] }}})];
-    mauto 3.
-Qed.
+(* Lemma glu_typ_unsorted_elem_resp_per_typ {P} (pred_P : PredicativeSig P) : forall a a' typ_rel exp_rel, *)
+(*     {{ Dom a ≈ a' ∈ per_typ pred_P }} -> *)
+(*     {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} -> *)
+(*     {{ DG a' ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }}. *)
+(* Proof. *)
+(*   intros * [? H] ?. *)
+(*   eapply glu_typ_unsorted_elem_resp_per_typ_elem in H; eauto. *)
+(*   intuition. *)
+(* Qed. *)
 
-(* Same unprovability problem *)
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) a Γ A : (glu_elem_top_unsorted pred_P a Γ A)
-    with signature wf_exp_eq Γ A ==> eq ==> iff as glu_elem_top_unsorted_morphism_iff3.
-Proof.
-  intros M M' HMM' *.
-  split; intros []; econstructor; mauto 3; try (gen_presup HMM'; eassumption);
-    intros;
-    assert {{ Δ ⊢ M[σ] ≈ M'[σ] : A[σ] }} as HMσM'σ by mauto 4;
-    [rewrite <- HMσM'σ | rewrite -> HMσM'σ];
-    mauto.
-Qed.
 
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) a : (glu_typ_top_unsorted pred_P a)
-    with signature wf_ctx_eq ==> eq ==> iff as glu_typ_top_unsorted_morphism_iff1.
-Proof.
-  intros Γ Γ' HΓΓ' *.
-  split; intros []; econstructor; mauto 4.
-Qed.
+(* Lemma glu_typ_unsorted_elem_resp_per_elem {P} (pred_P : PredicativeSig P) : forall a a' R typ_rel exp_rel Γ M A m m', *)
+(*     {{ DF a ≈ a' ∈ per_typ_elem pred_P ↘ R }} -> *)
+(*     {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} -> *)
+(*     {{ Γ ⊢ M : A ® m ∈ exp_rel }} -> *)
+(*     {{ Dom m ≈ m' ∈ R }} -> *)
+(*     {{ Γ ⊢ M : A ® m' ∈ exp_rel }}. *)
+(* Proof. *)
+(*   intros * H ?. *)
+(*   eapply glu_typ_unsorted_elem_resp_per_typ_elem in H; eauto. *)
+(*   intuition. *)
+(* Qed. *)
 
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) a Γ : (glu_typ_top_unsorted pred_P a Γ)
-    with signature wf_typ_eq Γ ==> iff as glu_typ_top_unsorted_morphism_iff2.
-Proof.
-  intros A A' HAA' *.
-  split; intros []; econstructor; mauto 3;
-    try (gen_presup HAA'; eassumption);
-    intros;
-    assert {{ Δ ⊢ A[σ] ≈ A'[σ] }} as HAσA'σ by mauto 4;
-    mauto 4.
-Qed.
+
+(* (** *** Morphism instances for [glu_typ_unsorted_elem] *) *)
+(* Add Parametric Morphism {P} (pred_P : PredicativeSig P) : (glu_typ_unsorted_elem pred_P) *)
+(*     with signature glu_typ_pred_equivalence P ==> glu_exp_pred_equivalence P ==> eq ==> iff as simple_glu_typ_unsorted_elem_morphism_iff. *)
+(* Proof with mautosolve. *)
+(*   intros typ_rel typ_rel' ? exp_rel exp_rel'. *)
+(*   split; intro Horig; [gen exp_rel' typ_rel' | gen exp_rel typ_rel]; *)
+(*     inversion Horig; subst; unshelve econstructor; *)
+(*     try (etransitivity; [symmetry + idtac|]; eassumption); eauto; *)
+(*     apply_predicate_equivalence; eassumption. *)
+(* Qed. *)
+
+
+(* Add Parametric Morphism {P} (pred_P : PredicativeSig P) : (glu_typ_unsorted_elem pred_P) *)
+(*     with signature glu_typ_pred_equivalence P ==> glu_exp_pred_equivalence P ==> per_typ pred_P ==> iff as glu_typ_unsorted_elem_morphism_iff. *)
+(* Proof with mautosolve. *)
+(*   intros typ_rel typ_rel' HPP' exp_rel exp_rel' HElEl' a a' Haa'. *)
+(*   rewrite HPP', HElEl'. *)
+(*   split; intros; eapply glu_typ_unsorted_elem_resp_per_typ; mauto. *)
+(*   symmetry; eassumption. *)
+(* Qed. *)
+
+(* Add Parametric Morphism {P} (pred_P : PredicativeSig P) R : (glu_typ_unsorted_elem pred_P) *)
+(*     with signature glu_typ_pred_equivalence P ==> glu_exp_pred_equivalence P ==> per_typ_elem pred_P R ==> iff as glu_typ_unsorted_elem_morphism_iff'. *)
+(* Proof with mautosolve. *)
+(*   intros typ_rel typ_rel' HPP' exp_rel exp_rel' HElEl' **. *)
+(*   rewrite HPP', HElEl'. *)
+(*   split; intros; eapply glu_typ_unsorted_elem_resp_per_typ; mauto. *)
+(*   symmetry; mauto. *)
+(* Qed. *)
+
+(* Ltac saturate_glu_unsorted_by_per1 := *)
+(*   match goal with *)
+(*   | H : glu_typ_unsorted_elem ?pred_P ?typ_rel ?exp_rel ?a, *)
+(*       H1 : per_typ_elem ?pred_P _ ?a ?a' |- _ => *)
+(*       assert (glu_typ_unsorted_elem pred_P typ_rel exp_rel a') by (rewrite <- H1; eassumption); *)
+(*       fail_if_dup *)
+(*   | H : glu_typ_unsorted_elem ?pred_P ?typ_rel ?exp_rel ?a', *)
+(*       H1 : per_typ_elem ?pred_P _ ?a ?a' |- _ => *)
+(*       assert (glu_typ_unsorted_elem pred_P typ_rel exp_rel a) by (rewrite H1; eassumption); *)
+(*       fail_if_dup *)
+(*   end. *)
+
+(* Ltac saturate_glu_unsorted_by_per := *)
+(*   clear_dups; *)
+(*   repeat saturate_glu_unsorted_by_per1. *)
+
+(* Lemma per_typ_glu_typ_unsorted_elem {P} (pred_P : PredicativeSig P) : forall a, *)
+(*     {{ Dom a ≈ a ∈ per_typ pred_P }} -> *)
+(*     exists typ_rel exp_rel, {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }}. *)
+(* Proof. *)
+(*   simpl. *)
+(*   intros. *)
+(*   destruct_conjs. *)
+(*   inversion H0; subst. *)
+(*   - do 2 eexists. *)
+(*     econstructor; mauto 2; reflexivity. *)
+(*   - assert (per_sort pred_P s a a) by mauto. *)
+(*     assert (exists typ_rel exp_rel, {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }}) by (eapply per_sort_glu_sort_elem; mauto 2). *)
+(*     destruct_conjs. *)
+(*     do 2 eexists. *)
+(*     econstructor; mauto 2. *)
+(* Qed. *)
+
+(* #[export] *)
+(* Hint Resolve per_typ_glu_typ_unsorted_elem : mcpts. *)
+
+
+(* Corollary per_typ_elem_glu_typ_unsorted_elem {P} (pred_P : PredicativeSig P) : forall a R, *)
+(*     {{ DF a ≈ a ∈ per_typ_elem pred_P ↘ R }} -> *)
+(*     exists typ_rel exp_rel, {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }}. *)
+(* Proof. *)
+(*   intros. *)
+(*   apply per_typ_glu_typ_unsorted_elem; mauto. *)
+(* Qed. *)
+
+(* #[export] *)
+(* Hint Resolve per_typ_elem_glu_typ_unsorted_elem : mcpts. *)
+
+(* Ltac saturate_glu_unsorted_info1 := *)
+(*   match goal with *)
+(*   | H : glu_typ_unsorted_elem _ ?typ_rel _ _, *)
+(*       H1 : ?typ_rel _ _ |- _ => *)
+(*       pose proof (glu_typ_unsorted_elem_sort_lvl _ _ _ _ H _ _ H1); *)
+(*       fail_if_dup *)
+(*   | H : glu_typ_unsorted_elem _ _ ?exp_rel _, *)
+(*       H1 : ?exp_rel _ _ _ _ |- _ => *)
+(*       pose proof (glu_typ_unsorted_elem_trm_escape _ _ _ _ H _ _ _ _ H1); *)
+(*       fail_if_dup *)
+(*   end. *)
+
+(* Ltac saturate_glu_unsorted_info := *)
+(*   clear_dups; *)
+(*   repeat saturate_glu_info1. *)
+
+
+(* Lemma glu_typ_unsorted_elem_mut_monotone {P} (pred_P : PredicativeSig P) : forall a typ_rel exp_rel, *)
+(*     {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} -> *)
+(*     forall Δ σ Γ, *)
+(*       {{ Δ ⊢w σ : Γ }} -> *)
+(*       (forall A, *)
+(*         {{ Γ ⊢ A ® typ_rel }} -> *)
+(*         {{ Δ ⊢ A[σ] ® typ_rel }}) /\ *)
+(*     (forall M A m, *)
+(*       {{ Γ ⊢ M : A ® m ∈ exp_rel }} -> *)
+(*       {{ Δ ⊢ M[σ] : A[σ] ® m ∈ exp_rel }}). *)
+(* Proof. *)
+(*   simpl. *)
+(*   intros * Hglu. *)
+(*   inversion Hglu; subst. *)
+(*   - intros. *)
+(*     split; intros. *)
+(*     + rewrite H in *. *)
+(*       unfold sort_glu_typ_pred in *. *)
+(*       destruct_conjs. *)
+(*       repeat split; mauto 3; intros. *)
+(*       * transitivity {{{ Sort@s[σ] }}}; mauto 3. *)
+(*       (* * gen_presup H2. *) *)
+(*       (*   assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] }} by mauto 4. *) *)
+(*       (*   assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] : K }} by (eapply H3; mauto 3). *) *)
+(*       (*   gen_presup H8. *) *)
+(*       (*   assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' }} by (transitivity {{{ A[σ][σ0] }}}; mauto 3). *) *)
+(*       (*   assert ({{ Δ0 ⊢ A[σ∘σ0] : K }} -> {{ Δ0 ⊢ A[σ∘σ0] ≈ A' : K }}) by (eapply H3; mauto 3). *) *)
+(*       (*   transitivity {{{ A[σ∘σ0] }}}; mauto 3. *) *)
+(*       (* * gen_presup H2. *) *)
+(*       (*   assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] }} by mauto 4. *) *)
+(*       (*   assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' }} by (transitivity {{{ A[σ][σ0] }}}; mauto 3). *) *)
+(*       (*   assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' : K }} by (eapply H3; mauto 3). *) *)
+(*       (*   gen_presup H9. *) *)
+(*       (*   assert ({{ Δ0 ⊢ A[σ∘σ0] : K }} -> {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] : K }}) by (eapply H3; mauto 3). *) *)
+(*       (*   transitivity {{{ A[σ∘σ0] }}}; mauto 3.     *) *)
+
+(*     + rewrite H0 in *. *)
+(*       unfold sort_glu_exp_pred in *. *)
+(*       unfold glu_sort_typ in *. *)
+(*       destruct_conjs. *)
+(*       repeat split; [mauto 3 | transitivity {{{ Sort@s[σ] }}}; mauto 3 | ]; intros. *)
+(*       (* * gen_presup H2. *) *)
+(*       (*   assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] }} by mauto 4. *) *)
+(*       (*   assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] : K }} by (eapply H4; mauto 3). *) *)
+(*       (*   gen_presup H13. *) *)
+(*       (*   assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' }} by (transitivity {{{ A[σ][σ0] }}}; mauto 3). *) *)
+(*       (*   assert ({{ Δ0 ⊢ A[σ∘σ0] : K }} -> {{ Δ0 ⊢ A[σ∘σ0] ≈ A' : K }}) by (eapply H4; mauto 3). *) *)
+(*       (*   transitivity {{{ A[σ∘σ0] }}}; mauto 3. *) *)
+(*       (* * gen_presup H2. *) *)
+(*       (*   assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] }} by mauto 4. *) *)
+(*       (*   assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' }} by (transitivity {{{ A[σ][σ0] }}}; mauto 3). *) *)
+(*       (*   assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A' : K }} by (eapply H4; mauto 3). *) *)
+(*       (*   gen_presup H14. *) *)
+(*       (*   assert ({{ Δ0 ⊢ A[σ∘σ0] : K }} -> {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] : K }}) by (eapply H4; mauto 3). *) *)
+(*       (*   transitivity {{{ A[σ∘σ0] }}}; mauto 3. *) *)
+(*       (* * assert {{ Γ ⊢ M }} by mauto 3. *) *)
+(*       (*   assert {{ Δ0 ⊢ M[σ∘σ0] ≈ M[σ][σ0] }} by mauto 4. *) *)
+(*       (*   assert {{ Δ0 ⊢ M[σ∘σ0] ≈ M[σ][σ0] : B }} by (eapply H5; mauto 3). *) *)
+(*       (*   gen_presup H15. *) *)
+(*       (*   assert {{ Δ0 ⊢ M[σ∘σ0] ≈ M' }} by (transitivity {{{ M[σ][σ0] }}}; mauto 3). *) *)
+(*       (*   assert ({{ Δ0 ⊢ M[σ∘σ0] : B }} -> {{ Δ0 ⊢ M[σ∘σ0] ≈ M' : B }}) by (eapply H5; mauto 3). *) *)
+(*       (*   transitivity {{{ M[σ∘σ0] }}}; mauto 3. *) *)
+(*       (* * assert {{ Γ ⊢ M }} by mauto 3. *) *)
+(*       (*   assert {{ Δ0 ⊢ M[σ∘σ0] ≈ M[σ][σ0] }} by mauto 4. *) *)
+(*       (*   assert {{ Δ0 ⊢ M[σ∘σ0] ≈ M' : B }} by (eapply H5; mauto 3). *) *)
+(*       (*   gen_presup H15. *) *)
+(*       (*   (* assert {{ Δ0 ⊢ M[σ∘σ0] ≈ M' }} by (transitivity {{{ M[σ][σ0] }}}; mauto 3). *) *) *)
+(*       (*   assert ({{ Δ0 ⊢ M[σ∘σ0] : B }} -> {{ Δ0 ⊢ M[σ∘σ0] ≈ M[σ][σ0] : B }}) by (eapply H5; mauto 3). *) *)
+(*       (*   transitivity {{{ M[σ∘σ0] }}}; mauto 3. *) *)
+(*       * do 2 eexists; split; mauto 3. *)
+(*         eapply (glu_sort_elem_mut_monotone pred_P s m H4 H5 H6 Δ σ Γ); mauto 3. *)
+(*   - eapply glu_sort_elem_mut_monotone; eassumption. *)
+(* Qed. *)
+
+
+(* Lemma glu_typ_unsorted_elem_typ_monotone {P} (pred_P : PredicativeSig P) : forall a typ_rel exp_rel Δ σ Γ A, *)
+(*     {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} -> *)
+(*     {{ Γ ⊢ A ® typ_rel }} -> *)
+(*     {{ Δ ⊢w σ : Γ }} -> *)
+(*     {{ Δ ⊢ A[σ] ® typ_rel }}. *)
+(* Proof. *)
+(*   intros * H; intros. *)
+(*   eapply glu_typ_unsorted_elem_mut_monotone in H; eauto. *)
+(*   intuition. *)
+(* Qed. *)
+
+(* Lemma glu_typ_unsorted_elem_exp_monotone {P} (pred_P : PredicativeSig P) : forall a typ_rel exp_rel Δ σ Γ M A m, *)
+(*     {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} -> *)
+(*     {{ Γ ⊢ M : A ® m ∈ exp_rel }} -> *)
+(*     {{ Δ ⊢w σ : Γ }} -> *)
+(*     {{ Δ ⊢ M[σ] : A[σ] ® m ∈ exp_rel }}. *)
+(* Proof. *)
+(*   intros * H; intros. *)
+(*   eapply glu_typ_unsorted_elem_mut_monotone in H; eauto. *)
+(*   intuition. *)
+(* Qed. *)
+
+
+
+(* Add Parametric Morphism {P} (pred_P : PredicativeSig P) a : (glu_elem_bot_unsorted pred_P a) *)
+(*     with signature wf_ctx_eq ==> eq ==> eq ==> eq ==> iff as glu_elem_bot_unsorted_morphism_iff1. *)
+(* Proof. *)
+(*   intros Γ Γ' HΓΓ' *. *)
+(*   split; intros []; econstructor; mauto 4; [rewrite <- HΓΓ' | rewrite -> HΓΓ']; eassumption. *)
+(* Qed. *)
+
+(* Add Parametric Morphism {P} (pred_P : PredicativeSig P) a Γ : (glu_elem_bot_unsorted pred_P a Γ) *)
+(*     with signature wf_typ_eq Γ ==> eq ==> eq ==> iff as glu_elem_bot_unsorted_morphism_iff2. *)
+(* Proof. *)
+(*   intros A A' HAA' *. *)
+(*   split; intros []; econstructor; mauto 3;   *)
+(*     [rewrite <- HAA' | | rewrite -> HAA' |]; *)
+(*     try eassumption; *)
+(*     intros; eapply wf_exp_eq_conv'; mauto 3. *)
+(*   symmetry; mauto 3. *)
+(* Qed. *)
+
+(* (* Not sure if we actually want to prove this with wf_typ_eq Γ instead, but it does not seem like that would hold, or at least not straightforwardly *) *)
+(* Add Parametric Morphism {P} (pred_P : PredicativeSig P) a Γ A : (glu_elem_bot_unsorted pred_P a Γ A) *)
+(*     with signature wf_exp_eq Γ A ==> eq ==> iff as glu_elem_bot_unsorted_morphism_iff3. *)
+(* Proof.    *)
+(*   intros M M' HMM' *. *)
+(*   split; intros []; econstructor; mauto 3; try (gen_presup HMM'; eassumption); *)
+(*     intros.     *)
+(*   - assert {{ Δ ⊢ M[σ] ≈ M'0 : A[σ] }} as HMσM'σ by mauto 4. *)
+(*     transitivity {{{ M[σ] }}}; [symmetry |]; mauto 4. *)
+    
+(*   - assert {{ Δ ⊢ M'[σ] ≈ M'0 : A[σ] }} as HMσM'σ by mauto 4. *)
+(*     transitivity {{{ M'[σ] }}}; mauto 4. *)
+(* Qed. *)
+
+(* Add Parametric Morphism {P} (pred_P : PredicativeSig P) a : (glu_elem_top_unsorted pred_P a) *)
+(*     with signature wf_ctx_eq ==> eq ==> eq ==> eq ==> iff as glu_elem_top_unsorted_morphism_iff1. *)
+(* Proof. *)
+(*   intros Γ Γ' HΓΓ' *. *)
+(*   split; intros []; econstructor; mauto 4; [rewrite <- HΓΓ' | rewrite -> HΓΓ']; eassumption. *)
+(* Qed. *)
+
+(* Add Parametric Morphism {P} (pred_P : PredicativeSig P) a Γ : (glu_elem_top_unsorted pred_P a Γ) *)
+(*     with signature wf_typ_eq Γ ==> eq ==> eq ==> iff as glu_elem_top_unsorted_morphism_iff2. *)
+(* Proof. *)
+(*   intros A A' HAA' *. *)
+(*   split; intros []; econstructor; mauto 3; [rewrite <- HAA' | | rewrite -> HAA' | ]; *)
+(*     try eassumption; *)
+(*     intros; *)
+(*     assert {{ Δ ⊢ A[σ] ≈ A'[σ] }} as HAσA'σ by mauto 4; *)
+(*     [eapply wf_exp_eq_conv' with (A := {{{ A[σ] }}}) | eapply wf_exp_eq_conv' with (A := {{{ A'[σ] }}})]; *)
+(*     mauto 3. *)
+(* Qed. *)
+
+(* (* Same unprovability problem *) *)
+(* Add Parametric Morphism {P} (pred_P : PredicativeSig P) a Γ A : (glu_elem_top_unsorted pred_P a Γ A) *)
+(*     with signature wf_exp_eq Γ A ==> eq ==> iff as glu_elem_top_unsorted_morphism_iff3. *)
+(* Proof. *)
+(*   intros M M' HMM' *. *)
+(*   split; intros []; econstructor; mauto 3; try (gen_presup HMM'; eassumption); *)
+(*     intros; *)
+(*     assert {{ Δ ⊢ M[σ] ≈ M'[σ] : A[σ] }} as HMσM'σ by mauto 4; *)
+(*     [rewrite <- HMσM'σ | rewrite -> HMσM'σ]; *)
+(*     mauto. *)
+(* Qed. *)
+
+(* Add Parametric Morphism {P} (pred_P : PredicativeSig P) a : (glu_typ_top_unsorted pred_P a) *)
+(*     with signature wf_ctx_eq ==> eq ==> iff as glu_typ_top_unsorted_morphism_iff1. *)
+(* Proof. *)
+(*   intros Γ Γ' HΓΓ' *. *)
+(*   split; intros []; econstructor; mauto 4. *)
+(* Qed. *)
+
+(* Add Parametric Morphism {P} (pred_P : PredicativeSig P) a Γ : (glu_typ_top_unsorted pred_P a Γ) *)
+(*     with signature wf_typ_eq Γ ==> iff as glu_typ_top_unsorted_morphism_iff2. *)
+(* Proof. *)
+(*   intros A A' HAA' *. *)
+(*   split; intros []; econstructor; mauto 3; *)
+(*     try (gen_presup HAA'; eassumption); *)
+(*     intros; *)
+(*     assert {{ Δ ⊢ A[σ] ≈ A'[σ] }} as HAσA'σ by mauto 4; *)
+(*     mauto 4. *)
+(* Qed. *)
 
