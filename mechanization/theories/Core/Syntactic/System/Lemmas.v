@@ -410,7 +410,6 @@ Hint Resolve exp_eq_typ_sub_sub : mcpts.
   Hint Rewrite -> @exp_eq_sub_compose_typ @exp_eq_typ_sub_sub using mauto 4 : mcpts.
 
 (** *** Lemmas for [exp] of [{{{ ℕ }}}] *)
-
 Lemma exp_sub_nat {P} : forall {Γ : ctx P} {Δ M σ s} {r : Ru_nat P s},
     {{ Δ ⊢ M : ℕ }} ->
     {{ Γ ⊢s σ : Δ }} ->
