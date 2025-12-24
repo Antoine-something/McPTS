@@ -555,20 +555,20 @@ Variant cons_glu_sub_pred {P} (pred_P : PredicativeSig P) (s : P) Γ A (TSb : gl
 (*         {{ Δ ⊢s σ ® ρ ∈ cons_glu_sub_pred_unsorted pred_P Γ A TSb }} }. *)
 
 
-Inductive glu_ctx_env {P} (pred_P : PredicativeSig P) : glu_sub_pred P -> ctx P -> Prop :=
+Inductive glu_ctx_env {P} (pred_P : PredicativeSig P) : list P -> glu_sub_pred P -> ctx P -> Prop :=
 | glu_ctx_env_nil :
   `{ forall Sb,
         Sb <∙> nil_glu_sub_pred ->
-        {{ EG ⋅ ∈ glu_ctx_env pred_P ↘ Sb }} }
+        {{ EG ⋅ ∈ glu_ctx_env pred_P nil ↘ Sb }} }
 | glu_ctx_env_cons :
   `{ forall TSb Sb,
-        {{ EG Γ ∈ glu_ctx_env pred_P ↘ TSb }} ->
+        {{ EG Γ ∈ glu_ctx_env pred_P sts ↘ TSb }} ->
         {{ Γ ⊢ A : Sort@s }} ->
         (forall Δ σ ρ,
             {{ Δ ⊢s σ ® ρ ∈ TSb }} ->
             glu_rel_typ_with_sub pred_P s Δ A σ ρ) ->
         Sb <∙> cons_glu_sub_pred pred_P s Γ A TSb ->
-        {{ EG Γ, A ∈ glu_ctx_env pred_P ↘ Sb }} }.
+        {{ EG Γ, A ∈ glu_ctx_env pred_P (cons s sts) ↘ Sb }} }.
 
 (* Inductive glu_ctx_env_unsorted {P} (pred_P : PredicativeSig P) : glu_sub_pred P -> ctx P -> Prop := *)
 (* | glu_ctx_env_unsorted_nil : *)
@@ -589,11 +589,11 @@ Inductive glu_ctx_env {P} (pred_P : PredicativeSig P) : glu_sub_pred P -> ctx P 
 
 Variant glu_rel_exp_with_sub {P} (pred_P : PredicativeSig P) s Δ M A σ ρ : Prop :=
 | mk_glu_rel_exp_with_sub :
-  `{ forall P El,
+  `{ forall typ_rel exp_rel,
         {{ ⟦ A ⟧ ρ ↘ a }} ->
         {{ ⟦ M ⟧ ρ ↘ m }} ->
-        {{ DG a ∈ glu_sort_elem pred_P s ↘ P ↘ El }} ->
-        {{ Δ ⊢ M[σ] : A[σ] ® m ∈ El }} ->
+        {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
+        {{ Δ ⊢ M[σ] : A[σ] ® m ∈ exp_rel }} ->
         glu_rel_exp_with_sub pred_P s Δ M A σ ρ }.
 
 (* Variant glu_rel_exp_with_sub_unsorted {P} (pred_P : PredicativeSig P) Δ M A σ ρ : Prop := *)
@@ -612,8 +612,8 @@ Variant glu_rel_sub_with_sub {P} (pred_P : PredicativeSig P) Δ τ (Sb : glu_sub
      {{ Δ ⊢s τ ∘ σ ® ρ' ∈ Sb }} ->
      glu_rel_sub_with_sub pred_P Δ τ Sb σ ρ}.
 
-Definition glu_rel_ctx {P} (pred_P : PredicativeSig P) Γ : Prop := exists Sb, {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }}.
-Arguments glu_rel_ctx {P} pred_P Γ/.
+Definition glu_rel_ctx {P} (pred_P : PredicativeSig P) Γ sts : Prop := exists Sb, {{ EG Γ ∈ glu_ctx_env pred_P sts ↘ Sb }}.
+Arguments glu_rel_ctx {P} pred_P Γ sts/.
 
 
 (* Definition glu_rel_ctx_unsorted {P} (pred_P : PredicativeSig P) Γ : Prop := exists Sb, {{ EG Γ ∈ glu_ctx_env_unsorted pred_P ↘ Sb }}. *)
@@ -634,14 +634,14 @@ Arguments glu_rel_exp_resp_sub_env {P} pred_P s Sb M A/.
 (* Arguments glu_rel_exp_resp_sub_env_unsorted {P} pred_P Sb M A/. *)
 
 
-Definition glu_rel_exp {P} (pred_P : PredicativeSig P) Γ M A : Prop :=
+Definition glu_rel_exp {P} (pred_P : PredicativeSig P) Γ sts M A : Prop :=
   exists Sb,
-    {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} /\
+    {{ EG Γ ∈ glu_ctx_env pred_P sts ↘ Sb }} /\
       exists s,
       forall Δ σ ρ,
         {{ Δ ⊢s σ ® ρ ∈ Sb }} ->
         glu_rel_exp_with_sub pred_P s Δ M A σ ρ.
-Arguments glu_rel_exp {P} pred_P Γ M A/.
+Arguments glu_rel_exp {P} pred_P Γ sts M A/.
 
 (* Definition glu_rel_exp_unsorted {P} (pred_P : PredicativeSig P) Γ M A : Prop := *)
 (*   exists Sb, *)
@@ -664,14 +664,14 @@ Definition glu_rel_sub_resp_sub_env {P} (pred_P : PredicativeSig P) Sb Sb' τ :=
     glu_rel_sub_with_sub pred_P Δ τ Sb' σ ρ.
 Arguments glu_rel_sub_resp_sub_env {P} pred_P Sb Sb' τ/.
 
-Definition glu_rel_sub {P} (pred_P : PredicativeSig P) Γ τ Γ' : Prop :=
+Definition glu_rel_sub {P} (pred_P : PredicativeSig P) Γ sts τ Γ' sts' : Prop :=
   exists Sb Sb',
-    {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} /\
-    {{ EG Γ' ∈ glu_ctx_env pred_P ↘ Sb' }} /\
+    {{ EG Γ ∈ glu_ctx_env pred_P sts ↘ Sb }} /\
+    {{ EG Γ' ∈ glu_ctx_env pred_P sts' ↘ Sb' }} /\
       forall Δ σ ρ,
         {{ Δ ⊢s σ ® ρ ∈ Sb }} ->
         glu_rel_sub_with_sub pred_P Δ τ Sb' σ ρ.
-Arguments glu_rel_sub {P} pred_P Γ τ Γ'/.
+Arguments glu_rel_sub {P} pred_P Γ sts τ Γ' sts'/.
 
 
 (* Definition glu_rel_sub_unsorted {P} (pred_P : PredicativeSig P) Γ τ Γ' : Prop := *)
@@ -684,9 +684,9 @@ Arguments glu_rel_sub {P} pred_P Γ τ Γ'/.
 (* Arguments glu_rel_sub {P} pred_P Γ τ Γ'/. *)
 
 
-Notation "⟪ pred_P ⟫ ⊩ Γ" := (glu_rel_ctx pred_P Γ) (in custom judg at level 80, pred_P constr at level 0, Γ custom exp).
-Notation "⟪ pred_P ⟫ Γ ⊩ M : A" := (glu_rel_exp pred_P Γ M A) (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, M custom exp, A custom exp).
-Notation "⟪ pred_P ⟫ Γ ⊩s τ : Γ'" := (glu_rel_sub pred_P Γ τ Γ') (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, τ custom exp, Γ' custom exp).
+Notation "⟪ pred_P ⟫ ⊩ Γ : sts" := (glu_rel_ctx pred_P Γ sts) (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, sts custom exp).
+Notation "⟪ pred_P ⟫ Γ : sts ⊩ M : A" := (glu_rel_exp pred_P Γ sts M A) (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, M custom exp, A custom exp).
+Notation "⟪ pred_P ⟫ Γ : sts ⊩s τ : Γ' : sts'" := (glu_rel_sub pred_P Γ sts τ Γ' sts') (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, τ custom exp, Γ' custom exp).
 
 (* Notation "⟪ pred_P ⟫ ⊩u Γ" := (glu_rel_ctx_unsorted pred_P Γ) (in custom judg at level 80, pred_P constr at level 0, Γ custom exp). *)
 (* Notation "⟪ pred_P ⟫ Γ ⊩u M : A" := (glu_rel_exp_unsorted pred_P Γ M A) (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, M custom exp, A custom exp). *)

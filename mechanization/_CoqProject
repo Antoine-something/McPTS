@@ -53,3 +53,5 @@ theories/Core/Soundness/LogicalRelation/CoreTactics.v
 theories/Core/Soundness/LogicalRelation/CoreLemmas.v
 theories/Core/Soundness/LogicalRelation/Core.v
 theories/Core/Soundness/Realizability.v
+theories/Core/Soundness/LogicalRelation/Lemmas.v
+theories/Core/Soundness/LogicalRelation.v

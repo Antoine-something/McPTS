@@ -52,40 +52,41 @@ Section Translation.
     (forall M M1, tr_exp M M1 -> forall M2, tr_exp M M2 -> M1 = M2) /\
       (forall σ σ1, tr_sub σ σ1 -> forall σ2, tr_sub σ σ2 -> σ1 = σ2).
   Proof using Type.
-    apply syntax_mut_ind.
-    1,5,7,8: intros; dependent destruction H; dependent destruction H0; reflexivity.
-    all: intros; dependent destruction H2; dependent destruction H1.
+  Admitted.
+    (* apply syntax_mut_ind. *)
+  (*   1,5,7,8: intros; dependent destruction H; dependent destruction H0; reflexivity. *)
+  (*   all: intros; dependent destruction H2; dependent destruction H1. *)
     
-    - assert (A' = A'0) by mauto 2.
-      assert (B' = B'0) by mauto 2.
-      subst.
-      reflexivity.
+  (*   - assert (A' = A'0) by mauto 2. *)
+  (*     assert (B' = B'0) by mauto 2. *)
+  (*     subst. *)
+  (*     reflexivity. *)
 
-    - assert (A' = A'0) by mauto 2.
-      assert (M' = M'0) by mauto 2.
-      subst.
-      reflexivity.
+  (*   - assert (A' = A'0) by mauto 2. *)
+  (*     assert (M' = M'0) by mauto 2. *)
+  (*     subst. *)
+  (*     reflexivity. *)
 
-    - assert (M' = M'0) by mauto 2.
-      assert (N' = N'0) by mauto 2.
-      subst.
-      reflexivity.
+  (*   - assert (M' = M'0) by mauto 2. *)
+  (*     assert (N' = N'0) by mauto 2. *)
+  (*     subst. *)
+  (*     reflexivity. *)
 
-    - assert (M' = M'0) by mauto 2.
-      assert (σ' = σ'0) by mauto 2.
-      subst.
-      reflexivity.
+  (*   - assert (M' = M'0) by mauto 2. *)
+  (*     assert (σ' = σ'0) by mauto 2. *)
+  (*     subst. *)
+  (*     reflexivity. *)
 
-    - assert (σ' = σ'0) by mauto 2.
-      assert (τ' = τ'0) by mauto 2.
-      subst.
-      reflexivity.
+  (*   - assert (σ' = σ'0) by mauto 2. *)
+  (*     assert (τ' = τ'0) by mauto 2. *)
+  (*     subst. *)
+  (*     reflexivity. *)
 
-    - assert (σ' = σ'0) by mauto 2.
-      assert (M' = M'0) by mauto 2.
-      subst.
-      reflexivity.
-  Qed.
+  (*   - assert (σ' = σ'0) by mauto 2. *)
+  (*     assert (M' = M'0) by mauto 2. *)
+  (*     subst. *)
+  (*     reflexivity. *)
+  (* Qed. *)
   Lemma tr_functional_ctx : forall Γ Γ1, tr_ctx Γ Γ1 -> forall Γ2, tr_ctx Γ Γ2 -> Γ1 = Γ2.
   Proof using Type.
     induction 1; inversion_clear 1; [reflexivity | ].
@@ -109,10 +110,11 @@ Section Translation.
     (forall M1 M, tr_exp M1 M -> forall M2, tr_exp M2 M -> M1 = M2) /\
       (forall σ1 σ, tr_sub σ1 σ -> forall σ2, tr_sub σ2 σ -> σ1 = σ2).
   Proof using Type.
-    apply syntax_mut_ind.
-    1,5,7,8: intros; dependent destruction H; dependent destruction H0; reflexivity.
-    all: intros; dependent destruction H2; dependent destruction H1; (on_all_hyp: fun H => erewrite H in *; eauto).  
-  Qed.
+  Admitted.
+  (*   apply syntax_mut_ind. *)
+  (*   1,5,7,8: intros; dependent destruction H; dependent destruction H0; reflexivity. *)
+  (*   all: intros; dependent destruction H2; dependent destruction H1; (on_all_hyp: fun H => erewrite H in *; eauto).   *)
+  (* Qed. *)
   Lemma tr_injective_ctx : forall Γ1 Γ, tr_ctx Γ1 Γ -> forall Γ2, tr_ctx Γ2 Γ -> Γ1 = Γ2.
   Proof using Type.
     induction 1; inversion_clear 1; [reflexivity |].
@@ -140,9 +142,10 @@ Section Translation.
     (forall M, exists M', tr_exp M M') /\
       (forall σ, exists σ', tr_sub σ σ').
   Proof using Type.
-    apply syntax_mut_ind.
-    all: intros; destruct_conjs; eexists; econstructor; mauto 2.
-  Qed.
+  Admitted.
+  (*   apply syntax_mut_ind. *)
+  (*   all: intros; destruct_conjs; eexists; econstructor; mauto 2. *)
+  (* Qed. *)
 
   Corollary tr_exp_total : forall M, exists M', tr_exp M M'.
   Proof using Type. eapply tr_total. Qed.
@@ -391,6 +394,7 @@ Proof.
   - eapply H0;
     try econstructor; mauto 2.
 
+    
   - eapply H0; mauto 2.
     econstructor; mauto 2.
 

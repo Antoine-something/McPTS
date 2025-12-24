@@ -95,7 +95,7 @@ Qed.
 
 Lemma glu_nat_rule_irrelevance {P} {s} (r : Ru_nat P s) : forall Γ M a,
     glu_nat r Γ M a ->
-    forall (r' : Ru_nat P s), glu_nat r' Γ M a.
+    forall s' (r' : Ru_nat P s'), glu_nat r' Γ M a.
 Proof.
   intros.
   induction H; mauto 2.
@@ -643,6 +643,22 @@ Proof.
     split; intros; inversion_clear H; econstructor; mauto 2.
 Qed.
 
+
+(* Lemma functional_glu_sort_elem' {P} (pred_P : PredicativeSig P) : forall s s' a typ_rel typ_rel' exp_rel exp_rel', *)
+(*     {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} -> *)
+(*     {{ DG a ∈ glu_sort_elem pred_P s' ↘ typ_rel' ↘ exp_rel' }} -> *)
+(*     (typ_rel <∙> typ_rel') /\ (exp_rel <∙> exp_rel'). *)
+(* Proof. *)
+(*   intros * Hglu Hglu'. *)
+(*   assert (per_sort pred_P s a a) by mauto 2. *)
+(*   assert (per_sort pred_P s' a a) by mauto 2. *)
+(*   unfold per_sort in *. *)
+(*   destruct_conjs. *)
+(*   assert (per_typ_elem pred_P H a a) by mauto 2. *)
+(*   assert (per_typ_elem pred_P H0 a a) by mauto 2. *)
+(*   handle_per_typ_elem_irrel. *)
+  
+  
 (* Lemma glu_sort_elem_sort_irrel {P} (pred_P : PredicativeSig P) : forall {s s' a typ_rel typ_rel'  exp_rel exp_rel'}, *)
 (*     {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} -> *)
 (*     {{ DG a ∈ glu_sort_elem pred_P s' ↘ typ_rel' ↘ exp_rel' }} -> *)
@@ -1318,7 +1334,6 @@ Proof.
   intuition.
 Qed.
 
-(* STOPPED HERE *)
 
 Add Parametric Morphism {P} (pred_P : PredicativeSig P) (s : P) a : (glu_elem_bot pred_P s a)
     with signature wf_ctx_eq ==> eq ==> eq ==> eq ==> iff as glu_elem_bot_morphism_iff1.
@@ -1402,7 +1417,7 @@ Proof.
 Qed.
 
 (** *** Simple Morphism instance for [glu_ctx_env] *)
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) : (glu_ctx_env pred_P)
+Add Parametric Morphism {P} (pred_P : PredicativeSig P) (sts : list P) : (glu_ctx_env pred_P sts)
     with signature glu_sub_pred_equivalence P ==> eq ==> iff as simple_glu_ctx_env_morphism_iff.
 Proof.
   intros Sb Sb' HSbSb' a.
