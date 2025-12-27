@@ -684,9 +684,9 @@ Arguments glu_rel_sub {P} pred_P Γ sts τ Γ' sts'/.
 (* Arguments glu_rel_sub {P} pred_P Γ τ Γ'/. *)
 
 
-Notation "⟪ pred_P ⟫ ⊩ Γ : sts" := (glu_rel_ctx pred_P Γ sts) (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, sts custom exp).
-Notation "⟪ pred_P ⟫ Γ : sts ⊩ M : A" := (glu_rel_exp pred_P Γ sts M A) (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, M custom exp, A custom exp).
-Notation "⟪ pred_P ⟫ Γ : sts ⊩s τ : Γ' : sts'" := (glu_rel_sub pred_P Γ sts τ Γ' sts') (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, τ custom exp, Γ' custom exp).
+Notation "⟪ pred_P ⟫ ⊩ Γ : sts" := (glu_rel_ctx pred_P Γ sts) (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, sts constr).
+Notation "⟪ pred_P ⟫ Γ : sts ⊩ M : A" := (glu_rel_exp pred_P Γ sts M A) (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, M custom exp, A custom exp, sts constr).
+Notation "⟪ pred_P ⟫ Γ : sts ⊩s τ : Γ' : sts'" := (glu_rel_sub pred_P Γ sts τ Γ' sts') (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, sts constr, τ custom exp, Γ' custom exp, sts' constr).
 
 (* Notation "⟪ pred_P ⟫ ⊩u Γ" := (glu_rel_ctx_unsorted pred_P Γ) (in custom judg at level 80, pred_P constr at level 0, Γ custom exp). *)
 (* Notation "⟪ pred_P ⟫ Γ ⊩u M : A" := (glu_rel_exp_unsorted pred_P Γ M A) (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, M custom exp, A custom exp). *)

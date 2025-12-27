@@ -5,7 +5,7 @@ From Equations Require Import Equations.
 Record PtsSig : Type :=
   mkPtsSig {
       St :> Set;
-      Ax : St -> St -> Set;
+      Ax : St -> St -> Prop;
       Ru : St -> St -> St -> Set;
       Ru_nat : St -> Set;
     }.
@@ -63,6 +63,8 @@ Section OrderProperties.
   Qed.
 End OrderProperties.
 
+Definition FullSig (P : PtsSig) : Type := forall s, exists s', Ax P s s'.
+
 
 Section SignatureExtension.
   Context (P : PtsSig) (pred_P : PredicativeSig P).
@@ -72,7 +74,7 @@ Section SignatureExtension.
   | st_P : St P -> eSt
   | st_ext : nat -> eSt.
 
-  Inductive eAx : eSt -> eSt -> Set :=
+  Inductive eAx : eSt -> eSt -> Prop :=
   | ax_P : forall {s1 s2 : St P}, Ax P s1 s2 -> eAx (st_P s1) (st_P s2)
   | ax_ext : forall {n : nat}, eAx (st_ext n) (st_ext (S n))
   | ax_cross : forall {s : St P}, eAx (st_P s) (st_ext 0).
@@ -203,6 +205,17 @@ Section SignatureExtension.
 
   Definition epred_P : PredicativeSig eP :=
     mkPredicativeSig eP epred_rel eord_rel epred_rel_wf eord_ax eord_ru.
+
+  Lemma full_eP : FullSig eP.
+  Proof using Type.
+    intros s.
+    destruct s.
+    - exists (st_ext 0).
+      econstructor.
+
+    - exists (st_ext (S n)).
+      econstructor.
+  Qed.
 End SignatureExtension.
 
 Arguments st_P {P} s.
