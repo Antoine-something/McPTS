@@ -231,6 +231,7 @@ Proof.
 Qed.
 
 
+
 Lemma mk_glu_rel_typ_with_sub' {P} (pred_P : PredicativeSig P) : forall {s Δ A σ ρ a},
     {{ ⟦ A ⟧ ρ ↘ a }} ->
     (exists typ_rel exp_rel, {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }}) ->

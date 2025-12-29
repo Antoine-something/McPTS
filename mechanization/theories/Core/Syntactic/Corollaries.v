@@ -629,3 +629,33 @@ Qed.
 
 #[export]
 Hint Resolve exp_eq_typ_q_sigma_then_weak_weak_extend_succ_var_1 : mcpts.
+
+
+Lemma wf_exp_sort_sort {P} : forall {Γ : ctx P} {s K},
+    {{ Γ ⊢ Sort@s : K }} ->
+    exists s', {{ Γ ⊢ Sort@s' ≈ K }} /\ Ax P s s'.
+Proof.
+  intros * HK.
+  dependent induction HK.
+  - repeat eexists; mauto 2.
+  - assert (exists s', {{ Γ ⊢ Sort@s' ≈ A }} /\ Ax P s s') as [s' []] by (eapply IHHK; mauto 2).
+    assert {{ Γ ⊢ Sort@s' ≈ K }} by (etransitivity; mauto 2).
+    repeat eexists; mauto 2.
+Qed.
+
+Lemma wf_exp_sort_sub_sort {P} : forall {Γ : ctx P} {s σ K},
+    {{ Γ ⊢ Sort@s[σ] : K }} ->
+    {{ Γ ⊢ Sort@s[σ] ≈ Sort@s : K }}.
+Proof.
+  intros * Hs.
+  assert (exists Δ K', {{ Γ ⊢s σ : Δ }} /\ {{ Δ ⊢ Sort@s : K' }} /\ {{ Γ ⊢ K'[σ] ≈ K }}) as [Δ [K' [? []]]]by mauto 2.
+  assert (exists s', {{ Δ ⊢ Sort@s' ≈ K' }} /\ Ax P s s') as [s' []] by (eapply wf_exp_sort_sort; mauto 2).
+  assert {{ Γ ⊢ Sort@s' ≈ K }}.
+  {
+    transitivity {{{ K'[σ] }}}; mauto 2.
+    transitivity {{{ Sort@s'[σ] }}}; mauto 2.
+    symmetry; mauto 2.
+  }
+  enough {{ Γ ⊢ Sort@s[σ] ≈ Sort@s : Sort@s' }} by mauto 2.
+  mauto 2.
+Qed.

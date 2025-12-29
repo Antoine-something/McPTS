@@ -138,3 +138,97 @@ Qed.
 
 #[export]
 Hint Resolve glu_rel_exp_sub : mcpts.
+
+
+(* #[local] *)
+(* Lemma glu_rel_exp_conv' {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {sts Γ M A A' s}, *)
+(*     {{ ⟪ pred_P ⟫ Γ : sts ⊩ M : A }} -> *)
+(*     {{ Γ ⊢ A ≈ A' : Sort@s }} -> (** proof trick, will discharge. see the next lemma. *) *)
+(*     {{ Γ ⊢ A ≈ A' : Sort@s }} -> *)
+(*     {{ ⟪ pred_P ⟫ Γ : sts ⊩ M : A' }}. *)
+(* Proof. *)
+(*   intros * [? [? [k ?]]] [env_relΓ [? [? ?]]]%(completeness_fundamental_exp_eq P pred_P) ?. *)
+(*   econstructor; split; [eassumption |]. *)
+(*   exists (max i k); intros. *)
+(*   assert {{ Δ ⊢s σ : Γ }} by mauto 4. *)
+
+(*   destruct_glu_rel_exp_with_sub. *)
+(*   assert {{ Dom ρ ≈ ρ ∈ env_relΓ }} by (eapply glu_ctx_env_per_env; mauto). *)
+(*   (on_all_hyp: destruct_rel_by_assumption env_relΓ). *)
+(*   destruct_by_head rel_typ. *)
+(*   match_by_head eval_exp ltac:(fun H => directed dependent destruction H). *)
+(*   destruct_by_head rel_exp. *)
+(*   saturate_refl. *)
+(*   invert_per_univ_elems. *)
+(*   apply_equiv_left. *)
+(*   destruct_all. *)
+(*   handle_per_univ_elem_irrel. *)
+(*   assert (i <= max i k) by lia. *)
+(*   assert (k <= max i k) by lia. *)
+(*   assert {{ Δ ⊢ A'[σ] ≈ A[σ] : Type@(max i k) }} by mauto 4. *)
+(*   eapply mk_glu_rel_exp_with_sub''; intuition mauto using per_univ_elem_cumu_max_left, per_univ_elem_cumu_max_right. *)
+(*   bulky_rewrite. *)
+(*   eapply glu_univ_elem_exp_cumu_ge; try eassumption. *)
+(*   eapply glu_univ_elem_resp_per_univ; eauto. *)
+(*   symmetry. mauto. *)
+(* Qed. *)
+
+
+(* Lemma glu_rel_exp_conv {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {sts Γ M A A' s}, *)
+(*     {{ ⟪ pred_P ⟫ Γ : sts ⊩ M : A }} -> *)
+(*     {{ Γ ⊢ A ≈ A' : Sort@s }} -> *)
+(*     {{ ⟪ pred_P ⟫ Γ : sts ⊩ M : A' }}. *)
+(* Proof. *)
+(*   intros * [Sb [? [s' ?]]] HAA'. *)
+(*   assert {{ ⟪ pred_P ⟫ Γ ⊨u A ≈ A' : Sort@s }} as [env_relΓ [? ?]] by (eapply completeness_fundamental_exp_eq; mauto 2). *)
+  
+(*   assert (exists ρ ρ', initial_env Γ ρ /\ initial_env Γ ρ' /\ {{ Dom ρ ≈ ρ' ∈ env_relΓ }}) as [ρ [ρ']] by (eauto using per_ctx_then_per_env_initial_env). *)
+(*   destruct_conjs. *)
+(*   assert (exists elem_rel : relation (domain P), *)
+(*              rel_typ_unsorted pred_P {{{ Sort@s }}} ρ {{{ Sort@s }}} ρ' elem_rel /\ *)
+(*                rel_exp A ρ A' ρ' elem_rel) as [elem_rel []] by mauto. *)
+
+  
+(*   destruct_by_head (@rel_typ_unsorted P). *)
+(*   destruct_by_head (@rel_exp). *)
+(*   simplify_evals. *)
+  
+(*   assert {{ Γ ⊢s Id ® ρ ∈ Sb }} by (eapply initial_env_glu_rel_exp; mauto 2). *)
+(*   destruct_glu_rel_exp_with_sub. *)
+(*   simplify_evals. *)
+(*   rename m into a. *)
+(*   rename m' into a'. *)
+  
+(*   eexists; split; [eauto |]. *)
+(*   eexists. *)
+(*   intros. *)
+(*   assert (glu_rel_exp_with_sub pred_P s' Δ M A σ ρ0) by mauto 2. *)
+(*   destruct H15. *)
+(*   simplify_evals. *)
+(*   handle_functional_glu_sort_elem P. *)
+
+(*   assert (env_relΓ ρ0 ρ0) by (eapply glu_ctx_env_per_env; mauto 2). *)
+(*   assert (exists elem_rel0, rel_typ_unsorted pred_P {{{ Sort@s }}} ρ0 {{{ Sort@s }}} ρ0 elem_rel0 /\ rel_exp A ρ0 A' ρ0 elem_rel0) as [elem_rel0 []] by mauto 2. *)
+(*   destruct_by_head (@rel_typ_unsorted P). *)
+(*   destruct_by_head (@rel_exp).   *)
+(*   simplify_evals. *)
+(*   rename m' into a0'.   *)
+(*   assert (per_typ_elem pred_P (per_sort pred_P s) d{{{ Sort@s }}} d{{{ Sort@s }}}) by (eapply per_typ_sort; reflexivity). *)
+(*   handle_per_typ_elem_irrel. *)
+(*   assert (per_sort pred_P s a0' a0') by (transitivity a0; [symmetry |]; mauto 2). *)
+  
+(*   eapply mk_glu_rel_exp_with_sub''; mauto 3. *)
+(*   intros. *)
+(*   assert {{ Δ ⊢ A[σ] ≈ A'[σ] : Sort@s }} as <- by mauto 3. *)
+
+(*   assert (glu_sort_elem pred_P s typ_rel1 exp_rel1 a0). *)
+(*   { *)
+(*     symmetry in H25. *)
+(*     eapply glu_sort_elem_resp_per_sort; mauto 2. *)
+(*   } *)
+(*   eapply glu_sort_elem_exp_conv with (a := a0) (a' := a0) (exp_rel := exp_rel0); mauto. *)
+
+(*   assert (typ_rel0 Δ {{{ A [σ] }}}) by (eapply glu_sort_elem_trm_typ; mauto 2). *)
+(* Qed. *)
+
+  
