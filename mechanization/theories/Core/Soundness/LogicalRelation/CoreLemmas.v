@@ -448,7 +448,7 @@ Qed.
 Lemma glu_sort_elem_core_sort' {P} (pred_P : PredicativeSig P) : forall s' s typ_rel el_rel,
     Ax P s' s ->
     (typ_rel <∙> sort_glu_typ_pred pred_P s' s) ->
-    (el_rel <∙> sort_glu_exp_pred pred_P s' s) ->
+    (exp_rel <∙> sort_glu_exp_pred pred_P s' s) ->
     {{ DG Sort@s' ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ el_rel }}.
 Proof.
   intros.

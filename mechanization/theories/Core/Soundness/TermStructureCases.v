@@ -174,61 +174,74 @@ Hint Resolve glu_rel_exp_sub : mcpts.
 (* Qed. *)
 
 
-(* Lemma glu_rel_exp_conv {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {sts Γ M A A' s}, *)
-(*     {{ ⟪ pred_P ⟫ Γ : sts ⊩ M : A }} -> *)
-(*     {{ Γ ⊢ A ≈ A' : Sort@s }} -> *)
-(*     {{ ⟪ pred_P ⟫ Γ : sts ⊩ M : A' }}. *)
-(* Proof. *)
-(*   intros * [Sb [? [s' ?]]] HAA'. *)
-(*   assert {{ ⟪ pred_P ⟫ Γ ⊨u A ≈ A' : Sort@s }} as [env_relΓ [? ?]] by (eapply completeness_fundamental_exp_eq; mauto 2). *)
+Lemma glu_rel_exp_conv {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {sts Γ M A A' s},
+    {{ ⟪ pred_P ⟫ Γ : sts ⊩ M : A }} ->
+    {{ Γ ⊢ A ≈ A' : Sort@s }} ->
+    {{ ⟪ pred_P ⟫ Γ : sts ⊩ M : A' }}.
+Proof.
+  intros *.
   
-(*   assert (exists ρ ρ', initial_env Γ ρ /\ initial_env Γ ρ' /\ {{ Dom ρ ≈ ρ' ∈ env_relΓ }}) as [ρ [ρ']] by (eauto using per_ctx_then_per_env_initial_env). *)
-(*   destruct_conjs. *)
-(*   assert (exists elem_rel : relation (domain P), *)
-(*              rel_typ_unsorted pred_P {{{ Sort@s }}} ρ {{{ Sort@s }}} ρ' elem_rel /\ *)
-(*                rel_exp A ρ A' ρ' elem_rel) as [elem_rel []] by mauto. *)
+  intros * [Sb [? [s' ?]]] HAA'.
+  assert {{ ⟪ pred_P ⟫ Γ ⊨u A ≈ A' : Sort@s }} as [env_relΓ [? ?]] by (eapply completeness_fundamental_exp_eq; mauto 2).
+  
+  assert (exists ρ ρ', initial_env Γ ρ /\ initial_env Γ ρ' /\ {{ Dom ρ ≈ ρ' ∈ env_relΓ }}) as [ρ [ρ']] by (eauto using per_ctx_then_per_env_initial_env).
+  destruct_conjs.
+  assert (exists elem_rel : relation (domain P),
+             rel_typ_unsorted pred_P {{{ Sort@s }}} ρ {{{ Sort@s }}} ρ' elem_rel /\
+               rel_exp A ρ A' ρ' elem_rel) as [elem_rel []] by mauto.
 
   
-(*   destruct_by_head (@rel_typ_unsorted P). *)
-(*   destruct_by_head (@rel_exp). *)
-(*   simplify_evals. *)
+  destruct_by_head (@rel_typ_unsorted P).
+  destruct_by_head (@rel_exp).
+  simplify_evals.
   
-(*   assert {{ Γ ⊢s Id ® ρ ∈ Sb }} by (eapply initial_env_glu_rel_exp; mauto 2). *)
-(*   destruct_glu_rel_exp_with_sub. *)
-(*   simplify_evals. *)
-(*   rename m into a. *)
-(*   rename m' into a'. *)
+  assert {{ Γ ⊢s Id ® ρ ∈ Sb }} by (eapply initial_env_glu_rel_exp; mauto 2).
+  destruct_glu_rel_exp_with_sub.
+  simplify_evals.
+  rename m into a.
+  rename m' into a'.
   
-(*   eexists; split; [eauto |]. *)
-(*   eexists. *)
-(*   intros. *)
-(*   assert (glu_rel_exp_with_sub pred_P s' Δ M A σ ρ0) by mauto 2. *)
-(*   destruct H15. *)
-(*   simplify_evals. *)
-(*   handle_functional_glu_sort_elem P. *)
+  eexists; split; [eauto |].
+  eexists.
+  intros.
+  assert (glu_rel_exp_with_sub pred_P s' Δ M A σ ρ0) by mauto 2.
+  destruct H15.
+  simplify_evals.
+  handle_functional_glu_sort_elem P.
 
-(*   assert (env_relΓ ρ0 ρ0) by (eapply glu_ctx_env_per_env; mauto 2). *)
-(*   assert (exists elem_rel0, rel_typ_unsorted pred_P {{{ Sort@s }}} ρ0 {{{ Sort@s }}} ρ0 elem_rel0 /\ rel_exp A ρ0 A' ρ0 elem_rel0) as [elem_rel0 []] by mauto 2. *)
-(*   destruct_by_head (@rel_typ_unsorted P). *)
-(*   destruct_by_head (@rel_exp).   *)
-(*   simplify_evals. *)
-(*   rename m' into a0'.   *)
-(*   assert (per_typ_elem pred_P (per_sort pred_P s) d{{{ Sort@s }}} d{{{ Sort@s }}}) by (eapply per_typ_sort; reflexivity). *)
-(*   handle_per_typ_elem_irrel. *)
-(*   assert (per_sort pred_P s a0' a0') by (transitivity a0; [symmetry |]; mauto 2). *)
+  assert (env_relΓ ρ0 ρ0) by (eapply glu_ctx_env_per_env; mauto 2).
+  assert (exists elem_rel0, rel_typ_unsorted pred_P {{{ Sort@s }}} ρ0 {{{ Sort@s }}} ρ0 elem_rel0 /\ rel_exp A ρ0 A' ρ0 elem_rel0) as [elem_rel0 []] by mauto 2.
+  destruct_by_head (@rel_typ_unsorted P).
+  destruct_by_head (@rel_exp).
+  simplify_evals.
+  rename m' into a0'.
+  assert (per_typ_elem pred_P (per_sort pred_P s) d{{{ Sort@s }}} d{{{ Sort@s }}}) by (eapply per_typ_sort; reflexivity).
+  handle_per_typ_elem_irrel.
+  assert (per_sort pred_P s a0' a0') by (transitivity a0; [symmetry |]; mauto 2).
   
-(*   eapply mk_glu_rel_exp_with_sub''; mauto 3. *)
-(*   intros. *)
-(*   assert {{ Δ ⊢ A[σ] ≈ A'[σ] : Sort@s }} as <- by mauto 3. *)
+  eapply mk_glu_rel_exp_with_sub''; mauto 3.
+  intros.
+  assert {{ Δ ⊢ A[σ] ≈ A'[σ] : Sort@s }} as <- by mauto 3.
 
-(*   assert (glu_sort_elem pred_P s typ_rel1 exp_rel1 a0). *)
-(*   { *)
-(*     symmetry in H25. *)
-(*     eapply glu_sort_elem_resp_per_sort; mauto 2. *)
-(*   } *)
-(*   eapply glu_sort_elem_exp_conv with (a := a0) (a' := a0) (exp_rel := exp_rel0); mauto. *)
+  assert (glu_sort_elem pred_P s typ_rel1 exp_rel1 a0).
+  {
+    symmetry in H25.
+    eapply glu_sort_elem_resp_per_sort; mauto 2.
+  }
+  eapply glu_sort_elem_exp_conv with (a := a0) (a' := a0) (exp_rel := exp_rel0); mauto.
 
-(*   assert (typ_rel0 Δ {{{ A [σ] }}}) by (eapply glu_sort_elem_trm_typ; mauto 2). *)
-(* Qed. *)
+  assert (typ_rel0 Δ {{{ A [σ] }}}) by (eapply glu_sort_elem_trm_typ; mauto 2).
+
+  
+
+  
+  assert (exp_rel1 Δ {{{ A[σ] }}} {{{ M[σ] }}} m).
+  {
+    eapply glu_sort_elem_exp_conv with (exp_rel := exp_rel0); mauto 3.
+  }
+
+  by (eapply glu_sort_elem_exp_conv; mauto ).
+  
+Qed.
 
   

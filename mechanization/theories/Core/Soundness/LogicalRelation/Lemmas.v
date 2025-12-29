@@ -161,22 +161,6 @@ Proof.
   eapply glu_sort_elem_per_sort_typ_iff; mauto 2.
 Qed.
 
-
-(* Lemma glu_sort_elem_exp_conv {P} (pred_P : PredicativeSig P) : forall {s a a' typ_rel typ_rel' exp_rel exp_rel' Γ A M m}, *)
-(*     {{ Dom a ≈ a' ∈ per_sort pred_P s }} -> *)
-(*     {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} -> *)
-(*     {{ DG a' ∈ glu_sort_elem pred_P s ↘ typ_rel' ↘ exp_rel' }} -> *)
-(*     {{ Γ ⊢ M : A ® m ∈ exp_rel }} -> *)
-(*     {{ Γ ⊢ A ® typ_rel' }} -> *)
-(*     {{ Γ ⊢ M : A ® m ∈ exp_rel' }}. *)
-(* Proof. *)
-(*   intros * [] ? ? ? ?. *)
-(*   assert ((typ_rel <∙> typ_rel') /\ (exp_rel <∙> exp_rel')) by (eapply glu_sort_elem_per_sort_typ_iff; mauto 3). *)
-(*   destruct_conjs. *)
-(*   apply_predicate_equivalence. *)
-(*   eassumption. *)
-(* Qed. *)
-
 Lemma glu_sort_elem_exp_conv {P} (pred_P : PredicativeSig P) : forall {s1 s2 s3 a a' typ_rel typ_rel' exp_rel exp_rel' Γ A M m},
     {{ Dom a ≈ a' ∈ per_sort pred_P s1 }} ->
     {{ DG a ∈ glu_sort_elem pred_P s2 ↘ typ_rel ↘ exp_rel }} ->
@@ -230,6 +214,49 @@ Proof.
     eapply glu_nat_rule_irrelevance; mauto 2.
 Qed.
 
+
+Lemma glu_sort_elem_typ_conv {P} (pred_P : PredicativeSig P) : forall {s1 s2 s3 a a' typ_rel typ_rel' exp_rel exp_rel' Γ A},
+    {{ Dom a ≈ a' ∈ per_sort pred_P s1 }} ->
+    {{ DG a ∈ glu_sort_elem pred_P s2 ↘ typ_rel ↘ exp_rel }} ->
+    {{ DG a' ∈ glu_sort_elem pred_P s3 ↘ typ_rel' ↘ exp_rel' }} ->
+    {{ Γ ⊢ A ® typ_rel' }} ->
+    {{ Γ ⊢ A ® typ_rel }}.
+Proof.
+  intros * [] ? ? ?.
+
+  assert (per_typ_elem pred_P x a a') by mauto 2.
+  assert (per_sort_elem pred_P s2 x a a').
+  {
+    assert (per_sort pred_P s2 a a) by mauto 2.
+    destruct H4 as [R2 ?].
+    mauto.
+  }
+
+  assert (per_sort_elem pred_P s3 x a' a).
+  {
+    assert (per_sort pred_P s3 a' a') by mauto 2.
+    destruct H5 as [R3 ?].
+    symmetry in H4.
+    mauto.
+  }
+  assert (glu_sort_elem pred_P s2 typ_rel exp_rel a') by (eapply glu_sort_elem_resp_per_sort; mauto 3).
+  assert (glu_sort_elem pred_P s3 typ_rel' exp_rel' a) by (eapply glu_sort_elem_resp_per_sort; mauto 3).
+
+  invert_glu_sort_elem H0.
+  - invert_glu_sort_elem H8.
+    rewrite H8 in H3.
+    unfold sort_glu_typ_pred in H3.
+    
+    
+    saturate_glu_by_per.
+    
+    unfold sort_glu_exp_pred' in *.
+    unfold glu_sort_typ_rec in *.
+    
+    apply_predicate_equivalence.    
+    destruct_conjs.
+    repeat eexists; mauto 2.
+  
 
 
 Lemma mk_glu_rel_typ_with_sub' {P} (pred_P : PredicativeSig P) : forall {s Δ A σ ρ a},
