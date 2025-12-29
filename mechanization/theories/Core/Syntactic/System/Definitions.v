@@ -448,8 +448,7 @@ Proof.
   - eauto using wf_sub_eq_sym.
   - eauto using wf_sub_eq_trans.
 Qed.    
-
-    
+  
 #[export]
 Instance wf_typ_eq_PER {P : PtsSig} (Γ : ctx P) : PER (wf_typ_eq Γ).
 Proof.
