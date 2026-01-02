@@ -11,14 +11,20 @@ Qed.
 #[export]
 Hint Resolve glu_rel_ctx_empty : mcpts.
 
-Lemma glu_rel_ctx_extend {P} (pred_P : PredicativeSig P) : forall {sts Γ A s},
+Lemma glu_rel_ctx_extend {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {sts Γ A s},
     {{ ⟪ pred_P ⟫ ⊩ Γ : sts }} ->
-    {{ ⟪ pred_P ⟫ Γ : sts ⊩ A : Sort@s }} ->
+    exists s', 
+    {{ ⟪ pred_P ⟫ Γ : sts ⊩ A : Sort@s : s' }} ->
     {{ ⟪ pred_P ⟫ ⊩ Γ, A : (s :: sts) }}.
 Proof.
-  intros * [Sb] HA.
+  intros * [Sb].
+  assert (exists s', Ax P s s') as [s'] by (eapply full_P; mauto 2).
+  exists s'.
+  intros HA.
   assert {{ Γ ⊢ A : Sort@s }} by mauto 3.
-  invert_glu_rel_exp HA.
+  inversion_clear HA.
+  destruct_conjs.
+  (* invert_glu_rel_exp HA. *)
   eexists.
   econstructor; mauto 3; reflexivity.
 Qed.

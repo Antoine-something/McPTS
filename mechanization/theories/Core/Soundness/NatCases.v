@@ -12,7 +12,8 @@ Import Domain_Notations.
 
 Lemma glu_rel_exp_nat {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {sts Γ s} {r : Ru_nat P s},
     {{ ⟪ pred_P ⟫ ⊩ Γ : sts }} ->
-    {{ ⟪ pred_P ⟫ Γ : sts ⊩ ℕ : Sort@s }}.
+    exists s',
+    {{ ⟪ pred_P ⟫ Γ : sts ⊩ ℕ : Sort@s : s' }}.
 Proof.
   intros * ? [Sb].
   assert {{ ⊢ Γ }} by mauto 2.
@@ -34,17 +35,16 @@ Hint Resolve glu_rel_exp_nat : mcpts.
 
 Lemma glu_rel_exp_sub_nat {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {sts sts' Γ σ Δ M s} {r : Ru_nat P s},
     {{ ⟪ pred_P ⟫ Γ : sts ⊩s σ : Δ : sts' }} ->
-    {{ ⟪ pred_P ⟫ Δ : sts' ⊩ M : ℕ }} ->
-    {{ ⟪ pred_P ⟫ Γ : sts ⊩ M[σ] : ℕ }}.
+    {{ ⟪ pred_P ⟫ Δ : sts' ⊩ M : ℕ : s }} ->
+    {{ ⟪ pred_P ⟫ Γ : sts ⊩ M[σ] : ℕ : s }}.
 Proof.
   intros.
   assert {{ Γ ⊢s σ : Δ }} by mauto 3.
   assert {{ Γ ⊢ ℕ[σ] ≈ ℕ : Sort@s }} by (econstructor; mauto 2).
-  assert {{ ⟪ pred_P ⟫ Γ : sts ⊩ M[σ] : ℕ[σ] }} by (eapply glu_rel_exp_sub; mauto 3).
-  destruct H3 as [Sb [HgluΓ [s' ?]]].
+  assert {{ ⟪ pred_P ⟫ Γ : sts ⊩ M[σ] : ℕ[σ] : s }} by (eapply glu_rel_exp_sub; mauto 3).
+  destruct H3 as [Sb [HgluΓ]].
   exists Sb.
   split; [eassumption |].
-  exists s'.
   intros.
   destruct_glu_rel_exp_with_sub.
   simplify_evals.
@@ -62,11 +62,11 @@ Hint Resolve glu_rel_exp_sub_nat : mcpts.
 
 Lemma glu_rel_exp_clean_inversion2'' {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {sts Γ Sb M s} {r : Ru_nat P s},
     {{ EG Γ ∈ glu_ctx_env pred_P sts ↘ Sb }} ->
-    {{ ⟪ pred_P ⟫ Γ : sts ⊩ M : ℕ }} ->
+    {{ ⟪ pred_P ⟫ Γ : sts ⊩ M : ℕ : s }} ->
     glu_rel_exp_resp_sub_env pred_P s Sb M {{{ ℕ }}}.
 Proof.
   intros * ? ? HM.
-  assert {{ ⟪ pred_P ⟫ Γ : sts ⊩ ℕ : Sort@s }} by mauto 3.
+  assert (exists s', {{ ⟪ pred_P ⟫ Γ : sts ⊩ ℕ : Sort@s : s' }}) as [s'] by mauto 3.
   eapply glu_rel_exp_clean_inversion2 in HM; mauto 3.
 Qed.
 
@@ -84,11 +84,10 @@ Ltac invert_glu_rel_exp H ::=
 Lemma glu_rel_exp_of_nat {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {sts s} {r : Ru_nat P s} {Γ Sb M},
     {{ EG Γ ∈ glu_ctx_env pred_P sts ↘ Sb }} ->
     (forall Δ σ ρ, {{ Δ ⊢s σ ® ρ ∈ Sb }} -> exists m, {{ ⟦ M ⟧ ρ ↘ m }} /\ glu_nat r Δ {{{ M[σ] }}} m) ->
-    {{ ⟪ pred_P ⟫ Γ : sts ⊩ M : ℕ }}.
+    {{ ⟪ pred_P ⟫ Γ : sts ⊩ M : ℕ : s }}.
 Proof.
   intros * ? Hbody.
   eexists; split; mauto 3.
-  exists s.
   intros.
   edestruct Hbody as [? []]; mauto 3.
   econstructor; mauto 3.
@@ -99,7 +98,7 @@ Qed.
 
 Lemma glu_rel_exp_zero {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {sts s} {r : Ru_nat P s} {Γ},
     {{ ⟪ pred_P ⟫ ⊩ Γ : sts }} ->
-    {{ ⟪ pred_P ⟫ Γ : sts ⊩ zero : ℕ }}.
+    {{ ⟪ pred_P ⟫ Γ : sts ⊩ zero : ℕ : s }}.
 Proof.
   intros * ? * [Sb].
   eapply glu_rel_exp_of_nat with (r := r); mauto 3.
@@ -111,8 +110,8 @@ Qed.
 Hint Resolve glu_rel_exp_zero : mcpts.
 
 Lemma glu_rel_exp_succ {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {sts s} {r : Ru_nat P s} {Γ M},
-    {{ ⟪ pred_P ⟫ Γ : sts ⊩ M : ℕ }} ->
-    {{ ⟪ pred_P ⟫ Γ : sts ⊩ succ M : ℕ }}.
+    {{ ⟪ pred_P ⟫ Γ : sts ⊩ M : ℕ : s }} ->
+    {{ ⟪ pred_P ⟫ Γ : sts ⊩ succ M : ℕ : s }}.
 Proof.
   intros * ? * HM.
   assert {{ ⟪ pred_P ⟫ ⊩ Γ : sts }} as [SbΓ] by mauto 3.
@@ -137,16 +136,17 @@ Hint Resolve glu_rel_exp_succ : mcpts.
 
 Lemma glu_rel_sub_extend_nat {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {sts sts' s} {r : Ru_nat P s} {Γ σ Δ M},
     {{ ⟪ pred_P ⟫ Γ : sts ⊩s σ : Δ : sts' }} ->
-    {{ ⟪ pred_P ⟫ Γ : sts ⊩ M : ℕ }} ->
+    {{ ⟪ pred_P ⟫ Γ : sts ⊩ M : ℕ : s }} ->
     {{ ⟪ pred_P ⟫ Γ : sts ⊩s σ,,M : Δ, ℕ : (s :: sts') }}.
 Proof.
   intros.
   assert {{ ⟪ pred_P ⟫ ⊩ Δ : sts' }} by mauto 2.
-  assert {{ ⟪ pred_P ⟫ Γ : sts ⊩ ℕ[σ] : Sort@s }} by mauto 3.
+  assert (exists s', {{ ⟪ pred_P ⟫ Γ : sts ⊩ ℕ[σ] : Sort@s : s' }}) as [s'] by mauto 4.
   assert {{ Γ ⊢s σ : Δ }} by mauto 3.
   assert {{ Γ ⊢ ℕ ≈ ℕ[σ] : Sort@s }} by (symmetry; econstructor; mauto 2).
-  assert {{ ⟪ pred_P ⟫ Γ : sts ⊩ M : ℕ[σ] }} by admit.
-  mautosolve 3.
+  assert {{ ⟪ pred_P ⟫ Γ : sts ⊩ M : ℕ[σ] : s }} by (eapply glu_rel_exp_conv'; mauto 2).
+  assert (exists s'', {{ ⟪ pred_P ⟫ Δ : sts' ⊩ ℕ : Sort@s : s'' }}) as [s'']  by (eapply glu_rel_exp_nat; mauto 3).
+  eapply glu_rel_sub_extend; mauto 3.
 Qed.
 
 #[export]

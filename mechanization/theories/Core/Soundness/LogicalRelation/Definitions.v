@@ -634,14 +634,13 @@ Arguments glu_rel_exp_resp_sub_env {P} pred_P s Sb M A/.
 (* Arguments glu_rel_exp_resp_sub_env_unsorted {P} pred_P Sb M A/. *)
 
 
-Definition glu_rel_exp {P} (pred_P : PredicativeSig P) Γ sts M A : Prop :=
+Definition glu_rel_exp {P} (pred_P : PredicativeSig P) Γ sts M A s : Prop :=
   exists Sb,
     {{ EG Γ ∈ glu_ctx_env pred_P sts ↘ Sb }} /\
-      exists s,
       forall Δ σ ρ,
         {{ Δ ⊢s σ ® ρ ∈ Sb }} ->
         glu_rel_exp_with_sub pred_P s Δ M A σ ρ.
-Arguments glu_rel_exp {P} pred_P Γ sts M A/.
+Arguments glu_rel_exp {P} pred_P Γ sts M A s/.
 
 (* Definition glu_rel_exp_unsorted {P} (pred_P : PredicativeSig P) Γ M A : Prop := *)
 (*   exists Sb, *)
@@ -685,7 +684,7 @@ Arguments glu_rel_sub {P} pred_P Γ sts τ Γ' sts'/.
 
 
 Notation "⟪ pred_P ⟫ ⊩ Γ : sts" := (glu_rel_ctx pred_P Γ sts) (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, sts constr).
-Notation "⟪ pred_P ⟫ Γ : sts ⊩ M : A" := (glu_rel_exp pred_P Γ sts M A) (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, M custom exp, A custom exp, sts constr).
+Notation "⟪ pred_P ⟫ Γ : sts ⊩ M : A : s" := (glu_rel_exp pred_P Γ sts M A s) (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, M custom exp, A custom exp, sts constr, s constr).
 Notation "⟪ pred_P ⟫ Γ : sts ⊩s τ : Γ' : sts'" := (glu_rel_sub pred_P Γ sts τ Γ' sts') (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, sts constr, τ custom exp, Γ' custom exp, sts' constr).
 
 (* Notation "⟪ pred_P ⟫ ⊩u Γ" := (glu_rel_ctx_unsorted pred_P Γ) (in custom judg at level 80, pred_P constr at level 0, Γ custom exp). *)
