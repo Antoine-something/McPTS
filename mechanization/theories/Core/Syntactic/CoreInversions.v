@@ -203,9 +203,8 @@ Proof with mautosolve 3.
 Qed.
 
 #[export]
-Hint Resolve wf_exp_sub_inversion : mcpts.
-
-
+Hint Resolve wf_exp_sub_inversion : mcpts.  
+  
 (** We omit [wf_conv] and [wf_cumu] as they do not give useful inversions *)
 
 Lemma wf_sub_id_inversion {P : PtsSig} : forall (Γ : ctx P) Δ,

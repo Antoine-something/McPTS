@@ -20,6 +20,21 @@ Proof with mautosolve.
     eapply wf_exp_eq_conv; mauto 3.
 Qed.
 
+Add Parametric Morphism {P} Γ : (@wf_exp P Γ)
+  with signature wf_typ_eq Γ ==> eq ==> iff as wf_exp_morphism_iff3_typ.
+Proof with mautosolve.
+  split; intros; gen_presups;
+  eapply wf_exp_conv; mauto 3.
+Qed.
+
+Add Parametric Morphism {P} Γ : (@wf_exp_eq P Γ)
+    with signature wf_typ_eq Γ ==> eq ==> eq ==> iff as wf_exp_eq_morphism_iff3_typ.
+Proof with mautosolve.
+  split; intros; gen_presups;
+    eapply wf_exp_eq_conv; mauto 3.
+Qed.
+
+  
 #[local]
 Ltac impl_opt_constructor :=
   intros;

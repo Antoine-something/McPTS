@@ -990,3 +990,55 @@ Proof.
 Qed.
 
 
+Lemma glu_rel_exp_typ_implies_glu_rel_typ {P} {pred_P : PredicativeSig P} : forall {s s' Γ A σ ρ},
+    glu_rel_exp_with_sub pred_P s' Γ A {{{ Sort@s }}} σ ρ ->
+    glu_rel_typ_with_sub pred_P s Γ A σ ρ.
+Proof.
+  intros.
+  inversion_clear H.
+  simplify_evals.
+  invert_glu_sort_elem H2.
+  unfold sort_glu_exp_pred' in H0.
+  unfold glu_sort_typ_rec in H0.
+  apply H0 in H3.
+  destruct_conjs.
+  econstructor; mauto 2.
+Qed.
+
+
+Lemma glu_rel_typ_implies_glu_rel_exp_typ {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {s Γ A σ ρ},
+    glu_rel_typ_with_sub pred_P s Γ A σ ρ ->
+    exists s', glu_rel_exp_with_sub pred_P s' Γ A {{{ Sort@s }}} σ ρ.
+Proof.
+  intros.
+  assert (exists s', Ax P s s') as [s'] by (eapply full_P).
+  destruct H.
+  eexists; econstructor; mauto 3.
+  repeat split.
+  - assert {{ Γ ⊢ A[σ] : Sort@s }} by (eapply glu_sort_elem_sort_lvl; mauto 3).
+    gen_presup H3.
+    assert (exists Δ K, {{ Γ ⊢s σ : Δ }} /\ {{ Δ ⊢ A : K }} /\ {{ Γ ⊢ K[σ] ≈ Sort@s }}) as [Δ [K [? []]]] by mauto 2.
+    eapply wf_conv with (A := {{{ Sort@s }}}); mauto 3.
+  - assert {{ Γ ⊢ A[σ] : Sort@s }} by (eapply glu_sort_elem_sort_lvl; mauto 3).
+    gen_presup H3.
+    assert (exists Δ K, {{ Γ ⊢s σ : Δ }} /\ {{ Δ ⊢ A : K }} /\ {{ Γ ⊢ K[σ] ≈ Sort@s }}) as [Δ [K [? []]]] by mauto 2.
+    econstructor; mauto 2.
+  - repeat eexists; mauto 2.
+Qed.
+
+
+Lemma glu_rel_exp_sort_implies_ax {P} (pred_P : PredicativeSig P) : forall {Γ sts A s s'},
+    {{ ⟪ pred_P ⟫ Γ : sts ⊩ A : Sort@s : s' }} ->
+    Ax P s s'.
+Proof.
+  intros.
+  destruct H as [SbΓ []].
+  assert {{ ⊢ Γ }} by mauto 2.
+  assert (exists env_rel, {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }}) as [env_rel] by mauto 3.
+  assert (exists ρ ρ', initial_env Γ ρ /\ initial_env Γ ρ' /\ {{ Dom ρ ≈ ρ' ∈ env_rel }}) as [ρ [ρ' []]] by mauto using per_ctx_then_per_env_initial_env.
+  assert (SbΓ Γ {{{ Id }}} ρ) by (eapply initial_env_glu_rel_exp; mauto 3).
+  destruct_glu_rel_exp_with_sub.
+  simplify_evals.
+  invert_glu_sort_elem H8.
+  eassumption.
+Qed.

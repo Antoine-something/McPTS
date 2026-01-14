@@ -887,13 +887,12 @@ Lemma glu_nat_resp_per_nat {P} {s} (r : Ru_nat P s) : forall m n,
       glu_nat r Γ M n.
 Proof.
   induction 1; intros; progressive_inversion; mauto 3.
-  econstructor.
-  - mauto using (PER_refl2 _ per_bot).
-  - intros.
-    specialize (H (length Δ)).
-    destruct_all.
-    functional_read_rewrite_clear.
-    mauto.
+  econstructor; mauto 3.
+  intros.
+  specialize (H (length Δ)).
+  destruct_all.
+  functional_read_rewrite_clear.
+  mauto.
 Qed.
 
 #[local]
@@ -1222,7 +1221,12 @@ Proof.
       deepexec H1 ltac:(fun H => pose proof H).
       autorewrite with mcpts in *.
       repeat eexists; eauto.
-      assert {{ Δ0 ⊢s σ0,,N : Δ, IT[σ] }} by mauto 3.
+      assert {{ Δ0 ⊢s σ0,,N : Δ, IT[σ] }}.
+      {
+        econstructor; mauto 3.
+        assert {{ Δ0 ⊢ IT[σ][σ0] ≈ IT[σ∘σ0] }} by mauto 3.
+        eapply wf_conv'; mauto 3.        
+      }
       assert {{ Γ ⊢ M : Π r IT OT }} by mauto.
       assert {{ Δ0 ⊢ M[σ][σ0] : (Π r IT OT)[σ][σ0] }} by mauto.
       assert {{ Δ0 ⊢ (Π r IT OT)[σ][σ0] ≈ (Π r IT OT)[σ∘σ0] }} by (symmetry; mauto 3).
@@ -1237,17 +1241,9 @@ Proof.
       assert {{ Δ0, IT[σ∘σ0] ⊢ OT[q (σ∘σ0)] : Sort@s2[q (σ∘σ0)] }} by (repeat (econstructor; mauto 2)).
       assert {{ Δ0, IT[σ∘σ0] ⊢ Sort@s2 ≈ Sort@s2[q (σ∘σ0)] }} by mauto.
       assert {{ Δ0, IT[σ∘σ0] ⊢ OT[q (σ∘σ0)] : Sort@s2 }} by mauto.
-      assert {{ Δ0 ⊢ M[σ][σ0] N ≈ M[σ∘σ0] N : OT[q (σ∘σ0)][Id,,N] }}.
-      {
-        eapply wf_exp_eq_app_cong; mauto 2.
-        econstructor; mauto 2.
-      }
+      assert {{ Δ0 ⊢ M[σ][σ0] N ≈ M[σ∘σ0] N : OT[q (σ∘σ0)][Id,,N] }} by (eapply wf_exp_eq_app_cong; mauto 2).
       assert {{ Δ0 ⊢ OT[(q (σ∘σ0))∘(Id,,N)] ≈ OT[q (σ∘σ0)][Id,,N] }} by (eapply wf_typ_eq_sub_compose; mauto 4).
-      assert {{ Δ0 ⊢s (q (σ∘σ0))∘(Id,,N) ≈ σ∘σ0,,N : Γ, IT }}.
-      {
-        eapply sub_eq_q_sigma_id_extend; mauto 2.
-        econstructor; mauto 2.
-      }
+      assert {{ Δ0 ⊢s (q (σ∘σ0))∘(Id,,N) ≈ σ∘σ0,,N : Γ, IT }} by (eapply sub_eq_q_sigma_id_extend; mauto 2).
       assert {{ Γ, IT ⊢ OT ≈ OT : Sort@s2 }} by mauto 3.
       assert {{ Δ0 ⊢ OT[(q (σ∘σ0))∘(Id,,N)] ≈ OT[σ∘σ0,,N] : Sort@s2 }}.
       {
@@ -1267,12 +1263,7 @@ Proof.
       assert (exists mn : domain P, {{ $| m & n |↘ mn }} /\ OEL n equiv_n Δ0 {{{ OT[σ∘σ0,,N] }}} {{{ M[σ∘σ0] N }}} mn).
       {
         eapply H12; mauto.
-        enough (IEL Δ0 {{{ IT[σ][σ0] }}} N n).
-        {
-          eapply glu_sort_elem_trm_resp_typ_exp_eq; mauto 3.
-          symmetry.
-          econstructor; mauto 3.
-        }
+        enough (IEL Δ0 {{{ IT[σ][σ0] }}} N n) by (eapply glu_sort_elem_trm_resp_typ_exp_eq; mauto 3).
         eassumption.
       }
       destruct_conjs.
