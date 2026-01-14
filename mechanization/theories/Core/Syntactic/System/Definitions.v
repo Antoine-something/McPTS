@@ -422,12 +422,12 @@ Combined Scheme syntactic_wf_mut_ind from
 
 Scheme wf_ctx_mut_ind' := Induction for wf_ctx Sort Prop
 with wf_exp_mut_ind' := Induction for wf_exp Sort Prop
-with wf_typ_mut_ind' := Induction for wf_typ Sort Prop
+(* with wf_typ_mut_ind' := Induction for wf_typ Sort Prop *)
 with wf_sub_mut_ind' := Induction for wf_sub Sort Prop.
 Combined Scheme syntactic_wf_mut_ind' from
   wf_ctx_mut_ind',
   wf_exp_mut_ind',
-  wf_typ_mut_ind',
+  (* wf_typ_mut_ind', *)
   wf_sub_mut_ind'.
 
 

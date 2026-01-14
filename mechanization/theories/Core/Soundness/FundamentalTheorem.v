@@ -13,7 +13,6 @@ Section soundness_fundamental.
   Theorem soundness_fundamental {P} (pred_P : PredicativeSig P) (full_P : FullSig P) :
     (forall Γ, {{ ⊢ Γ }} -> exists sts, {{ ⟪ pred_P ⟫ ⊩ Γ : sts }}) /\
       (forall Γ A M, {{ Γ ⊢ M : A }} -> exists sts s, {{ ⟪ pred_P ⟫ Γ : sts ⊩ M : A : s }}) /\
-      (forall Γ A, {{ Γ ⊢ A }} -> exists sts s s', {{ ⟪ pred_P ⟫ Γ : sts ⊩ A : Sort@s : s' }}) /\
       (forall Γ Δ σ, {{ Γ ⊢s σ : Δ }} -> exists stsΓ stsΔ, {{ ⟪ pred_P ⟫ Γ : stsΓ ⊩s σ : Δ : stsΔ }}).
   Proof.
     apply syntactic_wf_mut_ind'; mauto 3.
