@@ -60,3 +60,4 @@ theories/Core/Soundness/TermStructureCases.v
 theories/Core/Soundness/SortCases.v
 theories/Core/Soundness/SubstitutionCases.v
 theories/Core/Soundness/FunctionCases.v
+theories/Core/Soundness/Extension/SystemAnnotated.v
