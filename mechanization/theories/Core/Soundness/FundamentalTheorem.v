@@ -7,14 +7,69 @@ From McPTS.Core.Soundness Require Import
   TermStructureCases
   SortCases.
 From McPTS.Core.Soundness Require Export LogicalRelation.
+From McPTS.Core.Soundness.Extension Require Import SystemAnnotated.
 Import Domain_Notations.
 
 Section soundness_fundamental.
+  #[local]
+  Ltac gen_soundness_IH P pred_P full_P soundness_ctx soundness_exp soundness_sub H :=
+  match type of H with
+  | {{ ⊫ ^?Γ > ?sts }} =>
+      let HΓ := fresh "HΓ" in
+      pose proof soundness_ctx P pred_P full_P Γ sts H as HΓ
+  | {{ ^?Γ : ?sts ⊫ ^?M : ^?A > ?s }} =>
+      let HM := fresh "HM" in
+      pose proof soundness_exp P pred_P full_P Γ sts A s M H as HM
+  | {{ ^?Γ : ?stsΓ ⊫s ^?σ : ^?Δ > ?stsΔ }} =>
+      let Hσ := fresh "Hσ" in
+      pose proof soundness_sub P pred_P full_P Γ stsΓ Δ stsΔ σ H as Hσ
+  end.
+   
+  Theorem soundness_fundamental_ctx_ann {P} (pred_P : PredicativeSig P) (full_P : FullSig P) :
+    forall Γ sts, {{ ⊫ Γ > sts }} -> {{ ⟪ pred_P ⟫ ⊩ Γ : sts }}
+  with soundness_fundamental_exp_ann {P} (pred_P : PredicativeSig P) (full_P : FullSig P):
+    forall Γ sts A s M, {{ Γ : sts ⊫ M : A > s }} -> {{ ⟪ pred_P ⟫ Γ : sts ⊩ M : A : s }}
+  with soundness_fundamental_sub_ann {P} (pred_P : PredicativeSig P) (full_P : FullSig P):
+    forall Γ stsΓ Δ stsΔ σ, {{ Γ : stsΓ ⊫s σ : Δ > stsΔ }} -> {{ ⟪ pred_P ⟫ Γ : stsΓ ⊩s σ : Δ : stsΔ }}.
+  Proof.
+    all: inversion_clear 1;
+      (on_all_hyp: gen_soundness_IH P pred_P full_P soundness_fundamental_ctx_ann soundness_fundamental_exp_ann soundness_fundamental_sub_ann);
+      clear soundness_fundamental_ctx_ann soundness_fundamental_exp_ann soundness_fundamental_sub_ann;
+      mauto 2.
+
+    - destruct HΓ as [SbΓ].
+      eexists; split; eauto.
+      intros.
+      econstructor.
+      
+      admit.
+    - admit.
+    - admit.
+    - admit.
+    - admit.
+    - admit.
+    - admit.
+    - admit.
+    - 
+      
+  Qed.
+  
+
+  Theorem soundness_fundamental_ctx {P} (pred_P : PredicativeSig P) (full_P : FullSig P) :
+    forall Γ, {{ ⊢ Γ }} -> exists sts, {{ ⟪ pred_P ⟫ ⊩ Γ : sts }}.
+  Proof.
+    intros.
+    assert (exists sts, {{ ⊫ Γ > sts }}) as [sts] by (eapply wf_ctx_implies_wf_ctx_ann; mauto 2).
+    eexists.
+    eapply soundness_fundamental_ctx_ann; mauto 2.
+  Qed.
+  
   Theorem soundness_fundamental {P} (pred_P : PredicativeSig P) (full_P : FullSig P) :
     (forall Γ, {{ ⊢ Γ }} -> exists sts, {{ ⟪ pred_P ⟫ ⊩ Γ : sts }}) /\
-      (forall Γ A M, {{ Γ ⊢ M : A }} -> exists sts s, {{ ⟪ pred_P ⟫ Γ : sts ⊩ M : A : s }}) /\
-      (forall Γ Δ σ, {{ Γ ⊢s σ : Δ }} -> exists stsΓ stsΔ, {{ ⟪ pred_P ⟫ Γ : stsΓ ⊩s σ : Δ : stsΔ }}).
+      (forall Γ A M, {{ Γ ⊢ M : A }} -> exists sts s, {{ ⟪ pred_P ⟫ Γ : sts ⊩ M : A : s }}).
+      (* (forall Γ stsΓ Δ stsΔ σ, {{ Γ : stsΓ ⊫s σ : Δ > stsΔ }} -> exists stsΓ stsΔ, {{ ⟪ pred_P ⟫ Γ : stsΓ ⊩s σ : Δ : stsΔ }}). *)
   Proof.
+    
     apply syntactic_wf_mut_ind'; mauto 3.
     - intros.
       destruct H0 as [sts [s']].

@@ -5,7 +5,8 @@ From McPTS.Core.Semantic Require Import Realizability.
 From McPTS.Core.Soundness Require Import LogicalRelation TermStructureCases.
 Import Domain_Notations.
 
-Lemma glu_rel_exp_of_typ {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {sts Γ Sb A s},
+Lemma glu_rel_exp_of_typ {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {sts Γ Sb A s s'},
+    Ax P s s' ->
     {{ EG Γ ∈ glu_ctx_env pred_P sts ↘ Sb }} ->
     (forall Δ σ ρ,
         {{ Δ ⊢s σ ® ρ ∈ Sb }} ->
@@ -14,23 +15,21 @@ Lemma glu_rel_exp_of_typ {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : 
             {{ ⟦ A ⟧ ρ ↘ a }} /\
               {{ Dom a ≈ a ∈ per_sort pred_P s }} /\
               forall typ_rel exp_rel, {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} -> {{ Δ ⊢ A[σ] ® typ_rel }}) ->
-    exists s',
       {{ ⟪ pred_P ⟫ Γ : sts ⊩ A : Sort@s : s' }}.
 Proof.
-  intros * ? Hbody.
-  assert (exists s', Ax P s s') as [s'] by (eapply full_P).
-  do 2 eexists; split; mauto.
+  intros * Hax ? Hbody.
+  (* assert (exists s', Ax P s s') as [s'] by (eapply full_P). *)
+  eexists; split; mauto.
   intros.
   edestruct Hbody as [? [? [? []]]]; mauto.
 Qed.
 
-Lemma glu_rel_exp_typ {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {sts Γ s s'},
-    Ax P s s' ->
+Lemma glu_rel_exp_typ {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {sts Γ s s' s''},
+    Ax P s s' -> Ax P s' s'' ->
     {{ ⟪ pred_P ⟫ ⊩ Γ : sts }} ->
-    exists s'',
     {{ ⟪ pred_P ⟫ Γ : sts ⊩ Sort@s : Sort@s' : s'' }}.
 Proof.
-  intros * Hax [].
+  intros * Hax Hax' [].
   eapply glu_rel_exp_of_typ; mauto 3.
   intros.
   assert {{ Δ ⊢s σ : Γ }} by mauto 3.

@@ -30,12 +30,13 @@ Qed.
 (* #[local] *)
 Hint Resolve cons_glu_sub_pred_pi_helper : mcpts.
 
-Lemma glu_rel_exp_pi {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {sts Γ A B s1 s2 s3 s1' s2'} {r : Ru P s1 s2 s3},
+Lemma glu_rel_exp_pi {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {sts Γ A B s1 s2 s3 s1' s2' s3'} {r : Ru P s1 s2 s3},
+    Ax P s3 s3' ->
     {{ ⟪ pred_P ⟫ Γ : sts ⊩ A : Sort@s1 : s1'}} ->
     {{ ⟪ pred_P ⟫ Γ, A : (s1 :: sts) ⊩ B : Sort@s2 : s2' }} ->
-    exists s3', {{ ⟪ pred_P ⟫ Γ : sts ⊩ Π r A B : Sort@s3 : s3' }}.
+    {{ ⟪ pred_P ⟫ Γ : sts ⊩ Π r A B : Sort@s3 : s3' }}.
 Proof.
-  intros * HA HB.
+  intros * Hax HA HB.
   assert {{ ⟪ pred_P ⟫ ⊩ Γ : sts }} as [SbΓ] by mauto.
   assert {{ Γ ⊢ A : Sort@s1 }} by mauto.
   inversion_clear HA as [SbΓ' []].
