@@ -50,15 +50,12 @@ Qed.
 #[export]
 Hint Resolve glu_rel_sub_id : mcpts.
 
-Lemma glu_rel_sub_weaken {P} (pred_P : PredicativeSig P) : forall {sts Γ A},
-    {{ ⟪ pred_P ⟫ ⊩ Γ, A : sts }} ->
-    exists sts' s,
-      sts = s :: sts' /\
-        {{ ⟪ pred_P ⟫ Γ, A : sts ⊩s Wk : Γ : sts' }}.
+Lemma glu_rel_sub_weaken {P} (pred_P : PredicativeSig P) : forall {Γ sts A s},
+    {{ ⟪ pred_P ⟫ ⊩ Γ, A : (s :: sts) }} ->
+    {{ ⟪ pred_P ⟫ Γ, A : (s :: sts) ⊩s Wk : Γ : sts }}.
 Proof.
   intros * [SbΓA].
   inversion_clear H.
-  exists sts0; exists s; split; [reflexivity |].
   (* match_by_head1 (@glu_ctx_env P) invert_glu_ctx_env. *)
   handle_functional_glu_ctx_env P.
   do 2 eexists; repeat split; [econstructor | |]; try reflexivity; mauto.
@@ -175,3 +172,4 @@ Qed.
 
 #[export]
 Hint Resolve glu_rel_sub_extend : mcpts.
+

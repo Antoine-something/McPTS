@@ -149,6 +149,7 @@ Proof.
   assert {{ Γ, A ⊢ A[Wk] : Sort@s1 }} by mauto 2.
   assert {{ Γ, A, A[Wk] ⊢ B[q Wk] : Sort@s2 }} by mauto 2.
   assert {{ Γ, A ⊢ M[Wk] : Π r A[Wk] B[q Wk] }} by (eapply wf_conv; mauto 3).
+  assert {{ Γ, A ⊢ A[Wk] }} by mauto 3.
   assert {{ Γ, A ⊢ #0 : A[Wk] }} by mauto 2.
   assert {{ Γ, A ⊢s q Wk∘(Id,,#0) ≈ Id : Γ, A }} by (etransitivity; mauto 3).
   assert {{ Γ, A ⊢s Id,,#0 : Γ, A, A[Wk] }} by mauto 3.
@@ -170,9 +171,11 @@ Proof.
   assert {{ ⊢ Γ, A }} by mauto 3.
   assert {{ Γ, A ⊢s Wk : Γ }} by mauto 2.
   assert {{ ⊢ Γ, A, A[Wk] }} by mauto 3.
+  assert {{ Γ, A ⊢ A[Wk] }} by mauto 3.
+  assert {{ Γ, A, A[Wk] ⊢ A[Wk][Wk] }} by mauto 4.
+  assert {{ Γ ⊢ A }} by mauto 3.
+  assert {{ Γ, A, A[Wk] ⊢ A[Wk∘Wk] }} by mauto 4.
   eapply wf_conv with (A := {{{ A[Wk][Wk] }}}); mauto 4.
-  assert {{ Γ, A, A[Wk] ⊢s Wk∘Wk : Γ }} by mauto 3.
-  econstructor; mauto 3.
 Qed.
 
 #[export]
@@ -251,6 +254,8 @@ Lemma presup_exp_eq_var_0_sub_left {P : PtsSig} : forall {Γ : ctx P} {σ Δ A M
 Proof.
   intros.
   assert {{ ⊢ Δ, A }} by mauto 2.
+  assert {{ Δ ⊢ A }} by mauto 2.
+  assert {{ Δ, A ⊢ A[Wk] }} by mauto 3.
   assert {{ Δ, A ⊢ #0 : A[Wk] }} by mauto 2.
   eapply wf_conv; mauto 3.
 Qed.
@@ -271,6 +276,7 @@ Proof.
   assert {{ ⊢ Δ, A }} by mauto 2.
   assert (exists s', {{ Δ ⊢ B : Sort@s' }}) by (eapply presup_ctx_lookup_typ; mauto).
   destruct_conjs.
+  assert {{ Δ, A ⊢ B[Wk] }} by mauto 4.
   assert {{ Δ, A ⊢ #(S x) : B[Wk] }} by mauto 3.
   eapply wf_conv; mauto 3.
 Qed.
@@ -525,8 +531,12 @@ Proof with mautosolve 5.
     eapply wf_conv; mauto 3.
     econstructor; mauto 3.
   - econstructor; mauto 3.
-    eapply wf_conv; mauto 5.
+    assert {{ Γ0 ⊢ A }} by mauto 2.
+    assert {{ Γ ⊢s Wk∘σ : Γ0 }} by mauto 3.
+    assert {{ Γ ⊢ A[Wk∘σ] }} by mauto 3.
+    eapply wf_conv with (A := {{{ A[Wk][σ] }}}); mauto 3.
 Qed.
+
 
 Ltac gen_presup H := gen_presup_IH @presup_exp_eq @presup_sub_eq @presup_typ_eq H + gen_core_presup H.
 

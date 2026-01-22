@@ -41,6 +41,24 @@ Ltac impl_opt_constructor :=
   gen_presups;
   mautosolve 4.
 
+
+Corollary wf_vlookup' {P} : forall {Γ : ctx P} {x A},
+    {{ ⊢ Γ }} ->
+    {{ #x : A ∈ Γ }} ->
+    {{ Γ ⊢ #x : A }}.
+Proof.
+  intros.
+  assert (exists s, {{ Γ ⊢ A : Sort@s }}) as [s] by mauto 2.
+  assert {{ Γ ⊢ A }} by mauto 2.
+  mauto 2.
+Qed.
+
+#[export]
+Hint Resolve wf_vlookup' : mcpts.
+#[export]
+Remove Hints wf_vlookup : mcpts.
+
+ 
 Corollary wf_conv' {P : PtsSig} : forall (Γ : ctx P) M A A',
     {{ Γ ⊢ M : A }} ->
     {{ Γ ⊢ A ≈ A' }} ->

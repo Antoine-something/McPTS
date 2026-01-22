@@ -35,6 +35,27 @@ match type of H with
 end.
 
 #[local]
+  Lemma ctxeq_lookup_helper {P} : forall {Γ : ctx P} {x A}, {{ #x : A ∈ Γ }} -> forall {Δ}, {{ ⊢ Δ ≈ Γ }} -> exists A', {{ #x : A' ∈ Δ }} /\ {{ Γ ⊢ A ≈ A' }} /\ {{ Δ ⊢ A ≈ A' }}.
+Proof.
+  induction 1; intros.
+  - inversion_clear H.
+    assert {{ ⊢ Γ }} by mauto 2.
+    assert {{ Γ, A ⊢s Wk : Γ }} by mauto 3.
+    assert {{ ⊢ Γ0 }} by mauto 2.
+    assert {{ Γ0, A0 ⊢s Wk : Γ0 }} by mauto 3.
+    eexists; repeat split; mauto 4.
+  - inversion_clear H0.
+    assert (exists A' : exp P, {{ # n : A' ∈ Γ0 }} /\ {{ Γ ⊢ A ≈ A' }} /\ {{ Γ0 ⊢ A ≈ A' }}) by mauto 2.
+    destruct_conjs.
+    assert {{ ⊢ Γ }} by mauto 2.
+    assert {{ Γ, B ⊢s Wk : Γ }} by mauto 3.
+    assert {{ ⊢ Γ0 }} by mauto 2.
+    assert {{ Γ0, A0 ⊢s Wk : Γ0 }} by mauto 3.
+    eexists; repeat split; mauto 3.
+
+Qed.
+
+#[local]
 Lemma ctxeq_exp_helper {P : PtsSig} : forall {Γ : ctx P} {M A}, {{ Γ ⊢ M : A }} -> forall {Δ}, {{ ⊢ Δ ≈ Γ }} -> {{ Δ ⊢ M : A }}
 with
 ctxeq_exp_eq_helper {P : PtsSig} : forall {Γ : ctx P} {M M' A}, {{ Γ ⊢ M ≈ M' : A }} -> forall {Δ}, {{ ⊢ Δ ≈ Γ }} -> {{ Δ ⊢ M ≈ M' : A }}
@@ -63,10 +84,13 @@ Proof with mautosolve.
     
   
   (** Variable case *)
-  - assert (exists B s, {{ #x : B ∈ Δ }} /\ {{ Γ ⊢ A ≈ B }} /\ {{ Δ ⊢ A ≈ B }} /\ {{ Δ ⊢ A : Sort@s }}) by mauto.
+  - assert (exists B, {{ #x : B ∈ Δ }} /\ {{ Γ ⊢ A ≈ B }} /\ {{ Δ ⊢ A ≈ B }}) by (eapply ctxeq_lookup_helper; mauto 2).
     destruct_conjs.
-    eapply wf_exp_conv; mauto 3.
-
+    
+    eapply wf_exp_conv with (A := H5); mauto 2.
+    assert (exists s, {{ Δ ⊢ H5 : Sort@s }}) as [] by mauto 3.
+    econstructor; mauto 2.
+    
   (** Natural recursion case **)
   - assert {{ Δ ⊢ MZ : B[Id,,zero] }} by mauto.
     assert {{ Δ ⊢ M0 : ℕ }} by mauto.

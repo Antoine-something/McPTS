@@ -115,7 +115,7 @@ Proof.
   intros.
   assert {{ #n : ^(iter (S n) (fun T' => {{{ T'[Wk] }}}) T) ∈ ^(Δ ++ T :: Γ) }} by (eapply app_ctx_lookup; mauto).
   subst.
-  econstructor; mauto.
+  eapply wf_vlookup'; mauto.
 Qed.
 
 Lemma sub_q_eq {P : PtsSig} : forall (Δ : ctx P) A Γ σ σ' s,

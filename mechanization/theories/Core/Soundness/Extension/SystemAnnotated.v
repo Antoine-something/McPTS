@@ -56,7 +56,7 @@ with wf_exp_ann {P} : ctx P -> list P -> exp P -> P -> exp P -> Prop :=
 | wfa_vlookup :
   `( {{ ⊫ Γ > sts }} ->
      {{ #x : A ∈ Γ }} ->
-     {{ Γ : sts ⊫ A > s }} ->
+     {{ Γ : sts ⊫ A : Sort@s > s' }} ->
      {{ Γ : sts ⊫ #x : A > s }} )
    
 (** Naturals *)
@@ -345,7 +345,8 @@ Proof.
     do 2 eexists; mauto 2.
     
   - destruct HΓ as [sts HΓ].
-    assert (exists s, {{ Γ ⊢ A : Sort@s }}) as [s] by mauto 2.
+    destruct HM as [sts' [s' HA']].
+    assert {{ Γ : sts ⊫ A : Sort@s > s' }} as HA by (eapply wf_exp_sts_irrel; mauto 2).
     do 2 eexists; mauto 2.
     
   - destruct HΓ as [sts HΓ].
@@ -402,12 +403,13 @@ Proof.
       - eapply wfa_succ; [eapply r|].
         eapply wfa_exp_conv with (A := {{{ ℕ[Wk][Wk] }}}); mauto 2.
         econstructor; mauto 3.
-        eapply wf_conv with (A := {{{ Sort@sn[Wk][Wk] }}}); mauto 2.
-        + econstructor; mauto 2.
-          econstructor; econstructor; mauto 2.
-        + transitivity {{{ Sort@sn[Wk∘Wk] }}}; [symmetry|]; econstructor; mauto 2.
-          eapply wf_exp_eq_conv' with (A := {{{ Sort@sn'[Wk∘Wk] }}}); mauto 3.
-          eapply wf_exp_eq_sub_compose; econstructor; mauto 2.
+        assert {{ Γ, ℕ, A0 ⊢ Sort@sn[Wk][Wk] ≈ Sort@sn[Wk∘Wk] }} by (symmetry; eapply wf_typ_eq_sub_compose; mauto 3).
+        assert {{ Γ, ℕ, A0 ⊢ Sort@sn[Wk∘Wk] ≈ Sort@sn }} by mauto 3.
+        assert {{ Γ, ℕ, A0 ⊢ Sort@sn[Wk][Wk] ≈ Sort@sn }} by (transitivity {{{ Sort@sn[Wk∘Wk] }}}; mauto 3).
+        eapply wfa_exp_conv with (A := {{{ Sort@sn[Wk][Wk] }}}); mauto 3.
+        econstructor; mauto 2.
+        econstructor; mauto 2.
+
       - symmetry; mauto 3.
     }
     clear HMS; rename H0 into HMS.
