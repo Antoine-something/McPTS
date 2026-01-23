@@ -599,9 +599,13 @@ Proof.
   simpl.
   intros * Ha Ha'. gen typ_rel' exp_rel'.
   induction Ha using glu_sort_elem_ind.
-  1,3: intros; basic_invert_glu_sort_elem Ha';
-    apply_predicate_equivalence; try solve [split; reflexivity].
-
+  3:(intros; basic_invert_glu_sort_elem Ha';
+       apply_predicate_equivalence; try solve [split; reflexivity]).
+  
+  - intros; basic_invert_glu_sort_elem Ha'.
+    unfold sort_glu_typ_pred in *.
+    
+    
   intros.
   simp glu_sort_elem in Ha'.
   inversion Ha'.

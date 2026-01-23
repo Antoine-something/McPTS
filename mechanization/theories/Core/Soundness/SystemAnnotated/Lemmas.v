@@ -3,150 +3,8 @@ From Coq Require Import List Classes.RelationClasses Setoid Morphisms.
 From McPTS Require Import PtsSignature LibTactics.
 From McPTS.Core Require Import Base.
 From McPTS.Core.Syntactic Require Export Syntax System Corollaries.
+From McPTS.Core.Soundness.SystemAnnotated Require Import Definitions.
 Import Syntax_Notations.
-
-
-Reserved Notation "⊫ Γ > sts " (in custom judg at level 80, Γ custom exp, sts constr).
-Reserved Notation "Γ : sts ⊫ M : A > s" (in custom judg at level 80, Γ custom exp, sts constr, M custom exp, A custom exp, s constr).
-Reserved Notation "Γ : sts ⊫ A > s" (in custom judg at level 80, Γ custom exp, sts constr, A custom exp, s constr).
-Reserved Notation "Γ : stsΓ ⊫s σ : Δ > stsΔ" (in custom judg at level 80, Γ custom exp, stsΓ constr, σ custom exp, Δ custom exp, stsΔ constr).
-(* Reserved Notation "'#' x : A > s ∈ Γ : sts" (in custom judg at level 80, x constr at level 0, A custom exp, s constr, Γ custom exp at level 50, sts constr). *)
-
-Generalizable All Variables.
-
-(* Inductive ctx_lookup_ann {P} : nat -> typ P -> P -> ctx P -> list P -> Prop :=  *)
-(* | here_a : `({{ #0 : A > s ∈ Γ, A : s :: sts }} ) *)
-(* | there_a : `({{ #n : A > s ∈ Γ : sts }} -> {{ #(S n) : A[Wk] > s ∈ Γ, B : (sb :: sts) }}) *)
-(* where "'#' x : A > s ∈ Γ : sts" := (ctx_lookup_ann x A s Γ sts) (in custom judg) : type_scope. *)
-  
-Inductive wf_ctx_ann {P} : ctx P -> list P -> Prop :=
-| wfa_ctx_empty : {{ ⊫ ⋅ > nil }}
-| wfa_ctx_extend :
-  `( {{ ⊫ Γ > sts }} ->
-     {{ Γ : sts ⊫ A : Sort@s > s' }} ->
-     {{ ⊫ Γ, A > (s :: sts) }} )
-where "⊫ Γ > sts" := (wf_ctx_ann Γ sts) (in custom judg) : type_scope
-
-with wf_exp_ann {P} : ctx P -> list P -> exp P -> P -> exp P -> Prop :=
-| wfa_st :
-  `( Ax P s1 s2 -> Ax P s2 s3 ->
-     {{ ⊫ Γ > sts }} ->
-     {{ Γ : sts ⊫ Sort@s1 : Sort@s2 > s3 }} )
-(** Functions *)
-| wfa_pi :
-  `( forall (r : Ru P s1 s2 s3),
-        Ax P s3 s3' ->
-        {{ Γ : sts ⊫ A : Sort@s1 > s1' }} ->
-        {{ Γ, A : (s1 :: sts) ⊫ B : Sort@s2 > s2' }} ->
-        {{ Γ : sts ⊫ Π r A B : Sort@s3 > s3' }} )
-| wfa_fn :
-  `( forall (r : Ru P s1 s2 s3),
-        {{ Γ : sts ⊫ A : Sort@s1 > s1' }} ->
-        {{ Γ, A : (s1 :: sts) ⊫ B : Sort@s2 > s2' }} ->
-        {{ Γ, A : (s1 :: sts) ⊫ M : B > s2 }} ->
-        {{ Γ : sts ⊫ λ r A M : Π r A B > s3 }} )
-| wfa_app :
-  `( forall (r : Ru P s1 s2 s3),
-        {{ Γ : sts ⊫ A : Sort@s1 > s1' }} ->
-        {{ Γ, A : (s1 :: sts) ⊫ B : Sort@s2 > s2' }} ->
-        {{ Γ : sts ⊫ M : Π r A B > s3 }} ->
-        {{ Γ : sts ⊫ N : A > s1 }} ->
-        {{ Γ : sts ⊫ M N : B[Id,,N] > s2 }} )
-   
-| wfa_vlookup :
-  `( {{ ⊫ Γ > sts }} ->
-     {{ #x : A ∈ Γ }} ->
-     {{ Γ : sts ⊫ A : Sort@s > s' }} ->
-     {{ Γ : sts ⊫ #x : A > s }} )
-   
-(** Naturals *)
-| wfa_nat :
-  `( forall (r : Ru_nat P sn),
-        Ax P sn sn' ->
-        {{ ⊫ Γ > sts }} ->
-        {{ Γ : sts ⊫ ℕ : Sort@sn > sn' }} )
-| wfa_zero :
-  `( forall (r : Ru_nat P sn),
-        {{ ⊫ Γ > sts }} ->
-        {{ Γ : sts ⊫ zero : ℕ > sn }} )
-| wfa_succ :
-  `( forall (r : Ru_nat P sn),
-        {{ Γ : sts ⊫ M : ℕ > sn' }} ->
-        {{ Γ : sts ⊫ succ M : ℕ > sn }} )
-| wfa_rec :
-  `( forall (r : Ru_nat P sn),
-        {{ Γ, ℕ : (sn :: sts) ⊫ A : Sort@sa > sa' }} ->
-        {{ Γ : sts ⊫ MZ : A[Id,,zero] > sa }} ->
-        {{ Γ, ℕ, A : (sa :: (sn :: sts)) ⊫ MS : A[Wk∘Wk,,succ #1] > sa }} ->
-        {{ Γ : sts ⊫ M : ℕ > sn }} ->
-        {{ Γ : sts ⊫ rec M return A | zero -> MZ | succ -> MS end : A[Id,,M] > sa }} )
-
-| wfa_exp_sub :
-  `( {{ Γ : sts ⊫s σ : Δ > sts' }} ->
-     {{ Δ : sts' ⊫ M : A > s }} ->
-     {{ Γ : sts ⊫ M[σ] : A[σ] > s }} )
-
-| wfa_exp_conv :
-  `( {{ Γ : sts ⊫ M : A > s }} ->
-     {{ Γ ⊢ A ≈ A' }} ->
-     {{ Γ : sts ⊫ M : A' > s }} )
-| wfa_exp_conv_st :
-  `( {{ Γ : sts ⊫ M : A > s }} ->
-     {{ Γ : sts ⊫ A > s' }} ->
-     {{ Γ : sts ⊫ M : A > s' }} )
-where "Γ : sts ⊫ M : A > s" := (wf_exp_ann Γ sts A s M) (in custom judg) : type_scope
-
-with wf_typ_ann {P} : ctx P -> list P -> typ P -> P -> Prop :=
-| wfa_typ_st :
-  `( Ax P s s' ->
-     {{ ⊫ Γ > sts }} ->
-     {{ Γ : sts ⊫ Sort@s > s' }} )
-| wfa_typ_exp :
-  `( {{ Γ : sts ⊫ A : Sort@s > s' }} ->
-     {{ Γ : sts ⊫ A > s }} )
-| wfa_typ_clo :
-  `( {{ Γ : sts ⊫s σ : Δ > sts' }} ->
-     {{ Δ : sts' ⊫ A > s }} ->
-     {{ Γ : sts ⊫ A[σ] > s }} )
-where "Γ : sts ⊫ A > s" := (wf_typ_ann Γ sts A s) (in custom judg) : type_scope
-                                                                             
-with wf_sub_ann {P} : ctx P -> list P -> ctx P -> list P -> sub P -> Prop :=
-| wfa_sub_id :
-  `( {{ ⊫ Γ > sts }} ->
-     {{ Γ : sts ⊫s Id : Γ > sts }} )
-| wfa_sub_weaken :
-  `( {{ ⊫ Γ, A > s :: sts }} ->
-     {{ Γ, A : s :: sts ⊫s Wk : Γ > sts }} )
-| wfa_sub_compose :
-  `( {{ Γ1 : sts1 ⊫s σ2 : Γ2 > sts2 }} ->
-     {{ Γ2 : sts2 ⊫s σ1 : Γ3 > sts3 }} ->
-     {{ Γ1 : sts1 ⊫s σ1∘σ2 : Γ3 > sts3 }} )
-| wfa_sub_extend :
-  `( {{ Γ : stsΓ ⊫s σ : Δ > stsΔ }} ->
-     {{ Δ : stsΔ ⊫ A : Sort@s > s' }} ->
-     {{ Γ : stsΓ ⊫ M : A[σ] > s }} ->
-     {{ Γ : stsΓ ⊫s σ,,M : Δ, A > s :: stsΔ }} )
-| wfa_sub_conv :
-  `( {{ Γ : stsΓ ⊫s σ : Δ > stsΔ }} ->
-     {{ ⊫ Δ' > stsΔ' }} ->
-     {{ ⊢ Δ ≈ Δ' }} ->
-     {{ Γ : stsΓ ⊫s σ : Δ' > stsΔ' }} )
-| wfa_sub_conv_sts :
-  `( {{ Γ : stsΓ ⊫s σ : Δ > stsΔ }} ->
-     {{ ⊫ Δ > stsΔ' }} ->
-     {{ Γ : stsΓ ⊫s σ : Δ > stsΔ' }} )
-where "Γ : stsΓ ⊫s σ : Δ > stsΔ" := (wf_sub_ann Γ stsΓ Δ stsΔ σ) (in custom judg) : type_scope.
-
-#[export]
-Hint Constructors wf_ctx_ann wf_exp_ann wf_typ_ann wf_sub_ann : mcpts.
-
-Scheme wf_ctx_ann_mut_ind := Induction for wf_ctx_ann Sort Prop
-with wf_exp_ann_mut_ind := Induction for wf_exp_ann Sort Prop
-with wf_sub_ann_mut_ind := Induction for wf_sub_ann Sort Prop.                                          
-Combined Scheme syntactic_wf_ann_mut_ind from
-  wf_ctx_ann_mut_ind,
-  wf_exp_ann_mut_ind,
-  wf_sub_ann_mut_ind.
 
 
 #[local]
@@ -196,14 +54,14 @@ Proof.
         intros stsΓ' HΓ);
     try specialize_IHs;
     only 2-4: (assert {{ ⊫ Γ,A0 > s1 :: stsΓ' }} as HΓA by mauto 2);
-    only 9: (assert (exists sn', Ax P sn sn') as [sn'] by (eapply full_P);
-             assert {{ Γ : stsΓ' ⊫ ℕ : Sort@sn > sn' }} by mauto 2;
-             assert {{ ⊫ Γ, ℕ > sn :: stsΓ' }} by mauto 2;
-             try specialize_IHs;
-             assert {{ ⊫ Γ, ℕ, A0 > s :: sn :: stsΓ' }} by mauto 2
-            );
-    only 12: (specialize_IHs);
-    only 17: (inversion_clear HΓ);
+    (* only 9: (assert (exists sn', Ax P sn sn') as [sn'] by (eapply full_P); *)
+    (*          assert {{ Γ : stsΓ' ⊫ ℕ : Sort@sn > sn' }} by mauto 2; *)
+    (*          assert {{ ⊫ Γ, ℕ > sn :: stsΓ' }} by mauto 2; *)
+    (*          try specialize_IHs; *)
+    (*          assert {{ ⊫ Γ, ℕ, A0 > s :: sn :: stsΓ' }} by mauto 2 *)
+    (*         ); *)
+    only 8: (specialize_IHs);
+    only 13: (inversion_clear HΓ);
     try solve [econstructor; mauto 2].
 
   inversion_clear H0.
@@ -332,14 +190,14 @@ Proof.
     clear HB; rename H into HB.
     
     destruct HM0 as [sts' [sΠ HM0]].
-    assert {{ Γ : sts ⊫ M0 : Π r A0 B > sΠ }} by (eapply wf_exp_sts_irrel; mauto 2).
+    assert {{ Γ : sts ⊫ M0 : Π A0 B > sΠ }} by (eapply wf_exp_sts_irrel; mauto 2).
     clear HM0; rename H into HM0.
-    assert {{ Γ : sts ⊫ Π r A0 B > s3 }} as HΠ.
+    assert {{ Γ : sts ⊫ Π A0 B > s3 }} as HΠ.
     {
       assert (exists s3', Ax P s3 s3') as [s3'] by (eapply full_P).
       mauto 3.
     }
-    assert {{ Γ : sts ⊫ M0 : Π r A0 B > s3 }} by mauto 3.
+    assert {{ Γ : sts ⊫ M0 : Π A0 B > s3 }} by mauto 3.
     clear HM0; rename H into HM0.
     
     do 2 eexists; mauto 2.
@@ -349,81 +207,81 @@ Proof.
     assert {{ Γ : sts ⊫ A : Sort@s > s' }} as HA by (eapply wf_exp_sts_irrel; mauto 2).
     do 2 eexists; mauto 2.
     
-  - destruct HΓ as [sts HΓ].
-    assert (exists s', Ax P s s') as [s'] by (eapply full_P).
-    do 2 eexists; mauto 2.
-  - destruct HΓ as [sts HΓ].
-    do 2 eexists; mauto 2.
-  - destruct HM as [sts [s' HM0]].
-    do 2 eexists; mauto 2.
-  - rename s into sn.
-    rename s' into s.
-    assert (exists sn', Ax P sn sn') as [sn'] by (eapply full_P).
-    destruct HM1 as [stsΓ [sa HMZ]].
-    assert {{ ⊫ Γ > stsΓ }} by (eapply wf_exp_ann_ctx_presup; mauto 2).
-    assert {{ Γ : stsΓ ⊫ ℕ : Sort@sn > sn' }} by mauto 2.
-    assert {{ ⊫ Γ, ℕ > sn :: stsΓ }} by mauto 2.
+  (* - destruct HΓ as [sts HΓ]. *)
+  (*   assert (exists s', Ax P s s') as [s'] by (eapply full_P). *)
+  (*   do 2 eexists; mauto 2. *)
+  (* - destruct HΓ as [sts HΓ]. *)
+  (*   do 2 eexists; mauto 2. *)
+  (* - destruct HM as [sts [s' HM0]]. *)
+  (*   do 2 eexists; mauto 2. *)
+  (* - rename s into sn. *)
+  (*   rename s' into s. *)
+  (*   assert (exists sn', Ax P sn sn') as [sn'] by (eapply full_P). *)
+  (*   destruct HM1 as [stsΓ [sa HMZ]]. *)
+  (*   assert {{ ⊫ Γ > stsΓ }} by (eapply wf_exp_ann_ctx_presup; mauto 2). *)
+  (*   assert {{ Γ : stsΓ ⊫ ℕ : Sort@sn > sn' }} by mauto 2. *)
+  (*   assert {{ ⊫ Γ, ℕ > sn :: stsΓ }} by mauto 2. *)
     
-    destruct HM2 as [stsΓℕ [s' HA0]].
-    assert {{ Γ, ℕ : sn :: stsΓ ⊫ A0 : Sort@s > s' }} by (eapply wf_exp_sts_irrel; mauto 2).
-    clear HA0; rename H7 into HA0.
+  (*   destruct HM2 as [stsΓℕ [s' HA0]]. *)
+  (*   assert {{ Γ, ℕ : sn :: stsΓ ⊫ A0 : Sort@s > s' }} by (eapply wf_exp_sts_irrel; mauto 2). *)
+  (*   clear HA0; rename H7 into HA0. *)
 
-    assert {{ Γ, ℕ : sn :: stsΓ ⊫ A0 > s }} by mauto 2.
-    assert {{ ⊫ Γ, ℕ, A0 > s :: sn :: stsΓ }} by mauto 2.
-    assert {{ Γ : stsΓ ⊫ MZ : A0[Id,,zero] > s }}.
-    {
-      enough {{ Γ : stsΓ ⊫ A0[Id,,zero] > s }} by mauto 3.
-      eapply wfa_typ_clo; mauto 2.
-      econstructor; mauto 2.
-      econstructor; mauto 2.
-      econstructor; mauto 2.
-      symmetry.
-      econstructor; mauto 3.
-    }
-    clear HMZ; rename H0 into HMZ.
-    clear sa.
+  (*   assert {{ Γ, ℕ : sn :: stsΓ ⊫ A0 > s }} by mauto 2. *)
+  (*   assert {{ ⊫ Γ, ℕ, A0 > s :: sn :: stsΓ }} by mauto 2. *)
+  (*   assert {{ Γ : stsΓ ⊫ MZ : A0[Id,,zero] > s }}. *)
+  (*   { *)
+  (*     enough {{ Γ : stsΓ ⊫ A0[Id,,zero] > s }} by mauto 3. *)
+  (*     eapply wfa_typ_clo; mauto 2. *)
+  (*     econstructor; mauto 2. *)
+  (*     econstructor; mauto 2. *)
+  (*     econstructor; mauto 2. *)
+  (*     symmetry. *)
+  (*     econstructor; mauto 3. *)
+  (*   } *)
+  (*   clear HMZ; rename H0 into HMZ. *)
+  (*   clear sa. *)
     
-    destruct HM0 as [stsΓℕA0 [sa HMS]].
-    assert {{ Γ, ℕ, A0 : s :: sn :: stsΓ ⊫ MS : A0[Wk∘Wk,,succ #1] > s }}.
-    {
-      assert {{ Γ, ℕ, A0 : s :: sn :: stsΓ ⊫ MS : A0[Wk∘Wk,,succ #1] > sa }} by (eapply wf_exp_sts_irrel; mauto 2).
-      enough {{ Γ, ℕ, A0 : s :: sn :: stsΓ ⊫ A0[Wk∘Wk,,succ #1] > s }} by mauto 3.
-      eapply wfa_typ_clo; mauto 2.
-      econstructor; mauto 4.
-      gen_presup H2.
-      assert {{ Γ, ℕ, A0 ⊢s Wk∘Wk : Γ }} by (econstructor; mauto 3).
-      assert {{ Γ, ℕ, A0 ⊢ ℕ[Wk∘Wk] ≈ ℕ : Sort@sn }} by (econstructor; mauto 2).
-      assert {{ Γ, ℕ, A0 ⊢ ℕ[Wk∘Wk] ≈ ℕ[Wk][Wk] : Sort@sn }}.
-      {
-        eapply wf_exp_eq_conv' with (A := {{{ Sort@sn[Wk∘Wk] }}}); mauto 3.
-        eapply wf_exp_eq_sub_compose; econstructor; mauto 2.
-      }
-      assert {{ Γ, ℕ, A0 ⊢ ℕ[Wk][Wk] ≈ ℕ : Sort@sn }} by (etransitivity; mauto 2).
-      eapply wfa_exp_conv with (A := {{{ ℕ }}}); mauto 2.
-      - eapply wfa_succ; [eapply r|].
-        eapply wfa_exp_conv with (A := {{{ ℕ[Wk][Wk] }}}); mauto 2.
-        econstructor; mauto 3.
-        assert {{ Γ, ℕ, A0 ⊢ Sort@sn[Wk][Wk] ≈ Sort@sn[Wk∘Wk] }} by (symmetry; eapply wf_typ_eq_sub_compose; mauto 3).
-        assert {{ Γ, ℕ, A0 ⊢ Sort@sn[Wk∘Wk] ≈ Sort@sn }} by mauto 3.
-        assert {{ Γ, ℕ, A0 ⊢ Sort@sn[Wk][Wk] ≈ Sort@sn }} by (transitivity {{{ Sort@sn[Wk∘Wk] }}}; mauto 3).
-        eapply wfa_exp_conv with (A := {{{ Sort@sn[Wk][Wk] }}}); mauto 3.
-        econstructor; mauto 2.
-        econstructor; mauto 2.
+  (*   destruct HM0 as [stsΓℕA0 [sa HMS]]. *)
+  (*   assert {{ Γ, ℕ, A0 : s :: sn :: stsΓ ⊫ MS : A0[Wk∘Wk,,succ #1] > s }}. *)
+  (*   { *)
+  (*     assert {{ Γ, ℕ, A0 : s :: sn :: stsΓ ⊫ MS : A0[Wk∘Wk,,succ #1] > sa }} by (eapply wf_exp_sts_irrel; mauto 2). *)
+  (*     enough {{ Γ, ℕ, A0 : s :: sn :: stsΓ ⊫ A0[Wk∘Wk,,succ #1] > s }} by mauto 3. *)
+  (*     eapply wfa_typ_clo; mauto 2. *)
+  (*     econstructor; mauto 4. *)
+  (*     gen_presup H2. *)
+  (*     assert {{ Γ, ℕ, A0 ⊢s Wk∘Wk : Γ }} by (econstructor; mauto 3). *)
+  (*     assert {{ Γ, ℕ, A0 ⊢ ℕ[Wk∘Wk] ≈ ℕ : Sort@sn }} by (econstructor; mauto 2). *)
+  (*     assert {{ Γ, ℕ, A0 ⊢ ℕ[Wk∘Wk] ≈ ℕ[Wk][Wk] : Sort@sn }}. *)
+  (*     { *)
+  (*       eapply wf_exp_eq_conv' with (A := {{{ Sort@sn[Wk∘Wk] }}}); mauto 3. *)
+  (*       eapply wf_exp_eq_sub_compose; econstructor; mauto 2. *)
+  (*     } *)
+  (*     assert {{ Γ, ℕ, A0 ⊢ ℕ[Wk][Wk] ≈ ℕ : Sort@sn }} by (etransitivity; mauto 2). *)
+  (*     eapply wfa_exp_conv with (A := {{{ ℕ }}}); mauto 2. *)
+  (*     - eapply wfa_succ; [eapply r|]. *)
+  (*       eapply wfa_exp_conv with (A := {{{ ℕ[Wk][Wk] }}}); mauto 2. *)
+  (*       econstructor; mauto 3. *)
+  (*       assert {{ Γ, ℕ, A0 ⊢ Sort@sn[Wk][Wk] ≈ Sort@sn[Wk∘Wk] }} by (symmetry; eapply wf_typ_eq_sub_compose; mauto 3). *)
+  (*       assert {{ Γ, ℕ, A0 ⊢ Sort@sn[Wk∘Wk] ≈ Sort@sn }} by mauto 3. *)
+  (*       assert {{ Γ, ℕ, A0 ⊢ Sort@sn[Wk][Wk] ≈ Sort@sn }} by (transitivity {{{ Sort@sn[Wk∘Wk] }}}; mauto 3). *)
+  (*       eapply wfa_exp_conv with (A := {{{ Sort@sn[Wk][Wk] }}}); mauto 3. *)
+  (*       econstructor; mauto 2. *)
+  (*       econstructor; mauto 2. *)
 
-      - symmetry; mauto 3.
-    }
-    clear HMS; rename H0 into HMS.
+  (*     - symmetry; mauto 3. *)
+  (*   } *)
+  (*   clear HMS; rename H0 into HMS. *)
 
-    destruct HM as [stsΓ' [sn'' HM0]].
-    assert {{ Γ : stsΓ ⊫ M0 : ℕ > sn }}.
-    {
-      assert {{ Γ : stsΓ ⊫ M0 : ℕ > sn'' }} by (eapply wf_exp_sts_irrel; mauto 2).
-      assert {{ Γ : stsΓ ⊫ ℕ > sn }} by mauto 2.
-      mauto 2.
-    }
-    clear HM0; rename H0 into HM0.
+  (*   destruct HM as [stsΓ' [sn'' HM0]]. *)
+  (*   assert {{ Γ : stsΓ ⊫ M0 : ℕ > sn }}. *)
+  (*   { *)
+  (*     assert {{ Γ : stsΓ ⊫ M0 : ℕ > sn'' }} by (eapply wf_exp_sts_irrel; mauto 2). *)
+  (*     assert {{ Γ : stsΓ ⊫ ℕ > sn }} by mauto 2. *)
+  (*     mauto 2. *)
+  (*   } *)
+  (*   clear HM0; rename H0 into HM0. *)
 
-    do 2 eexists; mauto 2.
+  (*   do 2 eexists; mauto 2. *)
     
   - destruct HM as [sts [s HA0]].
     destruct Hσ as [stsΓ [stsΔ Hσ]].
