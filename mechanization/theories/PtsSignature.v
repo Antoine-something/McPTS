@@ -6,7 +6,7 @@ Record PtsSig : Type :=
   mkPtsSig {
       St :> Set;
       Ax : St -> St -> Prop;
-      Ru : St -> St -> St -> Set;
+      Ru : St -> St -> St -> Prop;
       Ru_nat : St -> Set;
     }.
 
@@ -79,7 +79,7 @@ Section SignatureExtension.
   | ax_ext : forall {n : nat}, eAx (st_ext n) (st_ext (S n))
   | ax_cross : forall {s : St P}, eAx (st_P s) (st_ext 0).
 
-  Inductive eRu : eSt -> eSt -> eSt -> Set :=
+  Inductive eRu : eSt -> eSt -> eSt -> Prop :=
   | ru_P : forall {s1 s2 s3 : St P}, Ru P s1 s2 s3 -> eRu (st_P s1) (st_P s2) (st_P s3).
 
   Inductive eRu_nat : eSt -> Set :=

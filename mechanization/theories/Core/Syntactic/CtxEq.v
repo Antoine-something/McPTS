@@ -92,12 +92,12 @@ Proof with mautosolve.
     econstructor; mauto 2.
     
   (** Natural recursion case **)
-  - assert {{ Δ ⊢ MZ : B[Id,,zero] }} by mauto.
-    assert {{ Δ ⊢ M0 : ℕ }} by mauto.
-    assert {{ ⊢ Δ, ℕ ≈ Γ, ℕ }} by (econstructor; mauto 4).
-    assert {{ ⊢ Δ, ℕ, B ≈ Γ, ℕ, B }} by (econstructor; mauto 4).
-    assert {{ Δ, ℕ, B ⊢ MS : B[Wk∘Wk,,succ #1] }} by mauto.
-    mauto.
+  (* - assert {{ Δ ⊢ MZ : B[Id,,zero] }} by mauto. *)
+  (*   assert {{ Δ ⊢ M0 : ℕ }} by mauto. *)
+  (*   assert {{ ⊢ Δ, ℕ ≈ Γ, ℕ }} by (econstructor; mauto 4). *)
+  (*   assert {{ ⊢ Δ, ℕ, B ≈ Γ, ℕ, B }} by (econstructor; mauto 4). *)
+  (*   assert {{ Δ, ℕ, B ⊢ MS : B[Wk∘Wk,,succ #1] }} by mauto. *)
+  (*   mauto. *)
 
   (** Conversion case *)
   - assert {{ Δ ⊢ B ≈ A }} by mauto.
@@ -123,7 +123,7 @@ Proof with mautosolve.
     
   (** Function application congruence case *)
   - assert {{ Δ ⊢ N ≈ N' : B }} by mauto.
-    assert {{ Δ ⊢ M0 ≈ M'0 : Π r B C }} by mauto.
+    assert {{ Δ ⊢ M0 ≈ M'0 : Π B C }} by mauto.
     assert {{ Δ ⊢ B : Sort@s1 }} by mauto.
     assert {{ ⊢ Δ, B ≈ Γ, B }} by (econstructor; mauto 3).
     assert {{ Δ, B ⊢ C : Sort@s2 }} by mauto.
@@ -141,31 +141,31 @@ Proof with mautosolve.
   - assert {{ Δ ⊢ B : Sort@s1 }} by mauto.
     assert {{ ⊢ Δ, B ≈ Γ, B }} by (econstructor; mauto 3).
     assert {{ Δ, B ⊢ C : Sort@s2 }} by mauto.
-    assert {{ Δ ⊢ M : Π r B C }} by mauto.
+    assert {{ Δ ⊢ M : Π B C }} by mauto.
     mauto 2.
 
-  (** Natural recursion congruence case **)
-  - assert {{ Δ ⊢ MZ ≈ MZ' : B[Id,,zero] }} by mauto.
-    assert {{ Δ ⊢ M0 ≈ M'0 : ℕ }} by mauto.
-    assert {{ ⊢ Δ, ℕ ≈ Γ, ℕ }} by (econstructor; mauto 4).
-    assert {{ ⊢ Δ, ℕ, B ≈ Γ, ℕ, B }} by (econstructor; mauto 4).
-    assert {{ Δ, ℕ, B ⊢ MS ≈ MS' : B[Wk∘Wk,,succ #1] }} by mauto.
-    mauto.
+  (* (** Natural recursion congruence case **) *)
+  (* - assert {{ Δ ⊢ MZ ≈ MZ' : B[Id,,zero] }} by mauto. *)
+  (*   assert {{ Δ ⊢ M0 ≈ M'0 : ℕ }} by mauto. *)
+  (*   assert {{ ⊢ Δ, ℕ ≈ Γ, ℕ }} by (econstructor; mauto 4). *)
+  (*   assert {{ ⊢ Δ, ℕ, B ≈ Γ, ℕ, B }} by (econstructor; mauto 4). *)
+  (*   assert {{ Δ, ℕ, B ⊢ MS ≈ MS' : B[Wk∘Wk,,succ #1] }} by mauto. *)
+  (*   mauto. *)
 
-  (** Natural recursion base case **)
-  - assert {{ ⊢ Δ, ℕ ≈ Γ, ℕ }} by (econstructor; mauto 4).
-    assert {{ ⊢ Δ, ℕ, B ≈ Γ, ℕ, B }} by (econstructor; mauto 4).
-    assert {{ Δ, ℕ ⊢ B : Sort@s' }} by mauto.
-    assert {{ Δ ⊢ M' : B[Id,,zero] }} by mauto.
-    assert {{ Δ, ℕ, B ⊢ MS : B[Wk∘Wk,,succ #1] }} by mauto.
-    mauto.
+  (* (** Natural recursion base case **) *)
+  (* - assert {{ ⊢ Δ, ℕ ≈ Γ, ℕ }} by (econstructor; mauto 4). *)
+  (*   assert {{ ⊢ Δ, ℕ, B ≈ Γ, ℕ, B }} by (econstructor; mauto 4). *)
+  (*   assert {{ Δ, ℕ ⊢ B : Sort@s' }} by mauto. *)
+  (*   assert {{ Δ ⊢ M' : B[Id,,zero] }} by mauto. *)
+  (*   assert {{ Δ, ℕ, B ⊢ MS : B[Wk∘Wk,,succ #1] }} by mauto. *)
+  (*   mauto. *)
 
-  (** Natural recursion succ case **)
-  - assert {{ ⊢ Δ, ℕ ≈ Γ, ℕ }} by (econstructor; mauto 4).
-    assert {{ ⊢ Δ, ℕ, B ≈ Γ, ℕ, B }} by (econstructor; mauto 4).
-    assert {{ Δ ⊢ M0 : ℕ }} by mauto.
-    assert {{ Δ, ℕ, B ⊢ MS : B[Wk∘Wk,,succ #1] }} by mauto.
-    mauto.
+  (* (** Natural recursion succ case **) *)
+  (* - assert {{ ⊢ Δ, ℕ ≈ Γ, ℕ }} by (econstructor; mauto 4). *)
+  (*   assert {{ ⊢ Δ, ℕ, B ≈ Γ, ℕ, B }} by (econstructor; mauto 4). *)
+  (*   assert {{ Δ ⊢ M0 : ℕ }} by mauto. *)
+  (*   assert {{ Δ, ℕ, B ⊢ MS : B[Wk∘Wk,,succ #1] }} by mauto. *)
+  (*   mauto. *)
 
   (** Variable reflexivity case *)
   - assert (exists B s, {{ #x : B ∈ Δ }} /\ {{ Γ ⊢ A ≈ B }} /\ {{ Δ ⊢ A ≈ B }} /\ {{ Δ ⊢ A : Sort@s }}) by mauto.

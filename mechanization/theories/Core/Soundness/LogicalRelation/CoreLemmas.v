@@ -6,103 +6,103 @@ From McPTS.Core.Soundness.LogicalRelation Require Import CoreTactics Definitions
 From McPTS.Core.Soundness.Weakening Require Export Lemmas.
 Import Domain_Notations.
 
-Lemma glu_nat_per_nat {P} {s} (r : Ru_nat P s) : forall (Γ : ctx P) M a,
-    glu_nat r Γ M a ->
-    {{ Dom a ≈ a ∈ per_nat }}.
-Proof.
-  induction 1; mauto.
-Qed.
+(* Lemma glu_nat_per_nat {P} {s} (r : Ru_nat P s) : forall (Γ : ctx P) M a, *)
+(*     glu_nat r Γ M a -> *)
+(*     {{ Dom a ≈ a ∈ per_nat }}. *)
+(* Proof. *)
+(*   induction 1; mauto. *)
+(* Qed. *)
 
-#[local]
-Hint Resolve glu_nat_per_nat : mcpts.
+(* #[local] *)
+(* Hint Resolve glu_nat_per_nat : mcpts. *)
 
-Lemma glu_nat_escape {P} {s} (r : Ru_nat P s) : forall (Γ : ctx P) M a,
-    glu_nat r Γ M a ->
-    {{ ⊢ Γ }} ->
-    {{ Γ ⊢ M : ℕ }}.
-Proof.
-  induction 1; intros;
-    try match goal with
-    | H : _ |- _ => solve [gen_presup H; mauto]
-    end.
-  assert {{ Γ ⊢w Id : Γ }} by mauto.
-  match_by_head (per_bot m m) ltac:(fun H => specialize (H (length Γ)) as [M' []]).
-  clear_dups.
-  assert {{ Γ ⊢ M[Id] ≈ M' : ℕ }} by mauto.
-  gen_presups.
-  mauto.
-Qed.
+(* Lemma glu_nat_escape {P} {s} (r : Ru_nat P s) : forall (Γ : ctx P) M a, *)
+(*     glu_nat r Γ M a -> *)
+(*     {{ ⊢ Γ }} -> *)
+(*     {{ Γ ⊢ M : ℕ }}. *)
+(* Proof. *)
+(*   induction 1; intros; *)
+(*     try match goal with *)
+(*     | H : _ |- _ => solve [gen_presup H; mauto] *)
+(*     end. *)
+(*   assert {{ Γ ⊢w Id : Γ }} by mauto. *)
+(*   match_by_head (per_bot m m) ltac:(fun H => specialize (H (length Γ)) as [M' []]). *)
+(*   clear_dups. *)
+(*   assert {{ Γ ⊢ M[Id] ≈ M' : ℕ }} by mauto. *)
+(*   gen_presups. *)
+(*   mauto. *)
+(* Qed. *)
 
-#[export]
-Hint Resolve glu_nat_escape : mcpts.
+(* #[export] *)
+(* Hint Resolve glu_nat_escape : mcpts. *)
 
-Lemma glu_nat_resp_ctx_eq {P} {s} (r : Ru_nat P s) : forall (Γ : ctx P) M a Δ,
-    glu_nat r Γ M a ->
-    {{ ⊢ Γ ≈ Δ }} ->
-    glu_nat r Δ M a.
-Proof.
-  induction 1; intros; mauto.
-Qed.
+(* Lemma glu_nat_resp_ctx_eq {P} {s} (r : Ru_nat P s) : forall (Γ : ctx P) M a Δ, *)
+(*     glu_nat r Γ M a -> *)
+(*     {{ ⊢ Γ ≈ Δ }} -> *)
+(*     glu_nat r Δ M a. *)
+(* Proof. *)
+(*   induction 1; intros; mauto. *)
+(* Qed. *)
 
-#[local]
-Hint Resolve glu_nat_resp_ctx_eq : mcpts.
+(* #[local] *)
+(* Hint Resolve glu_nat_resp_ctx_eq : mcpts. *)
 
-Add Parametric Morphism {P} {s} (r : Ru_nat P s) : (glu_nat r)
-    with signature wf_ctx_eq ==> eq ==> eq ==> iff as glu_ctx_env_sub_morphism_iff1.
-Proof.
-  split; mauto using glu_nat_resp_ctx_eq.
-Qed.
+(* Add Parametric Morphism {P} {s} (r : Ru_nat P s) : (glu_nat r) *)
+(*     with signature wf_ctx_eq ==> eq ==> eq ==> iff as glu_ctx_env_sub_morphism_iff1. *)
+(* Proof. *)
+(*   split; mauto using glu_nat_resp_ctx_eq. *)
+(* Qed. *)
 
-Lemma glu_nat_resp_exp_eq {P} {s} (r : Ru_nat P s) : forall (Γ : ctx P) M a,
-    glu_nat r Γ M a ->
-    forall M',
-    {{ Γ ⊢ M ≈ M' : ℕ }} ->
-    glu_nat r Γ M' a.
-Proof.
-  induction 1; intros; mauto 4.
-  econstructor; trivial.
-  intros.
-  transitivity {{{ M[σ] }}}; mauto 2.
-  symmetry.
-  assert {{ Δ ⊢s σ : Γ }} by mauto 2.
-  assert {{ Δ ⊢ M[σ] ≈ M'[σ] : ℕ[σ] }} by mauto 3.
-  mauto.
-Qed.
+(* Lemma glu_nat_resp_exp_eq {P} {s} (r : Ru_nat P s) : forall (Γ : ctx P) M a, *)
+(*     glu_nat r Γ M a -> *)
+(*     forall M', *)
+(*     {{ Γ ⊢ M ≈ M' : ℕ }} -> *)
+(*     glu_nat r Γ M' a. *)
+(* Proof. *)
+(*   induction 1; intros; mauto 4. *)
+(*   econstructor; trivial. *)
+(*   intros. *)
+(*   transitivity {{{ M[σ] }}}; mauto 2. *)
+(*   symmetry. *)
+(*   assert {{ Δ ⊢s σ : Γ }} by mauto 2. *)
+(*   assert {{ Δ ⊢ M[σ] ≈ M'[σ] : ℕ[σ] }} by mauto 3. *)
+(*   mauto. *)
+(* Qed. *)
 
-#[local]
-Hint Resolve glu_nat_resp_exp_eq : mcpts.
+(* #[local] *)
+(* Hint Resolve glu_nat_resp_exp_eq : mcpts. *)
 
-Add Parametric Morphism {P} {s} (r : Ru_nat P s) Γ : (glu_nat r Γ)
-    with signature wf_exp_eq Γ {{{ ℕ }}} ==> eq ==> iff as glu_ctx_env_sub_morphism_iff2.
-Proof.
-  split; mauto using glu_nat_resp_exp_eq.
-Qed.
+(* Add Parametric Morphism {P} {s} (r : Ru_nat P s) Γ : (glu_nat r Γ) *)
+(*     with signature wf_exp_eq Γ {{{ ℕ }}} ==> eq ==> iff as glu_ctx_env_sub_morphism_iff2. *)
+(* Proof. *)
+(*   split; mauto using glu_nat_resp_exp_eq. *)
+(* Qed. *)
 
-Lemma glu_nat_readback {P} {s} (r : Ru_nat P s) : forall Γ M a,
-    glu_nat r Γ M a ->
-    forall Δ σ M',
-      {{ Δ ⊢w σ : Γ }} ->
-      {{ Rnf ⇓ ℕ a in length Δ ↘ M' }} ->
-      {{ Δ ⊢ M[σ] ≈ M' : ℕ }}.
-Proof.
-  induction 1; intros; progressive_inversion; gen_presups.
-  - transitivity {{{ zero[σ] }}}; mauto 4.
-  - assert {{ Δ ⊢ M'[σ] ≈ M0 : ℕ }} by mauto 4.
-    transitivity {{{ (succ M')[σ] }}}; mauto 3.
-    transitivity {{{ succ M'[σ] }}}; mauto 4.
-  - mauto 4.
-Qed.
+(* Lemma glu_nat_readback {P} {s} (r : Ru_nat P s) : forall Γ M a, *)
+(*     glu_nat r Γ M a -> *)
+(*     forall Δ σ M', *)
+(*       {{ Δ ⊢w σ : Γ }} -> *)
+(*       {{ Rnf ⇓ ℕ a in length Δ ↘ M' }} -> *)
+(*       {{ Δ ⊢ M[σ] ≈ M' : ℕ }}. *)
+(* Proof. *)
+(*   induction 1; intros; progressive_inversion; gen_presups. *)
+(*   - transitivity {{{ zero[σ] }}}; mauto 4. *)
+(*   - assert {{ Δ ⊢ M'[σ] ≈ M0 : ℕ }} by mauto 4. *)
+(*     transitivity {{{ (succ M')[σ] }}}; mauto 3. *)
+(*     transitivity {{{ succ M'[σ] }}}; mauto 4. *)
+(*   - mauto 4. *)
+(* Qed. *)
 
-Lemma glu_nat_rule_irrelevance {P} {s} (r : Ru_nat P s) : forall Γ M a,
-    glu_nat r Γ M a ->
-    forall s' (r' : Ru_nat P s'), glu_nat r' Γ M a.
-Proof.
-  intros.
-  induction H; mauto 2.
-Qed.
+(* Lemma glu_nat_rule_irrelevance {P} {s} (r : Ru_nat P s) : forall Γ M a, *)
+(*     glu_nat r Γ M a -> *)
+(*     forall s' (r' : Ru_nat P s'), glu_nat r' Γ M a. *)
+(* Proof. *)
+(*   intros. *)
+(*   induction H; mauto 2. *)
+(* Qed. *)
 
-#[local]
-Hint Resolve glu_nat_rule_irrelevance : mcpts.
+(* #[local] *)
+(* Hint Resolve glu_nat_rule_irrelevance : mcpts. *)
 
 #[global]
 Ltac simpl_glu_rel :=
@@ -278,7 +278,7 @@ Proof.
   - econstructor; mauto 4.
     repeat split; mauto 2; intros.
     mauto 4.
-  - split; mauto 3.
+  (* - split; mauto 3. *)
 Qed.
 
 Add Parametric Morphism {P} (pred_P : PredicativeSig P) s typ_rel exp_rel a (H : glu_sort_elem pred_P s typ_rel exp_rel a) : exp_rel
@@ -299,8 +299,8 @@ Proof.
   simpl.
   induction 1 using glu_sort_elem_ind; intros;
     simpl_glu_rel; mauto 4.
-  enough {{ Γ ⊢ M : ℕ }} by mauto 4.
-  mauto 2.
+  (* enough {{ Γ ⊢ M : ℕ }} by mauto 4. *)
+  (* mauto 2. *)
 Qed.
 
 Lemma glu_sort_elem_per_sort {P} (pred_P : PredicativeSig P) : forall s typ_rel exp_rel a,
@@ -325,7 +325,8 @@ Lemma glu_sort_elem_per_elem {P} (pred_P : PredicativeSig P) : forall s typ_rel 
 Proof.
   simpl.
   induction 1 using glu_sort_elem_ind; intros.
-  2-4: match_by_head (@per_sort_elem P) ltac:(fun H => directed invert_per_sort_elem H);
+  2-3: handle_per_sort_elem_irrel;
+    match_by_head (@per_sort_elem P) ltac:(fun H => directed invert_per_sort_elem H);
     simpl_glu_rel;
     try fold (per_sort pred_P s' m m);
     mauto 4.
@@ -340,16 +341,13 @@ Proof.
     try fold (per_sort pred_P s' m m).
     mauto 4.
 
-  - intros.
-    destruct_rel_mod_app.    
-    destruct_rel_mod_eval.
-    functional_eval_rewrite_clear.
-    do_per_sort_elem_irrel_assert.
-    apply_relation_equivalence.
-    assert (rel_mod_app m n m n' (x0 n n' equiv_n_n')) by mauto.
-    simplify_evals.
-    rewrite -> H22 in H8.
-    eassumption.    
+  (* - intros. *)
+  (*   destruct_rel_mod_app.     *)
+  (*   destruct_rel_mod_eval. *)
+  (*   functional_eval_rewrite_clear. *)
+  (*   do_per_sort_elem_irrel_assert. *)
+  (*   apply_relation_equivalence. *)
+  (*   mauto. *)
 Qed.
 
 
@@ -383,7 +381,16 @@ Proof.
     
   econstructor; eauto.
   match_by_head (@per_sort_elem P) ltac:(fun H => directed invert_per_sort_elem H).
+  assert (per_sort_elem pred_P s_in in_rel0 a a).
+  {
+    assert ((pred_rel pred_P s_in s3 \/ s_in = s3) /\ (pred_rel pred_P s_out s3 \/ s_out = s3)) as [] by (eapply ord_ru; eauto 2).
+    destruct equiv_a_a' as [equiv_a_a'_eq equiv_a_a'_rel].
+    destruct H15; subst; mauto.
+  }
+  handle_per_sort_elem_irrel.
+  
   intros ? ? N n ? ? equiv_n.
+  assert (equiv_n0 : in_rel0 n n) by (eapply H16; mauto).
   destruct_rel_mod_eval.
   enough (exists mn : domain P, {{ $| m & n |↘ mn }} /\  {{ Δ ⊢ M[σ] N : OT[σ,,N] ® mn ∈ OEL n equiv_n }}) as [? []]; eauto 3.
 Qed.
@@ -415,25 +422,39 @@ Proof.
   - econstructor; eauto.
     destruct_conjs.
     match_by_head (@per_sort_elem P) ltac:(fun H => directed invert_per_sort_elem H).
+    assert (per_sort_elem pred_P s_in in_rel0 a a).
+    {
+      assert ((pred_rel pred_P s_in s3 \/ s_in = s3) /\ (pred_rel pred_P s_out s3 \/ s_out = s3)) as [] by (eapply ord_ru; mauto 2).
+      destruct equiv_a_a'.
+      destruct H15; subst; mauto.
+    }
+    handle_per_sort_elem_irrel.
     intros.
+    assert (equiv_n0 : in_rel0 n n) by (eapply H16; mauto).
     destruct_rel_mod_eval.
     assert {{ Δ ⊢ N : IT[σ]}} by eauto using glu_sort_elem_trm_escape.
     assert (exists mn : domain P, {{ $| m & n |↘ mn }} /\  {{ Δ ⊢ M[σ] N : OT[σ,,N] ® mn ∈ OEL n equiv_n }}) as [? []] by intuition.
     eexists; split; eauto.
-    enough {{ Δ ⊢ M[σ] N ≈ M'[σ] N : OT[σ,,N] }} by eauto.
-    assert {{ Γ ⊢ M ≈ M' : Π r IT OT }} as Hty by mauto.
-    assert {{ Δ ⊢ IT[σ] : Sort@s1 }} by mauto 3.
-    assert {{ Δ, IT[σ] ⊢ OT[q σ] : Sort@s2 }} by mauto 4.
-    eapply wf_exp_eq_sub_cong with (Γ := Δ) in Hty; [| eapply sub_eq_refl; mauto 3].
-    autorewrite with mcpts in Hty.
-    eapply wf_exp_eq_app_cong with (N := N) (N' := N) in Hty; mauto 2.
-    assert ({{ Δ ⊢ OT[q σ][Id,,N] ≈ OT[σ,,N] }}) by mauto 4.
+    enough {{ Δ ⊢ M[σ] N ≈ M'[σ] N : OT[σ,,N] }} by mauto.
+    assert {{ Δ ⊢ (Π IT OT)[σ] ≈ Π IT[σ] OT[q σ] : Sort@s3 }} by mauto.
+    assert {{ Δ ⊢ A[σ] ≈ Π IT[σ] OT[q σ] : Sort@s3 }} by (transitivity {{{ (Π IT OT)[σ] }}}; mauto).
+    assert {{ Δ ⊢ M[σ] ≈ M'[σ] : A[σ] }} by mauto 4.
+    assert {{ Δ ⊢ M[σ] ≈ M'[σ] : Π IT[σ] OT[q σ] }} by mauto.
+    assert {{ Δ ⊢ N ≈ N : IT[σ] }} by mauto.
+    assert {{ Δ ⊢ OT[q σ][Id,,N] ≈ OT[σ,,N] }} by mauto 4.
     mauto.
+    (* assert {{ Δ ⊢ IT[σ] : Sort@s1 }} by mauto 3. *)
+    (* assert {{ Δ, IT[σ] ⊢ OT[q σ] : Sort@s2 }} by mauto 4. *)
+    (* eapply wf_exp_eq_sub_cong with (Γ := Δ) in Hty; [| eapply sub_eq_refl; mauto 3]. *)
+    (* autorewrite with mcpts in Hty. *)
+    (* eapply wf_exp_eq_app_cong with (N := N) (N' := N) in Hty; mauto 2. *)
+    (* assert ({{ Δ ⊢ OT[q σ][Id,,N] ≈ OT[σ,,N] }}) by mauto 4. *)
+    (* mauto. *)
 
   - intros.
     enough {{ Δ ⊢ M[σ] ≈ M'[σ] : A[σ] }}; mauto 4.
 
-  - mauto 4.
+  (* - mauto 4. *)
 Qed.
 
 Add Parametric Morphism {P} (pred_P : PredicativeSig P) s typ_rel exp_rel a (H : glu_sort_elem pred_P s typ_rel exp_rel a) Γ T : (exp_rel Γ T)
@@ -570,22 +591,30 @@ Proof with mautosolve.
 Qed.
 
 
-Lemma functional_glu_sort_elem {P} (pred_P : PredicativeSig P) : forall s a typ_rel typ_rel' exp_rel exp_rel',
+Lemma functional_glu_sort_elem {P} (pred_P : PredicativeSig P) : forall s s' a typ_rel typ_rel' exp_rel exp_rel',
     {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
-    {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel' ↘ exp_rel' }} ->
+    {{ DG a ∈ glu_sort_elem pred_P s' ↘ typ_rel' ↘ exp_rel' }} ->
     (typ_rel <∙> typ_rel') /\ (exp_rel <∙> exp_rel').
 Proof.
   simpl.
   intros * Ha Ha'. gen typ_rel' exp_rel'.
-  induction Ha using glu_sort_elem_ind; intros; basic_invert_glu_sort_elem Ha';
+  induction Ha using glu_sort_elem_ind.
+  1,3: intros; basic_invert_glu_sort_elem Ha';
     apply_predicate_equivalence; try solve [split; reflexivity].
 
-  - assert ((IP <∙> IP0) /\ (IEL <∙> IEL0)) as [].
+  intros.
+  simp glu_sort_elem in Ha'.
+  inversion Ha'.
+  - 
+    assert ((IP <∙> IP0) /\ (IEL <∙> IEL0)) as [].
+    {
+      eapply IHHa.
+    }
     { 
-      assert ((pred_rel pred_P s1 s3 \/ s1 = s3) /\ (pred_rel pred_P s2 s3 \/ s2 = s3)) by (eapply ord_ru; mauto).
+      assert ((pred_rel pred_P s0 s3 \/ s0 = s3) /\ (pred_rel pred_P s4 s3 \/ s4 = s3)) by (eapply ord_ru; mauto).
       destruct_conjs.
-      destruct H4.
-      + assert (glu_sort_elem pred_P s1 IP0 IEL0 a) by mauto.
+      destruct H3.
+      + assert (glu_sort_elem pred_P s0 IP0 IEL0 a) by mauto.
         apply (IHHa IEL0 IP0 H11).
       + assert (glu_sort_elem pred_P s1 IP0 IEL0 a) by (subst; mauto).
         apply (IHHa IEL0 IP0 H11).

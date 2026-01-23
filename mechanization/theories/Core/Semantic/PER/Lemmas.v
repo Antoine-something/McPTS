@@ -145,35 +145,35 @@ Proof.
   - eauto using per_top_typ_trans.
 Qed.
 
-Lemma per_nat_sym {P} : forall m n : domain P,
-    {{ Dom m ≈ n ∈ per_nat }} ->
-    {{ Dom n ≈ m ∈ per_nat }}.
-Proof with mautosolve.
-  induction 1; econstructor...
-Qed.
+(* Lemma per_nat_sym {P} : forall m n : domain P, *)
+(*     {{ Dom m ≈ n ∈ per_nat }} -> *)
+(*     {{ Dom n ≈ m ∈ per_nat }}. *)
+(* Proof with mautosolve. *)
+(*   induction 1; econstructor... *)
+(* Qed. *)
 
-#[export]
-Hint Resolve per_nat_sym : mcpts.
+(* #[export] *)
+(* Hint Resolve per_nat_sym : mcpts. *)
 
-Lemma per_nat_trans {P} : forall m n l : domain P,
-    {{ Dom m ≈ n ∈ per_nat }} ->
-    {{ Dom n ≈ l ∈ per_nat }} ->
-    {{ Dom m ≈ l ∈ per_nat }}.
-Proof with mautosolve.
-  intros * H. gen l.
-  induction H; inversion_clear 1; econstructor...
-Qed.
+(* Lemma per_nat_trans {P} : forall m n l : domain P, *)
+(*     {{ Dom m ≈ n ∈ per_nat }} -> *)
+(*     {{ Dom n ≈ l ∈ per_nat }} -> *)
+(*     {{ Dom m ≈ l ∈ per_nat }}. *)
+(* Proof with mautosolve. *)
+(*   intros * H. gen l. *)
+(*   induction H; inversion_clear 1; econstructor... *)
+(* Qed. *)
 
-#[export]
-Hint Resolve per_nat_trans : mcpts.
+(* #[export] *)
+(* Hint Resolve per_nat_trans : mcpts. *)
 
-#[export]
-Instance per_nat_PER {P} : PER (@per_nat P).
-Proof.
-  split.
-  - eauto using per_nat_sym.
-  - eauto using per_nat_trans.
-Qed.
+(* #[export] *)
+(* Instance per_nat_PER {P} : PER (@per_nat P). *)
+(* Proof. *)
+(*   split. *)
+(*   - eauto using per_nat_sym. *)
+(*   - eauto using per_nat_trans. *)
+(* Qed. *)
 
 Lemma per_ne_sym {P} : forall m n : domain P,
     {{ Dom m ≈ n ∈ per_ne }} ->
@@ -220,7 +220,7 @@ Proof with mautosolve.
     intros;
     destruct_rel_mod_eval;
     econstructor; mauto 3.
-  1-4: rewrite <- HRR'; mauto.
+  1-3: rewrite <- HRR'; mauto.
   all: rewrite HRR'; mauto.
 Qed.
 
@@ -238,7 +238,7 @@ Proof with mautosolve.
     intros;
     destruct_rel_mod_eval;
     econstructor; mauto 3.
-  1-4: rewrite <- HRR'; mauto.
+  1-3: rewrite <- HRR'; mauto.
   all: rewrite HRR'; mauto.
 Qed.
 
@@ -335,11 +335,11 @@ Proof.
   - split; intros; subst; eauto.
 Qed.
 
-Lemma per_sort_elem_pi_left_inversion {P} {pred_P : PredicativeSig P} : forall {s_in s_out s s'} {r : Ru P s_in s_out s} {a ρ B c' elem_rel},
-    {{ DF Π r a ρ B ≈ c' ∈ per_sort_elem pred_P s' ↘ elem_rel }} ->
-    exists a' ρ' B' in_rel (out_rel : forall {n n'} (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}), relation (domain P)),
+Lemma per_sort_elem_pi_left_inversion {P} {pred_P : PredicativeSig P} : forall {a ρ B c' elem_rel s'},
+    {{ DF Π a ρ B ≈ c' ∈ per_sort_elem pred_P s' ↘ elem_rel }} ->
+    exists s_in s_out s (r : Ru P s_in s_out s) a' ρ' B' in_rel (out_rel : forall {n n'} (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}), relation (domain P)),
       s' = s /\
-      c' = d{{{ Π r a' ρ' B' }}} /\
+      c' = d{{{ Π a' ρ' B' }}} /\
         {{ DF a ≈ a' ∈ per_sort_elem pred_P s_in ↘ in_rel }} /\
         (forall n n' (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}),
             rel_mod_eval (per_sort_elem pred_P s_out) B d{{{ ρ ↦ n }}} B' d{{{ ρ' ↦ n' }}} (out_rel equiv_n_n')) /\
@@ -349,7 +349,7 @@ Proof.
   basic_invert_per_sort_elem H.
   erewrite (per_sort_elem_pi_arg_helper r) in equiv_a_a'.
   erewrite (per_sort_elem_pi_ret_helper _ r) in H0.
-  eexists a', ρ', B', in_rel, out_rel; eauto.
+  eexists s_in, s_out, s', r, a', ρ', B', in_rel, out_rel; eauto.
 Qed.
 
 #[local]
@@ -398,7 +398,7 @@ Lemma per_sort_elem_pi_econstructor {P} {pred_P : PredicativeSig P} : forall {s_
     (forall {n n'} (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}),
         rel_mod_eval (per_sort_elem pred_P s_out) B d{{{ ρ ↦ n }}} B' d{{{ ρ' ↦ n' }}} (out_rel equiv_n_n')) ->
     (elem_rel <~> fun f f' => forall n n' (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}), rel_mod_app f n f' n' (out_rel equiv_n_n')) ->
-    {{ DF Π r a ρ B ≈ Π r a' ρ' B' ∈ per_sort_elem pred_P s ↘ elem_rel }}.
+    {{ DF Π a ρ B ≈ Π a' ρ' B' ∈ per_sort_elem pred_P s ↘ elem_rel }}.
 Proof.
   intros.
   rewrite <- (per_sort_elem_pi_arg_helper r) in equiv_a_a'.
@@ -454,8 +454,8 @@ Proof with mautosolve.
       intuition.
   - destruct_conjs.
     split; [per_sort_elem_econstructor' | apply_relation_equivalence]; mauto 3.
-  - destruct_conjs.
-    split; [per_sort_elem_econstructor' | apply_relation_equivalence]; mauto 3.
+  (* - destruct_conjs. *)
+  (*   split; [per_sort_elem_econstructor' | apply_relation_equivalence]; mauto 3. *)
 Qed.
 
 Corollary per_sort_sym {P} {pred_P : PredicativeSig P} : forall s R a b,
@@ -582,9 +582,9 @@ Proof with (per_sort_elem_econstructor'; mautosolve 4).
     handle_per_sort_elem_irrel.
     econstructor; eauto.
     intuition.
+  (* - (* nat case *) *)
+  (*   idtac... *)
   - (* neut case *)
-    idtac...
-- (* neut case *)
     idtac...
 Qed.
 
@@ -651,7 +651,7 @@ Lemma per_sort_elem_pi' {P : PtsSig} {pred_P : PredicativeSig P} :
     (forall {c c'} (equiv_c_c' : {{ Dom c ≈ c' ∈ in_rel }}),
         rel_mod_eval (per_sort_elem pred_P s_out) B d{{{ ρ ↦ c }}} B' d{{{ ρ' ↦ c' }}} (out_rel equiv_c_c')) ->
     (elem_rel <~> fun f f' => forall c c' (equiv_c_c' : {{ Dom c ≈ c' ∈ in_rel }}), rel_mod_app f c f' c' (out_rel equiv_c_c')) ->
-    {{ DF Π r a ρ B ≈ Π r a' ρ' B' ∈ per_sort_elem pred_P s ↘ elem_rel }}.
+    {{ DF Π a ρ B ≈ Π a' ρ' B' ∈ per_sort_elem pred_P s ↘ elem_rel }}.
 Proof.
   intros.
   per_sort_elem_econstructor'; eauto.
@@ -664,20 +664,24 @@ Ltac per_sort_elem_econstructor :=
 #[export]
 Hint Resolve per_sort_elem_pi' : mcpts.
 
-Lemma per_sort_elem_pi_clean_inversion {P : PtsSig} {pred_P : PredicativeSig P} : forall {s_in s_out s} {r : Ru P s_in s_out s} {a a' in_rel ρ ρ' B B' elem_rel},
-    {{ DF a ≈ a' ∈ per_sort_elem pred_P s_in ↘ in_rel }} ->
-    {{ DF Π r a ρ B ≈ Π r a' ρ' B' ∈ per_sort_elem pred_P s ↘ elem_rel }} ->
-    exists (out_rel : forall {n n'} (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}), relation (domain P)),
-      (forall n n' (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}),
-          rel_mod_eval (per_sort_elem pred_P s_out) B d{{{ ρ ↦ n }}} B' d{{{ ρ' ↦ n' }}} (out_rel equiv_n_n')) /\
-        (elem_rel <~> fun f f' => forall n n' (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}), rel_mod_app f n f' n' (out_rel equiv_n_n')).
+Lemma per_sort_elem_pi_clean_inversion {P : PtsSig} {pred_P : PredicativeSig P} : forall {s a a' ρ ρ' B B' elem_rel},
+    {{ DF Π a ρ B ≈ Π a' ρ' B' ∈ per_sort_elem pred_P s ↘ elem_rel }} ->
+    exists s_in s_out in_rel,
+      Ru P s_in s_out s /\ 
+        {{ DF a ≈ a' ∈ per_sort_elem pred_P s_in ↘ in_rel }} /\
+        exists (out_rel : forall {n n'} (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}), relation (domain P)),
+          (forall n n' (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}),
+              rel_mod_eval (per_sort_elem pred_P s_out) B d{{{ ρ ↦ n }}} B' d{{{ ρ' ↦ n' }}} (out_rel equiv_n_n')) /\
+            (elem_rel <~> fun f f' => forall n n' (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}), rel_mod_app f n f' n' (out_rel equiv_n_n')).
 Proof.
-  intros * Ha HΠ.
-  (unshelve eapply per_sort_elem_pi_left_inversion in HΠ; shelve_unifiable; deex_in HΠ; destruct HΠ as [_ [Heq [? []]]]; inversion Heq; subst).
+  intros * HΠ.
+  (unshelve eapply per_sort_elem_pi_left_inversion in HΠ; shelve_unifiable; deex_in HΠ; destruct HΠ as [? [Heq [? []]]]; inversion Heq; subst).
   rename a'0 into a'.
   rename ρ'0 into ρ'.
   rename B'0 into B'.
   handle_per_sort_elem_irrel.
+  exists s_in, s_out, in_rel.
+  repeat split; try eassumption.
   eexists.
   split.
   - instantiate (1 := fun n n' (equiv_n_n' : in_rel n n') m m' =>
@@ -685,8 +689,8 @@ Proof.
                           rel_typ pred_P s_out B d{{{ ρ ↦ n }}} B' d{{{ ρ' ↦ n' }}} R ->
                           R m m').
     intros.
-    assert (in_rel0 n n') by intuition.
-    (on_all_hyp: destruct_rel_by_assumption in_rel0).
+    assert (in_rel n n') by intuition.
+    (on_all_hyp: destruct_rel_by_assumption in_rel).
     econstructor; eauto.
     apply -> per_sort_elem_morphism_iff; eauto.
     split; intuition.
@@ -694,8 +698,9 @@ Proof.
     handle_per_sort_elem_irrel.
     intuition.
   - split; intros;
-      [assert (in_rel0 n n') by intuition; (on_all_hyp: destruct_rel_by_assumption in_rel0)
-      | assert (in_rel n n') by intuition; (on_all_hyp: destruct_rel_by_assumption in_rel)];
+      assert (in_rel n n') by intuition; (on_all_hyp: destruct_rel_by_assumption in_rel);
+      (* [assert (in_rel n n') by intuition; (on_all_hyp: destruct_rel_by_assumption in_rel) *)
+      (* | assert (in_rel n n') by intuition; (on_all_hyp: destruct_rel_by_assumption in_rel)]; *)
       econstructor; intuition.
     destruct_by_head (rel_typ pred_P).
     handle_per_sort_elem_irrel.

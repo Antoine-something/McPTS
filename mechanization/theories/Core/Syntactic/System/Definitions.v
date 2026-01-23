@@ -39,23 +39,23 @@ with wf_exp {P : PtsSig} : ctx P -> typ P -> exp P -> Prop :=
 
 (** Functions *)
 | wf_pi :
-  `( forall (r : Ru P s1 s2 s3),
-      {{ Γ ⊢ A : Sort@s1 }} ->
-      {{ Γ, A ⊢ B : Sort@s2 }} ->
-      {{ Γ ⊢ Π r A B : Sort@s3 }} )
+  `( Ru P s1 s2 s3 ->
+     {{ Γ ⊢ A : Sort@s1 }} ->
+     {{ Γ, A ⊢ B : Sort@s2 }} ->
+     {{ Γ ⊢ Π A B : Sort@s3 }} )
 | wf_fn :
-  `( forall (r : Ru P s1 s2 s3),
-        {{ Γ ⊢ A : Sort@s1 }} ->
-        {{ Γ, A ⊢ B : Sort@s2 }} ->
-        {{ Γ, A ⊢ M : B }} ->
-        {{ Γ ⊢ λ r A M : Π r A B }} )
+  `( Ru P s1 s2 s3 ->
+     {{ Γ ⊢ A : Sort@s1 }} ->
+     {{ Γ, A ⊢ B : Sort@s2 }} ->
+     {{ Γ, A ⊢ M : B }} ->
+     {{ Γ ⊢ λ A M : Π A B }} )
 | wf_app :
-  `( forall (r : Ru P s1 s2 s3),
-        {{ Γ ⊢ A : Sort@s1 }} ->
-        {{ Γ, A ⊢ B : Sort@s2 }} ->
-        {{ Γ ⊢ M : Π r A B }} ->
-        {{ Γ ⊢ N : A }} ->
-        {{ Γ ⊢ M N : B[Id,,N] }} )
+  `( Ru P s1 s2 s3 ->
+     {{ Γ ⊢ A : Sort@s1 }} ->
+     {{ Γ, A ⊢ B : Sort@s2 }} ->
+     {{ Γ ⊢ M : Π A B }} ->
+     {{ Γ ⊢ N : A }} ->
+     {{ Γ ⊢ M N : B[Id,,N] }} )
 
 | wf_vlookup :
   `( {{ ⊢ Γ }} ->
@@ -65,25 +65,25 @@ with wf_exp {P : PtsSig} : ctx P -> typ P -> exp P -> Prop :=
      {{ Γ ⊢ #x : A }} )
 
 (** Naturals **)
-| wf_nat :
-  `( forall (r : Ru_nat P s),
-        {{ ⊢ Γ }} ->
-        {{ Γ ⊢ ℕ: Sort@s }} )
-| wf_zero :
-  `(forall (r : Ru_nat P s),
-      {{ ⊢ Γ }} ->
-      {{ Γ ⊢ zero : ℕ}} )
-| wf_succ :
-  `( forall (r : Ru_nat P s),
-        {{ Γ ⊢ M : ℕ}} ->
-        {{ Γ ⊢ succ M : ℕ}} )
-| wf_natrec :
-  `( forall (r : Ru_nat P s),
-        {{ Γ, ℕ ⊢ A : Sort@s' }} ->
-        {{ Γ ⊢ MZ : A[Id,,zero] }} ->
-        {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
-        {{ Γ ⊢ M : ℕ}} ->
-        {{ Γ ⊢ rec M return A | zero -> MZ | succ -> MS end : A[Id,,M] }} )
+(* | wf_nat : *)
+(*   `( forall (r : Ru_nat P s), *)
+(*         {{ ⊢ Γ }} -> *)
+(*         {{ Γ ⊢ ℕ: Sort@s }} ) *)
+(* | wf_zero : *)
+(*   `(forall (r : Ru_nat P s), *)
+(*       {{ ⊢ Γ }} -> *)
+(*       {{ Γ ⊢ zero : ℕ}} ) *)
+(* | wf_succ : *)
+(*   `( forall (r : Ru_nat P s), *)
+(*         {{ Γ ⊢ M : ℕ}} -> *)
+(*         {{ Γ ⊢ succ M : ℕ}} ) *)
+(* | wf_natrec : *)
+(*   `( forall (r : Ru_nat P s), *)
+(*         {{ Γ, ℕ ⊢ A : Sort@s' }} -> *)
+(*         {{ Γ ⊢ MZ : A[Id,,zero] }} -> *)
+(*         {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,,succ #1] }} -> *)
+(*         {{ Γ ⊢ M : ℕ}} -> *)
+(*         {{ Γ ⊢ rec M return A | zero -> MZ | succ -> MS end : A[Id,,M] }} ) *)
 
 
 | wf_exp_sub :
@@ -166,107 +166,107 @@ with wf_exp_eq {P : PtsSig} : ctx P -> typ P -> exp P -> exp P -> Prop :=
      {{ Γ ⊢ Sort@s1[σ] ≈ Sort@s1 : Sort@s2 }} )
 
 | wf_exp_eq_pi_sub :
-  `( forall (r : Ru P s1 s2 s3),
-        {{ Γ ⊢s σ : Δ }} ->
-        {{ Δ ⊢ A : Sort@s1 }} ->
-        {{ Δ, A ⊢ B : Sort@s2 }} ->
-        {{ Γ ⊢ (Π r A B)[σ] ≈ Π r A[σ] B[q σ] : Sort@s3 }} )
+  `( Ru P s1 s2 s3 ->
+     {{ Γ ⊢s σ : Δ }} ->
+     {{ Δ ⊢ A : Sort@s1 }} ->
+     {{ Δ, A ⊢ B : Sort@s2 }} ->
+     {{ Γ ⊢ (Π A B)[σ] ≈ Π A[σ] B[q σ] : Sort@s3 }} )
 | wf_exp_eq_pi_cong :
-  `( forall (r : Ru P s1 s2 s3),
-        {{ Γ ⊢ A : Sort@s1 }} ->
-        {{ Γ ⊢ A ≈ A' : Sort@s1 }} ->
-        {{ Γ, A ⊢ B ≈ B' : Sort@s2 }} ->
-        {{ Γ ⊢ Π r A B ≈ Π r A' B' : Sort@s3 }} )
+  `( Ru P s1 s2 s3 ->
+     {{ Γ ⊢ A : Sort@s1 }} ->
+     {{ Γ ⊢ A ≈ A' : Sort@s1 }} ->
+     {{ Γ, A ⊢ B ≈ B' : Sort@s2 }} ->
+     {{ Γ ⊢ Π A B ≈ Π A' B' : Sort@s3 }} )
 | wf_exp_eq_fn_cong :
-  `( forall (r : Ru P s1 s2 s3),
-        {{ Γ ⊢ A : Sort@s1 }} ->
-        {{ Γ ⊢ A ≈ A' : Sort@s1 }} ->
-        {{ Γ, A ⊢ B : Sort@s2 }} -> 
-        {{ Γ, A ⊢ M ≈ M' : B }} ->
-        {{ Γ ⊢ λ r A M ≈ λ r A' M' : Π r A B }} )
+  `( Ru P s1 s2 s3 ->
+     {{ Γ ⊢ A : Sort@s1 }} ->
+     {{ Γ ⊢ A ≈ A' : Sort@s1 }} ->
+     {{ Γ, A ⊢ B : Sort@s2 }} -> 
+     {{ Γ, A ⊢ M ≈ M' : B }} ->
+     {{ Γ ⊢ λ A M ≈ λ A' M' : Π A B }} )
 | wf_exp_eq_fn_sub :
-  `( forall (r : Ru P s1 s2 s3),
-        {{ Γ ⊢s σ : Δ }} ->
-        {{ Δ ⊢ A : Sort@s1 }} ->
-        {{ Δ, A ⊢ B : Sort@s2 }} ->
-        {{ Δ, A ⊢ M : B }} ->
-        {{ Γ ⊢ (λ r A M)[σ] ≈ λ r A[σ] M[q σ] : (Π r A B)[σ] }} )
+  `( Ru P s1 s2 s3 ->
+     {{ Γ ⊢s σ : Δ }} ->
+     {{ Δ ⊢ A : Sort@s1 }} ->
+     {{ Δ, A ⊢ B : Sort@s2 }} ->
+     {{ Δ, A ⊢ M : B }} ->
+     {{ Γ ⊢ (λ A M)[σ] ≈ λ A[σ] M[q σ] : (Π A B)[σ] }} )
 | wf_exp_eq_app_cong :
-  `( forall (r : Ru P s1 s2 s3),
-        {{ Γ ⊢ A : Sort@s1 }} ->
-        {{ Γ, A ⊢ B : Sort@s2 }} ->
-        {{ Γ ⊢ M ≈ M' : Π r A B }} ->
-        {{ Γ ⊢ N ≈ N' : A }} ->
-        {{ Γ ⊢ M N ≈ M' N' : B[Id,,N] }} )
+  `( Ru P s1 s2 s3 ->
+     {{ Γ ⊢ A : Sort@s1 }} ->
+     {{ Γ, A ⊢ B : Sort@s2 }} ->
+     {{ Γ ⊢ M ≈ M' : Π A B }} ->
+     {{ Γ ⊢ N ≈ N' : A }} ->
+     {{ Γ ⊢ M N ≈ M' N' : B[Id,,N] }} )
 | wf_exp_eq_app_sub :
-  `( forall (r : Ru P s1 s2 s3),
-        {{ Γ ⊢s σ : Δ }} ->
-        {{ Δ ⊢ A : Sort@s1 }} ->
-        {{ Δ, A ⊢ B : Sort@s2 }} ->
-        {{ Δ ⊢ M : Π r A B }} ->
-        {{ Δ ⊢ N : A }} ->
-        {{ Γ ⊢ (M N)[σ] ≈ M[σ] N[σ] : B[σ,,N[σ]] }} )
+  `( Ru P s1 s2 s3 ->
+     {{ Γ ⊢s σ : Δ }} ->
+     {{ Δ ⊢ A : Sort@s1 }} ->
+     {{ Δ, A ⊢ B : Sort@s2 }} ->
+     {{ Δ ⊢ M : Π A B }} ->
+     {{ Δ ⊢ N : A }} ->
+     {{ Γ ⊢ (M N)[σ] ≈ M[σ] N[σ] : B[σ,,N[σ]] }} )
 | wf_exp_eq_pi_beta :
-  `( forall (r : Ru P s1 s2 s3),
-        {{ Γ ⊢ A : Sort@s1 }} ->
-        {{ Γ, A ⊢ B : Sort@s2 }} ->
-        {{ Γ, A ⊢ M : B }} ->
-        {{ Γ ⊢ N : A }} ->
-        {{ Γ ⊢ (λ r A M) N ≈ M[Id,,N] : B[Id,,N] }} )
+  `( Ru P s1 s2 s3 ->
+     {{ Γ ⊢ A : Sort@s1 }} ->
+     {{ Γ, A ⊢ B : Sort@s2 }} ->
+     {{ Γ, A ⊢ M : B }} ->
+     {{ Γ ⊢ N : A }} ->
+     {{ Γ ⊢ (λ A M) N ≈ M[Id,,N] : B[Id,,N] }} )
 | wf_exp_eq_pi_eta :
-  `( forall (r : Ru P s1 s2 s3),
-        {{ Γ ⊢ A : Sort@s1 }} ->
-        {{ Γ, A ⊢ B : Sort@s2 }} ->
-        {{ Γ ⊢ M : Π r A B }} ->
-        {{ Γ ⊢ M ≈ λ r A (M[Wk] #0) : Π r A B }} )
+  `( Ru P s1 s2 s3 ->
+     {{ Γ ⊢ A : Sort@s1 }} ->
+     {{ Γ, A ⊢ B : Sort@s2 }} ->
+     {{ Γ ⊢ M : Π A B }} ->
+     {{ Γ ⊢ M ≈ λ A (M[Wk] #0) : Π A B }} )
 (** Naturals **)
-| wf_exp_eq_nat_sub :
-  `( forall (r : Ru_nat P s),
-        {{ Γ ⊢s σ : Δ }} ->
-        {{ Γ ⊢ (ℕ)[σ] ≈ ℕ : Sort@s }} )
-| wf_exp_eq_zero_sub :
-  `( forall (r : Ru_nat P s),
-        {{ Γ ⊢s σ : Δ }} ->
-        {{ Γ ⊢ zero[σ] ≈ zero : ℕ}} )
-| wf_exp_eq_succ_sub :
-  `( forall (r : Ru_nat P s),
-        {{ Γ ⊢s σ : Δ }} ->
-        {{ Δ ⊢ M : ℕ}} ->
-        {{ Γ ⊢ (succ M)[σ] ≈ succ (M[σ]) : ℕ}} )
-| wf_exp_eq_succ_cong :
-  `( forall (r : Ru_nat P s),
-        {{ Γ ⊢ M ≈ M' : ℕ}} ->
-        {{ Γ ⊢ succ M ≈ succ M' : ℕ}} )
-| wf_exp_eq_natrec_cong :
-  `( forall (r : Ru_nat P s),
-        {{ Γ, ℕ ⊢ A : Sort@s' }} ->
-        {{ Γ, ℕ ⊢ A' : Sort@s' }} -> 
-        {{ Γ, ℕ ⊢ A ≈ A' }} ->
-        {{ Γ ⊢ MZ ≈ MZ' : A[Id,,zero] }} ->
-        {{ Γ, ℕ, A ⊢ MS ≈ MS' : A[Wk∘Wk,,succ #1] }} ->
-        {{ Γ ⊢ M ≈ M' : ℕ}} ->
-        {{ Γ ⊢ rec M return A | zero -> MZ | succ -> MS end ≈ rec M' return A' | zero -> MZ' | succ -> MS' end : A[Id,,M] }} )
-| wf_exp_eq_natrec_sub :
-  `( forall (r : Ru_nat P s),
-       {{ Γ ⊢s σ : Δ }} ->
-       {{ Δ, ℕ ⊢ A : Sort@s' }} ->
-       {{ Δ ⊢ MZ : A[Id,,zero] }} ->
-       {{ Δ, ℕ, A ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
-       {{ Δ ⊢ M : ℕ}} ->
-       {{ Γ ⊢ rec M return A | zero -> MZ | succ -> MS end[σ] ≈ rec M[σ] return A[q σ] | zero -> MZ[σ] | succ -> MS[q (q σ)] end : A[σ,,M[σ]] }} )
-| wf_exp_eq_nat_beta_zero :
-  `( forall (r : Ru_nat P s),
-        {{ Γ, ℕ ⊢ A : Sort@s' }} ->
-        {{ Γ ⊢ MZ : A[Id,,zero] }} ->
-        {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
-        {{ Γ ⊢ rec zero return A | zero -> MZ | succ -> MS end ≈ MZ : A[Id,,zero] }} )
-| wf_exp_eq_nat_beta_succ :
-  `( forall (r : Ru_nat P s),
-        {{ Γ, ℕ ⊢ A : Sort@s' }} ->
-        {{ Γ ⊢ MZ : A[Id,,zero] }} ->
-        {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
-        {{ Γ ⊢ M : ℕ}} ->
-        {{ Γ ⊢ rec succ M return A | zero -> MZ | succ -> MS end ≈ MS[Id,,M,,rec M return A | zero -> MZ | succ -> MS end] : A[Id,,succ M] }} )
+(* | wf_exp_eq_nat_sub : *)
+(*   `( forall (r : Ru_nat P s), *)
+(*         {{ Γ ⊢s σ : Δ }} -> *)
+(*         {{ Γ ⊢ (ℕ)[σ] ≈ ℕ : Sort@s }} ) *)
+(* | wf_exp_eq_zero_sub : *)
+(*   `( forall (r : Ru_nat P s), *)
+(*         {{ Γ ⊢s σ : Δ }} -> *)
+(*         {{ Γ ⊢ zero[σ] ≈ zero : ℕ}} ) *)
+(* | wf_exp_eq_succ_sub : *)
+(*   `( forall (r : Ru_nat P s), *)
+(*         {{ Γ ⊢s σ : Δ }} -> *)
+(*         {{ Δ ⊢ M : ℕ}} -> *)
+(*         {{ Γ ⊢ (succ M)[σ] ≈ succ (M[σ]) : ℕ}} ) *)
+(* | wf_exp_eq_succ_cong : *)
+(*   `( forall (r : Ru_nat P s), *)
+(*         {{ Γ ⊢ M ≈ M' : ℕ}} -> *)
+(*         {{ Γ ⊢ succ M ≈ succ M' : ℕ}} ) *)
+(* | wf_exp_eq_natrec_cong : *)
+(*   `( forall (r : Ru_nat P s), *)
+(*         {{ Γ, ℕ ⊢ A : Sort@s' }} -> *)
+(*         {{ Γ, ℕ ⊢ A' : Sort@s' }} ->  *)
+(*         {{ Γ, ℕ ⊢ A ≈ A' }} -> *)
+(*         {{ Γ ⊢ MZ ≈ MZ' : A[Id,,zero] }} -> *)
+(*         {{ Γ, ℕ, A ⊢ MS ≈ MS' : A[Wk∘Wk,,succ #1] }} -> *)
+(*         {{ Γ ⊢ M ≈ M' : ℕ}} -> *)
+(*         {{ Γ ⊢ rec M return A | zero -> MZ | succ -> MS end ≈ rec M' return A' | zero -> MZ' | succ -> MS' end : A[Id,,M] }} ) *)
+(* | wf_exp_eq_natrec_sub : *)
+(*   `( forall (r : Ru_nat P s), *)
+(*        {{ Γ ⊢s σ : Δ }} -> *)
+(*        {{ Δ, ℕ ⊢ A : Sort@s' }} -> *)
+(*        {{ Δ ⊢ MZ : A[Id,,zero] }} -> *)
+(*        {{ Δ, ℕ, A ⊢ MS : A[Wk∘Wk,,succ #1] }} -> *)
+(*        {{ Δ ⊢ M : ℕ}} -> *)
+(*        {{ Γ ⊢ rec M return A | zero -> MZ | succ -> MS end[σ] ≈ rec M[σ] return A[q σ] | zero -> MZ[σ] | succ -> MS[q (q σ)] end : A[σ,,M[σ]] }} ) *)
+(* | wf_exp_eq_nat_beta_zero : *)
+(*   `( forall (r : Ru_nat P s), *)
+(*         {{ Γ, ℕ ⊢ A : Sort@s' }} -> *)
+(*         {{ Γ ⊢ MZ : A[Id,,zero] }} -> *)
+(*         {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,,succ #1] }} -> *)
+(*         {{ Γ ⊢ rec zero return A | zero -> MZ | succ -> MS end ≈ MZ : A[Id,,zero] }} ) *)
+(* | wf_exp_eq_nat_beta_succ : *)
+(*   `( forall (r : Ru_nat P s), *)
+(*         {{ Γ, ℕ ⊢ A : Sort@s' }} -> *)
+(*         {{ Γ ⊢ MZ : A[Id,,zero] }} -> *)
+(*         {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,,succ #1] }} -> *)
+(*         {{ Γ ⊢ M : ℕ}} -> *)
+(*         {{ Γ ⊢ rec succ M return A | zero -> MZ | succ -> MS end ≈ MS[Id,,M,,rec M return A | zero -> MZ | succ -> MS end] : A[Id,,succ M] }} ) *)
 
 | wf_exp_eq_var :
   `( {{ ⊢ Γ }} ->
@@ -550,10 +550,10 @@ Hint Rewrite -> @wf_sub_eq_id_compose_right @wf_sub_eq_id_compose_left
                   @wf_sub_eq_p_extend using mauto 4 : mcpts.
 
 #[export]
-  Hint Rewrite -> @wf_exp_eq_sub_id @wf_exp_eq_pi_sub using mauto 4 : mcpts.
+Hint Rewrite -> @wf_exp_eq_sub_id @wf_exp_eq_pi_sub using mauto 4 : mcpts.
 
 #[export]
-Hint Rewrite -> @wf_exp_eq_typ_sub @wf_exp_eq_nat_sub using mauto 3 : mcpts.
+Hint Rewrite -> @wf_exp_eq_typ_sub using mauto 3 : mcpts.
 
 
 #[export]

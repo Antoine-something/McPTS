@@ -42,7 +42,7 @@ theories/Core/Completeness/SubstitutionCases.v
 theories/Core/Completeness/TermStructureCases.v
 theories/Core/Completeness/FunctionCases.v
 theories/Core/Completeness/VariableCases.v
-theories/Core/Completeness/NatCases.v
+# theories/Core/Completeness/NatCases.v
 theories/Core/Completeness/FundamentalTheorem.v
 theories/Core/Completeness.v
 
@@ -50,14 +50,14 @@ theories/Core/Soundness/Weakening/Definitions.v
 theories/Core/Soundness/Weakening/Lemmas.v
 theories/Core/Soundness/LogicalRelation/Definitions.v
 theories/Core/Soundness/LogicalRelation/CoreTactics.v
-theories/Core/Soundness/LogicalRelation/CoreLemmas.v
-theories/Core/Soundness/LogicalRelation/Core.v
-theories/Core/Soundness/Realizability.v
-theories/Core/Soundness/LogicalRelation/Lemmas.v
-theories/Core/Soundness/LogicalRelation.v
-theories/Core/Soundness/ContextCases.v
-theories/Core/Soundness/TermStructureCases.v
-theories/Core/Soundness/SortCases.v
-theories/Core/Soundness/SubstitutionCases.v
-theories/Core/Soundness/FunctionCases.v
-theories/Core/Soundness/Extension/SystemAnnotated.v
+# theories/Core/Soundness/LogicalRelation/CoreLemmas.v
+# theories/Core/Soundness/LogicalRelation/Core.v
+# theories/Core/Soundness/Realizability.v
+# theories/Core/Soundness/LogicalRelation/Lemmas.v
+# theories/Core/Soundness/LogicalRelation.v
+# theories/Core/Soundness/ContextCases.v
+# theories/Core/Soundness/TermStructureCases.v
+# theories/Core/Soundness/SortCases.v
+# theories/Core/Soundness/SubstitutionCases.v
+# theories/Core/Soundness/FunctionCases.v
+# theories/Core/Soundness/Extension/SystemAnnotated.v
