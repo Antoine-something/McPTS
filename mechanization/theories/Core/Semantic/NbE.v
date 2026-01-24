@@ -11,7 +11,7 @@ Inductive initial_env {P : PtsSig} : ctx P -> env P -> Prop :=
 | initial_env_cons :
   `( initial_env Γ ρ ->
      {{ ⟦ A ⟧ ρ ↘ a }} ->
-     initial_env ({{{ Γ, A }}}) d{{{ ρ ↦ ⇑! a (length Γ) }}}).
+     initial_env ({{{ Γ, A:Sort@s }}}) d{{{ ρ ↦ ⇑! a (length Γ) }}}).
 
 #[export]
 Hint Constructors initial_env : mcpts.
@@ -35,9 +35,9 @@ Hint Resolve functional_initial_env : mcpts.
     whether [a] is the evaluation result of A or not.
     If we want to specify that as well, we need a generalized
     version of [drop_env] that can drop [x] elements. *)
-Lemma initial_env_spec {P : PtsSig} : forall x (Γ : ctx P) ρ A,
+Lemma initial_env_spec {P : PtsSig} : forall x (Γ : ctx P) ρ A s,
     initial_env Γ ρ ->
-    {{ #x : A ∈ Γ }} ->
+    {{ #x : A : Sort@s ∈ Γ }} ->
     exists m a, {{ #| ρ[x] |↘ m }} /\ m = d{{{ ⇑! a (length Γ - x - 1) }}}.
 Proof.
   induction x; intros * Hinit Hlookup;
@@ -46,8 +46,7 @@ Proof.
     assert (length Γ0 - 0 = length Γ0) by lia.
     rewrite -> H0.
     econstructor; mauto.
-  - 
-    assert (exists m a, {{ #| ρ0[x] |↘ m}} /\ (m = d{{{ ⇑! a (length Γ0 - x - 1) }}})) by mauto.
+  - assert (exists m a, {{ #| ρ0[x] |↘ m}} /\ (m = d{{{ ⇑! a (length Γ0 - x - 1) }}})) by mauto.
     destruct_conjs.
     subst.
     assert (length Γ0 - x - 1 = length Γ0 - (S x)) by lia.

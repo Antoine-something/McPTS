@@ -536,7 +536,7 @@ Ltac eexists_rel_exp_unsorted_of_pi :=
 Lemma rel_exp_unsorted_pi_cong {P} {pred_P : PredicativeSig P} : forall {s1 s2 s3 Γ A A' B B'} {r : Ru P s1 s2 s3},
     {{ ⟪ pred_P ⟫ Γ ⊨u A : Sort@s1 }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u A ≈ A' : Sort@s1 }} ->
-    {{ ⟪ pred_P ⟫ Γ, A ⊨u B ≈ B' : Sort@s2 }} ->
+    {{ ⟪ pred_P ⟫ Γ, A:Sort@s1 ⊨u B ≈ B' : Sort@s2 }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u Π r A B ≈ Π r A' B' : Sort@s3 }}.
 Proof.
   intros * [env_relΓ]%rel_exp_unsorted_of_typ_inversion1 []%rel_exp_unsorted_of_typ_inversion1 [env_relΓA]%rel_exp_unsorted_of_typ_inversion1.
@@ -579,7 +579,7 @@ Hint Resolve rel_exp_unsorted_pi_cong : mcpts.
 Lemma rel_exp_unsorted_pi_sub {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru P s1 s2 s3} {Γ σ Δ A B},
     {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }} ->
     {{ ⟪ pred_P ⟫ Δ ⊨u A : Sort@s1 }} ->
-    {{ ⟪ pred_P ⟫ Δ, A ⊨u B : Sort@s2 }} ->
+    {{ ⟪ pred_P ⟫ Δ, A:Sort@s1 ⊨u B : Sort@s2 }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u (Π r A B)[σ] ≈ Π r (A[σ]) (B[q σ]) : Sort@s3 }}.
 Proof with mautosolve.
   intros * [env_relΓ] [env_relΔ]%rel_exp_unsorted_of_typ_inversion1 []%rel_exp_unsorted_of_typ_inversion1.
@@ -600,8 +600,8 @@ Proof with mautosolve.
   handle_per_sort_elem_irrel.
   econstructor; mauto.
   eexists.
-  assert (per_typ_elem pred_P x0 a a) by mauto.
-  assert (per_typ_elem pred_P x0 a0 a) by mauto.
+  assert (per_typ_elem pred_P (elem_relA ρσ ρ'σ' H7) a a) by mauto.
+  assert (per_typ_elem pred_P (elem_relA ρσ ρ'σ' H7) a0 a) by mauto.
   handle_per_typ_elem_irrel.
   per_sort_elem_econstructor; eauto.
   - eapply rel_exp_pi_core; eauto; try reflexivity.
@@ -627,8 +627,8 @@ Hint Resolve rel_exp_unsorted_pi_sub : mcpts.
 
 Lemma rel_exp_unsorted_fn_cong {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru P s1 s2 s3} {Γ A A' B M M'},
     {{ ⟪ pred_P ⟫ Γ ⊨u A ≈ A' : Sort@s1 }} ->
-    {{ ⟪ pred_P ⟫ Γ, A ⊨u M ≈ M' : B }} ->
-    {{ ⟪ pred_P ⟫ Γ, A ⊨u B : Sort@s2 }} ->
+    {{ ⟪ pred_P ⟫ Γ, A:Sort@s1 ⊨u M ≈ M' : B }} ->
+    {{ ⟪ pred_P ⟫ Γ, A:Sort@s1 ⊨u B : Sort@s2 }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u λ r A M ≈ λ r A' M' : Π r A B }}.
 Proof with mautosolve.
   intros * [env_relΓ]%rel_exp_unsorted_of_typ_inversion1 [] [env_relΓA]%rel_exp_unsorted_of_typ_inversion1.  
@@ -668,7 +668,7 @@ Proof with mautosolve.
       handle_per_sort_elem_irrel.
       handle_per_typ_elem_irrel.
       apply_relation_equivalence.      
-      eapply H10; mauto.      
+      eapply H20; mauto.      
     }
     apply_relation_equivalence;
       (on_all_hyp: fun H => destruct (H _ _ Hequiv));
@@ -699,7 +699,7 @@ Proof with mautosolve.
       handle_per_sort_elem_irrel.
       handle_per_typ_elem_irrel.
       apply_relation_equivalence.
-      eapply H9; mauto.
+      eapply H12; mauto.
     }
     extract_output_info_with P ρ c ρ' c' (cons_per_ctx_env env_relΓ elem_relA).
 
@@ -727,8 +727,8 @@ Hint Resolve rel_exp_unsorted_fn_cong : mcpts.
 Lemma rel_exp_unsorted_fn_sub {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru P s1 s2 s3} {Γ σ Δ A M B},
     {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }} ->
     {{ ⟪ pred_P ⟫ Δ ⊨u A : Sort@s1 }} ->
-    {{ ⟪ pred_P ⟫ Δ, A ⊨u M : B }} ->
-    {{ ⟪ pred_P ⟫ Δ, A ⊨u B : Sort@s2 }} ->
+    {{ ⟪ pred_P ⟫ Δ, A:Sort@s1 ⊨u M : B }} ->
+    {{ ⟪ pred_P ⟫ Δ, A:Sort@s1 ⊨u B : Sort@s2 }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u (λ r A M)[σ] ≈ λ r A[σ] M[q σ] : (Π r A B)[σ] }}.
 Proof with mautosolve.
   intros * [env_relΓ [? [env_relΔ]]] [env_relΔ']%rel_exp_unsorted_of_typ_inversion1 [env_relΔA] [env_relΔA']%rel_exp_unsorted_of_typ_inversion1.
@@ -772,7 +772,7 @@ Proof with mautosolve.
       econstructor; mauto.
       simpl; mauto.
       handle_per_typ_elem_irrel.
-      eapply H17; mauto.      
+      eapply H18; mauto.      
     }
     apply_relation_equivalence;
       (on_all_hyp: fun H => destruct (H _ _ Hequiv));
@@ -798,7 +798,7 @@ Proof with mautosolve.
       simpl; mauto.
       handle_per_sort_elem_irrel.
       apply_relation_equivalence.
-      eapply H16; mauto.      
+      eapply H17; mauto.      
     }
     apply_relation_equivalence;
       (on_all_hyp: fun H => destruct (H _ _ Hequiv));
@@ -960,8 +960,8 @@ Hint Resolve rel_exp_unsorted_app_sub : mcpts.
 
 
 Lemma rel_exp_unsorted_pi_beta {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru P s1 s2 s3} {Γ A M B N},
-    {{ ⟪ pred_P ⟫ Γ , A ⊨u M : B }} ->
-    {{ ⟪ pred_P ⟫ Γ, A ⊨u B : Sort@s2 }} ->
+    {{ ⟪ pred_P ⟫ Γ, A:Sort@s1 ⊨u M : B }} ->
+    {{ ⟪ pred_P ⟫ Γ, A:Sort@s1 ⊨u B : Sort@s2 }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u N : A }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u (λ r A M) N ≈ M[Id,,N] : B[Id,,N] }}.
 Proof with mautosolve.

@@ -61,18 +61,6 @@ Hint Transparent per_top_typ : mcpts.
 #[export]
   Hint Unfold per_top_typ : mcpts.
 
-Inductive per_nat {P : PtsSig} : relation (domain P):=
-| per_nat_zero : {{ Dom zero ≈ zero ∈ per_nat }}
-| per_nat_succ :
-  `{ {{ Dom m ≈ m' ∈ per_nat }} ->
-     {{ Dom succ m ≈ succ m' ∈ per_nat }} }
-| per_nat_neut :
-  `{ {{ Dom m ≈ m' ∈ per_bot }} ->
-     {{ Dom ⇑ a m ≈ ⇑ a' m' ∈ per_nat }} }
-.
-#[export]
-Hint Constructors per_nat : mcpts.
-
 Variant per_ne {P : PtsSig} : relation (domain P) :=
 | per_ne_neut :
   `{ {{ Dom m ≈ m' ∈ @per_bot P }} ->
@@ -116,11 +104,6 @@ Section Per_sort_elem_core_def.
               rel_mod_eval (fun R b b' => (s_out = s_elem -> {{ DF b ≈ b' ∈ per_sort_elem_core ↘ R }}) /\ (forall (lt_out_elem : pred_rel pred_P s_out s_elem), {{ DF b ≈ b' ∈ per_sort_elem_rec lt_out_elem ↘ R }})) B d{{{ ρ ↦ n }}} B' d{{{ ρ' ↦ n' }}} (out_rel equiv_n_n')) ->
           (elem_rel <~> fun f f' => forall n n' (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}), rel_mod_app f n f' n' (out_rel equiv_n_n')) ->
           {{ DF Π r a ρ B ≈ Π r a' ρ' B' ∈ per_sort_elem_core ↘ elem_rel }} }
-  | per_sort_elem_core_nat :
-    forall (r : Ru_nat P s_elem)
-      (elem_rel : relation dom),
-      (elem_rel <~> per_nat) ->
-      {{ DF ℕ ≈ ℕ ∈ per_sort_elem_core ↘ elem_rel }}
   | per_sort_elem_core_neut :
     `{ forall (elem_rel : relation dom),
           {{ Dom e ≈ e' ∈ per_bot }} ->
@@ -148,11 +131,6 @@ Section Per_sort_elem_core_def.
               rel_mod_eval (fun R b b' => (s_out = s_elem -> {{ DF b ≈ b' ∈ per_sort_elem_core ↘ R }} /\ motive R b b') /\ (forall (lt_out_elem : pred_rel pred_P s_out s_elem), {{ DF b ≈ b' ∈ per_sort_elem_rec lt_out_elem ↘ R }})) B d{{{ ρ ↦ n }}} B' d{{{ ρ' ↦ n' }}} (out_rel equiv_n_n')) ->
           (elem_rel <~> fun f f' => forall n n' (equiv_n_n' : (in_rel n n')), rel_mod_app f n f' n' (out_rel equiv_n_n')) ->
           motive elem_rel d{{{ Π r a ρ B }}} d{{{ Π r a' ρ' B' }}})
-      (case_nat :
-        forall (r : Ru_nat P s_elem)
-          {elem_rel : relation dom},
-          (elem_rel <~> per_nat) ->
-          motive elem_rel d{{{ ℕ }}} d{{{ ℕ }}})
       (case_ne :
         forall {b b'}
           {elem_rel : relation dom},
@@ -174,7 +152,6 @@ Section Per_sort_elem_core_def.
            let 'mk_rel_mod_eval b b' evb evb' (conj HB _) := HT _ _ equiv_n_n' in
            mk_rel_mod_eval b b' evb evb' (conj (fun eq => conj _ (per_sort_elem_core_strong_ind _ _ _ (HB eq))) _))
         HE;
-  | R, a, b, (per_sort_elem_core_nat _ _ HE) => case_nat _ HE;
   | R, a, b, (per_sort_elem_core_neut _ equiv_e_e' HE) => case_ne equiv_e_e' HE
   .
 End Per_sort_elem_core_def.
@@ -248,9 +225,6 @@ Section Per_sort_elem_ind_def.
               rel_mod_eval (fun R x y => {{ DF x ≈ y ∈ per_sort_elem pred_P s_out ↘ R }} /\ motive s_out R x y) B d{{{ ρ ↦ n }}} B' d{{{ ρ' ↦ n' }}} (out_rel equiv_n_n')) ->
           (elem_rel <~> fun f f' => forall n n' (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}), rel_mod_app f n f' n' (out_rel equiv_n_n')) ->
           motive s_elem elem_rel d{{{ Π r a ρ B }}} d{{{ Π r a' ρ' B' }}})
-      (case_N : forall s_elem (r : Ru_nat P s_elem) {elem_rel},
-          (elem_rel <~> per_nat) ->
-          motive s_elem elem_rel d{{{ ℕ }}} d{{{ ℕ }}})
       (case_ne :
         forall s_elem {b b' elem_rel},
           {{ Dom b ≈ b' ∈ per_bot }} ->
@@ -289,7 +263,6 @@ Section Per_sort_elem_ind_def.
                 | or_introl lt_out_s => mk_rel_mod_eval _ _ evb evb' (conj _ _)
                 | or_intror eq => let 'conj _ _ := Heq eq in _
                 end))
-        (fun _ _ => case_N _ _)
         (fun _ _ _ _ _ => case_ne _ _ _)
         R a b.
   Next Obligation.
@@ -378,9 +351,9 @@ Section Per_ctx_env_def.
           (equiv_Γ_Γ' : {{ EF Γ ≈ Γ' ∈ per_ctx_env ↘ tail_rel }}),
           PER tail_rel ->
           (forall {ρ ρ'} (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ tail_rel }}),
-              rel_typ_unsorted pred_P A ρ A' ρ' (head_rel equiv_ρ_ρ')) ->
+              rel_typ pred_P s A ρ A' ρ' (head_rel equiv_ρ_ρ')) ->
           (env_rel <~> cons_per_ctx_env tail_rel (@head_rel)) ->
-          {{ EF Γ, A ≈ Γ', A' ∈ per_ctx_env ↘ env_rel }} }
+          {{ EF Γ, A:Sort@s ≈ Γ', A':Sort@s ∈ per_ctx_env ↘ env_rel }} }
   .
 End Per_ctx_env_def.
 

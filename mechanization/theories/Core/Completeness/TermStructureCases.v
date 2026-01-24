@@ -74,7 +74,39 @@ Qed.
 #[export]
 Hint Resolve rel_exp_sub_cong : mcpts.
 
+Lemma rel_exp_sub_sort_rel_exp_no_sub {P} {pred_P : PredicativeSig P} : forall {Γ A B σ s},
+    {{ ⟪ pred_P ⟫ Γ ⊨u A ≈ B : Sort@s[σ] }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨u A ≈ B : Sort@s }}.
+Proof.
+  intros * [relΓ []].
+  eexists; split; mauto 2.
+  intros.
+  specialize (H0 ρ ρ' equiv_ρ_ρ') as [elem_rel []].
+  destruct H0.
+  simplify_evals.
+  assert (per_typ_elem pred_P (per_sort pred_P s) d{{{ Sort@s }}} d{{{ Sort@s }}}) by (econstructor; reflexivity).
+  handle_per_typ_elem_irrel.
+  eexists; split; mauto 2.
+  econstructor; mauto 2.
+Qed.
 
+#[local]
+Hint Resolve rel_exp_sub_sort_rel_exp_no_sub : mcpts.
+
+Lemma rel_exp_sub_cong_sort {P} {pred_P : PredicativeSig P} : forall {Δ A A' s σ σ' Γ},
+    {{ ⟪ pred_P ⟫ Δ ⊨u A ≈ A' : Sort@s }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Δ }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨u A[σ] ≈ A'[σ'] : Sort@s }}.
+Proof with mautosolve.
+  intros.
+  assert {{ ⟪ pred_P ⟫ Γ ⊨u A[σ] ≈ A'[σ'] : Sort@s[σ] }} by mauto 2.
+  mauto 2.
+Qed.
+
+#[export]
+Hint Resolve rel_exp_sub_cong_sort : mcpts.
+
+ 
 (* Lemma rel_exp_sub_id {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M A}, *)
 (*     {{ ⟪ pred_P ⟫ Γ ⊨ M : A }} -> *)
 (*     {{ ⟪ pred_P ⟫ Γ ⊨ M[Id] ≈ M : A }}. *)
@@ -178,9 +210,22 @@ Qed.
 #[export]
 Hint Resolve rel_exp_sub_compose : mcpts.
 
+Lemma rel_exp_sub_compose_sort {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ τ Γ' σ Γ'' A s},
+    {{ ⟪ pred_P ⟫ Γ ⊨s τ : Γ' }} ->
+    {{ ⟪ pred_P ⟫ Γ' ⊨s σ : Γ'' }} ->
+    {{ ⟪ pred_P ⟫ Γ'' ⊨u A : Sort@s }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨u A[σ∘τ] ≈ A[σ][τ] : Sort@s }}.
+Proof with mautosolve.
+  intros.
+  assert {{ ⟪ pred_P ⟫ Γ ⊨u A[σ∘τ] ≈ A[σ][τ] : Sort@s[σ∘τ] }} by mauto 2.
+  mauto 2.
+Qed.
 
+#[export]
+Hint Resolve rel_exp_sub_compose_sort : mcpts.
+ 
 
-Lemma rel_exp_conv {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M M' A A'},
+Lemma rel_exp_conv_typ {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M M' A A'},
     {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : A }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨ A ≈ A' }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : A' }}.
@@ -205,14 +250,45 @@ Proof with mautosolve.
   assert (exists elem_rel : relation (domain P), rel_typ_unsorted pred_P A ρ' A' ρ' elem_rel) by mauto.
   assert (exists elem_rel : relation (domain P), rel_typ_unsorted pred_P A ρ A' ρ elem_rel) by mauto.
   destruct_conjs.
+  eexists; split; mauto 2.
 
+    
+  
   destruct_by_head (@rel_typ_unsorted P).
   handle_per_typ_elem_irrel.
-  exists H4; split; mauto.
-  eexists; mauto.  
+  econstructor; mauto. 
   symmetry in H11.
   transitivity a1; mauto.
   transitivity a'1; mauto.  
+Qed.
+
+Lemma rel_typ_implies_rel_typ_unsorted {P} {pred_P : PredicativeSig P} : forall {Γ A A' s},
+    {{ ⟪ pred_P ⟫ Γ ⊨u A ≈ A' : Sort@s }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨ A ≈ A' }}.
+Proof.
+  intros * [relΓ []].
+  eexists; split; mauto 2.
+  intros.
+  specialize (H0 _ _ equiv_ρ_ρ') as [elem_rel []].
+  destruct H1.
+  destruct H0.
+  simplify_evals.
+  assert (per_typ_elem pred_P (per_sort pred_P s) d{{{ Sort@s }}} d{{{ Sort@s }}}) by (eapply per_typ_sort; reflexivity).
+  handle_per_typ_elem_irrel.
+  destruct H3 as [].
+  assert (per_typ_elem pred_P x m m') by mauto 3.
+  eexists.
+  econstructor; mauto 2.
+Qed.
+
+Lemma rel_exp_conv {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M M' A A' s},
+    {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : A }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨u A ≈ A' : Sort@s }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : A' }}.
+Proof with mautosolve. 
+  intros.
+  assert {{ ⟪ pred_P ⟫ Γ ⊨ A ≈ A' }} by (eapply rel_typ_implies_rel_typ_unsorted; mauto 2).
+  eapply rel_exp_conv_typ; mauto 2.
 Qed.
 
 #[export]

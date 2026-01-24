@@ -14,21 +14,21 @@ Reserved Notation "Γ ⊢ A" (in custom judg at level 80, Γ custom exp, A custo
 Reserved Notation "Γ ⊢ A ≈ A'" (in custom judg at level 80, Γ custom exp, A custom exp, A' custom exp).
 Reserved Notation "Γ ⊢s σ : Δ" (in custom judg at level 80, Γ custom exp, σ custom exp, Δ custom exp).
 Reserved Notation "Γ ⊢s σ ≈ σ' : Δ" (in custom judg at level 80, Γ custom exp, σ custom exp, σ' custom exp, Δ custom exp).
-Reserved Notation "'#' x : A ∈ Γ" (in custom judg at level 80, x constr at level 0, A custom exp, Γ custom exp at level 50).
+Reserved Notation "'#' x : A : K ∈ Γ" (in custom judg at level 80, x constr at level 0, A custom exp, K custom exp, Γ custom exp at level 50).
 
 Generalizable All Variables.
 
-Inductive ctx_lookup {P : PtsSig} : nat -> typ P -> ctx P -> Prop :=
-  | here : `({{ #0 : A[Wk] ∈ Γ, A }})
-  | there : `({{ #n : A ∈ Γ }} -> {{ #(S n) : A[Wk] ∈ Γ, B }})
-where "'#' x : A ∈ Γ" := (ctx_lookup x A Γ) (in custom judg) : type_scope.
+Inductive ctx_lookup {P : PtsSig} : nat -> typ P -> knd P -> ctx P -> Prop :=
+  | here : `({{ #0 : A[Wk] : Sort@s ∈ Γ, A : Sort@s }})
+  | there : `({{ #n : A : Sort@s ∈ Γ }} -> {{ #(S n) : A[Wk] : Sort@s ∈ Γ, B:K }})
+where "'#' x : A : K ∈ Γ" := (ctx_lookup x A K Γ) (in custom judg) : type_scope.
 
 Inductive wf_ctx {P : PtsSig} : ctx P -> Prop :=
 | wf_ctx_empty : {{ ⊢ ⋅ }}
 | wf_ctx_extend :
   `( {{ ⊢ Γ }} ->
      {{ Γ ⊢ A : Sort@s }} ->
-     {{ ⊢ Γ, A }} )
+     {{ ⊢ Γ, A:Sort@s }} )
 where "⊢ Γ" := (wf_ctx Γ) (in custom judg) : type_scope
 
 with wf_exp {P : PtsSig} : ctx P -> typ P -> exp P -> Prop :=
@@ -41,18 +41,18 @@ with wf_exp {P : PtsSig} : ctx P -> typ P -> exp P -> Prop :=
 | wf_pi :
   `( forall (r : Ru P s1 s2 s3),
       {{ Γ ⊢ A : Sort@s1 }} ->
-      {{ Γ, A ⊢ B : Sort@s2 }} ->
+      {{ Γ, A:Sort@s1 ⊢ B : Sort@s2 }} ->
       {{ Γ ⊢ Π r A B : Sort@s3 }} )
 | wf_fn :
   `( forall (r : Ru P s1 s2 s3),
         {{ Γ ⊢ A : Sort@s1 }} ->
-        {{ Γ, A ⊢ B : Sort@s2 }} ->
-        {{ Γ, A ⊢ M : B }} ->
+        {{ Γ, A:Sort@s1 ⊢ B : Sort@s2 }} ->
+        {{ Γ, A:Sort@s1 ⊢ M : B }} ->
         {{ Γ ⊢ λ r A M : Π r A B }} )
 | wf_app :
   `( forall (r : Ru P s1 s2 s3),
         {{ Γ ⊢ A : Sort@s1 }} ->
-        {{ Γ, A ⊢ B : Sort@s2 }} ->
+        {{ Γ, A:Sort@s1 ⊢ B : Sort@s2 }} ->
         {{ Γ ⊢ M : Π r A B }} ->
         {{ Γ ⊢ N : A }} ->
         {{ Γ ⊢ M N : B[Id,,N] }} )
@@ -61,35 +61,18 @@ with wf_exp {P : PtsSig} : ctx P -> typ P -> exp P -> Prop :=
   `( {{ ⊢ Γ }} ->
      (** This premise is redundant, but helpful for soundness *)
      {{ Γ ⊢ A : Sort@s }} ->
-     {{ #x : A ∈ Γ }} ->
+     {{ #x : A : Sort@s ∈ Γ }} ->
      {{ Γ ⊢ #x : A }} )
-
-(** Naturals **)
-| wf_nat :
-  `( forall (r : Ru_nat P s),
-        {{ ⊢ Γ }} ->
-        {{ Γ ⊢ ℕ: Sort@s }} )
-| wf_zero :
-  `(forall (r : Ru_nat P s),
-      {{ ⊢ Γ }} ->
-      {{ Γ ⊢ zero : ℕ}} )
-| wf_succ :
-  `( forall (r : Ru_nat P s),
-        {{ Γ ⊢ M : ℕ}} ->
-        {{ Γ ⊢ succ M : ℕ}} )
-| wf_natrec :
-  `( forall (r : Ru_nat P s),
-        {{ Γ, ℕ ⊢ A : Sort@s' }} ->
-        {{ Γ ⊢ MZ : A[Id,,zero] }} ->
-        {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
-        {{ Γ ⊢ M : ℕ}} ->
-        {{ Γ ⊢ rec M return A | zero -> MZ | succ -> MS end : A[Id,,M] }} )
-
-
-| wf_exp_sub :
+(** This rule needs to be duplicated to handle top sorts *)
+| wf_exp_sub_typ :
   `( {{ Γ ⊢s σ : Δ }} ->
      {{ Δ ⊢ M : A }} ->
+     {{ Δ ⊢ A : Sort@s }} ->
      {{ Γ ⊢ M[σ] : A[σ] }} )
+| wf_exp_sub_sort :
+  `( {{ Γ ⊢s σ : Δ }} ->
+     {{ Δ ⊢ A : Sort@s }} ->
+     {{ Γ ⊢ A[σ] : Sort@s }} )
 | wf_exp_conv :
   `( {{ Γ ⊢ M : A }} ->
      (** We have this extra argument for soundness.
@@ -101,31 +84,18 @@ with wf_exp {P : PtsSig} : ctx P -> typ P -> exp P -> Prop :=
          [{{ Γ ⊢ Type@1[Wk] : Type@2 }}] to apply [wf_exp_sub],
          which requires [{{ Γ ⊢ Type@2[Wk] : Type@3 }}], and so on.
       *)
-     {{ Γ ⊢ A' }} ->
-     {{ Γ ⊢ A ≈ A' }} ->
+     {{ Γ ⊢ A' : Sort@s }} ->
+     {{ Γ ⊢ A ≈ A' : Sort@s }} ->
      {{ Γ ⊢ M : A' }} )
 where "Γ ⊢ M : A" := (wf_exp Γ A M) (in custom judg) : type_scope
-
-with wf_typ {P : PtsSig} : ctx P -> typ P -> Prop :=
-| wf_typ_st :
-  `( {{ ⊢ Γ }} ->
-     {{ Γ ⊢ Sort@s }})
-| wf_typ_exp :
-  `( {{ Γ ⊢ A : Sort@s }} ->
-     {{ Γ ⊢ A }})
-| wf_typ_clo :
-  `( {{ Γ ⊢s σ : Δ }} ->
-     {{ Δ ⊢ A }} ->
-     {{ Γ ⊢ A[σ] }})
-where "Γ ⊢ A" := (wf_typ Γ A) (in custom judg) : type_scope
                                                          
 with wf_sub {P : PtsSig} : ctx P -> ctx P -> sub P -> Prop :=
 | wf_sub_id :
   `( {{ ⊢ Γ }} ->
      {{ Γ ⊢s Id : Γ }} )
 | wf_sub_weaken :
-  `( {{ ⊢ Γ, A }} ->
-     {{ Γ, A ⊢s Wk : Γ }} )
+  `( {{ ⊢ Γ, A:Sort@s }} ->
+     {{ Γ, A:Sort@s ⊢s Wk : Γ }} )
 | wf_sub_compose :
   `( {{ Γ1 ⊢s σ2 : Γ2 }} ->
      {{ Γ2 ⊢s σ1 : Γ3 }} ->
@@ -134,7 +104,7 @@ with wf_sub {P : PtsSig} : ctx P -> ctx P -> sub P -> Prop :=
   `( {{ Γ ⊢s σ : Δ }} ->
      {{ Δ ⊢ A : Sort@s }} ->
      {{ Γ ⊢ M : A[σ] }} ->
-     {{ Γ ⊢s σ,,M : Δ, A }} )
+     {{ Γ ⊢s σ,,M : Δ, A:Sort@s }} )
 | wf_sub_conv :
   `( {{ Γ ⊢s σ : Δ }} ->
      (** As in [wf_exp_subtyp], this extra argument is
@@ -151,12 +121,12 @@ with wf_ctx_eq {P : PtsSig} : ctx P -> ctx P -> Prop :=
 | wf_ctx_eq_extend :
   `( {{ ⊢ Γ ≈ Δ }} ->
      {{ Γ ⊢ A : Sort@s }} ->
-     {{ Γ ⊢ A' : Sort@s' }} ->
+     {{ Γ ⊢ A' : Sort@s }} ->
      {{ Δ ⊢ A : Sort@s }} ->
-     {{ Δ ⊢ A' : Sort@s' }} ->
-     {{ Γ ⊢ A ≈ A' }} ->
-     {{ Δ ⊢ A ≈ A' }} ->
-     {{ ⊢ Γ, A ≈ Δ, A' }} )
+     {{ Δ ⊢ A' : Sort@s }} ->
+     {{ Γ ⊢ A ≈ A' : Sort@s }} ->
+     {{ Δ ⊢ A ≈ A' : Sort@s }} ->
+     {{ ⊢ Γ, A:Sort@s ≈ Δ, A':Sort@s }} )
 where "⊢ Γ ≈ Γ'" := (wf_ctx_eq Γ Γ') (in custom judg) : type_scope
                                                           
 with wf_exp_eq {P : PtsSig} : ctx P -> typ P -> exp P -> exp P -> Prop :=
@@ -169,32 +139,32 @@ with wf_exp_eq {P : PtsSig} : ctx P -> typ P -> exp P -> exp P -> Prop :=
   `( forall (r : Ru P s1 s2 s3),
         {{ Γ ⊢s σ : Δ }} ->
         {{ Δ ⊢ A : Sort@s1 }} ->
-        {{ Δ, A ⊢ B : Sort@s2 }} ->
+        {{ Δ, A:Sort@s1 ⊢ B : Sort@s2 }} ->
         {{ Γ ⊢ (Π r A B)[σ] ≈ Π r A[σ] B[q σ] : Sort@s3 }} )
 | wf_exp_eq_pi_cong :
   `( forall (r : Ru P s1 s2 s3),
         {{ Γ ⊢ A : Sort@s1 }} ->
         {{ Γ ⊢ A ≈ A' : Sort@s1 }} ->
-        {{ Γ, A ⊢ B ≈ B' : Sort@s2 }} ->
+        {{ Γ, A:Sort@s1 ⊢ B ≈ B' : Sort@s2 }} ->
         {{ Γ ⊢ Π r A B ≈ Π r A' B' : Sort@s3 }} )
 | wf_exp_eq_fn_cong :
   `( forall (r : Ru P s1 s2 s3),
         {{ Γ ⊢ A : Sort@s1 }} ->
         {{ Γ ⊢ A ≈ A' : Sort@s1 }} ->
-        {{ Γ, A ⊢ B : Sort@s2 }} -> 
-        {{ Γ, A ⊢ M ≈ M' : B }} ->
+        {{ Γ, A:Sort@s1 ⊢ B : Sort@s2 }} -> 
+        {{ Γ, A:Sort@s1 ⊢ M ≈ M' : B }} ->
         {{ Γ ⊢ λ r A M ≈ λ r A' M' : Π r A B }} )
 | wf_exp_eq_fn_sub :
   `( forall (r : Ru P s1 s2 s3),
         {{ Γ ⊢s σ : Δ }} ->
         {{ Δ ⊢ A : Sort@s1 }} ->
-        {{ Δ, A ⊢ B : Sort@s2 }} ->
-        {{ Δ, A ⊢ M : B }} ->
+        {{ Δ, A:Sort@s1 ⊢ B : Sort@s2 }} ->
+        {{ Δ, A:Sort@s1 ⊢ M : B }} ->
         {{ Γ ⊢ (λ r A M)[σ] ≈ λ r A[σ] M[q σ] : (Π r A B)[σ] }} )
 | wf_exp_eq_app_cong :
   `( forall (r : Ru P s1 s2 s3),
         {{ Γ ⊢ A : Sort@s1 }} ->
-        {{ Γ, A ⊢ B : Sort@s2 }} ->
+        {{ Γ, A:Sort@s1 ⊢ B : Sort@s2 }} ->
         {{ Γ ⊢ M ≈ M' : Π r A B }} ->
         {{ Γ ⊢ N ≈ N' : A }} ->
         {{ Γ ⊢ M N ≈ M' N' : B[Id,,N] }} )
@@ -202,75 +172,27 @@ with wf_exp_eq {P : PtsSig} : ctx P -> typ P -> exp P -> exp P -> Prop :=
   `( forall (r : Ru P s1 s2 s3),
         {{ Γ ⊢s σ : Δ }} ->
         {{ Δ ⊢ A : Sort@s1 }} ->
-        {{ Δ, A ⊢ B : Sort@s2 }} ->
+        {{ Δ, A:Sort@s1 ⊢ B : Sort@s2 }} ->
         {{ Δ ⊢ M : Π r A B }} ->
         {{ Δ ⊢ N : A }} ->
         {{ Γ ⊢ (M N)[σ] ≈ M[σ] N[σ] : B[σ,,N[σ]] }} )
 | wf_exp_eq_pi_beta :
   `( forall (r : Ru P s1 s2 s3),
         {{ Γ ⊢ A : Sort@s1 }} ->
-        {{ Γ, A ⊢ B : Sort@s2 }} ->
-        {{ Γ, A ⊢ M : B }} ->
+        {{ Γ, A:Sort@s1 ⊢ B : Sort@s2 }} ->
+        {{ Γ, A:Sort@s1 ⊢ M : B }} ->
         {{ Γ ⊢ N : A }} ->
         {{ Γ ⊢ (λ r A M) N ≈ M[Id,,N] : B[Id,,N] }} )
 | wf_exp_eq_pi_eta :
   `( forall (r : Ru P s1 s2 s3),
         {{ Γ ⊢ A : Sort@s1 }} ->
-        {{ Γ, A ⊢ B : Sort@s2 }} ->
+        {{ Γ, A:Sort@s1 ⊢ B : Sort@s2 }} ->
         {{ Γ ⊢ M : Π r A B }} ->
         {{ Γ ⊢ M ≈ λ r A (M[Wk] #0) : Π r A B }} )
-(** Naturals **)
-| wf_exp_eq_nat_sub :
-  `( forall (r : Ru_nat P s),
-        {{ Γ ⊢s σ : Δ }} ->
-        {{ Γ ⊢ (ℕ)[σ] ≈ ℕ : Sort@s }} )
-| wf_exp_eq_zero_sub :
-  `( forall (r : Ru_nat P s),
-        {{ Γ ⊢s σ : Δ }} ->
-        {{ Γ ⊢ zero[σ] ≈ zero : ℕ}} )
-| wf_exp_eq_succ_sub :
-  `( forall (r : Ru_nat P s),
-        {{ Γ ⊢s σ : Δ }} ->
-        {{ Δ ⊢ M : ℕ}} ->
-        {{ Γ ⊢ (succ M)[σ] ≈ succ (M[σ]) : ℕ}} )
-| wf_exp_eq_succ_cong :
-  `( forall (r : Ru_nat P s),
-        {{ Γ ⊢ M ≈ M' : ℕ}} ->
-        {{ Γ ⊢ succ M ≈ succ M' : ℕ}} )
-| wf_exp_eq_natrec_cong :
-  `( forall (r : Ru_nat P s),
-        {{ Γ, ℕ ⊢ A : Sort@s' }} ->
-        {{ Γ, ℕ ⊢ A' : Sort@s' }} -> 
-        {{ Γ, ℕ ⊢ A ≈ A' }} ->
-        {{ Γ ⊢ MZ ≈ MZ' : A[Id,,zero] }} ->
-        {{ Γ, ℕ, A ⊢ MS ≈ MS' : A[Wk∘Wk,,succ #1] }} ->
-        {{ Γ ⊢ M ≈ M' : ℕ}} ->
-        {{ Γ ⊢ rec M return A | zero -> MZ | succ -> MS end ≈ rec M' return A' | zero -> MZ' | succ -> MS' end : A[Id,,M] }} )
-| wf_exp_eq_natrec_sub :
-  `( forall (r : Ru_nat P s),
-       {{ Γ ⊢s σ : Δ }} ->
-       {{ Δ, ℕ ⊢ A : Sort@s' }} ->
-       {{ Δ ⊢ MZ : A[Id,,zero] }} ->
-       {{ Δ, ℕ, A ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
-       {{ Δ ⊢ M : ℕ}} ->
-       {{ Γ ⊢ rec M return A | zero -> MZ | succ -> MS end[σ] ≈ rec M[σ] return A[q σ] | zero -> MZ[σ] | succ -> MS[q (q σ)] end : A[σ,,M[σ]] }} )
-| wf_exp_eq_nat_beta_zero :
-  `( forall (r : Ru_nat P s),
-        {{ Γ, ℕ ⊢ A : Sort@s' }} ->
-        {{ Γ ⊢ MZ : A[Id,,zero] }} ->
-        {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
-        {{ Γ ⊢ rec zero return A | zero -> MZ | succ -> MS end ≈ MZ : A[Id,,zero] }} )
-| wf_exp_eq_nat_beta_succ :
-  `( forall (r : Ru_nat P s),
-        {{ Γ, ℕ ⊢ A : Sort@s' }} ->
-        {{ Γ ⊢ MZ : A[Id,,zero] }} ->
-        {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
-        {{ Γ ⊢ M : ℕ}} ->
-        {{ Γ ⊢ rec succ M return A | zero -> MZ | succ -> MS end ≈ MS[Id,,M,,rec M return A | zero -> MZ | succ -> MS end] : A[Id,,succ M] }} )
 
 | wf_exp_eq_var :
   `( {{ ⊢ Γ }} ->
-     {{ #x : A ∈ Γ }} ->
+     {{ #x : A : Sort@s ∈ Γ }} ->
      {{ Γ ⊢ #x ≈ #x : A }} )
 | wf_exp_eq_var_0_sub :
   `( {{ Γ ⊢s σ : Δ }} ->
@@ -281,31 +203,44 @@ with wf_exp_eq {P : PtsSig} : ctx P -> typ P -> exp P -> exp P -> Prop :=
   `( {{ Γ ⊢s σ : Δ }} ->
      {{ Δ ⊢ A : Sort@s }} ->
      {{ Γ ⊢ M : A[σ] }} ->
-     {{ #x : B ∈ Δ }} ->
+     {{ #x : B : Sort@s' ∈ Δ }} ->
      {{ Γ ⊢ #(S x)[σ,,M] ≈ #x[σ] : B[σ] }} )
 | wf_exp_eq_var_weaken :
-  `( {{ ⊢ Γ, B }} ->
-     {{ #x : A ∈ Γ }} ->
-     {{ Γ, B ⊢ #x[Wk] ≈ #(S x) : A[Wk] }} )
-| wf_exp_eq_sub_cong :
-  `( {{ Δ ⊢ M ≈ M' : A }} ->
+  `( {{ ⊢ Γ, B:Sort@s' }} ->
+     {{ #x : A:Sort@s ∈ Γ }} ->
+     {{ Γ, B:Sort@s' ⊢ #x[Wk] ≈ #(S x) : A[Wk] }} )
+(** This rule needs to be duplicated to handle top sorts *)
+| wf_exp_eq_sub_cong_typ :
+  `( {{ Δ ⊢ A : Sort@s }} ->
+     {{ Δ ⊢ M ≈ M' : A }} ->
      {{ Γ ⊢s σ ≈ σ' : Δ }} ->
      {{ Γ ⊢ M[σ] ≈ M'[σ'] : A[σ] }} )
+| wf_exp_eq_sub_cong_sort :
+  `( {{ Δ ⊢ A ≈ A' : Sort@s }} ->
+     {{ Γ ⊢s σ ≈ σ' : Δ }} ->
+     {{ Γ ⊢ A[σ] ≈ A'[σ'] : Sort@s }} )
 | wf_exp_eq_sub_id :
   `( {{ Γ ⊢ M : A }} ->
      {{ Γ ⊢ M[Id] ≈ M : A }} )
-| wf_exp_eq_sub_compose :
+(** This rule needs to be duplicated to handle top sorts *)
+| wf_exp_eq_sub_compose_typ :
   `( {{ Γ ⊢s τ : Γ' }} ->
      {{ Γ' ⊢s σ : Γ'' }} ->
      {{ Γ'' ⊢ M : A }} ->
+     {{ Γ'' ⊢ A : Sort@s }} ->
      {{ Γ ⊢ M[σ∘τ] ≈ M[σ][τ] : A[σ∘τ] }} )
+| wf_exp_eq_sub_compose_sort :
+  `( {{ Γ ⊢s τ : Γ' }} ->
+     {{ Γ' ⊢s σ : Γ'' }} ->
+     {{ Γ'' ⊢ A : Sort@s }} ->
+     {{ Γ ⊢ A[σ∘τ] ≈ A[σ][τ] : Sort@s }} )
 | wf_exp_eq_conv :
   `( {{ Γ ⊢ M ≈ M' : A }} ->
-     {{ Γ ⊢ A' }} ->
+     {{ Γ ⊢ A' : Sort@s }} ->
      (** This extra argument is here to be consistent with
          [wf_exp_conv].
       *)
-     {{ Γ ⊢ A ≈ A' }} ->
+     {{ Γ ⊢ A ≈ A' : Sort@s }} ->
      {{ Γ ⊢ M ≈ M' : A' }} )
 | wf_exp_eq_sym :
   `( {{ Γ ⊢ M ≈ M' : A }} ->
@@ -315,44 +250,14 @@ with wf_exp_eq {P : PtsSig} : ctx P -> typ P -> exp P -> exp P -> Prop :=
      {{ Γ ⊢ M' ≈ M'' : A }} ->
      {{ Γ ⊢ M ≈ M'' : A }} )
 where "Γ ⊢ M ≈ M' : A" := (wf_exp_eq Γ A M M') (in custom judg) : type_scope
-
-with wf_typ_eq {P : PtsSig} : ctx P -> typ P -> typ P -> Prop :=
-| wf_typ_eq_st :
-  `( {{ ⊢ Γ }} ->
-     {{ Γ ⊢ Sort@s ≈ Sort@s }})
-| wf_typ_eq_sub_st :
-  `( {{ Γ ⊢s σ : Δ }} ->
-     {{ Γ ⊢ Sort@s[σ] ≈ Sort@s}})
-| wf_typ_eq_exp :
-  `( {{ Γ ⊢ A ≈ A' : Sort@s }} ->
-     {{ Γ ⊢ A ≈ A' }})
-| wf_typ_eq_sub_cong :
-  `( {{ Γ ⊢s σ ≈ σ' : Δ }} ->
-     {{ Δ ⊢ A ≈ A' }} ->
-     {{ Γ ⊢ A[σ] ≈ A'[σ'] }})
-| wf_typ_eq_sub_compose :
-  `( {{ Γ ⊢s τ : Γ' }} ->
-     {{ Γ' ⊢s σ : Γ'' }} ->
-     {{ Γ'' ⊢ A }} ->
-     {{ Γ ⊢ A[σ∘τ] ≈ A[σ][τ] }} )
-| wf_typ_eq_sub_id :
-  `( {{ Γ ⊢ A }} ->
-     {{ Γ ⊢ A[Id] ≈ A }} )
-| wf_typ_eq_refl : `({{ Γ ⊢ A }} ->
-                  {{ Γ ⊢ A ≈ A }})
-| wf_typ_eq_sym : `({{ Γ ⊢ A ≈ B }} ->
-                 {{ Γ ⊢ B ≈ A }})
-| wf_typ_eq_trans : `({{ Γ ⊢ A1 ≈ A2 }} -> {{ Γ ⊢ A2 ≈ A3 }} ->
-                   {{ Γ ⊢ A1 ≈ A3 }})
-where "Γ ⊢ A ≈ A'" := (wf_typ_eq Γ A A') (in custom judg) : type_scope
                                                                     
 with wf_sub_eq {P : PtsSig} : ctx P -> ctx P -> sub P -> sub P -> Prop :=
 | wf_sub_eq_id :
   `( {{ ⊢ Γ }} ->
      {{ Γ ⊢s Id ≈ Id : Γ }} )
 | wf_sub_eq_weaken :
-  `( {{ ⊢ Γ, A }} ->
-     {{ Γ, A ⊢s Wk ≈ Wk : Γ }} )
+  `( {{ ⊢ Γ, A:Sort@s }} ->
+     {{ Γ, A:Sort@s ⊢s Wk ≈ Wk : Γ }} )
 | wf_sub_eq_compose_cong :
   `( {{ Γ ⊢s τ ≈ τ' : Γ' }} ->
      {{ Γ' ⊢s σ ≈ σ' : Γ'' }} ->
@@ -361,7 +266,7 @@ with wf_sub_eq {P : PtsSig} : ctx P -> ctx P -> sub P -> sub P -> Prop :=
   `( {{ Γ ⊢s σ ≈ σ' : Δ }} ->
      {{ Δ ⊢ A : Sort@s }} ->
      {{ Γ ⊢ M ≈ M' : A[σ] }} ->
-     {{ Γ ⊢s σ,,M ≈ σ',,M' : Δ, A }} )
+     {{ Γ ⊢s σ,,M ≈ σ',,M' : Δ, A:Sort@s }} )
 | wf_sub_eq_id_compose_right :
   `( {{ Γ ⊢s σ : Δ }} ->
      {{ Γ ⊢s Id∘σ ≈ σ : Δ }} )
@@ -378,15 +283,15 @@ with wf_sub_eq {P : PtsSig} : ctx P -> ctx P -> sub P -> sub P -> Prop :=
      {{ Γ'' ⊢ A : Sort@s }} ->
      {{ Γ' ⊢ M : A[σ] }} ->
      {{ Γ ⊢s τ : Γ' }} ->
-     {{ Γ ⊢s (σ,,M)∘τ ≈ (σ∘τ),,M[τ] : Γ'', A }} )
+     {{ Γ ⊢s (σ,,M)∘τ ≈ (σ∘τ),,M[τ] : Γ'', A:Sort@s }} )
 | wf_sub_eq_p_extend :
   `( {{ Γ' ⊢s σ : Γ }} ->
      {{ Γ ⊢ A : Sort@s }} ->
      {{ Γ' ⊢ M : A[σ] }} ->
      {{ Γ' ⊢s Wk∘(σ,,M) ≈ σ : Γ }} )
 | wf_sub_eq_extend :
-  `( {{ Γ' ⊢s σ : Γ, A }} ->
-     {{ Γ' ⊢s σ ≈ (Wk∘σ),,#0[σ] : Γ, A }} )
+  `( {{ Γ' ⊢s σ : Γ, A:Sort@s }} ->
+     {{ Γ' ⊢s σ ≈ (Wk∘σ),,#0[σ] : Γ, A:Sort@s }} )
 | wf_sub_eq_sym :
   `( {{ Γ ⊢s σ ≈ σ' : Δ }} ->
      {{ Γ ⊢s σ' ≈ σ : Δ }} )
@@ -404,12 +309,70 @@ with wf_sub_eq {P : PtsSig} : ctx P -> ctx P -> sub P -> sub P -> Prop :=
      {{ Γ ⊢s σ ≈ σ' : Δ' }} )
 where "Γ ⊢s σ ≈ σ' : Δ" := (wf_sub_eq Γ Δ σ σ') (in custom judg) : type_scope.
 
+
+
+
+Inductive wf_typ {P : PtsSig} : ctx P -> typ P -> Prop :=
+| wf_typ_st :
+  `( {{ ⊢ Γ }} ->
+     {{ Γ ⊢ Sort@s }})
+| wf_typ_exp :
+  `( {{ Γ ⊢ A : Sort@s }} ->
+     {{ Γ ⊢ A }})
+(* | wf_typ_clo : *)
+(*   `( {{ Γ ⊢s σ : Δ }} -> *)
+(*      {{ Δ ⊢ A }} -> *)
+(*      {{ Γ ⊢ A[σ] }}) *)
+where "Γ ⊢ A" := (wf_typ Γ A) (in custom judg) : type_scope.
+
+Inductive wf_typ_eq {P : PtsSig} : ctx P -> typ P -> typ P -> Prop :=
+| wf_typ_eq_refl :
+  `( {{ Γ ⊢ A }} ->
+     {{ Γ ⊢ A ≈ A }} )
+| wf_typ_eq_sorted :
+  `( {{ Γ ⊢ A ≈ B : Sort@s }} ->
+     {{ Γ ⊢ A ≈ B }} )
+| wf_tp_eq_trans_sorted :
+  `( {{ Γ ⊢ A ≈ B }} ->
+     {{ Γ ⊢ B ≈ C : Sort@s }} ->
+     {{ Γ ⊢ A ≈ C }} )
+(* | wf_typ_eq_st : *)
+(*   `( {{ ⊢ Γ }} -> *)
+(*      {{ Γ ⊢ Sort@s ≈ Sort@s }}) *)
+(* | wf_typ_eq_sub_st : *)
+(*   `( {{ Γ ⊢s σ : Δ }} -> *)
+(*      {{ Γ ⊢ Sort@s[σ] ≈ Sort@s}}) *)
+(* | wf_typ_eq_exp : *)
+(*   `( {{ Γ ⊢ A ≈ A' : Sort@s }} -> *)
+(*      {{ Γ ⊢ A ≈ A' }}) *)
+(* | wf_typ_eq_sub_cong : *)
+(*   `( {{ Γ ⊢s σ ≈ σ' : Δ }} -> *)
+(*      {{ Δ ⊢ A ≈ A' }} -> *)
+(*      {{ Γ ⊢ A[σ] ≈ A'[σ'] }}) *)
+(* | wf_typ_eq_sub_compose : *)
+(*   `( {{ Γ ⊢s τ : Γ' }} -> *)
+(*      {{ Γ' ⊢s σ : Γ'' }} -> *)
+(*      {{ Γ'' ⊢ A }} -> *)
+(*      {{ Γ ⊢ A[σ∘τ] ≈ A[σ][τ] }} ) *)
+(* | wf_typ_eq_sub_id : *)
+(*   `( {{ Γ ⊢ A }} -> *)
+(*      {{ Γ ⊢ A[Id] ≈ A }} ) *)
+(* | wf_typ_eq_refl : `({{ Γ ⊢ A }} -> *)
+(*                   {{ Γ ⊢ A ≈ A }}) *)
+(* | wf_typ_eq_sym : `({{ Γ ⊢ A ≈ B }} -> *)
+(*                  {{ Γ ⊢ B ≈ A }}) *)
+(* | wf_typ_eq_trans : `({{ Γ ⊢ A1 ≈ A2 }} -> {{ Γ ⊢ A2 ≈ A3 }} -> *)
+(*                    {{ Γ ⊢ A1 ≈ A3 }}) *)
+where "Γ ⊢ A ≈ A'" := (wf_typ_eq Γ A A') (in custom judg) : type_scope.
+
+
+
 Scheme wf_ctx_mut_ind := Induction for wf_ctx Sort Prop
 with wf_ctx_eq_mut_ind := Induction for wf_ctx_eq Sort Prop
 with wf_exp_mut_ind := Induction for wf_exp Sort Prop
 with wf_exp_eq_mut_ind := Induction for wf_exp_eq Sort Prop
-with wf_typ_mut_ind := Induction for wf_typ Sort Prop
-with wf_typ_eq_mut_ind := Induction for wf_typ_eq Sort Prop
+(* with wf_typ_mut_ind := Induction for wf_typ Sort Prop *)
+(* with wf_typ_eq_mut_ind := Induction for wf_typ_eq Sort Prop *)
 with wf_sub_mut_ind := Induction for wf_sub Sort Prop
 with wf_sub_eq_mut_ind := Induction for wf_sub_eq Sort Prop.
 Combined Scheme syntactic_wf_mut_ind from
@@ -417,8 +380,8 @@ Combined Scheme syntactic_wf_mut_ind from
   wf_ctx_eq_mut_ind,
   wf_exp_mut_ind,
   wf_exp_eq_mut_ind,
-  wf_typ_mut_ind,
-  wf_typ_eq_mut_ind,
+  (* wf_typ_mut_ind, *)
+  (* wf_typ_eq_mut_ind, *)
   wf_sub_mut_ind,
   wf_sub_eq_mut_ind.
 
@@ -452,7 +415,35 @@ Proof.
   - eauto using wf_sub_eq_sym.
   - eauto using wf_sub_eq_trans.
 Qed.    
-  
+
+
+Lemma wf_typ_eq_trans {P} : forall {Γ : ctx P} {A B C},
+    {{ Γ ⊢ A ≈ B }} ->
+    {{ Γ ⊢ B ≈ C }} ->
+    {{ Γ ⊢ A ≈ C }}.
+Proof.
+  intros * HAB HBC.
+  gen A.
+  induction HBC; intros; mauto 2.
+  - assert {{ Γ ⊢ A0 ≈ B }} by mauto 2.
+    mauto 2.
+Qed.
+
+Lemma wf_typ_eq_sym {P} : forall {Γ : ctx P} {A B},
+    {{ Γ ⊢ A ≈ B }} ->
+    {{ Γ ⊢ B ≈ A }}.
+Proof.
+  induction 1; mauto 2.
+  - symmetry in H.
+    mauto 2.
+  - symmetry in H0.
+    assert {{ Γ ⊢ C ≈ B }} by mauto 2.
+    eapply wf_typ_eq_trans; mauto 2.
+Qed.
+
+#[export]
+Hint Resolve wf_typ_eq_sym wf_typ_eq_trans : mcpts.
+
 #[export]
 Instance wf_typ_eq_PER {P : PtsSig} (Γ : ctx P) : PER (wf_typ_eq Γ).
 Proof.
@@ -553,7 +544,7 @@ Hint Rewrite -> @wf_sub_eq_id_compose_right @wf_sub_eq_id_compose_left
   Hint Rewrite -> @wf_exp_eq_sub_id @wf_exp_eq_pi_sub using mauto 4 : mcpts.
 
 #[export]
-Hint Rewrite -> @wf_exp_eq_typ_sub @wf_exp_eq_nat_sub using mauto 3 : mcpts.
+Hint Rewrite -> @wf_exp_eq_typ_sub using mauto 3 : mcpts.
 
 
 #[export]
