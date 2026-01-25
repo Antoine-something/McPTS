@@ -338,7 +338,14 @@ Proof.
   assert {{ Γ, A:Sort@s1 ⊢ M[Wk] : (Π r A B)[Wk] }} by mauto 3.
   assert {{ Γ, A:Sort@s1 ⊢ Π r A[Wk] B[q Wk] ≈ (Π r A B)[Wk] : Sort@s3 }} by mauto 3.
   assert {{ Γ, A:Sort@s1 ⊢ M[Wk] : Π r A[Wk] B[q Wk] }} by mauto 4.
-  econstructor; [econstructor; revgoals; mauto 3 | mauto 3 |]. 
+  eapply wf_conv'; [ econstructor; revgoals; mauto 3 |]; mauto 3.
+  
+  (* assert {{ Γ,A:Sort@s1 ⊢ B[q Wk][Id,,#0] : Sort@s2 }}. *)
+  (* { *)
+  (*   admit. *)
+  (* } *)
+  (* eapply wf_exp *)
+  (* econstructor; [econstructor; revgoals; mauto 3 | mauto 3 | mauto 3 |].  *)
   (* eapply wf_typ_eq_exp. *)
   transitivity {{{ B[Wk∘Id,,#0] }}}.
   { 

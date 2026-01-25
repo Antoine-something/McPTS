@@ -18,8 +18,6 @@ Section soundness_fundamental.
       (forall Γ Δ σ, {{ Γ ⊫s σ : Δ }} -> {{ ⟪ pred_P ⟫ Γ ⊩s σ : Δ }}).
   Proof.
     eapply syntactic_wf_ann_mut_ind; mauto 3; intros.
-
-    eapply glu_rel_exp_conv; mauto 3.
   Qed.
 
   #[local]
@@ -44,29 +42,36 @@ Section soundness_fundamental.
 
   
   Theorem soundness_fundamental_ctx {P} (pred_P : PredicativeSig P) (full_P : FullSig P) :
-    forall Γ, {{ ⊢ Γ }} -> exists sts, {{ ⟪ pred_P ⟫ ⊩ Γ : sts }}.
+    forall Γ, {{ ⊢ Γ }} -> {{ ⟪ pred_P ⟫ ⊩ Γ }}.
   Proof.
     intros.
-    assert (exists sts, {{ ⊫ Γ > sts }}) as [sts] by (eapply wf_ctx_implies_wf_ctx_ann; mauto 2).
-    eexists.
+    assert {{ ⊫ Γ }} by (eapply wf_ctx_implies_wf_ctx_ann; mauto 2).
     eapply soundness_fundamental_ctx_ann; mauto 2.
   Qed.
 
   Theorem soundness_fundamental_exp {P} (pred_P : PredicativeSig P) (full_P : FullSig P) :
-    forall Γ M A, {{ Γ ⊢ M : A }} -> exists sts s, {{ ⟪ pred_P ⟫ Γ : sts ⊩ M : A : s }}.
+    forall Γ M A, {{ Γ ⊢ M : A }} -> exists s, {{ ⟪ pred_P ⟫ Γ ⊩ M : A > s }}.
   Proof.
     intros.
-    assert (exists sts s, {{ Γ : sts ⊫ M : A > s }}) as [sts [s]] by (eapply wf_exp_implies_wf_exp_ann; mauto 2).
-    do 2 eexists.
+    assert (exists s, {{ Γ ⊫ M : A > s }}) as [s] by (eapply wf_exp_implies_wf_exp_ann; mauto 2).
+    eexists.
     eapply soundness_fundamental_exp_ann; mauto 2.
   Qed.
 
-  Theorem soundness_fundamental_sub {P} (pred_P : PredicativeSig P) (full_P : FullSig P) :
-    forall Γ σ Δ, {{ Γ ⊢s σ : Δ }} -> exists sts sts', {{ ⟪ pred_P ⟫ Γ : sts ⊩s σ : Δ : sts' }}.
+  Theorem soundness_fundamental_typ {P} (pred_P : PredicativeSig P) (full_P : FullSig P) :
+    forall Γ A, {{ Γ ⊢ A }} -> exists s, {{ ⟪ pred_P ⟫ Γ ⊩ A > s }}.
   Proof.
     intros.
-    assert (exists sts sts', {{ Γ : sts ⊫s σ : Δ > sts' }}) as [sts [sts']] by (eapply wf_sub_implies_wf_sub_ann; mauto 2).
-    do 2 eexists.
+    assert (exists s, {{ Γ ⊫ A > s }}) as [s] by (eapply wf_typ_implies_wf_typ_ann; mauto 2).
+    eexists.
+    eapply soundness_fundamental_typ_ann; mauto 2.
+  Qed.
+  
+  Theorem soundness_fundamental_sub {P} (pred_P : PredicativeSig P) (full_P : FullSig P) :
+    forall Γ σ Δ, {{ Γ ⊢s σ : Δ }} -> {{ ⟪ pred_P ⟫ Γ ⊩s σ : Δ }}.
+  Proof.
+    intros.
+    assert {{ Γ ⊫s σ : Δ }} by (eapply wf_sub_implies_wf_sub_ann; mauto 2).
     eapply soundness_fundamental_sub_ann; mauto 2.
-  Qed.      
+  Qed.  
 End soundness_fundamental.

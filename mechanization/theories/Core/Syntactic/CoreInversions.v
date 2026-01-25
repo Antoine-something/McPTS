@@ -139,8 +139,8 @@ Proof with mautosolve 3.
   - specialize (IHwf_exp1 M σ A0 ltac:(reflexivity) ltac:(reflexivity)) as [Δ [A' [s']]].
     destruct_conjs.
     do 3 eexists; repeat split; mauto.
-    destruct H4; destruct_conjs.
-    + left; split; mauto 3.
+    destruct H5; destruct_conjs.
+    + left; split; mauto 3.      
     + right; split; mauto 3.
 Qed.
 

@@ -324,14 +324,14 @@ Lemma wf_exp_sub_id_wf_typ {P} : forall {Γ : ctx P} {M A},
     {{ Γ ⊢ M[Id] : A }}.
 Proof.
   induction 1; intros; try solve [econstructor; mauto 3].
-  - eapply wf_exp_conv with (A := {{{ (Π r A B)[Id] }}}); mauto 3.
-    econstructor; mauto 3.
-  - eapply wf_exp_conv with (A := {{{ B[Id,,N][Id] }}}); mauto 4.
-    econstructor; mauto 3.
-  - eapply wf_exp_conv with (A := {{{ A[Id] }}}); mauto 3.
-    econstructor; mauto 3.
-  - eapply wf_exp_conv with (A := {{{ A[σ][Id] }}}); mauto 3.
-    econstructor; mauto 3.
+  - eapply wf_exp_conv with (A := {{{ (Π r A B)[Id] }}}); mauto 3;
+      econstructor; mauto 3.
+  - eapply wf_exp_conv with (A := {{{ B[Id,,N][Id] }}}); mauto 4;
+      econstructor; mauto 3.
+  - eapply wf_exp_conv with (A := {{{ A[Id] }}}); mauto 3;
+      econstructor; mauto 3.
+  - eapply wf_exp_conv with (A := {{{ A[σ][Id] }}}); mauto 3;
+      econstructor; mauto 3.
 Qed.
 
 #[local]
@@ -373,6 +373,12 @@ Proof with mautosolve 5.
   all: try (econstructor; mautosolve 4).
   - econstructor; mauto 3.
     eapply wf_exp_conv; mauto 3.
+  - econstructor; mauto 3.
+    assert {{ Γ ⊢ A[σ0∘τ] : Sort@s }} by mauto 3.
+    assert {{ Γ ⊢ A[σ0][τ] : Sort@s }} by mauto 3.
+    assert {{ Γ ⊢ A[σ0∘τ] ≈ A[σ0][τ] : Sort@s }} by mauto 3.
+    assert {{ Γ ⊢ M[τ] : A[σ0][τ] }} by mauto 3.
+    mauto 3.
   - econstructor; mauto 3.
     assert {{ Γ0 ⊢ A : Sort@s }} by mauto 2.
     assert {{ Γ ⊢s Wk∘σ : Γ0 }} by mauto 3.

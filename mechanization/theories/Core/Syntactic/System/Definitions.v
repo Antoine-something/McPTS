@@ -84,6 +84,7 @@ with wf_exp {P : PtsSig} : ctx P -> typ P -> exp P -> Prop :=
          [{{ Γ ⊢ Sort@s1[Wk] : Sort@s2 }}] to apply [wf_exp_sub],
          which requires [{{ Γ ⊢ Sort@s2[Wk] : Sort@s3 }}], and so on.
       *)
+     {{ Γ ⊢ A : Sort@s }} ->
      {{ Γ ⊢ A' : Sort@s }} ->
      {{ Γ ⊢ A ≈ A' : Sort@s }} ->
      {{ Γ ⊢ M : A' }} )

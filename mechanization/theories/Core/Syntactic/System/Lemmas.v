@@ -534,6 +534,7 @@ Proof with mautosolve 4.
   (* transitivity {{{ Sort@s1[Wk∘Wk] }}}; mauto 3. *)
   (* symmetry. *)
   (* eapply wf_exp_eq_sub_compose_sort; mauto 3. *)
+  econstructor; mauto 3.
 Qed.
 
 #[export]
@@ -1050,11 +1051,12 @@ Proof.
   assert {{ Δ ⊢s σ,,M1 : Γ, B:Sort@s }} by mauto 4.
   assert {{ Δ ⊢ B[Wk][σ,,M1] : Sort@s }} by mauto 4.
   assert {{ Δ ⊢ B[Wk][σ,,M1] ≈ B[σ] : Sort@s }} by (etransitivity; mauto 3).
+  assert {{ Δ ⊢ B[σ] : Sort@s }} by mauto 3.
   assert {{ Δ ⊢ M2 : B[Wk][σ,,M1] }} by mauto 3.
   transitivity {{{ #0[σ,,M1] }}}; mauto 3.
-  eapply wf_exp_eq_conv with (A:= {{{ B[Wk][σ,,M1] }}});
-    [eapply wf_exp_eq_var_S_sub; eauto | |];
-    mauto 4.
+  (* eapply wf_exp_eq_conv with (A:= {{{ B[Wk][σ,,M1] }}}); *)
+  (*   [eapply wf_exp_eq_var_S_sub; eauto | |]; *)
+  (*   mauto 4. *)
 Qed.
 
 Lemma id_sub_lookup_var1 {P : PtsSig} : forall (Γ : ctx P) M1 M2 B s,
