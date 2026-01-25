@@ -7,7 +7,7 @@ From McPTS.Core.Soundness Require Export FundamentalTheorem.
 From McPTS.Core.Soundness.Extension Require Export SystemAnnotated.
 Import Domain_Notations.
 
-Theorem soundness {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {Γ : ctx P} {M A},
+Theorem full_soundness {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {Γ : ctx P} {M A},
     {{ Γ ⊢ M : A }} ->
     exists W, nbe Γ M A W /\ {{ Γ ⊢ M ≈ W : A }}.
 Proof.
@@ -31,37 +31,64 @@ Proof.
   assert {{ Γ ⊢ M[Id] ≈ M : A }} by mauto 3.
   assert {{ Γ ⊢ M[Id][Id] ≈ M : A }} by (transitivity {{{ M[Id] }}}; mauto 3).
   transitivity {{{ M[Id][Id] }}}; mauto 3.
-  (* bulky_rewrite_in HA. *)
-  (* assert {{ Γ ⊢ M[Id][Id] ≈ W : A[Id][Id] }} as HM by mauto 3. *)
-  (* bulky_rewrite_in HM. *)
-  (* match goal with *)
-  (* | H: forall Δ σ (w : nf), _ -> _ -> {{ Δ ⊢ M[Id][σ] ≈ ^(nf_to_exp w) : A[Id][σ] }} |- _ => *)
-  (*     clear H *)
-  (* end. *)
-  (* bulky_rewrite_in HM. *)
 Qed.
 
-Theorem soundness' {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {Γ : ctx P} {M A W},
+Theorem full_soundness' {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {Γ : ctx P} {M A W},
     {{ Γ ⊢ M : A }} ->
     nbe Γ M A W ->
     {{ Γ ⊢ M ≈ W : A }}.
 Proof.
-  intros * [? []]%(soundness pred_P full_P) ?.
+  intros * [? []]%(full_soundness pred_P full_P) ?.
   functional_nbe_rewrite_clear.
   eassumption.
 Qed.
 
-Lemma soundness_ty {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {Γ : ctx P} {A},
+Lemma full_soundness_ty {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {Γ : ctx P} {A},
     {{ Γ ⊢ A }} ->
     exists W, nbe_ty Γ A W /\ {{ Γ ⊢ A ≈ W }}.
 Proof.
   intros.
   assert (exists s, {{ Γ ⊢ A : Sort@s }}) as [s] by (eapply wf_typ_full_implies_wf_exp; mauto 2).
-  assert (exists W, nbe Γ A {{{ Sort@s }}} W /\ {{ Γ ⊢ A ≈ W : Sort@s }}) as [W [?%nbe_type_to_nbe_ty Heq]] by mauto using soundness.
+  assert (exists W, nbe Γ A {{{ Sort@s }}} W /\ {{ Γ ⊢ A ≈ W : Sort@s }}) as [W [?%nbe_type_to_nbe_ty Heq]] by mauto using full_soundness.
   eexists; split; mauto 3.
 Qed.
 
-Lemma soundness_ty' {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {Γ : ctx P} {A W},
+Lemma full_soundness_ty' {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {Γ : ctx P} {A W},
+    {{ Γ ⊢ A }} ->
+    nbe_ty Γ A W ->
+    {{ Γ ⊢ A ≈ W }}.
+Proof.
+  intros.
+  assert (exists B', nbe_ty Γ A B' /\ {{ Γ ⊢ A ≈ B' }}) as [? [? Heq]] by mauto using full_soundness_ty.
+  functional_nbe_rewrite_clear.
+  eassumption.
+Qed.
+
+
+
+Theorem soundness {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {M A},
+    {{ Γ ⊢ M : A }} ->
+    exists W, nbe Γ M A W /\ {{ Γ ⊢ M ≈ W : A }}.
+Proof.
+Admitted.
+
+Theorem soundness' {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {M A W},
+    {{ Γ ⊢ M : A }} ->
+    nbe Γ M A W ->
+    {{ Γ ⊢ M ≈ W : A }}.
+Proof.
+  intros * [? []]%(soundness pred_P) ?.
+  functional_nbe_rewrite_clear.
+  eassumption.
+Qed.
+
+Lemma soundness_ty {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {A},
+    {{ Γ ⊢ A }} ->
+    exists W, nbe_ty Γ A W /\ {{ Γ ⊢ A ≈ W }}.
+Proof.
+Admitted.
+
+Lemma soundness_ty' {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {A W},
     {{ Γ ⊢ A }} ->
     nbe_ty Γ A W ->
     {{ Γ ⊢ A ≈ W }}.
