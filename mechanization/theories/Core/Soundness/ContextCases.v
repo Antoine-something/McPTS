@@ -3,7 +3,7 @@ From McPTS.Core Require Import Base.
 From McPTS.Core.Soundness Require Import LogicalRelation.
 Import Domain_Notations.
 
-Lemma glu_rel_ctx_empty {P} (pred_P : PredicativeSig P) : {{ ⟪ pred_P ⟫ ⊩ ⋅ : nil }}.
+Lemma glu_rel_ctx_empty {P} (pred_P : PredicativeSig P) : {{ ⟪ pred_P ⟫ ⊩ ⋅ }}.
 Proof.
   do 2 econstructor; reflexivity.
 Qed.
@@ -11,10 +11,10 @@ Qed.
 #[export]
 Hint Resolve glu_rel_ctx_empty : mcpts.
 
-Lemma glu_rel_ctx_extend {P} (pred_P : PredicativeSig P) : forall {sts Γ A s s'},
-    {{ ⟪ pred_P ⟫ ⊩ Γ : sts }} ->
-    {{ ⟪ pred_P ⟫ Γ : sts ⊩ A : Sort@s : s' }} ->
-    {{ ⟪ pred_P ⟫ ⊩ Γ, A : (s :: sts) }}.
+Lemma glu_rel_ctx_extend {P} (pred_P : PredicativeSig P) : forall {Γ A s s'},
+    {{ ⟪ pred_P ⟫ ⊩ Γ }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩ A : Sort@s > s' }} ->
+    {{ ⟪ pred_P ⟫ ⊩ Γ, A:Sort@s }}.
 Proof.
   intros * [Sb].
   intros HA.

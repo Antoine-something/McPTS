@@ -5,9 +5,9 @@ From McPTS.Core.Semantic Require Import Realizability.
 From McPTS.Core.Soundness Require Import LogicalRelation TermStructureCases.
 Import Domain_Notations.
 
-Lemma glu_rel_exp_of_typ {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {sts Γ Sb A s s'},
+Lemma glu_rel_exp_of_typ {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {Γ Sb A s s'},
     Ax P s s' ->
-    {{ EG Γ ∈ glu_ctx_env pred_P sts ↘ Sb }} ->
+    {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} ->
     (forall Δ σ ρ,
         {{ Δ ⊢s σ ® ρ ∈ Sb }} ->
         {{ Δ ⊢ A[σ] : Sort@s }} /\
@@ -15,7 +15,7 @@ Lemma glu_rel_exp_of_typ {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : 
             {{ ⟦ A ⟧ ρ ↘ a }} /\
               {{ Dom a ≈ a ∈ per_sort pred_P s }} /\
               forall typ_rel exp_rel, {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} -> {{ Δ ⊢ A[σ] ® typ_rel }}) ->
-      {{ ⟪ pred_P ⟫ Γ : sts ⊩ A : Sort@s : s' }}.
+      {{ ⟪ pred_P ⟫ Γ ⊩ A : Sort@s > s' }}.
 Proof.
   intros * Hax ? Hbody.
   (* assert (exists s', Ax P s s') as [s'] by (eapply full_P). *)
@@ -24,10 +24,10 @@ Proof.
   edestruct Hbody as [? [? [? []]]]; mauto.
 Qed.
 
-Lemma glu_rel_exp_typ {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {sts Γ s s' s''},
+Lemma glu_rel_exp_typ {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {Γ s s' s''},
     Ax P s s' -> Ax P s' s'' ->
-    {{ ⟪ pred_P ⟫ ⊩ Γ : sts }} ->
-    {{ ⟪ pred_P ⟫ Γ : sts ⊩ Sort@s : Sort@s' : s'' }}.
+    {{ ⟪ pred_P ⟫ ⊩ Γ }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩ Sort@s : Sort@s' > s'' }}.
 Proof.
   intros * Hax Hax' [].
   eapply glu_rel_exp_of_typ; mauto 3.
@@ -45,14 +45,14 @@ Qed.
 #[export]
 Hint Resolve glu_rel_exp_typ : mcpts.
 
-Lemma glu_rel_exp_clean_inversion2' {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {s s' sts Γ Sb M},
+Lemma glu_rel_exp_clean_inversion2' {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {s s' Γ Sb M},
     Ax P s s' ->
-    {{ EG Γ ∈ glu_ctx_env pred_P sts ↘ Sb }} ->
-    {{ ⟪ pred_P ⟫ Γ : sts ⊩ M : Sort@s : s' }} ->
+    {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩ M : Sort@s > s' }} ->
     glu_rel_exp_resp_sub_env pred_P s' Sb M {{{ Sort@s }}}.
 Proof.
   intros * Hax ? HM.
-  assert (exists s'', {{ ⟪ pred_P ⟫ Γ : sts ⊩ Sort@s : Sort@s' : s'' }}) as [s''] by mauto 3.
+  assert (exists s'', {{ ⟪ pred_P ⟫ Γ ⊩ Sort@s : Sort@s' > s'' }}) as [s''] by mauto 3.
   eapply glu_rel_exp_clean_inversion2 in HM; mauto 3.
 Qed.
 
@@ -68,16 +68,16 @@ Qed.
 
 
 
-Lemma glu_rel_exp_sub_typ {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {sts sts' s' Γ σ Δ s A},
-    {{ ⟪ pred_P ⟫ Γ : sts ⊩s σ : Δ : sts' }} ->
-    {{ ⟪ pred_P ⟫ Δ : sts' ⊩ A : Sort@s : s' }} ->
-    {{ ⟪ pred_P ⟫ Γ : sts ⊩ A[σ] : Sort@s : s' }}.
+Lemma glu_rel_exp_sub_typ {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {s' Γ σ Δ s A},
+    {{ ⟪ pred_P ⟫ Γ ⊩s σ : Δ }} ->
+    {{ ⟪ pred_P ⟫ Δ ⊩ A : Sort@s > s' }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩ A[σ] : Sort@s > s' }}.
 Proof.
   intros.
   assert {{ Γ ⊢s σ : Δ }} by mauto 3.
   (* assert (exists s'', Ax P s s'') as [s''] by (eapply full_P). *)
   (* assert {{ Γ ⊢ Sort@s[σ] ≈ Sort@s : Sort@s'' }} by mauto 3. *)
-  assert {{ ⟪ pred_P ⟫ Γ : sts ⊩ A[σ] : Sort@s[σ] : s' }} by mauto 4.
+  assert {{ ⟪ pred_P ⟫ Γ ⊩ A[σ] : Sort@s[σ] > s' }} by mauto 4.
   
   simpl in H2.
   destruct_conjs.
@@ -91,9 +91,10 @@ Proof.
   econstructor; mauto.
 
   assert {{ Δ0 ⊢ Sort@s[σ][σ0] : Sort@s' }} by (eapply glu_sort_elem_trm_sort_lvl; mauto 2).
-  assert (exists Δ1 K1, {{ Δ0 ⊢s σ0 : Δ1 }} /\ {{ Δ1 ⊢ Sort@s[σ] : K1 }} /\ {{ Δ0 ⊢ K1[σ0] ≈ Sort@s' }}) as [Δ1 [K1 [? []]]] by mauto 2.
-  assert {{ Δ1 ⊢ Sort@s[σ] ≈ Sort@s : K1 }} by (eapply wf_exp_sort_sub_sort; mauto 2).
-  
+
+  assert {{ ⊢ Γ }} by mauto 2.
+  assert (Ax P s s') by (eapply glu_rel_exp_sort_implies_ax; mauto 2).
+  assert {{ Γ ⊢ Sort@s[σ] ≈ Sort@s : Sort@s' }} by mauto 4.  
   assert {{ Δ0 ⊢ Sort@s[σ][σ0] ≈ Sort@s[σ0] : Sort@s' }} as <- by mauto 4.
   eassumption.
 Qed.

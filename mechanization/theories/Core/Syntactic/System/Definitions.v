@@ -79,10 +79,10 @@ with wf_exp {P : PtsSig} : ctx P -> typ P -> exp P -> Prop :=
          Note that we need to keep it asymmetric:
          only [A'] is checked. If we check A as well,
          we cannot even construct something like
-         [{{ Γ ⊢ Type@0[Wk] : Type@1 }}] with the current
+         [{{ Γ ⊢ Sort@s0[Wk] : Sort@s1 }}] with the current
          rules. Under the symmetric rule, the example requires
-         [{{ Γ ⊢ Type@1[Wk] : Type@2 }}] to apply [wf_exp_sub],
-         which requires [{{ Γ ⊢ Type@2[Wk] : Type@3 }}], and so on.
+         [{{ Γ ⊢ Sort@s1[Wk] : Sort@s2 }}] to apply [wf_exp_sub],
+         which requires [{{ Γ ⊢ Sort@s2[Wk] : Sort@s3 }}], and so on.
       *)
      {{ Γ ⊢ A' : Sort@s }} ->
      {{ Γ ⊢ A ≈ A' : Sort@s }} ->
