@@ -577,9 +577,9 @@ Qed.
 Ltac invert_glu_ctx_env H :=
   (unshelve eapply (glu_ctx_env_cons_clean_inversion _ _ _ _) in H; shelve_unifiable; [eassumption |];
    destruct H as [? [? []]])
-  + dependent destruction H.
-
-
+  + dependent destruction H.    
+    
+    
 Lemma glu_ctx_env_eqtyp_sub_if {P} (pred_P : PredicativeSig P) : forall Γ Γ' Sb Sb' Δ σ ρ,
     {{ ⊢ Γ ≈ Γ' }} ->
     {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} ->
@@ -1009,7 +1009,7 @@ Qed.
 
 
 Lemma glu_rel_exp_sort_implies_ax {P} (pred_P : PredicativeSig P) : forall {Γ A s s'},
-    {{ ⟪ pred_P ⟫ Γ ⊩ A : Sort@s > s' }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩ A: Sort@s > s' }} ->
     Ax P s s'.
 Proof.
   intros.

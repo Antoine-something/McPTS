@@ -101,3 +101,40 @@ Qed.
 
 #[export]
 Hint Resolve glu_rel_exp_sub_typ : mcpts.
+
+
+Lemma glu_rel_typ_sort {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {Γ s s'},
+    Ax P s s' ->
+    {{ ⟪ pred_P ⟫ ⊩ Γ }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩ Sort@s > s' }}.
+Proof.
+  intros * Hax [SbΓ].
+  eexists; split; mauto 2.
+  intros.
+  econstructor; mauto 3.
+  unfold sort_glu_typ_pred.
+  mauto 3.
+Qed.
+
+#[export]
+Hint Resolve glu_rel_typ_sort : mcpts.
+
+Lemma glu_rel_typ_sorted {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {Γ A s s'},
+    {{ ⟪ pred_P ⟫ Γ ⊩ A : Sort@s > s' }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩ A > s }}.
+Proof.
+  intros * [SbΓ []].
+  eexists; split; mauto 2.
+  intros.
+  destruct_glu_rel_exp_with_sub.
+  simplify_evals.
+  invert_glu_sort_elem H4.
+  unfold sort_glu_exp_pred' in *.
+  unfold glu_sort_typ_rec in *.
+  apply_predicate_equivalence.
+  destruct_conjs.
+  econstructor; mauto 3.
+Qed.
+
+#[export]
+Hint Resolve glu_rel_typ_sorted : mcpts.

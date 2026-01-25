@@ -176,3 +176,26 @@ Qed.
 
 #[export]
 Hint Resolve glu_rel_sub_extend : mcpts.
+
+
+Lemma glu_rel_sub_conv {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {Γ σ Δ Δ'},
+    {{ ⟪ pred_P ⟫ Γ ⊩s σ : Δ }} ->
+    {{ ⟪ pred_P ⟫ ⊩ Δ' }} ->
+    {{ ⊢ Δ ≈ Δ' }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩s σ : Δ' }}.
+Proof.
+  intros * [SbΓ [SbΔ [? []]]] [SbΔ'] HΔΔ'.
+  assert (SbΔ <∙> SbΔ').
+  {
+    split; eapply glu_ctx_env_resp_per_ctx_helper; mauto 3.
+  }
+  do 2 eexists; repeat split; mauto 3.
+  intros.
+  destruct_glu_rel_sub_with_sub.
+  eapply H3 in H6.
+  econstructor; mauto 3.
+Qed.
+
+#[export]
+Hint Resolve glu_rel_sub_conv : mcpts.
+ 
