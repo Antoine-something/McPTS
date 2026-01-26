@@ -1260,7 +1260,7 @@ Lemma per_ctx_env_cons' {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ Γ
     (forall {ρ ρ'} (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ tail_rel }}),
         rel_typ pred_P s A ρ A' ρ' (head_rel equiv_ρ_ρ')) ->
     (env_rel <~> cons_per_ctx_env tail_rel (@head_rel)) ->
-    {{ EF Γ, A:Sort@s ≈ Γ', A':Sort@s ∈ per_ctx_env pred_P ↘ env_rel }}.
+    {{ EF Γ, A@s ≈ Γ', A'@s ∈ per_ctx_env pred_P ↘ env_rel }}.
 Proof.
   intros.
   econstructor; eauto.
@@ -1275,7 +1275,7 @@ Ltac per_ctx_env_econstructor :=
 
 Lemma per_ctx_env_cons_clean_inversion {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ Γ' env_relΓ A A' env_relΓA s},
     {{ EF Γ ≈ Γ' ∈ per_ctx_env pred_P ↘ env_relΓ }} ->
-    {{ EF Γ, A:Sort@s ≈ Γ', A':Sort@s ∈ per_ctx_env pred_P ↘ env_relΓA }} -> 
+    {{ EF Γ, A@s ≈ Γ', A'@s ∈ per_ctx_env pred_P ↘ env_relΓA }} -> 
     exists (head_rel : forall {ρ ρ'} (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}), relation (domain P)),
       (forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}),
           rel_typ pred_P s A ρ A' ρ' (head_rel equiv_ρ_ρ')) /\
@@ -1345,7 +1345,7 @@ Hint Resolve rel_typ_implies_rel_typ_unsorted : mcpts.
 
 Lemma per_ctx_env_cons_clean_inversion_unsorted {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ Γ' env_relΓ A A' env_relΓA s},
     {{ EF Γ ≈ Γ' ∈ per_ctx_env pred_P ↘ env_relΓ }} ->
-    {{ EF Γ, A:Sort@s ≈ Γ', A':Sort@s ∈ per_ctx_env pred_P ↘ env_relΓA }} -> 
+    {{ EF Γ, A@s ≈ Γ', A'@s ∈ per_ctx_env pred_P ↘ env_relΓA }} -> 
     exists (head_rel : forall {ρ ρ'} (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}), relation (domain P)),
       (forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}),
           rel_typ pred_P s A ρ A' ρ' (head_rel equiv_ρ_ρ')) /\

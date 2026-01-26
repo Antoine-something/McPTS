@@ -8,13 +8,13 @@ Import Domain_Notations.
 
 Lemma valid_lookup {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ x A env_relΓ s}
                         (equiv_Γ_Γ : {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_relΓ }}),
-    {{ #x : A : Sort@s ∈ Γ }} -> 
+    {{ #x : A@s ∈ Γ }} -> 
     forall ρ ρ' (equiv_p_p' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}),
     exists elem_rel,
       rel_typ_unsorted pred_P A ρ A ρ' elem_rel /\ rel_exp {{{ #x }}} ρ {{{ #x }}} ρ' elem_rel.
 Proof with solve [split; mauto].
   intros * ? HxinΓ.      
-  assert {{ #x : A : Sort@s ∈ Γ }} as HxinΓ' by mauto.
+  assert {{ #x : A@s ∈ Γ }} as HxinΓ' by mauto.
   remember Γ as Δ eqn:HΔΓ in HxinΓ', equiv_Γ_Γ at 2. clear HΔΓ. rename equiv_Γ_Γ into equiv_Γ_Δ.
   remember A as A' eqn:HAA' in HxinΓ' |- * at 2. clear HAA'.
   gen Δ A' env_relΓ.
@@ -27,7 +27,7 @@ Proof with solve [split; mauto].
     split; econstructor; mauto 3.
 
   - intros ? ? [].
-    specialize (IHHxinΓ _ _ _ equiv_Γ_Γ' H2 d{{{ ρ0 ↯ }}} d{{{ ρ'0 ↯ }}} equiv_ρ_drop_ρ'_drop).
+    specialize (IHHxinΓ _ _ _ equiv_Γ_Γ' H0 d{{{ ρ0 ↯ }}} d{{{ ρ'0 ↯ }}} equiv_ρ_drop_ρ'_drop).
     destruct_conjs.
     (on_all_hyp: destruct_rel_by_assumption tail_rel); destruct_conjs;
     eexists.
@@ -57,7 +57,7 @@ Qed.
 
 Lemma valid_exp_var {P} {pred_P : PredicativeSig P} : forall {Γ x A s},
     {{ ⟪ pred_P ⟫ ⊨ Γ }} ->
-    {{ # x : A : Sort@s ∈ Γ }} ->
+    {{ # x : A@s ∈ Γ }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u #x : A }}.
 Proof.
   intros * [? equiv_Γ] Hx.
@@ -71,7 +71,7 @@ Hint Resolve valid_exp_var : mcpts.
 
 Lemma rel_exp_var {P} {pred_P : PredicativeSig P} : forall {Γ x A s},
     {{ ⟪ pred_P ⟫ ⊨ Γ }} ->
-    {{ # x : A : Sort@s ∈ Γ }} ->
+    {{ # x : A@s ∈ Γ }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u #x ≈ #x : A}}.
 Proof.
   intros.
@@ -179,7 +179,7 @@ Hint Resolve rel_exp_var_0_sub : mcpts.
 Lemma rel_exp_var_S_sub {P} {pred_P : PredicativeSig P} : forall {Γ M σ Δ A x B s},
   {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }} ->
   {{ ⟪ pred_P ⟫ Γ ⊨u M : A[σ] }} ->
-  {{ #x : B : Sort@s ∈ Δ }} ->
+  {{ #x : B@s ∈ Δ }} ->
   {{ ⟪ pred_P ⟫ Γ ⊨u #(S x)[σ ,, M] ≈ #x[σ] : B[σ] }}.
 Proof with mautosolve.
   intros * [env_relΓ [? [env_relΔ]]] HM HxinΓ.
@@ -239,9 +239,9 @@ Hint Resolve rel_exp_var_S_sub : mcpts.
 
 
 Lemma rel_exp_var_weaken {P} {pred_P : PredicativeSig P} : forall {Γ B x A s s'},
-    {{ ⟪ pred_P ⟫ ⊨ Γ, B:Sort@s }} ->
-    {{ #x : A : Sort@s' ∈ Γ }} ->
-    {{ ⟪ pred_P ⟫ Γ, B:Sort@s ⊨u #x[Wk] ≈ #(S x) : A[Wk] }}.
+    {{ ⟪ pred_P ⟫ ⊨ Γ, B@s }} ->
+    {{ #x : A@s' ∈ Γ }} ->
+    {{ ⟪ pred_P ⟫ Γ, B@s ⊨u #x[Wk] ≈ #(S x) : A[Wk] }}.
 Proof with mautosolve.
   intros * [env_relΓB] HxinΓ.
   invert_per_ctx_envs_unsorted.

@@ -14,7 +14,7 @@ Hint Resolve glu_rel_ctx_empty : mcpts.
 Lemma glu_rel_ctx_extend {P} (pred_P : PredicativeSig P) : forall {Γ A s s'},
     {{ ⟪ pred_P ⟫ ⊩ Γ }} ->
     {{ ⟪ pred_P ⟫ Γ ⊩ A : Sort@s > s' }} ->
-    {{ ⟪ pred_P ⟫ ⊩ Γ, A:Sort@s }}.
+    {{ ⟪ pred_P ⟫ ⊩ Γ, A@s }}.
 Proof.
   intros * [Sb].
   intros HA.

@@ -47,7 +47,7 @@ Qed.
 Hint Resolve presup_typ_glu_rel_exp : mcpts.
 
 Lemma glu_rel_exp_vlookup {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {Γ x A s},
-    {{ #x : A : Sort@s ∈ Γ }} ->
+    {{ #x : A@s ∈ Γ }} ->
     {{ ⟪ pred_P ⟫ ⊩ Γ }} ->
     {{ ⟪ pred_P ⟫ Γ ⊩ #x : A > s}}.
 Proof.
@@ -63,9 +63,9 @@ Proof.
     intros.
     destruct_by_head (@cons_glu_sub_pred P).
     econstructor; mauto.
-  - assert (glu_ctx_env pred_P Sb {{{ Γ0, B:Sort@s0 }}}) by (econstructor; mauto).
-    specialize (IHHx pred_P full_P Γ0 A0 s ltac:(reflexivity) ltac:(reflexivity) ltac:(reflexivity) ltac:(econstructor; mauto 2)).
-    assert {{ Γ0 ⊢ A0 : Sort@s }} by mauto 3.
+  - assert (glu_ctx_env pred_P Sb {{{ Γ, B@s' }}}) by (econstructor; mauto).
+    specialize (IHHx ltac:(econstructor; mauto 2)).
+    assert {{ Γ ⊢ A : Sort@s }} by mauto 3.
     inversion_clear IHHx.
     destruct_conjs.
     handle_functional_glu_ctx_env P.
@@ -82,18 +82,18 @@ Proof.
       eapply mk_glu_rel_exp_with_sub''; intuition mauto.      
       handle_functional_glu_sort_elem P.
       
-      assert {{ ⊢ Γ0, B:Sort@s0 }} by mauto 3.
-      assert {{ Δ ⊢ A0[Wk∘σ] : Sort@s }} by (eapply glu_sort_elem_trm_sort_lvl; mauto 3).
-      assert {{ Δ ⊢ A0[Wk][σ] ≈ A0[Wk∘σ] : Sort@s }} as -> by mauto 4.
-      assert {{ Γ0 ⊢ #n : A0 }} by mauto 4.
-      assert {{ Γ0, B:Sort@s0 ⊢ #n[Wk] : A0[Wk] }} by mauto 3.
-      assert {{ Γ0, B:Sort@s0 ⊢ #n[Wk] ≈ #(S n) : A0[Wk] }} by mauto 3.
-      assert {{ Δ ⊢ #n[Wk][σ] ≈ #(S n)[σ] : A0[Wk∘σ] }} as <-.
+      assert {{ ⊢ Γ, B@s' }} by mauto 3.
+      assert {{ Δ ⊢ A[Wk∘σ] : Sort@s }} by (eapply glu_sort_elem_trm_sort_lvl; mauto 3).
+      assert {{ Δ ⊢ A[Wk][σ] ≈ A[Wk∘σ] : Sort@s }} as -> by mauto 4.
+      assert {{ Γ ⊢ #n : A }} by mauto 4.
+      assert {{ Γ, B@s' ⊢ #n[Wk] : A[Wk] }} by mauto 3.
+      assert {{ Γ, B@s' ⊢ #n[Wk] ≈ #(S n) : A[Wk] }} by mauto 3.
+      assert {{ Δ ⊢ #n[Wk][σ] ≈ #(S n)[σ] : A[Wk∘σ] }} as <-.
       {
-        eapply wf_exp_eq_conv' with (A := {{{ A0[Wk][σ] }}}); mauto 3.
+        eapply wf_exp_eq_conv' with (A := {{{ A[Wk][σ] }}}); mauto 3.
         eapply wf_exp_eq_sub_cong_typ; mauto 3.
       }
-      assert {{ Δ ⊢ #n[Wk∘σ] ≈ #n[Wk][σ] : A0[Wk∘σ] }} as <- by mauto 3.
+      assert {{ Δ ⊢ #n[Wk∘σ] ≈ #n[Wk][σ] : A[Wk∘σ] }} as <- by mauto 3.
       eassumption.
 Qed.
 

@@ -11,7 +11,7 @@ Inductive initial_env {P : PtsSig} : ctx P -> env P -> Prop :=
 | initial_env_cons :
   `( initial_env Γ ρ ->
      {{ ⟦ A ⟧ ρ ↘ a }} ->
-     initial_env ({{{ Γ, A:Sort@s }}}) d{{{ ρ ↦ ⇑! a (length Γ) }}}).
+     initial_env ({{{ Γ, A@s }}}) d{{{ ρ ↦ ⇑! a (length Γ) }}}).
 
 #[export]
 Hint Constructors initial_env : mcpts.
@@ -37,7 +37,7 @@ Hint Resolve functional_initial_env : mcpts.
     version of [drop_env] that can drop [x] elements. *)
 Lemma initial_env_spec {P : PtsSig} : forall x (Γ : ctx P) ρ A s,
     initial_env Γ ρ ->
-    {{ #x : A : Sort@s ∈ Γ }} ->
+    {{ #x : A@s ∈ Γ }} ->
     exists m a, {{ #| ρ[x] |↘ m }} /\ m = d{{{ ⇑! a (length Γ - x - 1) }}}.
 Proof.
   induction x; intros * Hinit Hlookup;

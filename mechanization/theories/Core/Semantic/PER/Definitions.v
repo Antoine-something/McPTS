@@ -353,7 +353,7 @@ Section Per_ctx_env_def.
           (forall {ρ ρ'} (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ tail_rel }}),
               rel_typ pred_P s A ρ A' ρ' (head_rel equiv_ρ_ρ')) ->
           (env_rel <~> cons_per_ctx_env tail_rel (@head_rel)) ->
-          {{ EF Γ, A:Sort@s ≈ Γ', A':Sort@s ∈ per_ctx_env ↘ env_rel }} }
+          {{ EF Γ, A@s ≈ Γ', A'@s ∈ per_ctx_env ↘ env_rel }} }
   .
 End Per_ctx_env_def.
 

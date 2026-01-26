@@ -51,8 +51,8 @@ Qed.
 Hint Resolve glu_rel_sub_id : mcpts.
 
 Lemma glu_rel_sub_weaken {P} (pred_P : PredicativeSig P) : forall {Γ A s},
-    {{ ⟪ pred_P ⟫ ⊩ Γ, A:Sort@s }} ->
-    {{ ⟪ pred_P ⟫ Γ, A:Sort@s ⊩s Wk : Γ }}.
+    {{ ⟪ pred_P ⟫ ⊩ Γ, A@s }} ->
+    {{ ⟪ pred_P ⟫ Γ, A@s ⊩s Wk : Γ }}.
 Proof.
   intros * [SbΓA].
   inversion_clear H.
@@ -97,7 +97,7 @@ Lemma glu_rel_sub_extend {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : 
     {{ ⟪ pred_P ⟫ Γ ⊩s σ : Δ }} ->
     {{ ⟪ pred_P ⟫ Δ ⊩ A : Sort@s > s' }} ->
     {{ ⟪ pred_P ⟫ Γ ⊩ M : A[σ] > s }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩s (σ ,, M) : Δ , A:Sort@s }}.
+    {{ ⟪ pred_P ⟫ Γ ⊩s (σ ,, M) : Δ , A@s }}.
 Proof.
   intros * Hσ HA HM.
   assert {{ Γ ⊢s σ : Δ }} by mauto 3.
@@ -148,8 +148,8 @@ Proof.
     rename m into a.
     assert {{ Δ0 ⊢s σ0 : Γ }} by mauto 4.
     econstructor; mauto 3.
-    assert {{ Δ0 ⊢s (σ,,M)∘σ0 : Δ, A:Sort@s }} by mauto 3.
-    assert {{ Δ0 ⊢s (σ,,M)∘σ0 ≈ (σ∘σ0),,M[σ0] : Δ, A:Sort@s }} by mauto 3.
+    assert {{ Δ0 ⊢s (σ,,M)∘σ0 : Δ, A@s }} by mauto 3.
+    assert {{ Δ0 ⊢s (σ,,M)∘σ0 ≈ (σ∘σ0),,M[σ0] : Δ, A@s }} by mauto 3.
     assert {{ Δ0 ⊢s Wk∘((σ,,M)∘σ0) : Δ }} by mauto 4.
     assert {{ Δ0 ⊢s Wk∘((σ,,M)∘σ0) ≈ Wk∘((σ∘σ0),,M[σ0]) : Δ }} by mauto 4.
     assert {{ Δ0 ⊢ M[σ0] : A[σ][σ0] }} by mauto 3.
@@ -157,12 +157,12 @@ Proof.
     assert {{ Δ0 ⊢s Wk∘((σ∘σ0),,M[σ0]) ≈ σ∘σ0 : Δ }} by mauto 3.
     assert {{ Δ0 ⊢s Wk∘((σ,,M)∘σ0) ≈ σ∘σ0 : Δ }} by mauto 3.
     econstructor; mauto 4.
-    + assert {{ Δ, A:Sort@s ⊢s Wk : Δ }} by mauto 4.
+    + assert {{ Δ, A@s ⊢s Wk : Δ }} by mauto 4.
       assert {{ Δ0 ⊢ A[Wk][(σ,,M)∘σ0] ≈ A[Wk∘((σ,,M)∘σ0)] : Sort@s }} as -> by (symmetry; mauto 3).
       assert {{ Δ0 ⊢ A[Wk∘((σ,,M)∘σ0)] ≈ A[σ∘σ0] : Sort@s }} as -> by mauto 3.
       assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] : Sort@s }} by mauto 3.
       rewrite -> H30.
-      assert {{ Δ, A:Sort@s ⊢ #0 : A[Wk] }} by mauto 3.
+      assert {{ Δ, A@s ⊢ #0 : A[Wk] }} by mauto 3.
       assert {{ Δ0 ⊢ #0[(σ,,M)∘σ0] ≈ #0[(σ∘σ0),,M[σ0]] : A[Wk][(σ,,M)∘σ0] }} by mauto 4.
       assert {{ Δ0 ⊢ #0[(σ,,M)∘σ0] ≈ #0[(σ∘σ0),,M[σ0]] : A[σ][σ0] }} as -> by mauto 4.
       assert {{ Δ0 ⊢ #0[(σ∘σ0),,M[σ0]] ≈ M[σ0] : A[σ∘σ0] }} by mauto.
