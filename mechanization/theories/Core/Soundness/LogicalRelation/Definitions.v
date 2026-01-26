@@ -57,7 +57,7 @@ Variant pi_glu_typ_pred {P : PtsSig} {s1 s2 s3} (r : Ru P s1 s2 s3)
 | mk_pi_glu_typ_pred :
   `{ {{ Γ ⊢ A ≈ Π r IT OT : Sort@s3 }} ->
      {{ Γ ⊢ IT : Sort@s1 }} ->
-     {{ Γ , IT:Sort@s1 ⊢ OT : Sort@s2 }} ->
+     {{ Γ , IT@s1 ⊢ OT : Sort@s2 }} ->
      (forall Δ σ, {{ Δ ⊢w σ : Γ }} -> {{ Δ ⊢ IT[σ] ® IP }}) ->
      (forall Δ σ M m,
          {{ Δ ⊢w σ : Γ }} ->
@@ -77,7 +77,7 @@ Variant pi_glu_exp_pred {P : PtsSig} {s1 s2 s3} (r : Ru P s1 s2 s3)
      {{ Dom m ≈ m ∈ elem_rel }} ->
      {{ Γ ⊢ A ≈ Π r IT OT : Sort@s3 }} ->
      {{ Γ ⊢ IT : Sort@s1 }} ->
-     {{ Γ , IT:Sort@s1 ⊢ OT : Sort@s2 }} ->
+     {{ Γ , IT@s1 ⊢ OT : Sort@s2 }} ->
      (forall Δ σ, {{ Δ ⊢w σ : Γ }} -> {{ Δ ⊢ IT[σ] ® IP }}) ->
      (forall Δ σ N n,
          {{ Δ ⊢w σ : Γ }} ->
@@ -497,7 +497,7 @@ Arguments nil_glu_sub_pred {P} Δ σ ρ/.
 Variant cons_glu_sub_pred {P} (pred_P : PredicativeSig P) (s : P) Γ A (TSb : glu_sub_pred P) : glu_sub_pred P :=
 | mk_cons_glu_sub_pred :
   `{ forall typ_rel exp_rel,
-        {{ Δ ⊢s σ : Γ, A:Sort@s }} ->
+        {{ Δ ⊢s σ : Γ, A@s }} ->
         {{ ⟦ A ⟧ ρ ↯ ↘ a }} ->
         {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
         {{ #| ρ[0] |↘ m }} ->
@@ -538,7 +538,7 @@ Inductive glu_ctx_env {P} (pred_P : PredicativeSig P) : glu_sub_pred P -> ctx P 
             {{ Δ ⊢s σ ® ρ ∈ TSb }} ->
             glu_rel_typ_with_sub pred_P s Δ A σ ρ) ->
         Sb <∙> cons_glu_sub_pred pred_P s Γ A TSb ->
-        {{ EG Γ, A:Sort@s ∈ glu_ctx_env pred_P ↘ Sb }} }.
+        {{ EG Γ, A@s ∈ glu_ctx_env pred_P ↘ Sb }} }.
 
 (* Inductive glu_ctx_env_unsorted {P} (pred_P : PredicativeSig P) : glu_sub_pred P -> ctx P -> Prop := *)
 (* | glu_ctx_env_unsorted_nil : *)

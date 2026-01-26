@@ -34,22 +34,22 @@ end.
 
 
 #[local]
-Lemma ctxeq_lookup_helper {P} : forall {Γ : ctx P} {x A s}, {{ #x : A : Sort@s ∈ Γ }} -> forall {Δ}, {{ ⊢ Δ ≈ Γ }} -> exists A', {{ #x : A' : Sort@s ∈ Δ }} /\ {{ Γ ⊢ A ≈ A' : Sort@s }} /\ {{ Δ ⊢ A ≈ A' : Sort@s }}.
+Lemma ctxeq_lookup_helper {P} : forall {Γ : ctx P} {x A s}, {{ #x : A@s ∈ Γ }} -> forall {Δ}, {{ ⊢ Δ ≈ Γ }} -> exists A', {{ #x : A'@s ∈ Δ }} /\ {{ Γ ⊢ A ≈ A' : Sort@s }} /\ {{ Δ ⊢ A ≈ A' : Sort@s }}.
 Proof.
   induction 1; intros.
   - inversion_clear H.
     assert {{ ⊢ Γ }} by mauto 2.
-    assert {{ Γ, A:Sort@s0 ⊢s Wk : Γ }} by mauto 3.
+    assert {{ Γ, A@s ⊢s Wk : Γ }} by mauto 3.
     assert {{ ⊢ Γ0 }} by mauto 2.
-    assert {{ Γ0, A0:Sort@s0 ⊢s Wk : Γ0 }} by mauto 3.
+    assert {{ Γ0, A0@s ⊢s Wk : Γ0 }} by mauto 3.
     eexists; repeat split; mauto 4.
   - inversion_clear H0.
-    assert (exists A' : exp P, {{ # n : A' : Sort@s0 ∈ Γ0 }} /\ {{ Γ ⊢ A ≈ A' : Sort@s0 }} /\ {{ Γ0 ⊢ A ≈ A' : Sort@s0 }}) by mauto 2.
+    assert (exists A' : exp P, {{ # n : A'@s ∈ Γ0 }} /\ {{ Γ ⊢ A ≈ A' : Sort@s }} /\ {{ Γ0 ⊢ A ≈ A' : Sort@s }}) by mauto 2.
     destruct_conjs.
     assert {{ ⊢ Γ }} by mauto 2.
-    assert {{ Γ, B:Sort@s1 ⊢s Wk : Γ }} by mauto 3.
+    assert {{ Γ, B@s' ⊢s Wk : Γ }} by mauto 3.
     assert {{ ⊢ Γ0 }} by mauto 2.
-    assert {{ Γ0, A0:Sort@s1 ⊢s Wk : Γ0 }} by mauto 3.
+    assert {{ Γ0, A0@s' ⊢s Wk : Γ0 }} by mauto 3.
     eexists; repeat split; mauto 3.
 Qed.
 
@@ -73,13 +73,13 @@ Proof with mautosolve.
   (** Π and λ cases *)
   1,2,3:
     assert {{ Δ ⊢ B : Sort@s1 }} by mauto;
-    assert {{ ⊢ Δ, B:Sort@s1 ≈ Γ, B:Sort@s1 }} by (econstructor; mauto 3);
-    assert {{ Δ, B:Sort@s1 ⊢ C : Sort@s2 }} by mauto;
+    assert {{ ⊢ Δ, B@s1 ≈ Γ, B@s1 }} by (econstructor; mauto 3);
+    assert {{ Δ, B@s1 ⊢ C : Sort@s2 }} by mauto;
     econstructor; mauto.
     
   
   (** Variable case *)
-  - assert (exists B, {{ #x : B : Sort@s ∈ Δ }} /\ {{ Γ ⊢ A ≈ B : Sort@s }} /\ {{ Δ ⊢ A ≈ B : Sort@s }}) by (eapply ctxeq_lookup_helper; mauto 2).
+  - assert (exists B, {{ #x : B@s ∈ Δ }} /\ {{ Γ ⊢ A ≈ B : Sort@s }} /\ {{ Δ ⊢ A ≈ B : Sort@s }}) by (eapply ctxeq_lookup_helper; mauto 2).
     destruct_conjs.
     
     eapply wf_exp_conv with (A := H5); mauto 2.
@@ -92,52 +92,52 @@ Proof with mautosolve.
   (** Π congruence case *)
   - assert {{ Δ ⊢ B : Sort@s1 }} by mauto.
     assert {{ Δ ⊢ B ≈ B' : Sort@s1 }} by mauto.
-    assert {{ ⊢ Δ, B:Sort@s1 ≈ Γ, B:Sort@s1 }} by (econstructor; mauto 3).
-    assert {{ Δ, B:Sort@s1 ⊢ C ≈ C' : Sort@s2 }} by mauto.
+    assert {{ ⊢ Δ, B@s1 ≈ Γ, B@s1 }} by (econstructor; mauto 3).
+    assert {{ Δ, B@s1 ⊢ C ≈ C' : Sort@s2 }} by mauto.
     mauto 2.
 
   (** λ congruence case *)
   - assert {{ Δ ⊢ B : Sort@s1 }} by mauto.
     assert {{ Δ ⊢ B ≈ B' : Sort@s1 }} by mauto.
-    assert {{ ⊢ Δ, B:Sort@s1 ≈ Γ, B:Sort@s1 }} by (econstructor; mauto 3).
-    assert {{ Δ, B:Sort@s1 ⊢ C : Sort@s2 }} by mauto.
-    assert {{ Δ, B:Sort@s1 ⊢ M0 ≈ M'0 : C }} by mauto.
+    assert {{ ⊢ Δ, B@s1 ≈ Γ, B@s1 }} by (econstructor; mauto 3).
+    assert {{ Δ, B@s1 ⊢ C : Sort@s2 }} by mauto.
+    assert {{ Δ, B@s1 ⊢ M0 ≈ M'0 : C }} by mauto.
     mauto 2.
     
   (** Function application congruence case *)
   - assert {{ Δ ⊢ N ≈ N' : B }} by mauto.
     assert {{ Δ ⊢ M0 ≈ M'0 : Π r B C }} by mauto.
     assert {{ Δ ⊢ B : Sort@s1 }} by mauto.
-    assert {{ ⊢ Δ, B:Sort@s1 ≈ Γ, B:Sort@s1 }} by (econstructor; mauto 3).
-    assert {{ Δ, B:Sort@s1 ⊢ C : Sort@s2 }} by mauto.
+    assert {{ ⊢ Δ, B@s1 ≈ Γ, B@s1 }} by (econstructor; mauto 3).
+    assert {{ Δ, B@s1 ⊢ C : Sort@s2 }} by mauto.
     mauto 2.
     
   (** β case *)
   - assert {{ Δ ⊢ B : Sort@s1 }} by mauto.
-    assert {{ ⊢ Δ, B:Sort@s1 ≈ Γ, B:Sort@s1 }} by (econstructor; mauto 3).
-    assert {{ Δ, B:Sort@s1 ⊢ C : Sort@s2 }} by mauto.
-    assert {{ Δ, B:Sort@s1 ⊢ M0 : C }} by mauto.
+    assert {{ ⊢ Δ, B@s1 ≈ Γ, B@s1 }} by (econstructor; mauto 3).
+    assert {{ Δ, B@s1 ⊢ C : Sort@s2 }} by mauto.
+    assert {{ Δ, B@s1 ⊢ M0 : C }} by mauto.
     assert {{ Δ ⊢ N : B }} by mauto.
     mauto 2.
 
   (** η case *)
   - assert {{ Δ ⊢ B : Sort@s1 }} by mauto.
-    assert {{ ⊢ Δ, B:Sort@s1 ≈ Γ, B:Sort@s1 }} by (econstructor; mauto 3).
-    assert {{ Δ, B:Sort@s1 ⊢ C : Sort@s2 }} by mauto.
+    assert {{ ⊢ Δ, B@s1 ≈ Γ, B@s1 }} by (econstructor; mauto 3).
+    assert {{ Δ, B@s1 ⊢ C : Sort@s2 }} by mauto.
     assert {{ Δ ⊢ M : Π r B C }} by mauto.
     mauto 2.
 
   (** Variable reflexivity case *)
-  - assert (exists B, {{ #x : B : Sort@s ∈ Δ }} /\ {{ Γ ⊢ A ≈ B : Sort@s }} /\ {{ Δ ⊢ A ≈ B : Sort@s }} /\ {{ Δ ⊢ A : Sort@s }}) by mauto.
+  - assert (exists B, {{ #x : B@s ∈ Δ }} /\ {{ Γ ⊢ A ≈ B : Sort@s }} /\ {{ Δ ⊢ A ≈ B : Sort@s }} /\ {{ Δ ⊢ A : Sort@s }}) by mauto.
     destruct_conjs.
     eapply wf_exp_eq_conv; mauto.
 
   (** Variable weakening case *)
   - inversion_clear HΓΔ.
-    assert {{ ⊢ Γ0, A0:Sort@s' }} by (econstructor; mauto 3).
-    assert (exists B', {{ #x : B' : Sort@s ∈ Γ1 }} /\ {{ Γ0 ⊢ B ≈ B' : Sort@s }} /\ {{ Γ1 ⊢ B ≈ B' : Sort@s }} /\ {{ Γ1 ⊢ B : Sort@s }}) as [B'] by mauto.
-    assert {{ ⊢ Γ1, A0:Sort@s' }} by mauto 3.
-    assert {{ Γ1, A0:Sort@s' ⊢s Wk : Γ1 }} by mauto 3.
+    assert {{ ⊢ Γ0, A0@s' }} by (econstructor; mauto 3).
+    assert (exists B', {{ #x : B'@s ∈ Γ1 }} /\ {{ Γ0 ⊢ B ≈ B' : Sort@s }} /\ {{ Γ1 ⊢ B ≈ B' : Sort@s }} /\ {{ Γ1 ⊢ B : Sort@s }}) as [B'] by mauto.
+    assert {{ ⊢ Γ1, A0@s' }} by mauto 3.
+    assert {{ Γ1, A0@s' ⊢s Wk : Γ1 }} by mauto 3.
     destruct_conjs.
     eapply wf_exp_eq_conv; mauto 4.
 

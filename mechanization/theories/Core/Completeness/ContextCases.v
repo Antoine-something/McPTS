@@ -55,7 +55,7 @@ Hint Resolve rel_ctx_empty : mcpts.
 Lemma rel_ctx_extend {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ Γ' A A' s},
     {{ ⟪ pred_P ⟫ ⊨ Γ ≈ Γ' }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u A ≈ A' : Sort@s }} ->
-    {{ ⟪ pred_P ⟫ ⊨ Γ, A:Sort@s ≈ Γ', A':Sort@s }}.
+    {{ ⟪ pred_P ⟫ ⊨ Γ, A@s ≈ Γ', A'@s }}.
 Proof with intuition.
   intros * [] [env_relΓ]%rel_exp_unsorted_of_typ_inversion1.
   pose env_relΓ.
@@ -88,7 +88,7 @@ Lemma rel_ctx_extend_het {P} {pred_P : PredicativeSig P} : forall {Γ Δ A A' s}
     {{ ⟪ pred_P ⟫ Δ ⊨u A' : Sort@s }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u A ≈ A' : Sort@s }} ->
     {{ ⟪ pred_P ⟫ Δ ⊨u A ≈ A' : Sort@s }} ->
-    {{ ⟪ pred_P ⟫ ⊨ Γ,A:Sort@s ≈ Δ,A':Sort@s }}.
+    {{ ⟪ pred_P ⟫ ⊨ Γ, A@s ≈ Δ, A'@s }}.
 Proof.
   intros * [] [env_relΓ]%rel_exp_unsorted_of_typ_inversion1 []%rel_exp_unsorted_of_typ_inversion1
              [env_relΔ]%rel_exp_unsorted_of_typ_inversion1 []%rel_exp_unsorted_of_typ_inversion1
@@ -122,7 +122,7 @@ Qed.
 
 Lemma rel_ctx_extend' {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ A s},      
     {{ ⟪ pred_P ⟫ Γ ⊨u A : Sort@s }} ->
-    {{ ⟪ pred_P ⟫ ⊨ Γ, A:Sort@s }}.
+    {{ ⟪ pred_P ⟫ ⊨ Γ, A@s }}.
 Proof.
   intros.
   eapply rel_ctx_extend; eauto.

@@ -41,12 +41,18 @@ Section Translation.
 
   Inductive tr_ctx : ctx P -> ctx eSig -> Prop :=
   | tr_nil : tr_ctx {{{ ⋅ }}} {{{ ⋅ }}}
-  | tr_cons : forall Γ Γ' A A',
+  | tr_cons : forall Γ Γ' s A A',
       tr_ctx Γ Γ' -> tr_exp A A' ->
-      tr_ctx {{{ Γ, A }}} {{{ Γ', A' }}}.
+      tr_ctx {{{ Γ, A@s }}} {{{ Γ', A'@^(st_P s) }}}.
 
   #[local]
   Hint Constructors tr_exp tr_sub tr_ctx : mcpts.
+
+  Scheme tr_exp_mut_ind := Induction for tr_exp Sort Prop
+  with tr_sub_mut_ind := Induction for tr_sub Sort Prop.
+  Combined Scheme syntactic_tr_mut_ind from
+    tr_exp_mut_ind,
+    tr_sub_mut_ind.
 
   Lemma tr_functional :
     (forall M M1, tr_exp M M1 -> forall M2, tr_exp M M2 -> M1 = M2) /\
@@ -253,7 +259,7 @@ Ltac destruct_tr H :=
   | tr_sub {{{ ^?σ ∘ ^?τ }}} ?σ' => dependent destruction H
   | tr_sub {{{ ^?σ,,^?M }}} ?M' => dependent destruction H
   | tr_ctx {{{ ⋅ }}} ?Γ' => dependent destruction H
-  | tr_ctx {{{ ^?Γ, ^?A }}} ?Γ' => dependent destruction H
+  | tr_ctx {{{ ^?Γ, ^?A@^?K }}} ?Γ' => dependent destruction H
   end;
   functional_tr_rewrite_clear.
 
@@ -270,16 +276,16 @@ Ltac invert_tr H :=
   | tr_sub {{{ ^?σ ∘ ^?τ }}} ?σ' => directed inversion H
   | tr_sub {{{ ^?σ,,^?M }}} ?M' => directed inversion H
   | tr_ctx {{{ ⋅ }}} ?Γ' => directed inversion H
-  | tr_ctx {{{ ^?Γ, ^?A }}} ?Γ' => directed inversion H
+  | tr_ctx {{{ ^?Γ, ^?A@^?K }}} ?Γ' => directed inversion H
   end;
   subst.
 
 
-Lemma tr_wf_ctx_lookup {P} : forall {A : typ P} {n Γ A' Γ'},
+Lemma tr_wf_ctx_lookup {P} : forall {A : typ P} {n Γ s A' Γ'},
     tr_exp A A' ->
     tr_ctx Γ Γ' ->
-    {{ #n : A ∈ Γ }} ->
-    {{ #n : A' ∈ Γ' }}.
+    {{ #n : A@s ∈ Γ }} ->
+    {{ #n : A'@^(st_P s) ∈ Γ' }}.
 Proof.
   intros.
   gen H H0 A' Γ'.

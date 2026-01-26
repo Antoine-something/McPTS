@@ -18,7 +18,7 @@ Inductive wf_ctx_ann {P} : ctx P -> Prop :=
 | wfa_ctx_enxtend :
   `( {{ ⊫ Γ }} ->
      {{ Γ ⊫ A : Sort@s > s' }} ->
-     {{ ⊫ Γ, A:Sort@s }} )
+     {{ ⊫ Γ, A@s }} )
 where "⊫ Γ" := (wf_ctx_ann Γ) (in custom judg) : type_scope
 with wf_exp_ann {P} : ctx P -> typ P -> P -> exp P -> Prop :=
 (** Sorts *)
@@ -32,18 +32,18 @@ with wf_exp_ann {P} : ctx P -> typ P -> P -> exp P -> Prop :=
   `( forall (r : Ru P s1 s2 s3),
         Ax P s3 s3' ->
         {{ Γ ⊫ A : Sort@s1 > s1' }} ->
-        {{ Γ, A:Sort@s1 ⊫ B : Sort@s2 > s2' }} ->
+        {{ Γ, A@s1 ⊫ B : Sort@s2 > s2' }} ->
         {{ Γ ⊫ Π r A B : Sort@s3 > s3' }} )
 | wfa_fn :
   `( forall (r : Ru P s1 s2 s3),
         {{ Γ ⊫ A : Sort@s1 > s1' }} ->
-        {{ Γ, A:Sort@s1 ⊫ B : Sort@s2 > s2' }} ->
-        {{ Γ, A:Sort@s1 ⊫ M : B > s2 }} ->
+        {{ Γ, A@s1 ⊫ B : Sort@s2 > s2' }} ->
+        {{ Γ, A@s1 ⊫ M : B > s2 }} ->
         {{ Γ ⊫ λ r A M : Π r A B > s3 }} )
 | wfa_app :
   `( forall (r : Ru P s1 s2 s3),
         {{ Γ ⊫ A : Sort@s1 > s1' }} ->
-        {{ Γ, A:Sort@s1 ⊫ B : Sort@s2 > s2' }} ->
+        {{ Γ, A@s1 ⊫ B : Sort@s2 > s2' }} ->
         {{ Γ ⊫ M : Π r A B > s3 }} ->
         {{ Γ ⊫ N : A > s1 }} ->
         {{ Γ ⊫ M N : B[Id,,N] > s2 }} )
@@ -52,7 +52,7 @@ with wf_exp_ann {P} : ctx P -> typ P -> P -> exp P -> Prop :=
 | wfa_vlookup :
   `( {{ ⊫ Γ }} ->
      (** This premise is redundant, but helpful for soundness *)
-     {{ #x : A : Sort@s ∈ Γ }} ->
+     {{ #x : A@s ∈ Γ }} ->
      {{ Γ ⊫ #x : A > s }} )
 
 (** explicit substitutions *)
@@ -92,8 +92,8 @@ with wf_sub_ann {P} : ctx P -> ctx P -> sub P -> Prop :=
   `( {{ ⊫ Γ }} ->
      {{ Γ ⊫s Id : Γ }} )
 | wfa_sub_weaken :
-  `( {{ ⊫ Γ, A:Sort@s }} ->
-     {{ Γ, A:Sort@s ⊫s Wk : Γ }} )
+  `( {{ ⊫ Γ, A@s }} ->
+     {{ Γ, A@s ⊫s Wk : Γ }} )
 | wfa_sub_compose :
   `( {{ Γ1 ⊫s σ2 : Γ2 }} ->
      {{ Γ2 ⊫s σ1 : Γ3 }} ->
@@ -102,7 +102,7 @@ with wf_sub_ann {P} : ctx P -> ctx P -> sub P -> Prop :=
   `( {{ Γ ⊫s σ : Δ }} ->
      {{ Δ ⊫ A : Sort@s > s' }} ->
      {{ Γ ⊫ M : A[σ] > s }} ->
-     {{ Γ ⊫s σ,,M : Δ, A:Sort@s }} )
+     {{ Γ ⊫s σ,,M : Δ, A@s }} )
 | wfa_sub_conv :
   `( {{ Γ ⊫s σ : Δ }} ->
      {{ ⊫ Δ' }} ->

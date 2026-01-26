@@ -322,7 +322,7 @@ Proof.
     enough {{ Δ ⊢ M[σ] N ≈ M'[σ] N : OT[σ,,N] }} by eauto.
     assert {{ Γ ⊢ M ≈ M' : Π r IT OT }} as Hty by mauto.
     assert {{ Δ ⊢ IT[σ] : Sort@s1 }} by mauto 3.
-    assert {{ Δ, IT[σ]:Sort@s1 ⊢ OT[q σ] : Sort@s2 }} by mauto 4.
+    assert {{ Δ, IT[σ]@s1 ⊢ OT[q σ] : Sort@s2 }} by mauto 4.
     eapply wf_exp_eq_sub_cong_typ with (Γ := Δ) in Hty; [| mauto 3 | eapply sub_eq_refl; mauto 3].
     autorewrite with mcpts in Hty.
     eapply wf_exp_eq_app_cong with (N := N) (N' := N) in Hty; mauto 2.
@@ -1047,9 +1047,9 @@ Proof.
       destruct_rel_mod_eval.
       simplify_evals.
       deepexec H1 ltac:(fun H => pose proof H).
-      assert {{ Δ0 ⊢s (q σ)∘(σ0,,M) ≈ σ∘σ0,,M : Γ, IT:Sort@s1 }} by mauto.
-      assert {{ Δ, IT[σ]:Sort@s1 ⊢s q σ : Γ, IT:Sort@s1 }} by mauto 3.
-      assert {{ Δ0 ⊢s σ0,,M : Δ, IT[σ]:Sort@s1 }} by mauto 3.
+      assert {{ Δ0 ⊢s (q σ)∘(σ0,,M) ≈ σ∘σ0,,M : Γ, IT@s1 }} by mauto.
+      assert {{ Δ, IT[σ]@s1 ⊢s q σ : Γ, IT@s1 }} by mauto 3.
+      assert {{ Δ0 ⊢s σ0,,M : Δ, IT[σ]@s1 }} by mauto 3.
       assert {{ Δ0 ⊢ OT[q σ][σ0,,M] ≈ OT[(q σ)∘(σ0,,M)] : Sort@s2 }} by mauto.
       assert {{ Δ0 ⊢ OT[q σ][σ0,,M] ≈ OT[σ∘σ0,,M] : Sort@s2 }} by mauto.
       enough (OP m equiv_m Δ0 {{{ OT[σ∘σ0,,M] }}}) by (eapply glu_sort_elem_typ_resp_exp_eq; mauto 2).
@@ -1073,7 +1073,7 @@ Proof.
       deepexec H1 ltac:(fun H => pose proof H).
       autorewrite with mcpts in *.
       repeat eexists; eauto.
-      assert {{ Δ0 ⊢s σ0,,N : Δ, IT[σ]:Sort@s1 }} by mauto 3.
+      assert {{ Δ0 ⊢s σ0,,N : Δ, IT[σ]@s1 }} by mauto 3.
       assert {{ Γ ⊢ M : Π r IT OT }} by mauto.
       assert {{ Δ ⊢ M[σ] : (Π r IT OT)[σ] }} by mauto 2.
       assert {{ Δ0 ⊢ M[σ][σ0] : (Π r IT OT)[σ][σ0] }} by mauto 3.
@@ -1083,18 +1083,18 @@ Proof.
       assert {{ Δ0 ⊢ M[σ][σ0] ≈ M[σ∘σ0] : Π r IT[σ∘σ0] OT[q (σ∘σ0)] }} by mauto.
       assert {{ Δ0 ⊢ IT[σ∘σ0] : Sort@s1 }} by mauto 4.
       assert {{ Δ0 ⊢ IT[σ∘σ0] ≈ IT[σ][σ0] : Sort@s1 }} by mauto.
-      assert {{ Δ0, IT[σ∘σ0]:Sort@s1 ⊢ #0 : IT[(σ∘σ0)][Wk] }} by (eapply wf_vlookup'; econstructor; mauto 2).
-      assert {{ Δ0, IT[σ∘σ0]:Sort@s1 ⊢ IT[(σ∘σ0)∘Wk] ≈ IT[σ∘σ0][Wk] : Sort@s1 }} by (eapply wf_exp_eq_sub_compose_sort; mauto 3).
-      assert {{ Δ0, IT[σ∘σ0]:Sort@s1 ⊢ #0 : IT[(σ∘σ0)∘Wk] }} by mauto 3.
-      assert {{ Δ0, IT[σ∘σ0]:Sort@s1 ⊢ OT[q (σ∘σ0)] : Sort@s2 }} by mauto 4.
+      assert {{ Δ0, IT[σ∘σ0]@s1 ⊢ #0 : IT[(σ∘σ0)][Wk] }} by (eapply wf_vlookup'; econstructor; mauto 2).
+      assert {{ Δ0, IT[σ∘σ0]@s1 ⊢ IT[(σ∘σ0)∘Wk] ≈ IT[σ∘σ0][Wk] : Sort@s1 }} by (eapply wf_exp_eq_sub_compose_sort; mauto 3).
+      assert {{ Δ0, IT[σ∘σ0]@s1 ⊢ #0 : IT[(σ∘σ0)∘Wk] }} by mauto 3.
+      assert {{ Δ0, IT[σ∘σ0]@s1 ⊢ OT[q (σ∘σ0)] : Sort@s2 }} by mauto 4.
       assert {{ Δ0 ⊢ M[σ][σ0] N ≈ M[σ∘σ0] N : OT[q (σ∘σ0)][Id,,N] }} by (eapply wf_exp_eq_app_cong; mauto 4).
       assert {{ Δ0 ⊢ OT[(q (σ∘σ0))∘(Id,,N)] ≈ OT[q (σ∘σ0)][Id,,N] : Sort@s2 }} by (eapply wf_exp_eq_sub_compose_sort; mauto 4).
-      assert {{ Δ0 ⊢s (q (σ∘σ0))∘(Id,,N) ≈ σ∘σ0,,N : Γ, IT:Sort@s1 }} by (eapply sub_eq_q_sigma_id_extend; mauto 3).
-      assert {{ Γ, IT:Sort@s1 ⊢ OT ≈ OT : Sort@s2 }} by mauto 3.
+      assert {{ Δ0 ⊢s (q (σ∘σ0))∘(Id,,N) ≈ σ∘σ0,,N : Γ, IT@s1 }} by (eapply sub_eq_q_sigma_id_extend; mauto 3).
+      assert {{ Γ, IT@s1 ⊢ OT ≈ OT : Sort@s2 }} by mauto 3.
       assert {{ Δ0 ⊢ OT[(q (σ∘σ0))∘(Id,,N)] ≈ OT[σ∘σ0,,N] : Sort@s2 }} by mauto 3.
       assert {{ Δ0 ⊢ OT[q (σ∘σ0)][Id,,N] ≈ OT[σ∘σ0,,N] : Sort@s2 }} by mauto.
       assert {{ Δ0 ⊢ M[σ][σ0] N ≈ M[σ∘σ0] N : OT[σ∘σ0,,N] }} by mauto.
-      assert {{ Δ0 ⊢s (q σ)∘(σ0,,N) ≈ (σ∘σ0),,N : Γ, IT:Sort@s1 }} by (eapply sub_eq_q_sigma_sigma0_extend; mauto 2).     
+      assert {{ Δ0 ⊢s (q σ)∘(σ0,,N) ≈ (σ∘σ0),,N : Γ, IT@s1 }} by (eapply sub_eq_q_sigma_sigma0_extend; mauto 2).     
       assert {{ Δ0 ⊢ OT[(q σ)∘(σ0,,N)] ≈ OT[q σ][σ0,,N] : Sort@s2 }} by mauto.
       assert {{ Δ0 ⊢ OT[(q σ)∘(σ0,,N)] ≈ OT[σ∘σ0,,N] : Sort@s2 }} by mauto 4.
       assert {{ Δ0 ⊢ OT[q σ][σ0,,N] ≈ OT[σ∘σ0,,N] : Sort@s2 }} by mauto.

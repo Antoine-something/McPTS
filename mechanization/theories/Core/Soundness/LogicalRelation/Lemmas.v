@@ -364,7 +364,7 @@ Proof.
   
   destruct_by_head (@cons_glu_sub_pred P).
   econstructor; mauto 4.
-  assert {{ Γ, A:Sort@s ⊢s Wk : Γ }} by mauto 3.
+  assert {{ Γ, A@s ⊢s Wk : Γ }} by mauto 3.
   assert {{ Δ ⊢ A[Wk][σ] ≈ A[Wk][σ'] : Sort@s }} as <- by mauto 4.
   assert {{ Δ ⊢ #0[σ] ≈ #0[σ'] : A[Wk][σ] }} as <- by mauto 4.
   eassumption.
@@ -379,7 +379,7 @@ Qed.
 Lemma cons_glu_sub_pred_resp_wf_sub_eq {P} (pred_P : PredicativeSig P) : forall {s Γ A Sb Δ σ σ' ρ},
     {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} ->
     {{ Γ ⊢ A : Sort@s }} ->
-    {{ Δ ⊢s σ ≈ σ' : Γ, A:Sort@s }} ->
+    {{ Δ ⊢s σ ≈ σ' : Γ, A@s }} ->
     {{ Δ ⊢s σ ® ρ ∈ cons_glu_sub_pred pred_P s Γ A Sb }} ->
     {{ Δ ⊢s σ' ® ρ ∈ cons_glu_sub_pred pred_P s Γ A Sb }}.
 Proof.
@@ -396,7 +396,7 @@ Proof.
 Qed.
 
 Add Parametric Morphism {P} (pred_P : PredicativeSig P) s Γ A Sb Δ (Hglu : {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }}) (HA : {{ Γ ⊢ A : Sort@s }}) : (cons_glu_sub_pred pred_P s Γ A Sb Δ)
-    with signature wf_sub_eq Δ {{{ Γ, A:Sort@s }}} ==> eq ==> iff as cons_glu_sub_pred_morphism_iff.
+    with signature wf_sub_eq Δ {{{ Γ, A@s }}} ==> eq ==> iff as cons_glu_sub_pred_morphism_iff.
 Proof.
   split; mauto using cons_glu_sub_pred_resp_wf_sub_eq.
 Qed.
@@ -555,7 +555,7 @@ Ltac handle_functional_glu_ctx_env P :=
 
 Lemma glu_ctx_env_cons_clean_inversion {P} (pred_P : PredicativeSig P) : forall {s Γ TSb A Sb},
   {{ EG Γ ∈ glu_ctx_env pred_P ↘ TSb }} ->
-  {{ EG Γ, A:Sort@s ∈ glu_ctx_env pred_P ↘ Sb }} ->
+  {{ EG Γ, A@s ∈ glu_ctx_env pred_P ↘ Sb }} ->
   {{ Γ ⊢ A : Sort@s }} /\
       (forall Δ σ ρ,
           {{ Δ ⊢s σ ® ρ ∈ TSb }} ->
@@ -610,14 +610,14 @@ Proof.
   destruct_by_head (@cons_glu_sub_pred P).
   econstructor; mauto 3.
   - assert {{ Δ' ⊢ #0[σ0][σ] : A[Wk][σ0][σ] ® m ∈ exp_rel }} by (eapply glu_sort_elem_exp_monotone; mauto 3).
-    assert {{ Γ, A:Sort@s ⊢ #0 : A[Wk] }} by mauto 3.
-    assert {{ Γ, A:Sort@s ⊢s Wk : Γ }} by mauto 3.
+    assert {{ Γ, A@s ⊢ #0 : A[Wk] }} by mauto 3.
+    assert {{ Γ, A@s ⊢s Wk : Γ }} by mauto 3.
     assert {{ Δ' ⊢ #0[σ0∘σ] ≈ #0[σ0][σ] : A[Wk][σ0∘σ] }} as -> by mauto 4.
     assert {{ Δ' ⊢s σ : Δ }} by mauto 3.
     assert {{ Δ' ⊢ A[Wk][σ0][σ] ≈ A[Wk][σ0∘σ] : Sort@s }} as <- by mauto 4.
     eassumption.
   - assert {{ Δ' ⊢s σ : Δ }} by mauto 3.
-    assert {{ Γ, A:Sort@s ⊢s Wk : Γ }} by mauto 3.
+    assert {{ Γ, A@s ⊢s Wk : Γ }} by mauto 3.
     assert {{ Δ' ⊢s (Wk ∘ σ0) ∘ σ ≈ Wk ∘ (σ0 ∘ σ) : Γ }} as <- by mauto 3.
     mauto 3.
 Qed.
@@ -634,7 +634,7 @@ Proof.
   intros.
   assert {{ Δ ⊢s σ : Γ }} by mauto 2.
   assert {{ Δ ⊢ M : A[σ] }} by mauto 2 using glu_sort_elem_trm_escape.
-  assert {{ Δ ⊢s σ,,M : Γ, A:Sort@s }} by mauto 2.
+  assert {{ Δ ⊢s σ,,M : Γ, A@s }} by mauto 2.
   econstructor; mauto 3;
     autorewrite with mcpts; mauto 3.
 
@@ -672,14 +672,14 @@ Proof.
     end.
     eapply realize_glu_elem_bot; mauto.
     assert {{ ⊢ Γ }} by mauto 3.
-    assert {{ Γ, A:Sort@s ⊢s Wk : Γ }} by mauto 4.
-    assert {{ Γ, A:Sort@s ⊢ A[Wk] : Sort@s }} by mauto 4.
-    assert {{ Γ, A:Sort@s ⊢ A[Wk] ≈ A[Wk][Id] : Sort@s }} as <- by mauto 3.
-    assert {{ Γ, A:Sort@s ⊢ #0 ≈ #0[Id] : A[Wk] }} as <- by mauto.
+    assert {{ Γ, A@s ⊢s Wk : Γ }} by mauto 4.
+    assert {{ Γ, A@s ⊢ A[Wk] : Sort@s }} by mauto 4.
+    assert {{ Γ, A@s ⊢ A[Wk] ≈ A[Wk][Id] : Sort@s }} as <- by mauto 3.
+    assert {{ Γ, A@s ⊢ #0 ≈ #0[Id] : A[Wk] }} as <- by mauto.
     eapply var_glu_elem_bot; mauto.
-  - assert {{ Γ, A:Sort@s ⊢s Wk : Γ }} by mauto 4.
-    assert {{ Γ, A:Sort@s ⊢s Wk∘Id : Γ }} by mauto 4.
-    assert {{ Γ, A:Sort@s ⊢s Id∘Wk ≈ Wk∘Id : Γ }} as <- by (transitivity (@a_weaken P); mauto 3).
+  - assert {{ Γ, A@s ⊢s Wk : Γ }} by mauto 4.
+    assert {{ Γ, A@s ⊢s Wk∘Id : Γ }} by mauto 4.
+    assert {{ Γ, A@s ⊢s Id∘Wk ≈ Wk∘Id : Γ }} as <- by (transitivity (@a_weaken P); mauto 3).
     eapply glu_ctx_env_sub_monotone; mauto 4.
 Qed.
 
