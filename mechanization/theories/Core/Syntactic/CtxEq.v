@@ -33,7 +33,6 @@ match type of H with
 end.
 
 
-#[local]
 Lemma ctxeq_lookup_helper {P} : forall {Γ : ctx P} {x A s}, {{ #x : A@s ∈ Γ }} -> forall {Δ}, {{ ⊢ Δ ≈ Γ }} -> exists A', {{ #x : A'@s ∈ Δ }} /\ {{ Γ ⊢ A ≈ A' : Sort@s }} /\ {{ Δ ⊢ A ≈ A' : Sort@s }}.
 Proof.
   induction 1; intros.
