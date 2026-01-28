@@ -773,6 +773,19 @@ Proof.
     repeat eexists; mauto 3.
 Qed.
 
+Lemma inv_tr_wf_exp {P} : forall Γ' M' A',
+    {{ Γ' ⊢ M' : A' }} ->
+    forall (Γ : ctx P) M A,
+      {{ ⊢t Γ ≜ Γ' }} ->
+      {{ Γ ⊢t A ≜ A' }} ->
+      {{ Γ ⊢t M ≜ M' : A }} ->
+      {{ Γ ⊢ M : A }}.
+Proof.
+  intros.
+  inversion H; subst; mauto 3.
+Qed.
+
+  
 Lemma inv_tr_judg {P} :
   (forall Γ' Δ',
       {{ ⊢ Γ' ≈ Δ' }} ->
@@ -862,6 +875,7 @@ Proof.
     (** UIP *)
     dependent destruction H24.
     assert {{ Γ0 ⊢ H8 ≈ H7 : Sort@_ }} by (apply H; mauto 3).
+    
     econstructor; mauto 3.
     eapply H0; mauto 3.
     + eapply tr_conv; mauto 3.
