@@ -42,7 +42,7 @@ Section functional_eval.
       eapply env_lookup_functional; mauto 2.
 
     (** 'progressive_inversion' does not work well with functions because of the rule annotations
-       use 'progressive_invert' on the relevant assumption instead *)
+        use 'progressive_invert' on the relevant assumption instead *)
     - progressive_invert H0.
       assert (a = a0) by mauto.
       subst.      
