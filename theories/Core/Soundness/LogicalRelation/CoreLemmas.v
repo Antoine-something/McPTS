@@ -1149,3 +1149,38 @@ Proof.
     induction Horig; econstructor;
     try (etransitivity; [symmetry + idtac|]; eassumption); eauto.
 Qed.
+
+
+
+(** Lemmas for unsorted gluing model *)
+Lemma glu_typ_elem_per_typ {P} (pred_P : PredicativeSig P) : forall so typ_rel exp_rel a,
+    {{ DG a ∈ glu_typ_elem pred_P so ↘ typ_rel ↘ exp_rel }} ->
+    {{ Dom a ≈ a ∈ per_typ pred_P }}.
+Proof.
+  inversion_clear 1.
+  - eexists; econstructor; reflexivity.
+  - enough (per_sort pred_P s a a); mauto 3.
+    destruct H as [R].
+    eexists.
+    mauto 2.
+Qed.
+
+#[export]
+Hint Resolve glu_sort_elem_per_sort : mcpts.
+
+Lemma glu_typ_elem_per_elem {P} (pred_P : PredicativeSig P) : forall s0 typ_rel exp_rel a,
+    {{ DG a ∈ glu_typ_elem pred_P s0 ↘ typ_rel ↘ exp_rel }} ->
+    forall Γ M A m R,
+      {{ Γ ⊢ M : A ® m ∈ exp_rel }} ->
+      {{ DF a ≈ a ∈ per_typ_elem pred_P ↘ R }} ->
+      {{ Dom m ≈ m ∈ R }}.
+Proof.
+  inversion_clear 1.
+  - intros.
+    assert (per_typ_elem pred_P (per_sort pred_P s) d{{{ Sort@s }}} d{{{ Sort@s }}}) by (econstructor; reflexivity).
+    handle_per_typ_elem_irrel.
+    simpl_glu_rel.
+    eapply glu_sort_elem_per_sort; mauto 3.    
+  - intros.
+    eapply glu_sort_elem_per_typ_elem; mauto 3.
+Qed.

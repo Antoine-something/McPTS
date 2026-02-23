@@ -393,3 +393,122 @@ Proof.
   eapply realize_glu_elem_bot; mauto 4.
   eauto using var_glu_elem_bot.
 Qed.
+
+
+(** Realizability for unsorted gluing model *)
+Theorem realize_glu_typ_elem_gen {P} {pred_P : PredicativeSig P} : forall a so typ_rel exp_rel,
+    {{ DG a ∈ glu_typ_elem pred_P so ↘ typ_rel ↘ exp_rel }} ->
+    (forall Γ A R,
+        {{ DF a ≈ a ∈ per_typ_elem pred_P ↘ R }} ->
+        {{ Γ ⊢ A ® typ_rel }} ->
+        {{ Γ ⊢ A ® glu_typ_top_unsorted pred_P so a }}) /\
+      (forall Γ M A m,
+          (** We repeat this to get the relation between [a] and [P]
+              more easily after applying [induction 1.] *)
+          {{ DG a ∈ glu_typ_elem pred_P so ↘ typ_rel ↘ exp_rel }} ->
+          {{ Γ ⊢ M : A ® m ∈ glu_elem_bot_unsorted pred_P so a }} ->
+          {{ Γ ⊢ M : A ® ⇑ a m ∈ exp_rel }}) /\
+      (forall Γ M A m R,
+          (** We repeat this to get the relation between [a] and [P]
+              more easily after applying [induction 1.] *)
+          {{ DG a ∈ glu_typ_elem pred_P so ↘ typ_rel ↘ exp_rel }} ->
+          {{ Γ ⊢ M : A ® m ∈ exp_rel }} ->
+          {{ DF a ≈ a ∈ per_typ_elem pred_P ↘ R }} ->
+          {{ Dom m ≈ m ∈ R }} ->
+          {{ Γ ⊢ M : A ® m ∈ glu_elem_top_unsorted pred_P so a }}).
+Proof.
+  destruct 1; subst.
+  - repeat split; intros.
+    + simpl_glu_rel; econstructor; mauto 3.
+    + inversion_clear H3.
+      inversion_clear H6.
+      handle_functional_glu_sort_elem P.
+      simpl in H7.
+      simpl.
+      split; mauto 2.
+      do 2 eexists; split.
+      * glu_sort_elem_econstructor; mauto 2; reflexivity.
+      * simpl.
+        split; [subst; mauto 2|].
+        intros.
+        subst.
+        eapply H9; mauto 3.
+    + simpl_glu_rel.
+      assert {{ Γ ⊢ M ® glu_typ_top pred_P s m }} by mauto 3.
+      destruct H8.
+      subst.
+      econstructor; mauto 2.
+      * inversion_clear H2.
+        simpl_glu_rel.
+        reflexivity.
+      * intros.
+        inversion_clear H11.
+        eapply H10; mauto 2.        
+
+  - assert (glu_sort_elem pred_P s typ_rel exp_rel a) by eassumption. 
+    eapply realize_glu_sort_elem_gen in H0.
+    destruct_conjs.
+    repeat split; intros.
+    + enough (glu_typ_top pred_P s a Γ A).
+      {
+        destruct H5.
+        econstructor; mauto 3.
+      }
+      eapply H0; mauto 3.
+      assert (per_sort pred_P s a a) as [] by mauto 2.
+      assert (per_sort_elem pred_P s R a a) by mauto 3. 
+      eassumption.
+    + eapply H1; mauto 3.
+      inversion_clear H4.
+      econstructor; mauto 3.
+    + enough (glu_elem_top pred_P s a Γ A M m).
+      {
+        destruct H7.
+        econstructor; mauto 3.
+      }
+      eapply H2; mauto 3.
+      assert (per_sort pred_P s a a) as [] by mauto 2.
+      assert (per_sort_elem pred_P s R a a) by mauto 3. 
+      eassumption.
+Qed.
+
+
+Corollary realize_glu_typ_top_unsorted {P} (pred_P : PredicativeSig P) : forall a so typ_rel exp_rel,
+    {{ DG a ∈ glu_typ_elem pred_P so ↘ typ_rel ↘ exp_rel }} ->
+    forall Γ A,
+      {{ Γ ⊢ A ® typ_rel }} ->
+      {{ Γ ⊢ A ® glu_typ_top_unsorted pred_P so a }}.
+Proof.
+  intros.
+  pose proof H.
+  eapply glu_typ_elem_per_typ in H.
+  simpl in *. destruct_all.
+  eapply realize_glu_typ_elem_gen; eauto.
+Qed.
+
+Corollary realize_glu_elem_bot_unsorted {P} (pred_P : PredicativeSig P) : forall a so typ_rel exp_rel,
+    {{ DG a ∈ glu_typ_elem pred_P so ↘ typ_rel ↘ exp_rel }} ->
+    forall Γ A M m,
+      {{ Γ ⊢ M : A ® m ∈ glu_elem_bot_unsorted pred_P so a }} ->
+      {{ Γ ⊢ M : A ® ⇑ a m ∈ exp_rel }}.
+Proof.
+  intros.
+  eapply realize_glu_typ_elem_gen; eauto.
+Qed.
+
+Theorem realize_glu_elem_top_unsorted {P} (pred_P : PredicativeSig P) : forall a so typ_rel exp_rel,
+    {{ DG a ∈ glu_typ_elem pred_P so ↘ typ_rel ↘ exp_rel }} ->
+    forall Γ A M m,
+      {{ Γ ⊢ M : A ® m ∈ exp_rel }} ->
+      {{ Γ ⊢ M : A ® m ∈ glu_elem_top_unsorted pred_P so a }}.
+Proof.
+  intros.
+  pose proof H.
+  eapply glu_typ_elem_per_typ in H.
+  simpl in *. destruct_all.
+  eapply realize_glu_typ_elem_gen; eauto.
+  eapply glu_typ_elem_per_elem; eauto.
+Qed.
+
+#[export]
+Hint Resolve realize_glu_typ_top_unsorted realize_glu_elem_top_unsorted : mcpts.

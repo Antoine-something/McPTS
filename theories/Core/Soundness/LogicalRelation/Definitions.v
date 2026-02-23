@@ -356,6 +356,49 @@ Section GluingInduction.
 End GluingInduction.
 
 
+(** Gluing relation that includes top sorts *)
+Definition top_sort_glu_typ_pred {P : PtsSig} (pred_P : PredicativeSig P) (s : P) : glu_typ_pred P :=
+  fun Γ A => (A = {{{ Sort@s }}}).
+Arguments top_sort_glu_typ_pred {P} pred_P s Γ A/.
+Transparent top_sort_glu_typ_pred.
+
+Definition top_sort_glu_exp_pred {P} (pred_P : PredicativeSig P) (s : P) : glu_exp_pred P :=
+  fun Γ A M m => (A = {{{ Sort@s }}}) /\
+                (exists typ_rel exp_rel, {{ DG m ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} /\
+                                      {{ Γ ⊢ M ® typ_rel }}).
+Arguments top_sort_glu_exp_pred {P} pred_P s Γ A M m/.
+Transparent top_sort_glu_exp_pred.
+
+(** 
+    We still need annotations for the soundness proof, but top sorts cannot be annotated.
+    The simple solution is to use a sort option for the annotation.
+    The built-in option type in Rocq can only be used in Type, but our sorts are defined in Set.
+    So, we define our own option for sorts
+ *)
+
+Inductive SortOption (P : PtsSig) : Type :=
+| None : SortOption P
+| Some : P -> SortOption P
+.
+
+Arguments None {P}.
+Arguments Some {P} s.
+
+Inductive glu_typ_elem {P} (pred_P : PredicativeSig P) : SortOption P -> glu_typ_pred P -> glu_exp_pred P -> domain P -> Prop :=
+| glu_typ_elem_top_sort :
+  `{ (forall s', Ax P s s' -> False) ->
+     typ_rel <∙> top_sort_glu_typ_pred pred_P s ->
+     exp_rel <∙> top_sort_glu_exp_pred pred_P s ->
+     {{ DG Sort@s ∈ glu_typ_elem pred_P None ↘ typ_rel ↘ exp_rel }} }
+| glu_typ_elem_sort :
+  `{ {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
+     {{ DG a ∈ glu_typ_elem pred_P (Some s) ↘ typ_rel ↘ exp_rel }} }
+.
+
+
+
+
+(** Top and bottom relations *)
 Variant glu_elem_bot {P} (pred_P : PredicativeSig P) s a Γ A M m : Prop :=
   | glu_elem_bot_make : forall typ_rel exp_rel,
       {{ Γ ⊢ M : A }} ->
@@ -370,12 +413,12 @@ Hint Constructors glu_elem_bot : mcpts.
 
 
 Variant glu_elem_top {P} (pred_P : PredicativeSig P) s a Γ A M m : Prop :=
-| glu_elem_top_make : forall P El,
+| glu_elem_top_make : forall typ_rel exp_rel,
     {{ Γ ⊢ M : A }} ->
-    {{ DG a ∈ glu_sort_elem pred_P s ↘ P ↘ El }} ->
-    {{ Γ ⊢ A ® P }} ->
+    {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
+    {{ Γ ⊢ A ® typ_rel }} ->
     {{ Dom ⇓ a m ≈ ⇓ a m ∈ per_top }} ->
-    (forall Δ σ w, {{ Δ ⊢w σ : Γ }} -> {{ Rnf ⇓ a m in length Δ ↘ w }} -> {{ Δ ⊢ M[σ] ≈ w : A[σ] }}) ->
+    (forall Δ σ W, {{ Δ ⊢w σ : Γ }} -> {{ Rnf ⇓ a m in length Δ ↘ W }} -> {{ Δ ⊢ M[σ] ≈ W : A[σ] }}) ->
     {{ Γ ⊢ M : A ® m ∈ glu_elem_top pred_P s a }}.
 #[export]
 Hint Constructors glu_elem_top : mcpts.
@@ -389,22 +432,61 @@ Variant glu_typ_top {P} (pred_P : PredicativeSig P) (s : P) a Γ A : Prop :=
 #[export]
 Hint Constructors glu_typ_top : mcpts.
 
-Variant glu_rel_typ_with_sub {P} (pred_P : PredicativeSig P) s Δ A σ ρ : Prop :=
-| mk_glu_rel_typ_with_sub :
-  `{ forall typ_rel exp_rel,
-        {{ ⟦ A ⟧ ρ ↘ a }} ->
-        {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
-        {{ Δ ⊢ A[σ] ® typ_rel }} ->
-        glu_rel_typ_with_sub pred_P s Δ A σ ρ }.
 
-Variant glu_rel_exp_with_sub {P} (pred_P : PredicativeSig P) s Δ M A σ ρ : Prop :=
-| mk_glu_rel_exp_with_sub :
-  `{ forall typ_rel exp_rel,
-        {{ ⟦ A ⟧ ρ ↘ a }} ->
-        {{ ⟦ M ⟧ ρ ↘ m }} ->
-        {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
-        {{ Δ ⊢ M[σ] : A[σ] ® m ∈ exp_rel }} ->
-        glu_rel_exp_with_sub pred_P s Δ M A σ ρ }.
+Inductive glu_elem_bot_unsorted {P} (pred_P : PredicativeSig P) : SortOption P -> domain P -> ctx P -> typ P -> exp P -> domain_ne P -> Prop :=
+| glu_elem_bot_unsorted_top_sort : forall s a Γ A M m typ_rel exp_rel,
+    (forall s', Ax P s s' -> False) ->
+    {{ Γ ⊢ M : A }} ->
+    {{ DG a ∈ glu_typ_elem pred_P None ↘ typ_rel ↘ exp_rel }} ->
+    {{ Γ ⊢ A ® typ_rel }} ->
+    {{ Dom m ≈ m ∈ per_bot }} ->
+    (forall Δ σ M', {{ Δ ⊢w σ : Γ }} -> {{ Rne m in length Δ ↘ M' }} -> {{ Δ ⊢ M[σ] ≈ M' : A }}) ->
+    {{ Γ ⊢ M : A ® m ∈ glu_elem_bot_unsorted pred_P None a }}
+| glu_elem_bot_unsorted_sorted : forall s a Γ A M m typ_rel exp_rel,
+    {{ Γ ⊢ M : A }} ->
+    {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
+    {{ Γ ⊢ A ® typ_rel }} ->
+    {{ Dom m ≈ m ∈ per_bot }} ->
+    (forall Δ σ M', {{ Δ ⊢w σ : Γ }} -> {{ Rne m in length Δ ↘ M' }} -> {{ Δ ⊢ M[σ] ≈ M' : A[σ] }}) ->
+    {{ Γ ⊢ M : A ® m ∈ glu_elem_bot_unsorted pred_P (Some s) a }}.
+#[export]
+Hint Constructors glu_elem_bot_unsorted : mcpts.
+             
+Inductive glu_elem_top_unsorted {P} (pred_P : PredicativeSig P) : SortOption P -> domain P -> ctx P -> typ P -> exp P -> domain P -> Prop :=
+| glu_elem_top_unsorted_top_sort : forall s a Γ A M m typ_rel exp_rel,
+    (forall s', Ax P s s' -> False) ->
+    {{ Γ ⊢ M : A }} ->
+    {{ DG a ∈ glu_typ_elem pred_P None ↘ typ_rel ↘ exp_rel }} ->
+    {{ Γ ⊢ A ® typ_rel }} ->
+    {{ Dom ⇓ a m ≈ ⇓ a m ∈ per_top }} ->
+    (forall Δ σ W, {{ Δ ⊢w σ : Γ }} -> {{ Rnf ⇓ a m in length Δ ↘ W }} -> {{ Δ ⊢ M[σ] ≈ W : A }}) ->
+    {{ Γ ⊢ M : A ® m ∈ glu_elem_top_unsorted pred_P None a }}
+| glu_elem_top_unsorted_sorted : forall s a Γ A M m typ_rel exp_rel,
+    {{ Γ ⊢ M : A }} ->
+    {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
+    {{ Γ ⊢ A ® typ_rel }} ->
+    {{ Dom ⇓ a m ≈ ⇓ a m ∈ per_top }} ->
+    (forall Δ σ W, {{ Δ ⊢w σ : Γ }} -> {{ Rnf ⇓ a m in length Δ ↘ W }} -> {{ Δ ⊢ M[σ] ≈ W : A[σ] }}) ->
+    {{ Γ ⊢ M : A ® m ∈ glu_elem_top_unsorted pred_P (Some s) a }}.
+#[export]
+Hint Constructors glu_elem_top_unsorted : mcpts.
+
+Inductive glu_typ_top_unsorted {P} (pred_P : PredicativeSig P) : SortOption P -> domain P -> ctx P -> exp P -> Prop :=
+| glu_typ_top_unsorted_top_sort :
+  forall s a Γ A,
+    (forall s', Ax P s s' -> False) ->
+    (A = {{{ Sort@s }}}) ->
+    (a = d{{{ Sort@s }}}) ->
+    {{ Γ ⊢ A ® glu_typ_top_unsorted pred_P None a }}
+| glu_typ_top_unsorted_sorted :
+  forall s a Γ A,
+    {{ Γ ⊢ A  : Sort@s }} ->
+    {{ Dom a ≈ a ∈ per_top_typ }} ->
+    (forall Δ σ A', {{ Δ ⊢w σ : Γ }} -> {{ Rtyp a in length Δ ↘ A' }} -> {{ Δ ⊢ A[σ] ≈ A' : Sort@s }}) ->
+    {{ Γ ⊢ A ® glu_typ_top_unsorted pred_P (Some s) a }}.
+#[export]
+Hint Constructors glu_typ_top_unsorted : mcpts.
+
 
 
 (** Gluing model for contexts and substitutions *)
@@ -429,6 +511,14 @@ Variant cons_glu_sub_pred {P} (pred_P : PredicativeSig P) (s : P) Γ A (TSb : gl
         {{ Δ ⊢s Wk ∘ σ ® ρ ↯ ∈ TSb }} ->
         {{ Δ ⊢s σ ® ρ ∈ cons_glu_sub_pred pred_P s Γ A TSb }} }.
 
+Variant glu_rel_typ_with_sub {P} (pred_P : PredicativeSig P) s Δ A σ ρ : Prop :=
+| mk_glu_rel_typ_with_sub :
+  `{ forall typ_rel exp_rel,
+        {{ ⟦ A ⟧ ρ ↘ a }} ->
+        {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
+        {{ Δ ⊢ A[σ] ® typ_rel }} ->
+        glu_rel_typ_with_sub pred_P s Δ A σ ρ }.
+
 
 Inductive glu_ctx_env {P} (pred_P : PredicativeSig P) : glu_sub_pred P -> ctx P -> Prop :=
 | glu_ctx_env_nil :
@@ -445,41 +535,17 @@ Inductive glu_ctx_env {P} (pred_P : PredicativeSig P) : glu_sub_pred P -> ctx P 
         Sb <∙> cons_glu_sub_pred pred_P s Γ A TSb ->
         {{ EG Γ, A@s ∈ glu_ctx_env pred_P ↘ Sb }} }.
 
+(** Logical relation for contexts *)
+Definition glu_rel_ctx {P} (pred_P : PredicativeSig P) Γ : Prop := exists Sb, {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }}.
+Arguments glu_rel_ctx {P} pred_P Γ/.
 
+
+(** Logical relations for substitutions *)
 Variant glu_rel_sub_with_sub {P} (pred_P : PredicativeSig P) Δ τ (Sb : glu_sub_pred P) σ ρ : Prop :=
 | mk_glu_rel_sub_with_sub :
   `{ {{ ⟦ τ ⟧s ρ ↘ ρ' }} ->
      {{ Δ ⊢s τ ∘ σ ® ρ' ∈ Sb }} ->
      glu_rel_sub_with_sub pred_P Δ τ Sb σ ρ}.
-
-Definition glu_rel_ctx {P} (pred_P : PredicativeSig P) Γ : Prop := exists Sb, {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }}.
-Arguments glu_rel_ctx {P} pred_P Γ/.
-
-
-
-Definition glu_rel_exp_resp_sub_env {P} (pred_P : PredicativeSig P) s Sb M A :=
-  forall Δ σ ρ,
-    {{ Δ ⊢s σ ® ρ ∈ Sb }} ->
-    glu_rel_exp_with_sub pred_P s Δ M A σ ρ.
-Arguments glu_rel_exp_resp_sub_env {P} pred_P s Sb M A/.
-
-
-Definition glu_rel_typ {P} (pred_P : PredicativeSig P) s Γ A : Prop :=
-  exists Sb,
-    {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} /\
-      forall Δ σ ρ,
-        {{ Δ ⊢s σ ® ρ ∈ Sb }} ->
-        glu_rel_typ_with_sub pred_P s Δ A σ ρ.
-
-
-Definition glu_rel_exp {P} (pred_P : PredicativeSig P) s Γ M A : Prop :=
-  exists Sb,
-    {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} /\
-      forall Δ σ ρ,
-        {{ Δ ⊢s σ ® ρ ∈ Sb }} ->
-        glu_rel_exp_with_sub pred_P s Δ M A σ ρ.
-Arguments glu_rel_exp {P} pred_P s Γ M A/.
-
 
 Definition glu_rel_sub_resp_sub_env {P} (pred_P : PredicativeSig P) Sb Sb' τ :=
   forall Δ σ ρ,
@@ -497,7 +563,101 @@ Definition glu_rel_sub {P} (pred_P : PredicativeSig P) Γ τ Γ' : Prop :=
 Arguments glu_rel_sub {P} pred_P Γ τ Γ'/.
 
 
+(** Logical relations for expressions *)
+Variant glu_rel_exp_with_sub {P} (pred_P : PredicativeSig P) s Δ M A σ ρ : Prop :=
+| mk_glu_rel_exp_with_sub :
+  `{ forall typ_rel exp_rel,
+        {{ ⟦ A ⟧ ρ ↘ a }} ->
+        {{ ⟦ M ⟧ ρ ↘ m }} ->
+        {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
+        {{ Δ ⊢ M[σ] : A[σ] ® m ∈ exp_rel }} ->
+        glu_rel_exp_with_sub pred_P s Δ M A σ ρ }.
+
+Definition glu_rel_exp_resp_sub_env {P} (pred_P : PredicativeSig P) s Sb M A :=
+  forall Δ σ ρ,
+    {{ Δ ⊢s σ ® ρ ∈ Sb }} ->
+    glu_rel_exp_with_sub pred_P s Δ M A σ ρ.
+Arguments glu_rel_exp_resp_sub_env {P} pred_P s Sb M A/.
+
+Definition glu_rel_exp {P} (pred_P : PredicativeSig P) s Γ M A : Prop :=
+  exists Sb,
+    {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} /\
+      forall Δ σ ρ,
+        {{ Δ ⊢s σ ® ρ ∈ Sb }} ->
+        glu_rel_exp_with_sub pred_P s Δ M A σ ρ.
+Arguments glu_rel_exp {P} pred_P s Γ M A/.
+
+
+Inductive glu_rel_exp_with_sub_unsorted {P} (pred_P : PredicativeSig P) : SortOption P -> ctx P -> exp P -> typ P -> sub P -> env P -> Prop :=
+| glu_rel_exp_with_sub_unsorted_top_sort :
+  `{ forall typ_rel exp_rel,
+        (forall s', Ax P s s' -> False) ->
+        (A = {{{ Sort@s }}}) ->
+        (a = d{{{ Sort@s }}}) ->
+        {{ ⟦ M ⟧ ρ ↘ m }} ->
+        {{ DG a ∈ glu_typ_elem pred_P None ↘ typ_rel ↘ exp_rel }} ->
+        {{ Δ ⊢ M[σ] : Sort@s ® m ∈ exp_rel }} ->
+        glu_rel_exp_with_sub_unsorted pred_P None Δ M A σ ρ }
+| glu_rel_exp_with_sub_unsorted_sorted :
+  `{ forall typ_rel exp_rel,
+        {{ ⟦ A ⟧ ρ ↘ a }} ->
+        {{ ⟦ M ⟧ ρ ↘ m }} ->
+        {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
+        {{ Δ ⊢ M[σ] : A[σ] ® m ∈ exp_rel }} ->
+        glu_rel_exp_with_sub_unsorted pred_P (Some s) Δ M A σ ρ }.
+
+
+Definition glu_rel_exp_resp_sub_env_unsorted {P} (pred_P : PredicativeSig P) so Sb M A :=
+  forall Δ σ ρ,
+    {{ Δ ⊢s σ ® ρ ∈ Sb }} ->
+    glu_rel_exp_with_sub_unsorted pred_P so Δ M A σ ρ.
+Arguments glu_rel_exp_resp_sub_env_unsorted {P} pred_P so Sb M A/.
+
+Definition glu_rel_exp_unsorted {P} (pred_P : PredicativeSig P) so Γ M A : Prop :=
+  exists Sb,
+    {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} /\
+      forall Δ σ ρ,
+        {{ Δ ⊢s σ ® ρ ∈ Sb }} ->
+        glu_rel_exp_with_sub_unsorted pred_P so Δ M A σ ρ.
+Arguments glu_rel_exp_unsorted {P} pred_P so Γ M A/.
+
+
+(** Logical relation for types *)
+Definition glu_rel_typ {P} (pred_P : PredicativeSig P) s Γ A : Prop :=
+  exists Sb,
+    {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} /\
+      forall Δ σ ρ,
+        {{ Δ ⊢s σ ® ρ ∈ Sb }} ->
+        glu_rel_typ_with_sub pred_P s Δ A σ ρ.
+
+
+Inductive glu_rel_typ_with_sub_unsorted {P} (pred_P : PredicativeSig P) : SortOption P -> ctx P -> typ P -> sub P -> env P -> Prop :=
+| glu_rel_typ_with_sub_unsorted_top_sort :
+  `{ forall typ_rel exp_rel,
+        (A = {{{ Sort@s }}}) ->
+        (a = d{{{ Sort@s }}}) ->
+        {{ DG a ∈ glu_typ_elem pred_P None ↘ typ_rel ↘ exp_rel }} ->
+        glu_rel_typ_with_sub_unsorted pred_P Nonce Δ A σ ρ }
+| glu_rel_typ_with_sub_unsorted_sorted :
+  `{ forall typ_rel exp_rel,
+        {{ ⟦ A ⟧ ρ ↘ a }} ->
+        {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
+        {{ Δ ⊢ A[σ] ® typ_rel }} ->
+        glu_rel_typ_with_sub_unsorted pred_P (Some s) Δ A σ ρ }.
+
+
+Definition glu_rel_typ_unsorted {P} (pred_P : PredicativeSig P) so Γ A : Prop :=
+  exists Sb,
+    {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} /\
+      forall Δ σ ρ,
+        {{ Δ ⊢s σ ® ρ ∈ Sb }} ->
+        glu_rel_typ_with_sub pred_P so Δ A σ ρ.
+
+
+
 Notation "⟪ pred_P ⟫ ⊩ Γ" := (glu_rel_ctx pred_P Γ) (in custom judg at level 80, pred_P constr at level 0, Γ custom exp).
-Notation "⟪ pred_P ⟫ Γ ⊩ M : A > s" := (glu_rel_exp pred_P s Γ M A) (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, M custom exp, A custom exp, s custom exp).
-Notation "⟪ pred_P ⟫ Γ ⊩ A > s" := (glu_rel_typ pred_P s Γ A) (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, A custom exp, s custom exp).
 Notation "⟪ pred_P ⟫ Γ ⊩s τ : Γ'" := (glu_rel_sub pred_P Γ τ Γ') (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, τ custom exp, Γ' custom exp).
+Notation "⟪ pred_P ⟫ Γ ⊩ M : A '@' s" := (glu_rel_exp pred_P s Γ M A) (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, M custom exp, A custom exp, s custom exp).
+Notation "⟪ pred_P ⟫ Γ ⊩u M : A '@' so" := (glu_rel_exp_unsorted pred_P so Γ M A) (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, M custom exp, A custom exp, so custom exp).
+Notation "⟪ pred_P ⟫ Γ ⊩ A '@' s" := (glu_rel_typ pred_P s Γ A) (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, A custom exp, s custom exp).
+Notation "⟪ pred_P ⟫ Γ ⊩u A '@' so" := (glu_rel_typ_unsorted pred_P so Γ A) (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, A custom exp, so custom exp).

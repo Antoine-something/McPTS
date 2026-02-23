@@ -727,7 +727,7 @@ Ltac destruct_glu_rel_typ_with_sub :=
 
 Lemma glu_rel_exp_clean_inversion1 {P} (pred_P : PredicativeSig P) : forall {s Γ Sb M A},
     {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩ M : A > s}} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩ M : A @ s}} ->
     forall Δ σ ρ,
       {{ Δ ⊢s σ ® ρ ∈ Sb }} ->
       glu_rel_exp_with_sub pred_P s Δ M A σ ρ.
@@ -741,8 +741,8 @@ Qed.
 
 Lemma glu_rel_exp_clean_inversion2 {P} (pred_P : PredicativeSig P) : forall {s s' Γ Sb M A},
     {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩ A : Sort@s > s' }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩ M : A > s }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩ A : Sort@s @ s' }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩ M : A @ s }} ->
     glu_rel_exp_resp_sub_env pred_P s Sb M A.
 Proof.
   simpl.
@@ -772,7 +772,7 @@ Ltac invert_glu_rel_exp H :=
 
 
 Lemma glu_rel_exp_to_wf_exp {P} (pred_P : PredicativeSig P) : forall {s Γ A M},
-    {{ ⟪ pred_P ⟫ Γ ⊩ M : A > s }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩ M : A @ s }} ->
     {{ Γ ⊢ M : A }}.
 Proof.
   intros * [Sb].
@@ -915,7 +915,7 @@ Hint Resolve glu_rel_exp_preserves_lvl : mcpts.
 
 Ltac saturate_syn_judge1 :=
   match goal with
-  | H : {{ ⟪ ?pred_P ⟫ ^?Γ ⊩ ^?M : ^?A > ^?s }} |- _ =>
+  | H : {{ ⟪ ?pred_P ⟫ ^?Γ ⊩ ^?M : ^?A @ ^?s }} |- _ =>
       assert {{ Γ ⊢ M : A }} by mauto; fail_if_dup
   | H : {{ ⟪ ?pred_P ⟫ ^?Γ ⊩s ^?τ : ^?Γ' }} |- _ =>
       assert {{ Γ ⊢s τ : Γ' }} by mauto; fail_if_dup
@@ -927,7 +927,7 @@ Ltac saturate_syn_judge :=
 
 Ltac invert_sem_judge1 :=
   match goal with
-  | H : {{ ⟪ ?pred_P ⟫ ^?Γ ⊩ ^?M : ^?A > ^?s }} |- _ =>
+  | H : {{ ⟪ ?pred_P ⟫ ^?Γ ⊩ ^?M : ^?A @ ^?s }} |- _ =>
       invert_glu_rel_exp H
   | H : {{ ⟪ ?pred_P ⟫ ^?Γ ⊩s ^?τ : ^?Γ' }} |- _ =>
       invert_glu_rel_sub H
@@ -939,7 +939,7 @@ Ltac invert_sem_judge :=
 
 
 Lemma glu_rel_exp_typ_well_sorted {P} (pred_P : PredicativeSig P) : forall {Γ M A s},
-    {{ ⟪ pred_P ⟫ Γ ⊩ M : A > s }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩ M : A @ s }} ->
     {{ Γ ⊢ A : Sort@s }}.
 Proof.
   intros.
@@ -987,7 +987,7 @@ Qed.
 
 
 Lemma glu_rel_exp_sort_implies_ax {P} (pred_P : PredicativeSig P) : forall {Γ A s s'},
-    {{ ⟪ pred_P ⟫ Γ ⊩ A: Sort@s > s' }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩ A: Sort@s @ s' }} ->
     Ax P s s'.
 Proof.
   intros.
