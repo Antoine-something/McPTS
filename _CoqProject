@@ -54,8 +54,8 @@ theories/Core/Soundness/LogicalRelation/Core.v
 theories/Core/Soundness/Realizability.v
 theories/Core/Soundness/LogicalRelation/Lemmas.v
 theories/Core/Soundness/LogicalRelation.v
-# theories/Core/Soundness/ContextCases.v
-# theories/Core/Soundness/TermStructureCases.v
+theories/Core/Soundness/ContextCases.v
+theories/Core/Soundness/TermStructureCases.v
 # theories/Core/Soundness/SortCases.v
 # theories/Core/Soundness/SubstitutionCases.v
 # theories/Core/Soundness/FunctionCases.v

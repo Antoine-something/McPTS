@@ -1001,3 +1001,66 @@ Proof.
   invert_glu_sort_elem H8.
   eassumption.
 Qed.
+
+
+
+(** Lemmas for unsorted logical relations *)
+Lemma glu_rel_exp_implies_glu_rel_exp_unsorted {P} (pred_P : PredicativeSig P) : forall {Γ M A s},
+    {{ ⟪ pred_P ⟫ Γ ⊩ M : A @ s }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩u M : A @ ^(Some s) }}.
+Proof.
+  intros * [SbΓ []].
+  eexists; split; [eassumption |].
+  intros.
+  destruct (H0 Δ σ ρ H1).
+  econstructor; mauto 3.
+Qed.
+
+#[export]
+Hint Resolve glu_rel_exp_implies_glu_rel_exp_unsorted : mcpts.
+
+Lemma glu_rel_exp_unsorted_implies_glu_rel_exp {P} (pred_P : PredicativeSig P) : forall {Γ M A s},
+    {{ ⟪ pred_P ⟫ Γ ⊩u M : A @ ^(Some s) }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩ M : A @ s }}.
+Proof.
+  intros * [SbΓ []].
+  eexists; split; [eassumption |].
+  intros.
+  pose proof (H0 Δ σ ρ H1).
+  inversion_clear H2.
+  econstructor; mauto 3.
+Qed.
+
+#[export]
+Hint Resolve glu_rel_exp_unsorted_implies_glu_rel_exp : mcpts.
+
+
+Lemma glu_rel_typ_implies_glu_rel_typ_unsorted {P} (pred_P : PredicativeSig P) : forall {Γ A s},
+    {{ ⟪ pred_P ⟫ Γ ⊩ A @ s }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩u A @ ^(Some s) }}.
+Proof.
+  intros *[SbΓ []].
+  eexists; split; [eassumption|].
+  intros.
+  destruct (H0 Δ σ ρ H1).
+  econstructor; mauto 3.
+Qed.
+
+#[export]
+Hint Resolve glu_rel_typ_implies_glu_rel_typ_unsorted : mcpts.
+
+Lemma glu_rel_typ_unsorted_implies_glu_rel_typ {P} (pred_P : PredicativeSig P) : forall {Γ A s},
+    {{ ⟪ pred_P ⟫ Γ ⊩u A @ ^(Some s) }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩ A @ s }}.
+Proof.
+  intros *[SbΓ []].
+  eexists; split; [eassumption|].
+  intros.
+  pose proof (H0 Δ σ ρ H1).
+  inversion_clear H2.
+  econstructor; mauto 3.
+Qed.
+
+#[export]
+Hint Resolve glu_rel_typ_unsorted_implies_glu_rel_typ : mcpts.
+

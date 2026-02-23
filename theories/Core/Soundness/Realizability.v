@@ -420,10 +420,11 @@ Proof.
   destruct 1; subst.
   - repeat split; intros.
     + simpl_glu_rel; econstructor; mauto 3.
-    + inversion_clear H3.
-      inversion_clear H6.
+    + inversion_clear H2.
+      inversion_clear H1.
+      inversion_clear H4.
       handle_functional_glu_sort_elem P.
-      simpl in H7.
+      simpl in H5.
       simpl.
       split; mauto 2.
       do 2 eexists; split.
@@ -432,18 +433,18 @@ Proof.
         split; [subst; mauto 2|].
         intros.
         subst.
-        eapply H9; mauto 3.
+        eapply H7; mauto 3.
     + simpl_glu_rel.
       assert {{ Γ ⊢ M ® glu_typ_top pred_P s m }} by mauto 3.
-      destruct H8.
+      destruct H7.
       subst.
       econstructor; mauto 2.
-      * inversion_clear H2.
+      * inversion_clear H1.
         simpl_glu_rel.
         reflexivity.
       * intros.
-        inversion_clear H11.
-        eapply H10; mauto 2.        
+        inversion_clear H10.
+        eapply H9; mauto 2.        
 
   - assert (glu_sort_elem pred_P s typ_rel exp_rel a) by eassumption. 
     eapply realize_glu_sort_elem_gen in H0.
