@@ -1064,3 +1064,178 @@ Qed.
 #[export]
 Hint Resolve glu_rel_typ_unsorted_implies_glu_rel_typ : mcpts.
 
+
+(** Lemmas for unsorted relations *)
+Add Parametric Morphism {P} (pred_P : PredicativeSig P) so a Γ A M : (glu_elem_bot_unsorted pred_P so a Γ A M)
+    with signature per_bot ==> iff as glu_elem_bot_unsorted_morphism_iff4.
+Proof.
+  intros m m' Hmm' *.
+  split; inversion_clear 1;
+    econstructor; mauto 3;
+    intros;
+    specialize (Hmm' (length Δ)) as [? []];
+    specialize (H3 (length Δ)) as [? []];
+    functional_read_rewrite_clear;
+    mauto 3.
+Qed.
+
+
+Add Parametric Morphism {P} (pred_P : PredicativeSig P) so a Γ A M R (H : per_typ_elem pred_P R a a) : (glu_elem_top_unsorted pred_P so a Γ A M)
+    with signature R ==> iff as glu_elem_top_unsorted_morphism_iff4.
+Proof.
+  intros m m' Hmm' *.
+  split; inversion_clear 1.
+  all: (econstructor; mauto 3;
+        pose proof (per_typ_elem_then_per_top H Hmm') as Hmm'';
+        [try (etransitivity; mauto 3) |];
+        intros;
+        specialize (Hmm'' (length Δ)) as [? []];
+        functional_read_rewrite_clear;
+        mauto 3).
+Qed.
+
+
+Lemma glu_typ_elem_exp_unique_upto_exp_eq {P} (pred_P : PredicativeSig P) : forall {so a typ_rel typ_rel' exp_rel exp_rel' Γ A A' M M' m},
+    {{ DG a ∈ glu_typ_elem pred_P so ↘ typ_rel ↘ exp_rel }} ->
+    {{ DG a ∈ glu_typ_elem pred_P so ↘ typ_rel' ↘ exp_rel' }} ->
+    {{ Γ ⊢ M : A ® m ∈ exp_rel }} ->
+    {{ Γ ⊢ M' : A' ® m ∈ exp_rel' }} ->
+    {{ Γ ⊢ M ≈ M' : A }}.
+Proof.
+  inversion_clear 1; inversion_clear 1; intros.
+  - simpl_glu_rel.
+    subst.
+    mauto 3.
+  - mauto 3.
+Qed.
+
+#[export]
+Hint Resolve glu_typ_elem_exp_unique_upto_exp_eq : mcpts.
+
+Lemma glu_typ_elem_exp_unique_upto_exp_eq' {P} (pred_P : PredicativeSig P) : forall {so a typ_rel exp_rel Γ A A' M M' m},
+    {{ DG a ∈ glu_typ_elem pred_P so ↘ typ_rel ↘ exp_rel }} ->
+    {{ Γ ⊢ M : A ® m ∈ exp_rel }} ->
+    {{ Γ ⊢ M' : A' ® m ∈ exp_rel }} ->
+    {{ Γ ⊢ M ≈ M' : A }}.
+Proof. mautosolve 4. Qed.
+
+#[export]
+Hint Resolve glu_typ_elem_exp_unique_upto_exp_eq' : mcpts.
+
+
+Lemma glu_typ_elem_per_typ_iff {P} (pred_P : PredicativeSig P) : forall {so a a' typ_rel typ_rel' exp_rel exp_rel'},
+    {{ Dom a ≈ a' ∈ per_typ pred_P }} ->
+    {{ DG a ∈ glu_typ_elem pred_P so ↘ typ_rel ↘ exp_rel }} ->
+    {{ DG a' ∈ glu_typ_elem pred_P so ↘ typ_rel' ↘ exp_rel' }} ->
+    (typ_rel <∙> typ_rel') /\ (exp_rel <∙> exp_rel').
+Proof.
+  inversion 2; subst.
+  - destruct H as [R].
+    pose proof (per_typ_elem_then_per_top_typ H) as Haa'.
+    specialize (Haa' 0) as [? []].
+    inversion H3; subst.
+    inversion H4; subst.
+    inversion_clear 1.
+    split; etransitivity; [| symmetry | | symmetry]; mauto 2.
+  - inversion_clear 1.
+    eapply glu_sort_elem_per_typ_iff; mauto 2.
+Qed.
+
+
+Lemma glu_rel_exp_unsorted_clean_inversion1 {P} (pred_P : PredicativeSig P) : forall {so Γ Sb M A},
+    {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩u M : A @ so }} ->
+    forall Δ σ ρ,
+      {{ Δ ⊢s σ ® ρ ∈ Sb }} ->
+      glu_rel_exp_with_sub_unsorted pred_P so Δ M A σ ρ.
+Proof.
+  intros * ? [].
+  destruct_conjs.
+  intros.
+  handle_functional_glu_ctx_env P.
+  mauto.
+Qed.
+
+Lemma glu_rel_exp_unsorted_clean_inversion2 {P} (pred_P : PredicativeSig P) : forall {s so Γ Sb M A},
+    {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩u A : Sort@s @ so }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩u M : A @ ^(Some s) }} ->
+    glu_rel_exp_resp_sub_env_unsorted pred_P (Some s) Sb M A.
+Proof.
+  simpl.
+  intros * ? HA HM.
+  intros.
+  eapply (glu_rel_exp_unsorted_clean_inversion1 pred_P H) in HA; [| eassumption].
+  eapply (glu_rel_exp_unsorted_clean_inversion1 pred_P H) in HM; [| eassumption].
+  inversion_clear HM.
+  assert (typ_rel Δ {{{ A[σ] }}}) by (eapply glu_sort_elem_trm_typ; mauto 3).
+  inversion_clear HA.
+  - inversion H6; subst.
+    inversion_clear H9.
+    simplify_evals.
+    simpl_glu_rel.
+    handle_functional_glu_sort_elem P.
+    econstructor; mauto 3.
+  - simplify_evals.
+    match_by_head (@glu_sort_elem P) ltac:(fun H => directed invert_glu_sort_elem H).
+    apply_predicate_equivalence.
+    unfold sort_glu_exp_pred' in *.
+    unfold glu_sort_typ_rec in *.
+    destruct_conjs.
+    handle_functional_glu_sort_elem P.
+    econstructor; mauto 3.
+Qed.
+
+#[global]
+Ltac invert_glu_rel_exp_unsorted H :=
+  (unshelve eapply (glu_rel_exp_unsorted_clean_inversion2 _ _ _ _ _ _) in H; shelve_unifiable; [eassumption | eassumption |];
+   simpl in H)
+  + (unshelve eapply (glu_rel_exp_unsorted_clean_inversion1 _ _ _ _ _) in H; shelve_unifiable; [eassumption |];
+     destruct H as [])
+  + (inversion H as [? [? [? ?]]]; subst).
+
+
+Ltac destruct_glu_rel_exp_with_sub_unsorted :=
+  repeat
+    match goal with
+    | H : (forall Δ σ ρ, {{ Δ ⊢s σ ® ρ ∈ ?sub_glu_rel }} -> glu_rel_exp_with_sub_unsorted _ _ _ _ _ _ _) |- _ =>
+        destruct_glu_rel_by_assumption sub_glu_rel H; fail_if_dup; mark H
+    | H : glu_rel_exp_with_sub_unsorted _ _ _ _ _ _ _ |- _ =>
+        dependent destruction H
+    end;
+  unmark_all.
+
+
+Ltac destruct_glu_rel_typ_with_sub_unsorted :=
+  repeat
+    match goal with
+    | H : (forall Δ σ ρ, {{ Δ ⊢s σ ® ρ ∈ ?sub_glu_rel }} -> glu_rel_typ_with_sub_unsorted _ _ _ _ _ _) |- _ =>
+        destruct_glu_rel_by_assumption sub_glu_rel H; fail_if_dup; mark H
+    | H : glu_rel_typ_with_sub_unsorted _ _ _ _ _ _ |- _ =>
+        dependent destruction H
+    end;
+  unmark_all.
+
+
+Lemma glu_rel_exp_unsorted_to_wf_exp {P} (pred_P : PredicativeSig P) : forall {so Γ A M},
+    {{ ⟪ pred_P ⟫ Γ ⊩u M : A @ so }} ->
+    {{ Γ ⊢ M : A }}.
+Proof.
+  intros * [Sb].
+  destruct_conjs.
+  assert (exists env_rel, {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }}) as [env_rel] by mauto 3.
+  assert (exists ρ ρ', initial_env Γ ρ /\ initial_env Γ ρ' /\ {{ Dom ρ ≈ ρ' ∈ env_rel }}) as [ρ] by mauto using per_ctx_then_per_env_initial_env.
+  destruct_conjs.
+  functional_initial_env_rewrite_clear.
+  assert {{ Γ ⊢s Id ® ρ ∈ Sb }} by (eapply initial_env_glu_rel_exp; mauto 3).
+  assert (glu_rel_exp_with_sub_unsorted pred_P so Γ M A {{{ Id }}} ρ) by mauto 3.
+  dependent destruction H4.
+  - inversion_clear H8.
+    simpl_glu_rel.
+    enough {{ Γ ⊢ M[Id] : Sort@s }} as HId; mauto 3 using glu_sort_elem_trm_escape.
+    eapply glu_sort_elem_sort_lvl; mauto 2.
+  - enough {{ Γ ⊢ M[Id] : A[Id] }} as HId; mauto 3 using glu_sort_elem_trm_escape.    
+Qed.
+
+#[export]
+Hint Resolve glu_rel_exp_unsorted_to_wf_exp : mcpts.

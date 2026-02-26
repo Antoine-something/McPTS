@@ -183,17 +183,17 @@ Qed.
 Hint Resolve glu_rel_exp_sub : mcpts.
 
 
-Lemma glu_rel_exp_sub_unsorted {P} (pred_P : PredicativeSig P) : forall {Γ σ Δ M A s},
+Lemma glu_rel_exp_sub_typ_unsorted {P} (pred_P : PredicativeSig P) : forall {Γ σ Δ M A s},
     {{ ⟪ pred_P ⟫ Γ ⊩s σ : Δ }} ->
-    {{ ⟪ pred_P ⟫ Δ ⊩ M : A @ s }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩ M[σ] : A[σ] @ s }}.
+    {{ ⟪ pred_P ⟫ Δ ⊩u M : A @ ^(Some s) }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩u M[σ] : A[σ] @ ^(Some s) }}.
 Proof.
   intros * Hσ HM.
   assert {{ Γ ⊢s σ : Δ }} by mauto 3.
   assert {{ Δ ⊢ M : A }} by mauto 3.
   assert {{ ⟪ pred_P ⟫ Δ ⊩u A : Sort@s @ ^None }} by mauto 3.
   destruct Hσ as [SbΓ [SbΔ]].
-  destruct_conjs.
+  destruct_conjs.  
   inversion_clear HM as [? []].
   assert {{ Δ ⊢ A : Sort@s }} by mauto 3.
   eexists; split; mauto.
@@ -201,7 +201,8 @@ Proof.
   destruct_glu_rel_sub_with_sub.
   handle_functional_glu_ctx_env P.
   rewrite <- H12 in H10.
-  destruct_glu_rel_exp_with_sub.
+  assert (glu_rel_exp_with_sub_unsorted pred_P (Some s) Δ' M A {{{ σ∘τ }}} ρ') by mauto 3.
+  inversion_clear H3.
   assert {{ Dom a ≈ a ∈ per_sort pred_P s }} as [] by mauto.
   econstructor; mauto.
 
@@ -211,7 +212,42 @@ Proof.
 Qed.
 
 #[export]
-Hint Resolve glu_rel_exp_sub_unsorted : mcpts.
+Hint Resolve glu_rel_exp_sub_typ_unsorted : mcpts.
+
+Lemma glu_rel_exp_sub_sort_unsorted {P} (pred_P : PredicativeSig P) : forall {Γ σ Δ M A},
+    {{ ⟪ pred_P ⟫ Γ ⊩s σ : Δ }} ->
+    {{ ⟪ pred_P ⟫ Δ ⊩u M : A @ ^None }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩u M[σ] : A @ ^None }}.
+Proof.
+  intros * Hσ HM.
+  assert {{ Γ ⊢s σ : Δ }} by mauto 3.
+  assert {{ Δ ⊢ M : A }} by mauto 3.
+  (* assert {{ ⟪ pred_P ⟫ Δ ⊩u A : Sort@s @ ^None }} by mauto 3. *)
+  destruct Hσ as [SbΓ [SbΔ]].
+  destruct_conjs.  
+  inversion_clear HM as [? []].
+  (* assert {{ Δ ⊢ A : Sort@s }} by mauto 3. *)
+  eexists; split; mauto.
+  intros Δ' τ ρ ?.
+  destruct_glu_rel_sub_with_sub.
+  handle_functional_glu_ctx_env P.
+  rewrite <- H10 in H8.
+  assert (glu_rel_exp_with_sub_unsorted pred_P None Δ' M A {{{ σ∘τ }}} ρ') by mauto 3.
+  inversion_clear H2.
+  inversion H13; subst.
+  simpl_glu_rel.
+  inversion H19; subst.
+  econstructor; mauto 3.
+  eapply H15.
+  split; [reflexivity |].
+  do 2 eexists; split; mauto 3.
+
+  assert {{ Δ' ⊢ M[σ∘τ] ≈ M[σ][τ] : Sort@s }} as <- by mauto 3.
+  eassumption.
+Qed.
+
+#[export]
+Hint Resolve glu_rel_exp_sub_sort_unsorted : mcpts.
 
 
 Lemma glu_rel_exp_conv {P} (pred_P : PredicativeSig P) : forall {Γ M A A' s},
