@@ -114,9 +114,42 @@ Ltac invert_glu_rel_exp H :=
    simpl in H)
   + invert_glu_rel_exp_old H.
 
+Lemma glu_rel_exp_unsorted_clean_inversion2' {P} (pred_P : PredicativeSig P) : forall {s so Γ Sb M},
+    {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩u M : Sort@s @ so }} ->
+    glu_rel_exp_resp_sub_env_unsorted pred_P so Sb M {{{ Sort@s }}}.
+Proof.
+  intros * ? HM.
+  destruct so.
+  - destruct HM as [SbΓ []].
+    simpl.
+    intros.
+    handle_functional_glu_ctx_env P.
+    assert (glu_rel_exp_with_sub_unsorted pred_P None Δ M {{{ Sort@s }}} σ ρ) by mauto 2.
+    dependent destruction H.
+    inversion H5; subst.
+    simpl_glu_rel.
+    econstructor; mauto 3.
+    eapply H7.
+    split; [reflexivity|].
+    repeat eexists; mauto 2.
+  - assert {{ ⟪ pred_P ⟫ Γ ⊩u Sort@s : Sort@s0 @ ^None }} by mauto 3.
+    eapply glu_rel_exp_unsorted_clean_inversion2 in HM; mauto 3.
+Qed.
+
+#[local]
+Ltac invert_glu_rel_exp_unsorted_old H :=
+  invert_glu_rel_exp_unsorted H.
+
+#[global]
+Ltac invert_glu_rel_exp_unsorted H :=
+  (unshelve eapply (glu_rel_exp_unsorted_clean_inversion2' _ _ _ _ _ _) in H; shelve_unifiable; [eassumption |];
+   simpl in H)
+  + invert_glu_rel_exp_unsorted_old H.
 
 
-Lemma glu_rel_exp_sub_typ {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {s' Γ σ Δ s A},
+
+Lemma glu_rel_exp_sub_typ {P} (pred_P : PredicativeSig P) : forall {s' Γ σ Δ s A},
     {{ ⟪ pred_P ⟫ Γ ⊩s σ : Δ }} ->
     {{ ⟪ pred_P ⟫ Δ ⊩ A : Sort@s @ s' }} ->
     {{ ⟪ pred_P ⟫ Γ ⊩ A[σ] : Sort@s @ s' }}.
@@ -154,29 +187,35 @@ Lemma glu_rel_exp_sub_typ_unsorted {P} (pred_P : PredicativeSig P) : forall {so 
     {{ ⟪ pred_P ⟫ Γ ⊩u A[σ] : Sort@s @ so }}.
 Proof.
   intros.
-  assert {{ Γ ⊢s σ : Δ }} by mauto 3.
-  assert {{ ⟪ pred_P ⟫ Γ ⊩u A[σ] : Sort@s[σ] @ so }} by mauto 4.
-  
-  simpl in H2.
-  destruct_conjs.
-  eexists.
-  split; mauto.
-  intros.
-  assert (glu_rel_exp_with_sub pred_P s' Δ0 {{{ A[σ] }}} {{{ Sort@s[σ] }}} σ0 ρ) by mauto.
-  dependent destruction H6.
-  simplify_evals.
-  econstructor; mauto.
+  destruct so.
+  - assert {{ Δ ⊢ A : Sort@s }} by mauto 3.
+    assert {{ Γ ⊢s σ : Δ }} by mauto 3.
+    destruct H as [SbΓ [? [? []]]].
+    destruct H0 as [SbΔ []].
+    handle_functional_glu_ctx_env P.
+    eexists; split; [eassumption |].
+    intros.
+    destruct_glu_rel_sub_with_sub.
+    rewrite <- H7 in H8.
+    assert (glu_rel_exp_with_sub_unsorted pred_P None Δ0 A {{{ Sort@s }}} {{{ σ∘σ0 }}} ρ') by mauto 2.
+    dependent destruction H9.
+    econstructor; mauto 3.
+    inversion_clear H12.
+    simpl_glu_rel.
+    repeat eexists; mauto 2.
+    assert {{ Δ0 ⊢s σ0 : Γ }} by mauto 3.
+    assert {{ Δ0 ⊢ M[σ∘σ0] ≈ M[σ][σ0] : Sort@s }} as <- by mauto 4.
+    eassumption.
 
-  assert {{ Δ0 ⊢ Sort@s[σ][σ0] : Sort@s' }} by (eapply glu_sort_elem_trm_sort_lvl; mauto 2).
+  - assert {{ ⟪ pred_P ⟫ Δ ⊩ A : Sort@s @ s0 }} by mauto 2.
+    assert {{ ⟪ pred_P ⟫ Γ ⊩ A[σ] : Sort@s @ s0 }} by mauto 2.
+    mauto 2.
+Qed.
 
-  assert {{ ⊢ Γ }} by mauto 2.
-  assert (Ax P s s') by (eapply glu_rel_exp_sort_implies_ax; mauto 2).
-  assert {{ Γ ⊢ Sort@s[σ] ≈ Sort@s : Sort@s' }} by mauto 4.  
-  assert {{ Δ0 ⊢ Sort@s[σ][σ0] ≈ Sort@s[σ0] : Sort@s' }} as <- by mauto 4.
-  eassumption.  
-  
+#[export]
+Hint Resolve glu_rel_exp_sub_typ_unsorted : mcpts.  
 
-Lemma glu_rel_typ_sort {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {Γ s s'},
+Lemma glu_rel_typ_sort {P} (pred_P : PredicativeSig P) : forall {Γ s s'},
     Ax P s s' ->
     {{ ⟪ pred_P ⟫ ⊩ Γ }} ->
     {{ ⟪ pred_P ⟫ Γ ⊩ Sort@s @ s' }}.
@@ -192,7 +231,20 @@ Qed.
 #[export]
 Hint Resolve glu_rel_typ_sort : mcpts.
 
-Lemma glu_rel_typ_sorted {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {Γ A s s'},
+
+Lemma glu_rel_typ_unsorted_sort {P} (pred_P : PredicativeSig P) : forall {Γ s s'},
+    Ax P s s' ->
+    {{ ⟪ pred_P ⟫ ⊩ Γ }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩u Sort@s @ ^(Some s') }}.
+Proof.
+  intros.
+  mauto 3.
+Qed.
+
+#[export]
+Hint Resolve glu_rel_typ_unsorted_sort : mcpts.
+
+Lemma glu_rel_typ_sorted {P} (pred_P : PredicativeSig P) : forall {Γ A s s'},
     {{ ⟪ pred_P ⟫ Γ ⊩ A : Sort@s @ s' }} ->
     {{ ⟪ pred_P ⟫ Γ ⊩ A @ s }}.
 Proof.
@@ -211,3 +263,29 @@ Qed.
 
 #[export]
 Hint Resolve glu_rel_typ_sorted : mcpts.
+
+
+Lemma glu_rel_typ_unsorted_sorted {P} (pred_P : PredicativeSig P) : forall {Γ A s so},
+    {{ ⟪ pred_P ⟫ Γ ⊩u A : Sort@s @ so }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩u A @ ^(Some s) }}.
+Proof.
+  intros * [SbΓ []].
+  eexists; split; mauto 2.
+  intros.
+  assert (glu_rel_exp_with_sub_unsorted pred_P so Δ A {{{ Sort@s }}} σ ρ) by mauto 2.
+  dependent destruction H2.
+  - inversion H5; subst.
+    simpl_glu_rel.    
+    econstructor; mauto 3.
+
+  - simplify_evals.
+    invert_glu_sort_elem H4.
+    unfold sort_glu_exp_pred' in *.
+    unfold glu_sort_typ_rec in *.
+    apply_predicate_equivalence.
+    destruct_conjs.
+    econstructor; mauto 3.
+Qed.
+
+#[export]
+Hint Resolve glu_rel_typ_unsorted_sorted : mcpts.
