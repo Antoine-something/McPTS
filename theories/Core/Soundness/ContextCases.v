@@ -40,18 +40,6 @@ Proof.
   destruct_conjs.
   eexists.
   econstructor; mauto 3; try reflexivity.
-  intros.
-  assert (glu_rel_exp_with_sub_unsorted pred_P so Δ A {{{ Sort@s }}} σ ρ) by mauto 3.
-  dependent destruction H4.
-  - inversion_clear H7.
-    simpl_glu_rel.
-    econstructor; mauto 3.
-  - simplify_evals.
-    invert_glu_sort_elem H6.
-    simpl_glu_rel.
-    unfold glu_sort_typ_rec in *.
-    destruct_conjs.
-    econstructor; mauto 3.
 Qed.
 
 #[export]

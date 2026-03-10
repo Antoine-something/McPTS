@@ -1194,12 +1194,25 @@ Ltac invert_glu_rel_exp_unsorted H :=
      destruct H as [])
   + (inversion H as [? [? [? ?]]]; subst).
 
+Ltac destruct_glu_rel_exp_unsorted_by_assumption sub_glu_rel H :=
+  repeat
+    match goal with
+    | H' : {{ ^?Δ ⊢s ^?σ ® ^?ρ ∈ ?sub_glu_rel0 }} |- _ =>
+        unify sub_glu_rel0 sub_glu_rel;
+        let H'' := fresh "H''" in
+        assert (glu_rel_exp_with_sub_unsorted _ _ _ _ _ _ _) as H'' by (eapply (H _ _ _ H'); mauto 3);
+        inversion_clear H'' as [];
+        subst;
+        destruct_conjs;
+        mark_with H' 1
+    end;
+  unmark_all_with 1.
 
 Ltac destruct_glu_rel_exp_with_sub_unsorted :=
   repeat
     match goal with
     | H : (forall Δ σ ρ, {{ Δ ⊢s σ ® ρ ∈ ?sub_glu_rel }} -> glu_rel_exp_with_sub_unsorted _ _ _ _ _ _ _) |- _ =>
-        destruct_glu_rel_by_assumption sub_glu_rel H; fail_if_dup; mark H
+        destruct_glu_rel_exp_unsorted_by_assumption sub_glu_rel H; fail_if_dup; mark H
     | H : glu_rel_exp_with_sub_unsorted _ _ _ _ _ _ _ |- _ =>
         dependent destruction H
     end;
@@ -1239,3 +1252,24 @@ Qed.
 
 #[export]
 Hint Resolve glu_rel_exp_unsorted_to_wf_exp : mcpts.
+
+
+Lemma glu_rel_exp_with_sub_unsorted_typ_implies_glu_rel_typ_with_sub {P} (pred_P : PredicativeSig P) : forall {so s Δ A σ ρ},
+    glu_rel_exp_with_sub_unsorted pred_P so Δ A {{{ Sort@s }}} σ ρ ->
+    glu_rel_typ_with_sub pred_P s Δ A σ ρ.
+Proof.
+  intros * H.
+  dependent destruction H.
+  - inversion H2; subst.
+    simpl_glu_rel.
+    econstructor; mauto 2.
+  - simplify_evals.
+    invert_glu_sort_elem H1.
+    unfold sort_glu_exp_pred' in H1.
+    unfold glu_sort_typ_rec in H1.
+    simpl_glu_rel.
+    econstructor; mauto 2.
+Qed.
+
+#[export]
+Hint Resolve glu_rel_exp_with_sub_unsorted_typ_implies_glu_rel_typ_with_sub : mcpts.

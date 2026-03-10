@@ -47,7 +47,7 @@ Qed.
 Hint Resolve presup_typ_glu_rel_exp : mcpts.
 
 
-Lemma presup_glu_rel_exp_unsorted {P} (pred_P : PredicativeSig P) : forall {s Γ M A},
+Lemma presup_glu_rel_exp_unsorted_typ {P} (pred_P : PredicativeSig P) : forall {s Γ M A},
     {{ ⟪ pred_P ⟫ Γ ⊩u M : A @ ^(Some s) }} ->
     {{ ⟪ pred_P ⟫ ⊩ Γ }} /\ {{ ⟪ pred_P ⟫ Γ ⊩u A : Sort@s @ ^None }}.
 Proof.
@@ -63,27 +63,58 @@ Proof.
     eapply glu_sort_elem_trm_typ; mauto 2.
 Qed.
 
-Lemma presup_ctx_glu_rel_exp_unsorted {P} (pred_P : PredicativeSig P) : forall {s Γ M A},
-    {{ ⟪ pred_P ⟫ Γ ⊩u M : A @ ^(Some s) }} ->
+Lemma presup_glu_rel_exp_unsorted_sort {P} (pred_P : PredicativeSig P) : forall {Γ M A},
+    {{ ⟪ pred_P ⟫ Γ ⊩u M : A @ ^None }} ->
+    {{ ⟪ pred_P ⟫ ⊩ Γ }} /\ (exists s, A = {{{ Sort@s }}}).
+Proof.
+  intros * [SbΓ []].
+  split; [eexists; eassumption |].
+
+  assert (exists env_relΓ, {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_relΓ }}) as [env_relΓ] by mauto 2.
+  assert (exists ρ ρ', initial_env Γ ρ /\ initial_env Γ ρ' /\ {{ Dom ρ ≈ ρ' ∈ env_relΓ }}) as [ρ [ρ' []]] by (eauto using per_ctx_then_per_env_initial_env).
+  assert {{ Γ ⊢s Id ® ρ ∈ SbΓ }} by (eapply initial_env_glu_rel_exp; mauto 2).
+  assert (glu_rel_exp_with_sub_unsorted pred_P None Γ M A {{{ Id }}} ρ) by mauto 2.
+  inversion_clear H5.
+  eauto.
+Qed.
+
+
+Lemma presup_ctx_glu_rel_exp_unsorted {P} (pred_P : PredicativeSig P) : forall {so Γ M A},
+    {{ ⟪ pred_P ⟫ Γ ⊩u M : A @ so }} ->
     {{ ⟪ pred_P ⟫ ⊩ Γ }}.
 Proof.
-  intros * []%presup_glu_rel_exp_unsorted;
+  intros *.
+  dependent destruction so.
+  - intros * []%presup_glu_rel_exp_unsorted_sort;
+    eassumption.
+  - intros * []%presup_glu_rel_exp_unsorted_typ;
     eassumption.
 Qed.
 
 #[export]
 Hint Resolve presup_ctx_glu_rel_exp_unsorted : mcpts.
 
-Lemma presup_typ_glu_rel_exp_unsorted {P} (pred_P : PredicativeSig P) : forall {s Γ M A},
+Lemma presup_typ_glu_rel_exp_unsorted_typ {P} (pred_P : PredicativeSig P) : forall {s Γ M A},
     {{ ⟪ pred_P ⟫ Γ ⊩u M : A @ ^(Some s) }} ->
     {{ ⟪ pred_P ⟫ Γ ⊩u A : Sort@s @ ^None }}.
 Proof.
-  intros * []%presup_glu_rel_exp_unsorted;
+  intros * []%presup_glu_rel_exp_unsorted_typ;
     eassumption.
 Qed.
 
 #[export]
-Hint Resolve presup_typ_glu_rel_exp_unsorted : mcpts.
+  Hint Resolve presup_typ_glu_rel_exp_unsorted_typ : mcpts.
+
+Lemma presup_typ_glu_rel_exp_unsorted_sort {P} (pred_P : PredicativeSig P) : forall {Γ M A},
+    {{ ⟪ pred_P ⟫ Γ ⊩u M : A @ ^None }} ->
+    exists s, A = {{{ Sort@s }}}.
+Proof.
+  intros * []%presup_glu_rel_exp_unsorted_sort;
+    eassumption.
+Qed.
+
+#[export]
+Hint Resolve presup_typ_glu_rel_exp_unsorted_sort : mcpts.
 
 
 
