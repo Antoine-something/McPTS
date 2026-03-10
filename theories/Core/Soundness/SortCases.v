@@ -232,7 +232,7 @@ Qed.
 Hint Resolve glu_rel_typ_sort : mcpts.
 
 
-Lemma glu_rel_typ_unsorted_sort {P} (pred_P : PredicativeSig P) : forall {Γ s s'},
+Lemma glu_rel_typ_unsorted_sort_ax {P} (pred_P : PredicativeSig P) : forall {Γ s s'},
     Ax P s s' ->
     {{ ⟪ pred_P ⟫ ⊩ Γ }} ->
     {{ ⟪ pred_P ⟫ Γ ⊩u Sort@s @ ^(Some s') }}.
@@ -242,7 +242,22 @@ Proof.
 Qed.
 
 #[export]
-Hint Resolve glu_rel_typ_unsorted_sort : mcpts.
+Hint Resolve glu_rel_typ_unsorted_sort_ax : mcpts.
+
+Lemma glu_rel_typ_unsorted_sort_none {P} (pred_P : PredicativeSig P) : forall {Γ s},
+    {{ ⟪ pred_P ⟫ ⊩ Γ }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩u Sort@s @ ^None}}.
+Proof.
+  intros * [SbΓ].
+  eexists; split; [eassumption |].
+  intros.
+  econstructor; try reflexivity.
+  econstructor; try reflexivity.
+Qed.
+
+#[export]
+Hint Resolve glu_rel_typ_unsorted_sort_none : mcpts.
+
 
 Lemma glu_rel_typ_sorted {P} (pred_P : PredicativeSig P) : forall {Γ A s s'},
     {{ ⟪ pred_P ⟫ Γ ⊩ A : Sort@s @ s' }} ->
@@ -289,3 +304,17 @@ Qed.
 
 #[export]
 Hint Resolve glu_rel_typ_unsorted_sorted : mcpts.
+
+
+Lemma glu_exp_with_sub_unsorted_typ_none {P} (pred_P : PredicativeSig P) : forall {Γ A s so},
+    {{ ⟪ pred_P ⟫ Γ ⊩u A : Sort@s @ so }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩u A : Sort@s @ ^None }}.
+Proof.
+  intros.
+  assert {{ ⟪ pred_P ⟫ ⊩ Γ }} by mauto 2.
+  assert {{ ⟪ pred_P ⟫ Γ ⊩u Sort@s @ ^None }} by mauto 3.
+  mauto 2.
+Qed.
+
+#[export]
+Hint Resolve glu_exp_with_sub_unsorted_typ_none : mcpts.

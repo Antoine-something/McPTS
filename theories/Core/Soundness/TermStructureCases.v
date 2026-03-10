@@ -444,4 +444,6 @@ Proof.
 Qed.
 
 #[export]
-Hint Resolve glu_rel_exp_conv_sort_unsorted : mcpts.
+Hint Resolve glu_rel_exp_conv_sort_unsorted : mcpts.  
+  
+  

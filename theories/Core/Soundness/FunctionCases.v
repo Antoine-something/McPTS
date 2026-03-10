@@ -119,7 +119,7 @@ Qed.
 Hint Resolve glu_rel_exp_pi : mcpts.
 
 
-Lemma glu_rel_exp_pi_unsorted {P} (pred_P : PredicativeSig P) : forall {Γ A B s1 s2 s3} {r : Ru P s1 s2 s3},
+Lemma glu_rel_exp_pi_unsorted' {P} (pred_P : PredicativeSig P) : forall {Γ A B s1 s2 s3} {r : Ru P s1 s2 s3},
     {{ ⟪ pred_P ⟫ Γ ⊩u A : Sort@s1 @ ^None }} ->
     {{ ⟪ pred_P ⟫ Γ, A@s1 ⊩u B : Sort@s2 @ ^None }} ->
     {{ ⟪ pred_P ⟫ Γ ⊩u Π r A B : Sort@s3 @ ^None }}.
@@ -216,8 +216,20 @@ Proof.
     eassumption.
 Qed.
 
+Lemma glu_rel_exp_pi_unsorted {P} (pred_P : PredicativeSig P) : forall {Γ A B s1 s2 s3 so1 so2} {r : Ru P s1 s2 s3},
+    {{ ⟪ pred_P ⟫ Γ ⊩u A : Sort@s1 @ so1 }} ->
+    {{ ⟪ pred_P ⟫ Γ, A@s1 ⊩u B : Sort@s2 @ so2 }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩u Π r A B : Sort@s3 @ ^None }}.
+Proof.
+  intros.
+  assert {{ ⟪ pred_P ⟫ Γ ⊩u A : Sort@s1 @ ^None }} by mauto 2.
+  assert {{ ⟪ pred_P ⟫ Γ, A@s1 ⊩u B : Sort@s2 @ ^None }} by mauto 2.
+  eapply glu_rel_exp_pi_unsorted'; mauto 2.
+Qed.
+  
 #[export]
 Hint Resolve glu_rel_exp_pi_unsorted : mcpts.
+
 
 Lemma glu_rel_exp_of_pi {P} (pred_P : PredicativeSig P) : forall {Γ M A B Sb s1 s2 s3} {r : Ru P s1 s2 s3},
     {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} ->
@@ -551,7 +563,7 @@ Proof.
     mauto 3.
 Qed.
 
-Lemma glu_rel_exp_fn_unsorted {P} (pred_P : PredicativeSig P) : forall {Γ M A B s1 s2 s3} {r : Ru P s1 s2 s3},
+Lemma glu_rel_exp_fn_unsorted' {P} (pred_P : PredicativeSig P) : forall {Γ M A B s1 s2 s3} {r : Ru P s1 s2 s3},
     {{ ⟪ pred_P ⟫ Γ ⊩u A : Sort@s1 @ ^None }} ->
     {{ ⟪ pred_P ⟫ Γ, A@s1 ⊩u M : B @ ^(Some s2) }} ->
     {{ ⟪ pred_P ⟫ Γ ⊩u λ r A M : Π r A B @ ^(Some s3) }}.
@@ -561,6 +573,16 @@ Proof.
   assert {{ ⟪ pred_P ⟫ ⊩ Γ }} by mauto 3.
   assert {{ ⟪ pred_P ⟫ ⊩ Γ, A@s1 }} by mauto 3.
   mauto 3 using glu_rel_exp_fn_helper_unsorted.
+Qed.
+
+Lemma glu_rel_exp_fn_unsorted {P} (pred_P : PredicativeSig P) : forall {Γ M A B s1 s2 s3 so1} {r : Ru P s1 s2 s3},
+    {{ ⟪ pred_P ⟫ Γ ⊩u A : Sort@s1 @ so1 }} ->
+    {{ ⟪ pred_P ⟫ Γ, A@s1 ⊩u M : B @ ^(Some s2) }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩u λ r A M : Π r A B @ ^(Some s3) }}.
+Proof.
+  intros.
+  assert {{ ⟪ pred_P ⟫ Γ ⊩u A : Sort@s1 @ ^None }} by mauto 2.
+  eapply glu_rel_exp_fn_unsorted'; mauto 2.
 Qed.
 
 #[export]
@@ -956,7 +978,7 @@ Proof.
   eapply glu_sort_elem_typ_unique_upto_exp_eq; revgoals; try eassumption.
 Qed.
 
-Lemma glu_rel_exp_app_unsorted {P} (pred_P : PredicativeSig P) : forall {Γ M N A B s1 s2 s3} {r : Ru P s1 s2 s3},
+Lemma glu_rel_exp_app_unsorted' {P} (pred_P : PredicativeSig P) : forall {Γ M N A B s1 s2 s3} {r : Ru P s1 s2 s3},
     {{ ⟪ pred_P ⟫ Γ, A@s1 ⊩u B : Sort@s2 @ ^None }} ->
     {{ ⟪ pred_P ⟫ Γ ⊩u M : Π r A B @ ^(Some s3) }} ->
     {{ ⟪ pred_P ⟫ Γ ⊩u N : A @ ^(Some s1) }} ->
@@ -973,5 +995,16 @@ Proof.
   mauto 2 using glu_rel_exp_app_helper_unsorted.
 Qed.
 
+Lemma glu_rel_exp_app_unsorted {P} (pred_P : PredicativeSig P) : forall {Γ M N A B s1 s2 s3 so2} {r : Ru P s1 s2 s3},
+    {{ ⟪ pred_P ⟫ Γ, A@s1 ⊩u B : Sort@s2 @ ^so2 }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩u M : Π r A B @ ^(Some s3) }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩u N : A @ ^(Some s1) }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊩u M N : B[Id,,N] @ ^(Some s2) }}.
+Proof.
+  intros.
+  assert {{ ⟪ pred_P ⟫ Γ, A@s1 ⊩u B : Sort@s2 @ ^None }} by mauto 2.
+  eapply glu_rel_exp_app_unsorted'; mauto 2.
+Qed.
+  
 #[export]
 Hint Resolve glu_rel_exp_app_unsorted : mcpts.
