@@ -118,7 +118,79 @@ Proof with mautosolve 4.
 Qed.
 
 #[export]
-Hint Resolve wf_vlookup_inversion : mcpts.
+  Hint Resolve wf_vlookup_inversion : mcpts.
+
+Lemma wf_nat_inversion {P} : forall {Γ : ctx P} {A},
+    {{ Γ ⊢ ℕ : A }} ->
+    exists s (r : Ru_nat P s),
+      {{ Γ ⊢ Sort@s ≈ A }}.
+Proof with mautosolve.
+  intros * H.
+  dependent induction H.
+  - eexists. mauto.
+  - specialize (IHwf_exp1 A0 ltac:(reflexivity) ltac:(reflexivity)).
+    destruct_conjs.
+    do 2 eexists. apply H3.
+    etransitivity; mauto.
+Qed.
+
+#[export]
+  Hint Resolve wf_nat_inversion : mcpts.
+
+Corollary wf_zero_inversion {P} : forall {Γ : ctx P} {A},
+    {{ Γ ⊢ zero : A }} ->
+    exists s (r : Ru_nat P s),
+      {{ Γ ⊢ ℕ ≈ A }}.
+Proof with mautosolve.
+  intros * H.
+  dependent induction H.
+  - eexists. mauto.
+  - specialize (IHwf_exp1 A0 ltac:(reflexivity) ltac:(reflexivity)).
+    destruct_conjs.
+    do 2 eexists. apply H3.
+    etransitivity; mauto.
+Qed.
+
+#[export]
+Hint Resolve wf_zero_inversion : mcpts.
+
+Corollary wf_succ_inversion {P} : forall {Γ : ctx P} {A M},
+    {{ Γ ⊢ succ M : A }} ->
+    {{ Γ ⊢ M : ℕ }} /\ {{ Γ ⊢ ℕ ≈ A }}.
+Proof with mautosolve.
+  intros * H.
+  dependent induction H.
+  - eexists; mautosolve.
+  - specialize (IHwf_exp1 A0 M ltac:(reflexivity) ltac:(reflexivity)).
+    destruct_conjs.
+    eexists. apply H3.
+    etransitivity; mauto.
+Qed.
+
+#[export]
+Hint Resolve wf_succ_inversion : mcpts.
+
+Lemma wf_natrec_inversion {P} : forall {Γ : ctx P} {s s' A M A' MZ MS},
+    {{ Γ ⊢ rec M return A' | zero -> MZ | succ -> MS end : A }} ->
+    {{ Γ ⊢ MZ : A'[Id,,zero] }} /\ {{ Γ, ℕ@s, A'@s' ⊢ MS : A'[Wk∘Wk,,succ(#1)] }} /\ {{ Γ ⊢ M : ℕ }} /\ {{ Γ ⊢ A'[Id,,M] ≈ A }}.
+Proof with mautosolve.
+  intros * H.
+  dependent induction H.
+  - (* do 3 (eexists; mauto). *)
+    (* eapply wf_typ_eq_refl. *)
+    (* assert {{ Γ, ℕ ⊢ A' }}; mauto 2. *)
+    (* assert {{ Γ ⊢s Id,,M : Γ, ℕ }} by mauto 4. *)
+  (* mauto 2. *)
+    admit.
+  - specialize (IHwf_exp1 s s' A0 M A' MZ MS ltac:(reflexivity) ltac:(reflexivity)).
+    destruct_conjs.
+    repeat split; mauto.
+Admitted.
+    
+#[export]
+Hint Resolve wf_natrec_inversion : mcpts.
+
+
   
 (** Here, we get a disjunction because we cannot know in advance if A' is a sort or not *)
 Lemma wf_exp_sub_inversion {P : PtsSig} : forall {Γ : ctx P} {M σ A},

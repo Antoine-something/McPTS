@@ -187,7 +187,48 @@ Proof.
 Qed.
 
 #[local]
-Hint Rewrite -> @sub_decompose_q using mauto : mcpts.
+  Hint Rewrite -> @sub_decompose_q using mauto : mcpts.
+
+
+Lemma exp_nat_sub_lhs {P} : forall {Γ : ctx P} {σ Δ s} {r : Ru_nat P s},
+    {{ Γ ⊢s σ : Δ }} ->
+    {{ Γ ⊢ ℕ[σ] }}.
+Proof.
+  intros; mauto 5.
+Qed.
+#[export]
+Hint Resolve exp_nat_sub_lhs : mcpts.
+
+Lemma exp_zero_sub_lhs {P} : forall {Γ : ctx P} {σ Δ s} {r : Ru_nat P s},
+    {{ Γ ⊢s σ : Δ }} ->
+    {{ Γ ⊢ zero[σ] : ℕ }}.
+Proof.
+  intros; mauto 4.
+Qed.
+#[export]
+Hint Resolve exp_zero_sub_lhs : mcpts.
+
+Lemma exp_succ_sub_lhs {P} : forall {Γ : ctx P} {σ Δ M s} {r : Ru_nat P s},
+    {{ Γ ⊢s σ : Δ }} ->
+    {{ Δ ⊢ M : ℕ }} ->
+    {{ Γ ⊢ (succ M)[σ] : ℕ }}.
+Proof.
+  intros; mauto 3.
+Qed.
+#[export]
+Hint Resolve exp_succ_sub_lhs : mpts.
+
+Lemma exp_succ_sub_rhs {P} : forall {Γ : ctx P} {σ Δ M s} {r : Ru_nat P s},
+    {{ Γ ⊢s σ : Δ }} ->
+    {{ Δ ⊢ M : ℕ }} ->
+    {{ Γ ⊢ succ (M[σ]) : ℕ }}.
+Proof.
+  intros; mauto 3.
+Qed.
+
+#[export]
+Hint Resolve exp_succ_sub_rhs : mcpts.
+
 
 
 Lemma sub_decompose_q_typ {P : PtsSig} : forall (Γ : ctx P) A B σ Δ Δ' τ M s s',
@@ -383,7 +424,53 @@ Proof.
 Qed.
 
 #[export]
-Hint Resolve exp_sub_decompose_double_q_with_id_double_extend : mcpts.
+  Hint Resolve exp_sub_decompose_double_q_with_id_double_extend : mcpts.
+
+Lemma exp_eq_natrec_cong_rhs_typ {P} : forall {Γ : ctx P} {M M' A A' s} {r : Ru_nat P s},
+    {{ Γ, ℕ@s ⊢ A ≈ A' }} ->
+    {{ Γ ⊢ M ≈ M' : ℕ }} ->
+    {{ Γ ⊢ A[Id,,M] ≈ A'[Id,,M'] }}.
+Proof.
+  intros.
+  gen_presups.
+  assert {{ Γ ⊢ ℕ[Id] ≈ ℕ }} by mauto 3.
+  assert {{ Γ ⊢ M ≈ M' : ℕ[Id] }} by mauto 3.
+  assert {{ Γ ⊢s Id,,M ≈ Id,,M' : Γ, ℕ@s }} by mauto 3.
+  mauto 5.
+Admitted.
+#[export]
+  Hint Resolve exp_eq_natrec_cong_rhs_typ : mcpts.
+
+Lemma exp_eq_nat_beta_succ_rhs_typ_gen {P} : forall {Γ : ctx P} {σ Δ A M N s s'} {r: Ru_nat P s},
+    {{ Γ ⊢s σ : Δ }} ->
+    {{ Δ, ℕ@s ⊢ A : Sort@s' }} ->
+    {{ Γ ⊢ M : ℕ }} ->
+    {{ Γ ⊢ N : A[σ,,M] }} ->
+    {{ Γ ⊢ A[Wk∘Wk,,succ #1][σ,,M,,N] ≈ A[σ,,succ M] }}.
+Proof.
+  intros.
+  assert {{ ⊢ Δ }} by mauto 3.
+  assert {{ Δ, ℕ@s ⊢s Wk : Δ }} by mauto 3.
+  assert {{ Δ, ℕ@s, A@s' ⊢s Wk : Δ, ℕ@s }} by mauto 4.
+  assert {{ Δ, ℕ@s, A@s' ⊢s Wk∘Wk : Δ }} by mauto 3.
+  assert {{ Δ, ℕ@s, A@s' ⊢s Wk∘Wk,,succ #1 : Δ, ℕ@s }} by mauto 4.
+  assert {{ Γ ⊢s σ,,M : Δ, ℕ@s }} by mauto 4.
+  assert {{ Γ ⊢s σ,,M,,N : Δ, ℕ@s, A@s' }} by mauto 3.
+  assert {{ Γ ⊢s σ,,M,,N : Δ, ℕ@s, A@s' }} by mauto 3.
+  autorewrite with mcpts.
+  assert {{ Γ ⊢s (Wk∘Wk,,succ #1)∘(σ,,M,,N) ≈ ((Wk∘Wk)∘(σ,,M,,N)),,(succ #1)[σ,,M,,N] : Δ, ℕ@s }} by mauto 4.
+  assert {{ Γ ⊢s (Wk∘Wk)∘(σ,,M,,N) ≈ Wk∘(Wk∘(σ,,M,,N)) : Δ }} by mauto 3.
+  assert {{ Γ ⊢s Wk∘(σ,,M,,N) ≈ σ,,M : Δ, ℕ@s }} by (autorewrite with mcpts; mauto 3).
+  assert {{ Γ ⊢s (Wk∘Wk)∘(σ,,M,,N) ≈ Wk∘(σ,,M) : Δ }} by (unshelve bulky_rewrite; constructor).
+  assert {{ Γ ⊢s (Wk∘Wk)∘(σ,,M,,N) ≈ σ : Δ }} by bulky_rewrite.
+  assert {{ Γ ⊢ (succ #1)[σ,,M,,N] ≈ succ (#1[σ,,M,,N]) : ℕ }} by mauto 3.
+  assert {{ Γ ⊢ (succ #1)[σ,,M,,N] ≈ succ (#0[σ,,M]) : ℕ }} by (bulky_rewrite; mauto 4).
+  assert {{ Γ ⊢ (succ #1)[σ,,M,,N] ≈ succ M : ℕ }} by (bulky_rewrite; mauto 3).
+  assert {{ Γ ⊢s (Wk∘Wk)∘(σ,,M,,N),,(succ #1)[σ,,M,,N] ≈ σ,,succ M : Δ, ℕ@s }} by mauto 3.
+  mauto 5.
+Admitted.
+#[export]
+Hint Resolve exp_eq_nat_beta_succ_rhs_typ_gen : mcpts.
 
 
 Lemma sub_eq_q_compose {P : PtsSig} : forall {Γ : ctx P} {A σ Δ τ Δ' s},
@@ -427,3 +514,23 @@ Qed.
 Hint Resolve sub_eq_q_compose : mcpts.
 #[export]
 Hint Rewrite -> @sub_eq_q_compose using mauto 4 : mcpts.
+
+Lemma sub_eq_q_compose_nat {P} : forall {Γ : ctx P} {σ Δ τ Δ' s} {r: Ru_nat P s},
+  {{ Δ ⊢s σ : Γ }} ->
+  {{ Δ' ⊢s τ : Δ }} ->
+  {{ Δ', ℕ@s ⊢s q σ∘q τ ≈ q (σ∘τ) : Γ, ℕ@s }}.
+Proof.
+  intros.
+  assert {{ Γ ⊢ ℕ : Sort@s }} by mauto 4.
+  assert {{ Δ' ⊢ ℕ[σ∘τ] ≈ ℕ }} by mauto 3.
+  assert {{ ⊢ Δ' }} by mauto 3.
+  assert {{ Δ' ⊢ ℕ : Sort@s }} by mauto 3.
+  assert {{ Δ' ⊢ ℕ[σ∘τ] : Sort@s }} by mauto 3.  
+  assert {{ ⊢ Δ', ℕ[σ∘τ]@s ≈ Δ', ℕ@s }} by (econstructor; mauto 4).
+  mautosolve 3.
+Qed.
+
+#[export]
+Hint Resolve sub_eq_q_compose_nat : mcpts.
+#[export]
+Hint Rewrite -> @sub_eq_q_compose_nat using mauto 4 : mcpts.

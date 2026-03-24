@@ -306,3 +306,81 @@ Proof.
   destruct_conjs.  
   econstructor; mauto 2.
 Qed.
+
+
+Corollary wf_exp_eq_nat_sub' {P} : forall {Γ : ctx P} {s} {r : Ru_nat P s}  σ Δ,
+    {{ Γ ⊢s σ : Δ }} ->
+    {{ Γ ⊢ ℕ[σ] ≈ ℕ }}.
+Proof.
+  intros.
+  mauto.
+Qed.
+
+#[export]
+Hint Resolve wf_exp_eq_nat_sub' : mcpts.
+#[export]
+Remove Hints wf_exp_eq_nat_sub : mcpts.
+
+
+Corollary wf_exp_eq_natrec_cong' {P} : forall {Γ : ctx P} {A A' MZ MZ' MS MS' M M' s s'} {r : Ru_nat P s},
+    {{ Γ, ℕ@s ⊢ A : Sort@s' }} ->
+    {{ Γ, ℕ@s ⊢ A' : Sort@s' }} ->
+    {{ Γ, ℕ@s ⊢ A ≈ A' }} ->
+    {{ Γ ⊢ MZ ≈ MZ' : A[Id,,zero] }} ->
+    {{ Γ, ℕ@s, A@s' ⊢ MS ≈ MS' : A[Wk∘Wk,,succ #1] }} ->
+    {{ Γ ⊢ M ≈ M' : ℕ }} ->
+    {{ Γ ⊢ rec M return A | zero -> MZ | succ -> MS end ≈ rec M' return A' | zero -> MZ' | succ -> MS' end : A[Id,,M] }}.
+Proof.
+  try impl_opt_constructor.
+Admitted.
+
+#[export]
+Hint Resolve wf_exp_eq_natrec_cong' : mcpts.
+#[export]
+Remove Hints wf_exp_eq_natrec_cong : mcpts.
+
+Corollary wf_exp_eq_natrec_sub' {P} : forall {Γ : ctx P} {σ Δ A MZ MS M s s'} {r : Ru_nat P s},
+    {{ Γ ⊢s σ : Δ }} ->
+    {{ Δ, ℕ@s ⊢ A : Sort@s' }} ->
+    {{ Δ ⊢ MZ : A[Id,,zero] }} ->
+    {{ Δ, ℕ@s, A@s' ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
+    {{ Δ ⊢ M : ℕ }} ->
+    {{ Γ ⊢ rec M return A | zero -> MZ | succ -> MS end[σ] ≈ rec M[σ] return A[q σ] | zero -> MZ[σ] | succ -> MS[q (q σ)] end : A[σ,,M[σ]] }}.
+Proof.
+  impl_opt_constructor.
+Qed.
+
+#[export]
+Hint Resolve wf_exp_eq_natrec_sub' : mcpts.
+#[export]
+Remove Hints wf_exp_eq_natrec_sub : mcpts.
+
+Corollary wf_exp_eq_nat_beta_zero' {P} : forall {Γ : ctx P} {A MZ MS s s'} {r : Ru_nat P s},
+    {{ Γ, ℕ@s ⊢ A : Sort@s' }} ->
+    {{ Γ ⊢ MZ : A[Id,,zero] }} ->
+    {{ Γ, ℕ@s, A@s' ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
+    {{ Γ ⊢ rec zero return A | zero -> MZ | succ -> MS end ≈ MZ : A[Id,,zero] }}.
+Proof.
+  impl_opt_constructor.
+Qed.
+
+#[export]
+Hint Resolve wf_exp_eq_nat_beta_zero' : mcpts.
+#[export]
+Remove Hints wf_exp_eq_nat_beta_zero : mcpts.
+
+
+Corollary wf_exp_eq_nat_beta_succ' {P} : forall {Γ : ctx P} {A MZ MS M s s'} {r : Ru_nat P s},
+    {{ Γ, ℕ@s ⊢ A : Sort@s' }} ->
+    {{ Γ ⊢ MZ : A[Id,,zero] }} ->
+    {{ Γ, ℕ@s, A@s' ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
+    {{ Γ ⊢ M : ℕ }} ->
+    {{ Γ ⊢ rec (succ M) return A | zero -> MZ | succ -> MS end ≈ MS[Id,,M,,rec M return A | zero -> MZ | succ -> MS end] : A[Id,,succ M] }}.
+Proof.
+  impl_opt_constructor.
+Qed.
+
+#[export]
+Hint Resolve wf_exp_eq_nat_beta_succ' : mcpts.
+#[export]
+Remove Hints wf_exp_eq_nat_beta_succ : mcpts.
