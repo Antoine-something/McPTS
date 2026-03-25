@@ -5,6 +5,7 @@ From McPTS.Core.Completeness Require Import
   SubstitutionCases
   TermStructureCases
   SortCases
+  NatCases
   VariableCases.
 From McPTS.Core.Completeness Require Export LogicalRelation.
 From McPTS.Core.Syntactic Require Export SystemOpt.

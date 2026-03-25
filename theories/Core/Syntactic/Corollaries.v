@@ -439,7 +439,7 @@ Qed.
 #[export]
   Hint Resolve exp_eq_natrec_cong_rhs_typ : mcpts.
 
-Lemma exp_eq_nat_beta_succ_rhs_typ_gen {P} : forall {Γ : ctx P} {σ Δ A M N s s'} {r: Ru_nat P s},
+Lemma exp_eq_nat_beta_succ_rhs_typ_gen {P} : forall {Γ : ctx P} {σ Δ A M N s s'} {r : Ru_nat P s},
     {{ Γ ⊢s σ : Δ }} ->
     {{ Δ, ℕ@s ⊢ A : Sort@s' }} ->
     {{ Γ ⊢ M : ℕ }} ->
@@ -513,7 +513,7 @@ Hint Resolve sub_eq_q_compose : mcpts.
 #[export]
 Hint Rewrite -> @sub_eq_q_compose using mauto 4 : mcpts.
 
-Lemma sub_eq_q_compose_nat {P} : forall {Γ : ctx P} {σ Δ τ Δ' s} {r: Ru_nat P s},
+Lemma sub_eq_q_compose_nat {P} : forall {Γ : ctx P} {σ Δ τ Δ' s} {r : Ru_nat P s},
   {{ Δ ⊢s σ : Γ }} ->
   {{ Δ' ⊢s τ : Δ }} ->
   {{ Δ', ℕ@s ⊢s q σ∘q τ ≈ q (σ∘τ) : Γ, ℕ@s }}.
