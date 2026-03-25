@@ -82,9 +82,9 @@ Proof.
   intros.
   handle_functional_glu_ctx_env P.
   destruct_glu_rel_sub_with_sub.
-  rewrite <- H10 in H9.
   destruct_glu_rel_sub_with_sub.
-  econstructor; mauto.
+  simplify_evals.
+  econstructor; mauto 3.
   enough {{ Δ ⊢s (σ1 ∘ σ2) ∘ σ ≈ σ1 ∘ (σ2 ∘ σ) : Γ3 }} as -> by eassumption.
   mauto 3.
 Qed.
@@ -106,21 +106,13 @@ Proof.
   assert (Ax P s s') by (eapply glu_rel_exp_sort_implies_ax; mauto 2).
   destruct Hσ as [SbΓ [SbΔ]].
   destruct_conjs.
-  destruct HA as [Sb []].
-  destruct HM as [Sb' []].
-  handle_functional_glu_ctx_env P.
+  invert_glu_rel_exp HA.
+  invert_glu_rel_exp HM.
   do 2 eexists; repeat split; mauto.
   - econstructor; mauto 3; try reflexivity.
-    intros.
-    rewrite <- H13 in H4.
-    assert (glu_rel_exp_with_sub pred_P s' Δ0 A {{{ Sort@s }}} σ0 ρ) by mauto 2.
-    mauto 2.
     
   - intros.
-    handle_functional_glu_ctx_env P.
     destruct_glu_rel_sub_with_sub.
-    rewrite <- H14 in H4.
-    rewrite <- H13 in H11.
     destruct_glu_rel_exp_with_sub.
     simplify_evals.
     match_by_head (@glu_sort_elem P) ltac:(fun H => directed invert_glu_sort_elem H).
@@ -145,7 +137,7 @@ Proof.
       assert {{ Δ0 ⊢ A[Wk][(σ,,M)∘σ0] ≈ A[Wk∘((σ,,M)∘σ0)] : Sort@s }} as -> by (symmetry; mauto 3).
       assert {{ Δ0 ⊢ A[Wk∘((σ,,M)∘σ0)] ≈ A[σ∘σ0] : Sort@s }} as -> by mauto 3.
       assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] : Sort@s }} by mauto 3.
-      rewrite -> H30.
+      rewrite -> H26.
       assert {{ Δ, A@s ⊢ #0 : A[Wk] }} by mauto 3.
       assert {{ Δ0 ⊢ #0[(σ,,M)∘σ0] ≈ #0[(σ∘σ0),,M[σ0]] : A[Wk][(σ,,M)∘σ0] }} by mauto 4.
       assert {{ Δ0 ⊢ #0[(σ,,M)∘σ0] ≈ #0[(σ∘σ0),,M[σ0]] : A[σ][σ0] }} as -> by mauto 4.
@@ -161,80 +153,63 @@ Qed.
 #[export]
 Hint Resolve glu_rel_sub_extend : mcpts.
 
-
 Lemma glu_rel_sub_extend_unsorted {P} (pred_P : PredicativeSig P) : forall {Γ σ Δ M A s so},
     {{ ⟪ pred_P ⟫ Γ ⊩s σ : Δ }} ->
     {{ ⟪ pred_P ⟫ Δ ⊩u A : Sort@s @ so }} ->
     {{ ⟪ pred_P ⟫ Γ ⊩u M : A[σ] @ ^(Some s) }} ->
     {{ ⟪ pred_P ⟫ Γ ⊩s (σ ,, M) : Δ , A@s }}.
 Proof.
-  intros * Hσ HA HM'.
-  assert {{ ⟪ pred_P ⟫ Γ ⊩ M : A[σ] @ s }} as HM by mauto 2.
-  destruct so.
-  - assert {{ Γ ⊢s σ : Δ }} by mauto 3.
-    assert {{ Δ ⊢ A : Sort@s }} by mauto 3.
-    assert {{ Γ ⊢ M : A[σ] }} by mauto 3.
-    destruct Hσ as [SbΓ [SbΔ]].
-    destruct_conjs.
-    destruct HA as [Sb []].
-    destruct HM as [Sb' []].
-    handle_functional_glu_ctx_env P.
-    do 2 eexists; repeat split; mauto.    
-    + econstructor; mauto 3; try reflexivity.
-      intros.
-      rewrite <- H11 in H2.
-      assert (glu_rel_exp_with_sub_unsorted pred_P None Δ0 A {{{ Sort@s }}} σ0 ρ) by mauto 2.
-      dependent destruction H3.
-      inversion H13; subst.
-      simpl_glu_rel.
-      assert (glu_rel_typ_with_sub_unsorted pred_P (Some s) Δ0 M0 σ0 ρ) by (econstructor; mauto 3).
-      dependent destruction H17.
-      econstructor; mauto 3.
+  intros * Hσ HA HM.
+  destruct so; [| mautosolve 4].
+  assert {{ Γ ⊢s σ : Δ }} by mauto 3.
+  assert {{ Δ ⊢ A : Sort@s }} by mauto 3.
+  assert {{ Γ ⊢ M : A[σ] }} by mauto 3.
+  destruct Hσ as [SbΓ [SbΔ]].
+  destruct_conjs.
+  invert_glu_rel_exp_unsorted HA.
+  invert_glu_rel_exp_unsorted HM.
+  handle_functional_glu_ctx_env P.
+  do 2 eexists; repeat split; mauto.
+  - econstructor; mauto 3; try reflexivity.
 
-    + intros.
-      destruct_glu_rel_sub_with_sub.
-      rewrite <- H12 in H2.
-      destruct_glu_rel_exp_with_sub.
-      rewrite <- H11 in H9.
-      assert (glu_rel_exp_with_sub_unsorted pred_P None Δ0 A {{{ Sort@s }}} {{{ σ∘σ0 }}} ρ') by mauto 3.
-      inversion_clear H16.
-      inversion_clear H20.
-      simpl_glu_rel.
-      econstructor; mauto 3.
-      inversion H17; subst.
-      inversion H20; subst.
-      simplify_evals.
-      rename m0 into a.
-      handle_functional_glu_sort_elem P.
+  - intros.
+    destruct_glu_rel_sub_with_sub.
+    destruct_glu_rel_exp_with_sub_unsorted.
+    autoinjections.
+    assert (glu_rel_exp_with_sub_unsorted pred_P None Δ0 A {{{ Sort@s0 }}} {{{ σ∘σ0 }}} ρ') by mauto 3.
+    simpl_glu_rel.
+    dir_inversion_clear_by_head (@glu_rel_exp_with_sub_unsorted P); autoinjections.
+    dir_inversion_clear_by_head (@glu_typ_elem P).
+    simplify_evals.
+    handle_functional_glu_sort_elem P.
+    econstructor; mauto 3.
+    rename m0 into a.
 
-      saturate_glu_info.
-      assert {{ Δ0 ⊢s σ0 : Γ }} by mauto 3.
-      assert {{ Γ ⊢s σ : Δ }} by mauto 3.
-      assert {{ Δ0 ⊢s Wk∘(σ,,M)∘σ0 ≈ (Wk∘(σ,,M))∘σ0 : Δ }} by (symmetry; econstructor; mauto 3).
-      assert {{ Δ0 ⊢s (Wk∘(σ,,M))∘σ0 ≈ σ∘σ0 : Δ }} by (econstructor; mauto 3).
-      assert {{ Δ0 ⊢s Wk∘(σ,,M)∘σ0 ≈ σ∘σ0 : Δ }} by (etransitivity; mauto 2).
-      
-      econstructor; mauto 3.
-      * assert {{ Γ ⊢s σ,,M : Δ, A@s1 }} by mauto 3.
-        assert {{ Δ, A@s1 ⊢ A[Wk] : Sort@s1 }} by mauto 3.
-        assert {{ Δ0 ⊢ A[Wk][(σ,,M)∘σ0] ≈ A[Wk][σ,,M][σ0] : Sort@s1 }} as -> by (symmetry; mauto 3).
-        assert {{ Γ ⊢ A[Wk][σ,,M] ≈ A[σ] : Sort@s1 }} by mauto 3.
-        assert {{ Δ0 ⊢ A[Wk][σ,,M][σ0] ≈ A[σ][σ0] : Sort@s1 }} as -> by mauto 3.
+    saturate_glu_info.
+    assert {{ Δ0 ⊢s σ0 : Γ }} by mauto 3.
+    assert {{ Γ ⊢s σ : Δ }} by mauto 3.
+    assert {{ Δ0 ⊢s Wk∘(σ,,M)∘σ0 ≈ (Wk∘(σ,,M))∘σ0 : Δ }} by (symmetry; econstructor; mauto 3).
+    assert {{ Δ0 ⊢s (Wk∘(σ,,M))∘σ0 ≈ σ∘σ0 : Δ }} by (econstructor; mauto 3).
+    assert {{ Δ0 ⊢s Wk∘(σ,,M)∘σ0 ≈ σ∘σ0 : Δ }} by (etransitivity; mauto 2).
+    
+    econstructor; mauto 3.
+    + assert {{ Γ ⊢s σ,,M : Δ, A@s }} by mauto 3.
+      assert {{ Δ, A@s ⊢ A[Wk] : Sort@s }} by mauto 3.
+      assert {{ Δ0 ⊢ A[Wk][(σ,,M)∘σ0] ≈ A[Wk][σ,,M][σ0] : Sort@s }} as -> by (symmetry; mauto 3).
+      assert {{ Γ ⊢ A[Wk][σ,,M] ≈ A[σ] : Sort@s }} by mauto 3.
+      assert {{ Δ0 ⊢ A[Wk][σ,,M][σ0] ≈ A[σ][σ0] : Sort@s }} as -> by mauto 3.
 
-        assert {{ Γ ⊢ #0[σ,,M] ≈ M : A[σ] }} by mauto 3.
-        assert {{ Δ0 ⊢ #0[σ,,M][σ0] ≈ M[σ0] : A[σ][σ0] }} by mauto 4.
-        assert {{ Δ0 ⊢ #0[(σ,,M)∘σ0] ≈ #0[(σ,,M)][σ0] : A[Wk][(σ,,M)∘σ0] }} by (econstructor; mauto 3).
-        assert {{ Δ0 ⊢ A[Wk][(σ,,M)∘σ0] ≈ A[σ][σ0] : Sort@s1 }} by (etransitivity; mauto 3).        
-        assert {{ Δ0 ⊢ #0[σ,,M][σ0] ≈ #0[(σ,,M)∘σ0] : A[σ][σ0] }} by (symmetry; mauto 3).
-        assert {{ Δ0 ⊢ #0[(σ,,M)∘σ0] ≈ M[σ0] : A[σ][σ0] }} as -> by mauto 3.        
-        mauto 2.
-      * apply_predicate_equivalence.
-        simpl.
-        rewrite -> H24.
-        mauto 2.
-                     
-  - assert {{ ⟪ pred_P ⟫ Δ ⊩ A : Sort@s @ s0 }} by mauto 2.  
-    mauto 2.
+      assert {{ Γ ⊢ #0[σ,,M] ≈ M : A[σ] }} by mauto 3.
+      assert {{ Δ0 ⊢ #0[σ,,M][σ0] ≈ M[σ0] : A[σ][σ0] }} by mauto 4.
+      assert {{ Δ0 ⊢ #0[(σ,,M)∘σ0] ≈ #0[(σ,,M)][σ0] : A[Wk][(σ,,M)∘σ0] }} by (econstructor; mauto 3).
+      assert {{ Δ0 ⊢ A[Wk][(σ,,M)∘σ0] ≈ A[σ][σ0] : Sort@s }} by (etransitivity; mauto 3).        
+      assert {{ Δ0 ⊢ #0[σ,,M][σ0] ≈ #0[(σ,,M)∘σ0] : A[σ][σ0] }} by (symmetry; mauto 3).
+      assert {{ Δ0 ⊢ #0[(σ,,M)∘σ0] ≈ M[σ0] : A[σ][σ0] }} as -> by mauto 3.        
+      mauto 2.
+    + apply_predicate_equivalence.
+      simpl.
+      rewrite -> H17.
+      eassumption.
 Qed.
 
 #[export]
