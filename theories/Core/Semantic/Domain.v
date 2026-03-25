@@ -10,6 +10,9 @@ Inductive domain (P : PtsSig) : Set :=
 | d_sort : P -> domain P
 | d_pi : forall (s1 s2 s3 : P), Ru P s1 s2 s3 -> domain P -> env P -> exp P -> domain P
 | d_fn : forall (s1 s2 s3 : P), Ru P s1 s2 s3 ->  env P -> exp P -> domain P
+| d_nat : domain P
+| d_zero : domain P
+| d_succ : domain P -> domain P
 | d_neut : domain P -> domain_ne P -> domain P
 with domain_ne (P : PtsSig) : Set :=
 (** Notice that the number x here is not a de Bruijn index but an absolute
@@ -18,6 +21,7 @@ with domain_ne (P : PtsSig) : Set :=
  *)
 | d_var : forall (x : nat), domain_ne P
 | d_app : domain_ne P -> domain_nf P -> domain_ne P
+| d_natrec : env P -> exp P -> domain P -> exp P -> domain_ne P -> domain_ne P
 with domain_nf (P : PtsSig) : Set :=
 | d_dom : domain P -> domain P -> domain_nf P
 (** Contrary to McTT, environments are lists instead of functions *)
@@ -27,9 +31,13 @@ where "'env'" := (fun P => (list (domain P))).
 Arguments d_sort {_}.
 Arguments d_pi {_ _ _ _}.
 Arguments d_fn {_ _ _ _}.
+Arguments d_nat {_}.
+Arguments d_zero {_}.
+Arguments d_succ {_}.
 Arguments d_neut {_}.
 Arguments d_var {_}.
 Arguments d_app {_}.
+Arguments d_natrec {_}.
 Arguments d_dom {_}.
 
 Derive NoConfusion for domain domain_ne domain_nf.
@@ -63,6 +71,10 @@ Module Domain_Notations.
   Notation "'Π' r a ρ B" := (d_pi r a ρ B) (in custom domain at level 0, r constr at level 0, a custom domain at level 30, ρ custom domain at level 0, B custom exp at level 30) : mcpts_scope.
   Notation "'λ' r ρ M" := (d_fn r ρ M) (in custom domain at level 0, r constr at level 0, ρ custom domain at level 30, M custom exp at level 30) : mcpts_scope.
   Notation "f x .. y" := (d_app .. (d_app f x) .. y) (in custom domain at level 40, f custom domain, x custom domain at next level, y custom domain at next level) : mcpts_scope.
+  Notation "'ℕ'" := d_nat (in custom domain) : mcpts_scope.
+  Notation "'zero'" := d_zero (in custom domain at level 0) : mcpts_scope.
+  Notation "'succ' m" := (d_succ m) (in custom domain at level 30, m custom domain at level 30) : mcpts_scope.
+  Notation "'rec' m 'under' ρ 'return' A | 'zero' -> mz | 'succ' -> MS 'end'" := (d_natrec ρ A mz MS m) (in custom domain at level 0, A custom exp at level 60, mz custom domain at level 60, MS custom exp at level 60, ρ custom domain at level 60, m custom domain at level 60) : mcpts_scope.
   Notation "'!' n" := (d_var n) (in custom domain at level 0, n constr at level 0) : mcpts_scope.
   Notation "'⇑' a m" := (d_neut a m) (in custom domain at level 0, a custom domain at level 30, m custom domain at level 30) : mcpts_scope.
   Notation "'⇓' a m" := (d_dom a m) (in custom domain at level 0, a custom domain at level 30, m custom domain at level 30) : mcpts_scope.

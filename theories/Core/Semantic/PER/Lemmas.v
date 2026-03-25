@@ -145,6 +145,36 @@ Proof.
   - eauto using per_top_typ_trans.
 Qed.
 
+Lemma per_nat_sym {P} : forall m n : domain P,
+    {{ Dom m ≈ n ∈ per_nat }} ->
+    {{ Dom n ≈ m ∈ per_nat }}.
+Proof with mautosolve.
+  induction 1; econstructor...
+Qed.
+
+#[export]
+Hint Resolve per_nat_sym : mcpts.
+
+Lemma per_nat_trans {P} : forall m n l : domain P,
+    {{ Dom m ≈ n ∈ per_nat }} ->
+    {{ Dom n ≈ l ∈ per_nat }} ->
+    {{ Dom m ≈ l ∈ per_nat }}.
+Proof with mautosolve.
+  intros * H. gen l.
+  induction H; inversion_clear 1; econstructor...
+Qed.
+
+#[export]
+Hint Resolve per_nat_trans : mcpts.
+
+#[export]
+Instance per_nat_PER {P} : PER (@per_nat P).
+Proof.
+  split.
+  - eauto using per_nat_sym.
+  - eauto using per_nat_trans.
+Qed.
+
 Lemma per_ne_sym {P} : forall m n : domain P,
     {{ Dom m ≈ n ∈ per_ne }} ->
     {{ Dom n ≈ m ∈ per_ne }}.
@@ -179,7 +209,7 @@ Qed.
 
 Add Parametric Morphism {P} {pred_P : PredicativeSig P} s (per_sort_elem_rec : forall s', pred_rel pred_P s' s -> relation (domain P) -> relation (domain P)) : (per_sort_elem_core pred_P s per_sort_elem_rec)
     with signature (@relation_equivalence (domain P)) ==> eq ==> eq ==> iff as per_sort_elem_core_morphism_iff.
-Proof with mautosolve.
+Proof with mautosolve 3.
   simpl.
   intros R R' HRR'.
 
@@ -190,13 +220,13 @@ Proof with mautosolve.
     intros;
     destruct_rel_mod_eval;
     econstructor; mauto 3.
-  1-3: rewrite <- HRR'; mauto.
-  all: rewrite HRR'; mauto.
+  1-4: rewrite <- HRR'...
+  all: rewrite HRR'...
 Qed.
 
 Add Parametric Morphism {P} {pred_P : PredicativeSig P} s : (per_sort_elem pred_P s)
     with signature (@relation_equivalence (domain P)) ==> eq ==> eq ==> iff as per_sort_elem_morphism_iff.
-Proof with mautosolve.
+Proof with mautosolve 3.
   simp per_sort_elem.
   intros R R' HRR'.
 
@@ -208,8 +238,8 @@ Proof with mautosolve.
     intros;
     destruct_rel_mod_eval;
     econstructor; mauto 3.
-  1-3: rewrite <- HRR'; mauto.
-  all: rewrite HRR'; mauto.
+  1-4: rewrite <- HRR'...
+  all: rewrite HRR'...
 Qed.
 
 
@@ -419,8 +449,8 @@ Proof with mautosolve.
       econstructor; eauto.
       per_sort_elem_right_irrel_assert.
       intuition.
-  - destruct_conjs.
-    split; [per_sort_elem_econstructor' | apply_relation_equivalence]; mauto 3.
+  - split; [per_sort_elem_econstructor' | apply_relation_equivalence]; mauto 3.
+  - split; [per_sort_elem_econstructor' | apply_relation_equivalence]; mauto 3.
 Qed.
 
 Corollary per_sort_sym {P} {pred_P : PredicativeSig P} : forall s R a b,
@@ -547,6 +577,8 @@ Proof with (per_sort_elem_econstructor'; mautosolve 4).
     handle_per_sort_elem_irrel.
     econstructor; eauto.
     intuition.
+  - (* nat case *)
+    idtac...
   - (* neut case *)
     idtac...
 Qed.

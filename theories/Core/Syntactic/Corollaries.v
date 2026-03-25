@@ -194,7 +194,7 @@ Lemma exp_nat_sub_lhs {P} : forall {Γ : ctx P} {σ Δ s} {r : Ru_nat P s},
     {{ Γ ⊢s σ : Δ }} ->
     {{ Γ ⊢ ℕ[σ] : Sort@s }}.
 Proof.
-  intros; mauto 5.
+  intros; mauto 4.
 Qed.
 #[export]
 Hint Resolve exp_nat_sub_lhs : mcpts.
@@ -225,11 +225,8 @@ Lemma exp_succ_sub_rhs {P} : forall {Γ : ctx P} {σ Δ M s} {r : Ru_nat P s},
 Proof.
   intros; mauto 3.
 Qed.
-
 #[export]
 Hint Resolve exp_succ_sub_rhs : mcpts.
-
-
 
 Lemma sub_decompose_q_typ {P : PtsSig} : forall (Γ : ctx P) A B σ Δ Δ' τ M s s',
   {{ Γ, A@s ⊢ B : Sort@s' }} ->
