@@ -18,7 +18,7 @@ Section soundness_fundamental.
       (forall Γ A s, {{ Γ ⊫ A @ s }} -> {{ ⟪ pred_P ⟫ Γ ⊩u A @ s }}) /\
       (forall Γ Δ σ, {{ Γ ⊫s σ : Δ }} -> {{ ⟪ pred_P ⟫ Γ ⊩s σ : Δ }}).
   Proof.
-    eapply syntactic_wf_ann_mut_ind; mauto 3; intros.
+    eapply syntactic_wf_ann_mut_ind; mauto.
   Qed.
 
   #[local]
