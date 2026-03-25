@@ -532,3 +532,23 @@ Qed.
 Hint Resolve sub_eq_q_compose_nat : mcpts.
 #[export]
 Hint Rewrite -> @sub_eq_q_compose_nat using mauto 4 : mcpts.
+
+Lemma exp_eq_typ_q_sigma_then_weak_weak_extend_succ_var_1 {P} : forall {Γ : ctx P} {Δ σ A s s'} {r : Ru_nat P s},
+    {{ Δ ⊢s σ : Γ }} ->
+    {{ Γ, ℕ@s ⊢ A : Sort@s' }} ->
+    {{ Δ, ℕ@s, A[q σ]@s' ⊢ A[q σ][Wk∘Wk,,succ #1] ≈ A[Wk∘Wk,,succ #1][q (q σ)] : Sort@s' }}.
+Proof.
+  intros.
+  assert {{ Δ, ℕ@s ⊢s q σ : Γ, ℕ@s }} by (econstructor; mauto 3).
+  assert {{ Δ, ℕ@s, A[q σ]@s' ⊢s Wk∘Wk,,succ #1 : Δ, ℕ@s }} by (eapply @sub_weak_compose_weak_extend_succ_var_1 with (P := P); mauto 3).
+  assert {{ Δ, ℕ@s, A[q σ]@s' ⊢ A[q σ][Wk∘Wk,,succ #1] ≈ A[q σ∘(Wk∘Wk,,succ #1)] : Sort@s' }} as -> by mauto 3.
+
+  assert {{ Δ, ℕ@s, A[q σ]@s' ⊢s q (q σ) : Γ, ℕ@s, A@s' }} by mauto 3.
+  assert {{ Γ, ℕ@s, A@s' ⊢s Wk∘Wk,,succ #1 : Γ, ℕ@s }} by (eapply @sub_weak_compose_weak_extend_succ_var_1 with (P := P); mauto 3).
+  assert {{ Δ, ℕ@s, A[q σ]@s' ⊢ A[Wk∘Wk,,succ #1][q (q σ)] ≈ A[(Wk∘Wk,,succ #1)∘q (q σ)] : Sort@s' }} by (symmetry; mauto 3).
+  transitivity {{{ A[(Wk∘Wk,,succ #1)∘q (q σ)] }}}; mauto 2.
+  mauto 4.
+Qed.
+
+#[export]
+Hint Resolve exp_eq_typ_q_sigma_then_weak_weak_extend_succ_var_1 : mcpts.
