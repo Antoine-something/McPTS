@@ -192,7 +192,7 @@ Qed.
 
 Lemma exp_nat_sub_lhs {P} : forall {Γ : ctx P} {σ Δ s} {r : Ru_nat P s},
     {{ Γ ⊢s σ : Δ }} ->
-    {{ Γ ⊢ ℕ[σ] }}.
+    {{ Γ ⊢ ℕ[σ] : Sort@s }}.
 Proof.
   intros; mauto 5.
 Qed.
@@ -426,18 +426,19 @@ Qed.
 #[export]
   Hint Resolve exp_sub_decompose_double_q_with_id_double_extend : mcpts.
 
-Lemma exp_eq_natrec_cong_rhs_typ {P} : forall {Γ : ctx P} {M M' A A' s} {r : Ru_nat P s},
-    {{ Γ, ℕ@s ⊢ A ≈ A' }} ->
+Lemma exp_eq_natrec_cong_rhs_typ {P} : forall {Γ : ctx P} {M M' A A' s s'} {r : Ru_nat P s},
+    {{ Γ, ℕ@s ⊢ A ≈ A' : Sort@s' }} ->
     {{ Γ ⊢ M ≈ M' : ℕ }} ->
-    {{ Γ ⊢ A[Id,,M] ≈ A'[Id,,M'] }}.
+    {{ Γ ⊢ A[Id,,M] ≈ A'[Id,,M'] : Sort@s' }}.
 Proof.
   intros.
   gen_presups.
-  assert {{ Γ ⊢ ℕ[Id] ≈ ℕ }} by mauto 3.
+  assert {{ Γ ⊢ ℕ[Id] ≈ ℕ : Sort@s }} by mauto 3.
   assert {{ Γ ⊢ M ≈ M' : ℕ[Id] }} by mauto 3.
   assert {{ Γ ⊢s Id,,M ≈ Id,,M' : Γ, ℕ@s }} by mauto 3.
   mauto 5.
-Admitted.
+Qed.
+
 #[export]
   Hint Resolve exp_eq_natrec_cong_rhs_typ : mcpts.
 
@@ -446,7 +447,7 @@ Lemma exp_eq_nat_beta_succ_rhs_typ_gen {P} : forall {Γ : ctx P} {σ Δ A M N s 
     {{ Δ, ℕ@s ⊢ A : Sort@s' }} ->
     {{ Γ ⊢ M : ℕ }} ->
     {{ Γ ⊢ N : A[σ,,M] }} ->
-    {{ Γ ⊢ A[Wk∘Wk,,succ #1][σ,,M,,N] ≈ A[σ,,succ M] }}.
+    {{ Γ ⊢ A[Wk∘Wk,,succ #1][σ,,M,,N] ≈ A[σ,,succ M] : Sort@s' }}.
 Proof.
   intros.
   assert {{ ⊢ Δ }} by mauto 3.
@@ -468,7 +469,7 @@ Proof.
   assert {{ Γ ⊢ (succ #1)[σ,,M,,N] ≈ succ M : ℕ }} by (bulky_rewrite; mauto 3).
   assert {{ Γ ⊢s (Wk∘Wk)∘(σ,,M,,N),,(succ #1)[σ,,M,,N] ≈ σ,,succ M : Δ, ℕ@s }} by mauto 3.
   mauto 5.
-Admitted.
+Qed.
 #[export]
 Hint Resolve exp_eq_nat_beta_succ_rhs_typ_gen : mcpts.
 
@@ -522,7 +523,7 @@ Lemma sub_eq_q_compose_nat {P} : forall {Γ : ctx P} {σ Δ τ Δ' s} {r: Ru_nat
 Proof.
   intros.
   assert {{ Γ ⊢ ℕ : Sort@s }} by mauto 4.
-  assert {{ Δ' ⊢ ℕ[σ∘τ] ≈ ℕ }} by mauto 3.
+  assert {{ Δ' ⊢ ℕ[σ∘τ] ≈ ℕ : Sort@s }} by mauto 3.
   assert {{ ⊢ Δ' }} by mauto 3.
   assert {{ Δ' ⊢ ℕ : Sort@s }} by mauto 3.
   assert {{ Δ' ⊢ ℕ[σ∘τ] : Sort@s }} by mauto 3.  

@@ -310,7 +310,7 @@ Qed.
 
 Corollary wf_exp_eq_nat_sub' {P} : forall {Γ : ctx P} {s} {r : Ru_nat P s}  σ Δ,
     {{ Γ ⊢s σ : Δ }} ->
-    {{ Γ ⊢ ℕ[σ] ≈ ℕ }}.
+    {{ Γ ⊢ ℕ[σ] ≈ ℕ : Sort@s }}.
 Proof.
   intros.
   mauto.
@@ -325,14 +325,14 @@ Remove Hints wf_exp_eq_nat_sub : mcpts.
 Corollary wf_exp_eq_natrec_cong' {P} : forall {Γ : ctx P} {A A' MZ MZ' MS MS' M M' s s'} {r : Ru_nat P s},
     {{ Γ, ℕ@s ⊢ A : Sort@s' }} ->
     {{ Γ, ℕ@s ⊢ A' : Sort@s' }} ->
-    {{ Γ, ℕ@s ⊢ A ≈ A' }} ->
+    {{ Γ, ℕ@s ⊢ A ≈ A' : Sort@s' }} ->
     {{ Γ ⊢ MZ ≈ MZ' : A[Id,,zero] }} ->
     {{ Γ, ℕ@s, A@s' ⊢ MS ≈ MS' : A[Wk∘Wk,,succ #1] }} ->
     {{ Γ ⊢ M ≈ M' : ℕ }} ->
     {{ Γ ⊢ rec M return A | zero -> MZ | succ -> MS end ≈ rec M' return A' | zero -> MZ' | succ -> MS' end : A[Id,,M] }}.
 Proof.
   try impl_opt_constructor.
-Admitted.
+Qed.
 
 #[export]
 Hint Resolve wf_exp_eq_natrec_cong' : mcpts.

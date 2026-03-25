@@ -170,22 +170,23 @@ Qed.
 #[export]
 Hint Resolve wf_succ_inversion : mcpts.
 
-Lemma wf_natrec_inversion {P} : forall {Γ : ctx P} {s s' A M A' MZ MS},
+Lemma wf_natrec_inversion {P} : forall {Γ : ctx P} {A M A' MZ MS},
     {{ Γ ⊢ rec M return A' | zero -> MZ | succ -> MS end : A }} ->
-    {{ Γ ⊢ MZ : A'[Id,,zero] }} /\ {{ Γ, ℕ@s, A'@s' ⊢ MS : A'[Wk∘Wk,,succ(#1)] }} /\ {{ Γ ⊢ M : ℕ }} /\ {{ Γ ⊢ A'[Id,,M] ≈ A }}.
+    exists s s', {{ Γ ⊢ MZ : A'[Id,,zero] }} /\ {{ Γ, ℕ@s, A'@s' ⊢ MS : A'[Wk∘Wk,,succ(#1)] }} /\ {{ Γ ⊢ M : ℕ }} /\ {{ Γ ⊢ A'[Id,,M] ≈ A }}.
 Proof with mautosolve.
   intros * H.
   dependent induction H.
-  - (* do 3 (eexists; mauto). *)
-    (* eapply wf_typ_eq_refl. *)
-    (* assert {{ Γ, ℕ ⊢ A' }}; mauto 2. *)
-    (* assert {{ Γ ⊢s Id,,M : Γ, ℕ }} by mauto 4. *)
-  (* mauto 2. *)
-    admit.
-  - specialize (IHwf_exp1 s s' A0 M A' MZ MS ltac:(reflexivity) ltac:(reflexivity)).
+  - do 2 eexists.
+    do 3 (eexists; mauto).
+    eapply wf_typ_eq_refl.
+    assert {{ Γ, ℕ@s ⊢ A' }}; mauto 2.
+    assert {{ Γ ⊢s Id,,M : Γ, ℕ@s }} by mauto 4.
+    mauto 3.
+  - specialize (IHwf_exp1 A0 M A' MZ MS ltac:(reflexivity) ltac:(reflexivity)).
     destruct_conjs.
+    do 2 eexists.
     repeat split; mauto.
-Admitted.
+Qed.
     
 #[export]
 Hint Resolve wf_natrec_inversion : mcpts.
