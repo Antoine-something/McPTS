@@ -115,12 +115,12 @@ Lemma realize_per_typ_elem_gen {P : PtsSig} {pred_P : PredicativeSig P} : forall
     /\ (forall {b b'}, {{ Dom b ≈ b' ∈ R }} -> {{ Dom ⇓ a b ≈ ⇓ a' b' ∈ per_top }}).
 Proof with (solve [try (try (eexists; split); econstructor); mauto]).
   intros * Htypelem. simpl in Htypelem.
-  induction Htypelem.     
+  induction Htypelem.
   - repeat split.
     + econstructor; mauto.
     + intros.
       apply_relation_equivalence.
-      exists per_ne.     
+      exists per_ne.
       per_sort_elem_econstructor; mauto.
       reflexivity.
     + intros.
@@ -132,7 +132,7 @@ Proof with (solve [try (try (eexists; split); econstructor); mauto]).
       intros n.
       assert (exists C : nf P, {{ Rtyp b in n ↘ C }} /\ {{ Rtyp b' in n ↘ C }}) by mauto.
       destruct_conjs.
-      econstructor; mauto.  
+      econstructor; mauto.
   - eapply realize_per_sort_elem_gen; mauto.
 Qed.
 
@@ -176,7 +176,7 @@ Proof.
   - destruct_conjs.
     (on_all_hyp: destruct_rel_by_assumption tail_rel).
     do 2 eexists; repeat split; only 1-2: econstructor; eauto.
-    apply_relation_equivalence.    
+    apply_relation_equivalence.
     econstructor; mauto.
     eapply per_bot_then_per_elem; eauto.
     erewrite per_ctx_respects_length; mauto.

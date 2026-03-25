@@ -64,7 +64,7 @@ with read_typ {P : PtsSig} : nat -> domain P -> nf P -> Prop :=
 | read_typ_pi :
   `( forall r : Ru P s1 s2 s3,
         (** Normal form of arg type *)
-        {{ Rtyp a in i ↘ A }} ->        
+        {{ Rtyp a in i ↘ A }} ->
         (** Normal form of ret type *)
         {{ ⟦ B ⟧ ρ ↦ ⇑! a i ↘ b }} ->
         {{ Rtyp b in S i ↘ B' }} ->

@@ -18,7 +18,7 @@ Proof with mautosolve.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
   destruct_by_head (@rel_typ_unsorted P).
   functional_eval_rewrite_clear.
-  destruct_by_head (@rel_exp P).  
+  destruct_by_head (@rel_exp P).
   unshelve epose proof (per_typ_elem_then_per_top _ _ (length Γ)) as [? []]; shelve_unifiable; mauto.
 Qed.
 
@@ -36,7 +36,7 @@ Lemma completeness_typ_unsorted {P} {pred_P : PredicativeSig P} : forall {Γ : c
 Proof.
   intros * [env_relΓ]%(@completeness_fundamental_typ_eq P pred_P).
   destruct_conjs.
-  assert (exists p p', initial_env Γ p /\ initial_env Γ p' /\ {{ Dom p ≈ p' ∈ env_relΓ }}) as [p] by (eauto using per_ctx_then_per_env_initial_env).  
+  assert (exists p p', initial_env Γ p /\ initial_env Γ p' /\ {{ Dom p ≈ p' ∈ env_relΓ }}) as [p] by (eauto using per_ctx_then_per_env_initial_env).
   destruct_conjs.
   functional_initial_env_rewrite_clear.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).

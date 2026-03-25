@@ -297,7 +297,7 @@ Section Per_sort_elem_ind_def.
     rewrite -> r0.
     reflexivity.
   Qed.
-  
+
   #[derive(equations=no, eliminator=no), tactic="def_simp"]
   Equations per_sort_elem_ind s a b R (H : per_sort_elem pred_P s a b R) : motive s a b R :=
   | s, a, b, R, _ := per_sort_elem_ind' s a b R _.

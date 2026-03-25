@@ -90,4 +90,3 @@ Proposition drop_env_extend_env_cancel {P : PtsSig} : forall (ρ : env P) a,
 Proof.
   reflexivity.
 Qed.
-

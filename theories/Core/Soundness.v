@@ -28,7 +28,7 @@ Proof.
     split; [econstructor |]; try eassumption; [mauto 2|].
     dependent destruction H10.
     dependent destruction H12.
-    simpl_glu_rel.    
+    simpl_glu_rel.
     assert {{ Γ ⊢ M[Id][Id] ≈ W : Sort@s }} as HM by mauto 3.
     assert {{ Γ ⊢ M[Id][Id] ≈ W : Sort@s }} as HM' by mauto 3.
     assert {{ Γ ⊢ M[Id] ≈ M : Sort@s }} by mauto 3.

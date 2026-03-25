@@ -82,7 +82,7 @@ Section SignatureExtension.
 
   Inductive eRu_nat : eSt -> Set :=
   | runat_P : forall {s : St P}, Ru_nat P s -> eRu_nat (st_P s).
-    
+
   Definition eP : PtsSig := mkPtsSig eSt eAx eRu eRu_nat.
 
 
@@ -91,8 +91,8 @@ Section SignatureExtension.
   | pr_P : forall {s1 s2 : St P}, pred_rel pred_P s1 s2 -> epred_rel (st_P s1) (st_P s2)
   | pr_ext : forall {i j : nat}, i < j -> epred_rel (st_ext i) (st_ext j)
   | pr_cross : forall {s : St P} {i : nat}, epred_rel (st_P s) (st_ext i).
-    
-  
+
+
   Lemma eord_rel : StrictOrder epred_rel.
   Proof using Type.
     assert (StrictOrder (pred_rel pred_P)) by (eapply ord_rel).
@@ -147,7 +147,7 @@ Section SignatureExtension.
     - apply wf_acc_orig.
       apply (wf_rel pred_P).
   Qed.
-  
+
   Lemma wf_acc_lt : forall (i : nat), Acc lt i.
   Proof using Type.
     intros i.
@@ -158,7 +158,7 @@ Section SignatureExtension.
     - inversion H; auto.
       destruct IHi; auto.
   Qed.
-  
+
   Lemma epred_rel_wf : well_founded epred_rel.
   Proof using Type.
     assert (Hwf : well_founded (pred_rel pred_P)) by (apply wf_rel).
@@ -173,7 +173,7 @@ Section SignatureExtension.
     - apply wf_acc_orig.
       apply Hwf.
   Qed.
-  
+
   Lemma eord_ax : forall (s1 s2 : eP), Ax eP s1 s2 -> epred_rel s1 s2.
   Proof using Type.
     intros.
