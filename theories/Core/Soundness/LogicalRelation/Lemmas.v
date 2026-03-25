@@ -203,6 +203,11 @@ Proof.
     eapply H18.
     eassumption.
 
+  - invert_glu_sort_elem H9.
+    simpl_glu_rel.
+    split; mauto 2.
+    eapply glu_nat_rule_irrelevance; mauto 2.
+
   - invert_glu_sort_elem H10.
     simpl_glu_rel.
     econstructor; mauto 2.

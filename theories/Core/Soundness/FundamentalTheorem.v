@@ -5,6 +5,7 @@ From McPTS.Core.Soundness Require Import
   FunctionCases
   SubstitutionCases
   TermStructureCases
+  NatCases
   SortCases.
 From McPTS.Core.Soundness Require Export LogicalRelation.
 From McPTS.Core.Soundness.Extension Require Import SystemAnnotated.
