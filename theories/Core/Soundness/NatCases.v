@@ -147,7 +147,7 @@ Proof.
   assert {{ EG Γ, ℕ@sn ∈ glu_ctx_env pred_P ↘ SbΓℕ }} by (invert_glu_rel_exp_unsorted Hℕ; econstructor; mauto 3; reflexivity).
   invert_glu_rel_exp_unsorted H1.
   invert_glu_rel_exp_unsorted Hℕ.
-  assert (forall (Δ : list (exp P * P)) (σ : sub P) (ρ : list (domain P)), SbΓ Δ σ ρ -> glu_rel_typ_with_sub pred_P sn Δ {{{ ℕ }}} σ ρ) by mauto 3.
+  assert (forall (Δ : list (exp P * P)%type) (σ : sub P) (ρ : list (domain P)), SbΓ Δ σ ρ -> glu_rel_typ_with_sub pred_P sn Δ {{{ ℕ }}} σ ρ) by mauto 3.
   (on_all_hyp: fun H => directed destruct_glu_rel_exp_unsorted_by_assumption SbΓ H); autoinjections.
   simplify_evals.
   rename m0 into mz.
@@ -399,7 +399,7 @@ Proof.
   destruct_conjs.
   handle_functional_glu_ctx_env P.
 
-  assert (forall (Δ : list (exp P * P)) (σ : sub P) (ρ : list (domain P)), SbΓ Δ σ ρ -> glu_rel_typ_with_sub pred_P s Δ A σ ρ) by mauto 3.
+  assert (forall (Δ : list (exp P * P)%type) (σ : sub P) (ρ : list (domain P)), SbΓ Δ σ ρ -> glu_rel_typ_with_sub pred_P s Δ A σ ρ) by mauto 3.
   destruct_glu_rel_typ_with_sub.
   simplify_evals.
 
@@ -431,7 +431,7 @@ Proof.
   assert {{ EG Γ, ℕ@s ∈ glu_ctx_env pred_P ↘ cons_glu_sub_pred pred_P s Γ {{{ ℕ }}} SbΓ }}.
   {
     invert_glu_rel_exp_unsorted Hℕ; destruct_conjs; econstructor; mauto 3.
-    assert (forall (Δ : list (exp P * P)) (σ : sub P) (ρ : list (domain P)), SbΓ Δ σ ρ -> glu_rel_typ_with_sub pred_P s Δ {{{ ℕ }}} σ ρ) by mauto 3.
+    assert (forall (Δ : list (exp P * P)%type) (σ : sub P) (ρ : list (domain P)), SbΓ Δ σ ρ -> glu_rel_typ_with_sub pred_P s Δ {{{ ℕ }}} σ ρ) by mauto 3.
     split; intros * Hglu; invert_glu_ctx_env Hglu; econstructor; mauto 2.
   }
   assert {{ ⊢ Δ }} by mauto 2.
@@ -470,7 +470,7 @@ Proof.
   assert {{ Γ, ℕ@sn ⊢ A : Sort@s }} by mauto 2.
   pose proof HA.
   invert_glu_rel_exp_unsorted HA.
-  assert (forall (Δ : list (exp P * P)) (σ : sub P) (ρ : list (domain P)), SbΓℕ Δ σ ρ -> glu_rel_typ_with_sub pred_P s Δ A σ ρ) by mauto 3.
+  assert (forall (Δ : list (exp P * P)%type) (σ : sub P) (ρ : list (domain P)), SbΓℕ Δ σ ρ -> glu_rel_typ_with_sub pred_P s Δ A σ ρ) by mauto 3.
   pose (SbΓℕA := cons_glu_sub_pred pred_P s {{{ Γ, ℕ@sn }}} A SbΓℕ).
   assert {{ EG Γ, ℕ@sn, A@s ∈ glu_ctx_env pred_P ↘ SbΓℕA }} by (econstructor; mauto 3; reflexivity).
 
@@ -607,7 +607,7 @@ Proof.
     assert {{ Δ' ⊢s σ∘τ : Γ }} by mauto 3.
     assert {{ Δ' ⊢s σ∘τ ® ρ ∈ SbΓ }} by (eapply glu_ctx_env_sub_monotone; mauto 2).
     assert {{ Δ', ℕ@sn ⊢s q (σ∘τ) ® ρ ↦ ⇑! ℕ (length Δ') ∈ SbΓℕ }} by (unfold SbΓℕ; mauto 3).
-    assert (forall (Δ : list (exp P * P)) (σ : sub P) (ρ : list (domain P)), SbΓℕ Δ σ ρ -> glu_rel_typ_with_sub pred_P s Δ A σ ρ) by mauto 3.
+    assert (forall (Δ : list (exp P * P)%type) (σ : sub P) (ρ : list (domain P)), SbΓℕ Δ σ ρ -> glu_rel_typ_with_sub pred_P s Δ A σ ρ) by mauto 3.
     destruct_glu_rel_typ_with_sub.
     simplify_evals.
     dir_inversion_clear_by_head (@read_ne P).
@@ -737,7 +737,7 @@ Proof.
   assert {{ EG Γ, ℕ@sn ∈ glu_ctx_env pred_P ↘ SbΓℕ }} by (invert_glu_rel_exp_unsorted Hℕ; econstructor; mauto 3; reflexivity).
   pose proof HA.
   invert_glu_rel_exp_unsorted HA.
-  assert (forall (Δ : list (exp P * P)) (σ : sub P) (ρ : list (domain P)), SbΓℕ Δ σ ρ -> glu_rel_typ_with_sub pred_P s Δ A σ ρ) by mauto 3.
+  assert (forall (Δ : list (exp P * P)%type) (σ : sub P) (ρ : list (domain P)), SbΓℕ Δ σ ρ -> glu_rel_typ_with_sub pred_P s Δ A σ ρ) by mauto 3.
   assert {{ ⟪ pred_P ⟫ Γ, ℕ@sn, A@s ⊩u A[Wk∘Wk,,succ #1] : Sort@s @ so }}.
   {
     assert {{ ⟪ pred_P ⟫ ⊩ Γ, ℕ@sn, A@s }} by mauto 3.
@@ -778,7 +778,7 @@ Proof.
   invert_glu_rel_exp HM.
   pose proof HA.
   invert_glu_rel_exp_unsorted HA.
-  assert (forall (Δ : list (exp P * P)) (σ : sub P) (ρ : list (domain P)), SbΓℕ Δ σ ρ -> glu_rel_typ_with_sub pred_P s Δ A σ ρ) by mauto 3.
+  assert (forall (Δ : list (exp P * P)%type) (σ : sub P) (ρ : list (domain P)), SbΓℕ Δ σ ρ -> glu_rel_typ_with_sub pred_P s Δ A σ ρ) by mauto 3.
   eapply glu_rel_exp_implies_glu_rel_exp_unsorted.
   eexists; split; [eassumption |].
   intros.

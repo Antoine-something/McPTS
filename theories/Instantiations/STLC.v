@@ -70,13 +70,11 @@ Section STLCSig.
     mkPredicativeSig Sig_stlc pred_rel ord_rel wf_rel ord_ax ord_ru.
 End STLCSig.
 
-#[local]
-Hint Resolve pred_Sig : mcpts.
 
-Definition exp_stlc := exp Sig_stlc.
-Definition sub_stlc := exp Sig_stlc.
+(* Definition exp_stlc := exp Sig_stlc. *)
+(* Definition sub_stlc := exp Sig_stlc. *)
 
-Definition wf_exp_stlc := @wf_exp Sig_stlc.
+(* Definition wf_exp_stlc := @wf_exp Sig_stlc. *)
 
 Definition presup_exp_eq_stlc : forall {Γ : ctx Sig_stlc} {M M' A},
     {{ Γ ⊢ M ≈ M' : A }} -> {{ ⊢ Γ }} /\ {{ Γ ⊢ M : A }} /\ {{ Γ ⊢ M' : A }} /\ {{ Γ ⊢ A }}
