@@ -203,6 +203,11 @@ Proof.
     eapply H18.
     eassumption.
 
+  - invert_glu_sort_elem H9.
+    simpl_glu_rel.
+    split; mauto 2.
+    eapply glu_nat_rule_irrelevance; mauto 2.
+
   - invert_glu_sort_elem H10.
     simpl_glu_rel.
     econstructor; mauto 2.
@@ -728,48 +733,20 @@ Ltac destruct_glu_rel_typ_with_sub :=
 Lemma glu_rel_exp_clean_inversion1 {P} (pred_P : PredicativeSig P) : forall {s Γ Sb M A},
     {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} ->
     {{ ⟪ pred_P ⟫ Γ ⊩ M : A @ s}} ->
-    forall Δ σ ρ,
-      {{ Δ ⊢s σ ® ρ ∈ Sb }} ->
-      glu_rel_exp_with_sub pred_P s Δ M A σ ρ.
+    glu_rel_exp_resp_sub_env pred_P s Sb M A.
 Proof.
   intros * ? [].
   destruct_conjs.
-  intros.
+  intros ? **.
   handle_functional_glu_ctx_env P.
   mauto.
 Qed.
 
-Lemma glu_rel_exp_clean_inversion2 {P} (pred_P : PredicativeSig P) : forall {s s' Γ Sb M A},
-    {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩ A : Sort@s @ s' }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩ M : A @ s }} ->
-    glu_rel_exp_resp_sub_env pred_P s Sb M A.
-Proof.
-  simpl.
-  intros * ? HA HM.
-  intros.
-  eapply (glu_rel_exp_clean_inversion1 pred_P H) in HA; [| eassumption].
-  eapply (glu_rel_exp_clean_inversion1 pred_P H) in HM; [| eassumption].
-  destruct HA.
-  destruct HM.
-  simplify_evals.
-  match_by_head (@glu_sort_elem P) ltac:(fun H => directed invert_glu_sort_elem H).
-  apply_predicate_equivalence.
-  unfold sort_glu_exp_pred' in *.
-  unfold glu_sort_typ_rec in *.
-  destruct_conjs.
-  econstructor; mauto 3.
-Qed.
-
-
 #[global]
 Ltac invert_glu_rel_exp H :=
-  (unshelve eapply (glu_rel_exp_clean_inversion2 _ _ _ _ _ _) in H; shelve_unifiable; [eassumption | eassumption |];
-   simpl in H)
-  + (unshelve eapply (glu_rel_exp_clean_inversion1 _ _ _ _ _) in H; shelve_unifiable; [eassumption |];
-     destruct H as [])
+ (unshelve eapply (glu_rel_exp_clean_inversion1 _ _) in H; shelve_unifiable; [eassumption |];
+  unfold glu_rel_exp_resp_sub_env in H)
   + (inversion H as [? [? [? ?]]]; subst).
-
 
 Lemma glu_rel_exp_to_wf_exp {P} (pred_P : PredicativeSig P) : forall {s Γ A M},
     {{ ⟪ pred_P ⟫ Γ ⊩ M : A @ s }} ->
@@ -839,10 +816,10 @@ Proof.
 Qed.
 
 Ltac invert_glu_rel_sub H :=
-  (unshelve eapply (glu_rel_sub_clean_inversion3 _ _ _ _ _ _) in H; shelve_unifiable; [eassumption | eassumption |])
-  + (unshelve eapply (glu_rel_sub_clean_inversion2 _ _ _ _ _) in H; shelve_unifiable; [eassumption |];
+  (unshelve eapply (glu_rel_sub_clean_inversion3 _ _ _) in H; shelve_unifiable; [eassumption | eassumption |])
+  + (unshelve eapply (glu_rel_sub_clean_inversion2 _ _) in H; shelve_unifiable; [eassumption |];
      destruct H as [? []])
-  + (unshelve eapply (glu_rel_sub_clean_inversion1 _ _ _ _ _) in H; shelve_unifiable; [eassumption |];
+  + (unshelve eapply (glu_rel_sub_clean_inversion1 _ _) in H; shelve_unifiable; [eassumption |];
      destruct H as [? []])
   + (inversion H; subst).
 
@@ -1145,53 +1122,19 @@ Qed.
 Lemma glu_rel_exp_unsorted_clean_inversion1 {P} (pred_P : PredicativeSig P) : forall {so Γ Sb M A},
     {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} ->
     {{ ⟪ pred_P ⟫ Γ ⊩u M : A @ so }} ->
-    forall Δ σ ρ,
-      {{ Δ ⊢s σ ® ρ ∈ Sb }} ->
-      glu_rel_exp_with_sub_unsorted pred_P so Δ M A σ ρ.
+    glu_rel_exp_resp_sub_env_unsorted pred_P so Sb M A.
 Proof.
   intros * ? [].
   destruct_conjs.
-  intros.
+  intros ? **.
   handle_functional_glu_ctx_env P.
   mauto.
 Qed.
 
-Lemma glu_rel_exp_unsorted_clean_inversion2 {P} (pred_P : PredicativeSig P) : forall {s so Γ Sb M A},
-    {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩u A : Sort@s @ so }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩u M : A @ ^(Some s) }} ->
-    glu_rel_exp_resp_sub_env_unsorted pred_P (Some s) Sb M A.
-Proof.
-  simpl.
-  intros * ? HA HM.
-  intros.
-  eapply (glu_rel_exp_unsorted_clean_inversion1 pred_P H) in HA; [| eassumption].
-  eapply (glu_rel_exp_unsorted_clean_inversion1 pred_P H) in HM; [| eassumption].
-  inversion_clear HM.
-  assert (typ_rel Δ {{{ A[σ] }}}) by (eapply glu_sort_elem_trm_typ; mauto 3).
-  inversion_clear HA.
-  - inversion H6; subst.
-    inversion_clear H9.
-    simplify_evals.
-    simpl_glu_rel.
-    handle_functional_glu_sort_elem P.
-    econstructor; mauto 3.
-  - simplify_evals.
-    match_by_head (@glu_sort_elem P) ltac:(fun H => directed invert_glu_sort_elem H).
-    apply_predicate_equivalence.
-    unfold sort_glu_exp_pred' in *.
-    unfold glu_sort_typ_rec in *.
-    destruct_conjs.
-    handle_functional_glu_sort_elem P.
-    econstructor; mauto 3.
-Qed.
-
 #[global]
 Ltac invert_glu_rel_exp_unsorted H :=
-  (unshelve eapply (glu_rel_exp_unsorted_clean_inversion2 _ _ _ _ _ _) in H; shelve_unifiable; [eassumption | eassumption |];
-   simpl in H)
-  + (unshelve eapply (glu_rel_exp_unsorted_clean_inversion1 _ _ _ _ _) in H; shelve_unifiable; [eassumption |];
-     destruct H as [])
+  (unshelve eapply (glu_rel_exp_unsorted_clean_inversion1 _ _) in H; shelve_unifiable; [eassumption |];
+   unfold glu_rel_exp_resp_sub_env_unsorted in H)
   + (inversion H as [? [? [? ?]]]; subst).
 
 Ltac destruct_glu_rel_exp_unsorted_by_assumption sub_glu_rel H :=

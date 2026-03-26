@@ -92,63 +92,6 @@ Qed.
 #[export]
 Hint Resolve glu_rel_exp_typ_unsorted : mcpts.
 
-
-Lemma glu_rel_exp_clean_inversion2' {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {s s' Γ Sb M},
-    Ax P s s' ->
-    {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩ M : Sort@s @ s' }} ->
-    glu_rel_exp_resp_sub_env pred_P s' Sb M {{{ Sort@s }}}.
-Proof.
-  intros * Hax ? HM.
-  assert (exists s'', {{ ⟪ pred_P ⟫ Γ ⊩ Sort@s : Sort@s' @ s'' }}) as [s''] by mauto 3.
-  eapply glu_rel_exp_clean_inversion2 in HM; mauto 3.
-Qed.
-
-#[local]
-Ltac invert_glu_rel_exp_old H :=
-  invert_glu_rel_exp H.
-
-#[global]
-Ltac invert_glu_rel_exp H :=
-  (unshelve eapply (glu_rel_exp_clean_inversion2' _ _ _ _ _ _) in H; shelve_unifiable; [eassumption |];
-   simpl in H)
-  + invert_glu_rel_exp_old H.
-
-Lemma glu_rel_exp_unsorted_clean_inversion2' {P} (pred_P : PredicativeSig P) : forall {s so Γ Sb M},
-    {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩u M : Sort@s @ so }} ->
-    glu_rel_exp_resp_sub_env_unsorted pred_P so Sb M {{{ Sort@s }}}.
-Proof.
-  intros * ? HM.
-  destruct so.
-  - destruct HM as [SbΓ []].
-    simpl.
-    intros.
-    handle_functional_glu_ctx_env P.
-    assert (glu_rel_exp_with_sub_unsorted pred_P None Δ M {{{ Sort@s }}} σ ρ) by mauto 2.
-    dependent destruction H.
-    inversion H5; subst.
-    simpl_glu_rel.
-    econstructor; mauto 3.
-    eapply H7.
-    split; [reflexivity|].
-    repeat eexists; mauto 2.
-  - assert {{ ⟪ pred_P ⟫ Γ ⊩u Sort@s : Sort@s0 @ ^None }} by mauto 3.
-    eapply glu_rel_exp_unsorted_clean_inversion2 in HM; mauto 3.
-Qed.
-
-#[local]
-Ltac invert_glu_rel_exp_unsorted_old H :=
-  invert_glu_rel_exp_unsorted H.
-
-#[global]
-Ltac invert_glu_rel_exp_unsorted H :=
-  (unshelve eapply (glu_rel_exp_unsorted_clean_inversion2' _ _ _ _ _ _) in H; shelve_unifiable; [eassumption |];
-   simpl in H)
-  + invert_glu_rel_exp_unsorted_old H.
-
-
-
 Lemma glu_rel_exp_sub_typ {P} (pred_P : PredicativeSig P) : forall {s' Γ σ Δ s A},
     {{ ⟪ pred_P ⟫ Γ ⊩s σ : Δ }} ->
     {{ ⟪ pred_P ⟫ Δ ⊩ A : Sort@s @ s' }} ->

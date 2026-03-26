@@ -323,7 +323,32 @@ Proof.
       eapply wf_exp_eq_conv' with (A := {{{ OT[q (σ∘Wk)][Id,,#0] }}}); mauto 2.
       eapply wf_exp_eq_app_cong'; [| mauto 3].
       symmetry.
-      rewrite <- wf_exp_eq_pi_sub; mauto 4.      
+      rewrite <- wf_exp_eq_pi_sub; mauto 4.
+
+  - econstructor; eauto; intros.
+    progressive_inversion.
+    transitivity {{{ ℕ[σ] }}}; mauto 3.
+
+  - handle_functional_glu_sort_elem P.
+    match_by_head (@glu_sort_elem P) invert_glu_sort_elem.
+    apply_equiv_left.
+    repeat split; eauto.
+    econstructor; trivial.
+
+    intros.
+    saturate_weakening_escape.
+    assert {{ Δ ⊢ A[σ] ≈ ℕ[σ] : Sort@s }} by mauto 3.
+    assert {{ Δ ⊢ A[σ] ≈ ℕ[σ] }} by mauto 2.
+    rewrite <- wf_exp_eq_nat_sub; try eassumption.
+    mauto 3.
+
+  - econstructor; mauto 3.
+    + bulky_rewrite. mauto 3.
+    + apply_equiv_left. trivial.
+    + intros.
+      saturate_weakening_escape.
+      bulky_rewrite.
+      mauto using glu_nat_readback.
       
   - econstructor; eauto.
     intros.

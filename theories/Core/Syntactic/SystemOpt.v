@@ -5,7 +5,7 @@ From McPTS.Core.Syntactic Require Export CoreInversions Presup.
 Import Syntax_Notations.
 
 
- 
+
 Add Parametric Morphism {P : PtsSig} (s : P) Γ : (wf_exp Γ)
     with signature wf_exp_eq Γ {{{ Sort@s }}} ==> eq ==> iff as wf_exp_morphism_iff3.
 Proof with mautosolve.
@@ -28,7 +28,7 @@ Proof.
   intros.
   induction H0; subst; gen_presups; mauto 2.
   assert {{ Γ ⊢ M : B }} by mauto 2.
-  mauto 3.  
+  mauto 3.
 Qed.
 
 Corollary wf_exp_eq_conv_typ {P} : forall {Γ : ctx P} {A B M M'},
@@ -39,12 +39,12 @@ Proof.
   intros.
   induction H0; subst; gen_presups; mauto 2.
   assert {{ Γ ⊢ M ≈ M' : B }} by mauto 2.
-  mauto 3.  
+  mauto 3.
 Qed.
 
 #[export]
 Hint Resolve wf_exp_conv_typ wf_exp_eq_conv_typ : mcpts.
- 
+
 
 Add Parametric Morphism {P} Γ : (@wf_exp P Γ)
   with signature wf_typ_eq Γ ==> eq ==> iff as wf_exp_morphism_iff3_typ.
@@ -60,7 +60,7 @@ Proof with mautosolve.
     eapply wf_exp_eq_conv_typ; mauto 3.
 Qed.
 
-  
+
 #[local]
 Ltac impl_opt_constructor :=
   intros;
@@ -83,7 +83,7 @@ Hint Resolve wf_vlookup' : mcpts.
 #[export]
 Remove Hints wf_vlookup : mcpts.
 
- 
+
 Corollary wf_conv' {P : PtsSig} : forall (Γ : ctx P) M A A' s,
     {{ Γ ⊢ M : A }} ->
     {{ Γ ⊢ A ≈ A' : Sort@s }} ->
@@ -143,7 +143,7 @@ Corollary wf_fn' {P : PtsSig} : forall {Γ : ctx P} {A M B s1 s2 s3} {r : Ru P s
     {{ Γ, A@s1 ⊢ M : B }} ->
     {{ Γ, A@s1 ⊢ B : Sort@s2 }} ->
     {{ Γ ⊢ λ r A M : Π r A B }}.
-Proof.  
+Proof.
   impl_opt_constructor.
 Qed.
 
@@ -160,7 +160,7 @@ Proof.
   intros.
   gen_presups.
   inversion_clear HAwf0.
-  assert ({{ Γ ⊢ A : Sort@s1 }} /\ {{ Γ, A@s1 ⊢ B : Sort@s2 }} /\ {{ Γ ⊢ Sort@s3 ≈ Sort@s }}) as [] by (eapply wf_pi_inversion; mauto 2).  
+  assert ({{ Γ ⊢ A : Sort@s1 }} /\ {{ Γ, A@s1 ⊢ B : Sort@s2 }} /\ {{ Γ ⊢ Sort@s3 ≈ Sort@s }}) as [] by (eapply wf_pi_inversion; mauto 2).
   destruct_conjs.
   econstructor; mauto 2.
 Qed.
@@ -171,7 +171,7 @@ Hint Resolve wf_app' : mcpts.
 Remove Hints wf_app : mcpts.
 
 Lemma wf_exp_eq_sort_sub' {P : PtsSig} : forall (Γ : ctx P) σ Δ s s',
-    Ax P s s' -> 
+    Ax P s s' ->
     {{ Γ ⊢s σ : Δ }} ->
     {{ Γ ⊢ Sort@s[σ] ≈ Sort@s : Sort@s' }}.
 Proof.
@@ -185,7 +185,7 @@ Hint Resolve wf_exp_eq_sort_sub' : mcpts.
 Hint Rewrite -> @wf_exp_eq_sort_sub' using solve [lia | mauto 3] : mcpts.
 
 Lemma wf_typ_eq_sort_sub' {P} : forall (Γ : ctx P) σ Δ s s',
-    Ax P s s' -> 
+    Ax P s s' ->
     {{ Γ ⊢s σ : Δ }} ->
     {{ Γ ⊢ Sort@s[σ] ≈ Sort@s }}.
 Proof.
@@ -256,7 +256,7 @@ Proof.
   assert ({{ Γ ⊢ A : Sort@s1 }} /\ {{ Γ, A@s1 ⊢ B : Sort@s2 }}) by mauto 2.
   destruct_conjs.
   econstructor; mauto 2.
-Qed.  
+Qed.
 
 #[export]
 Hint Resolve wf_exp_eq_app_cong' : mcpts.
@@ -303,6 +303,84 @@ Proof.
   intros.
   gen_presups.
   assert ({{ Γ ⊢ A : Sort@s1 }} /\ {{ Γ, A@s1 ⊢ B : Sort@s2 }}) by mauto 2.
-  destruct_conjs.  
+  destruct_conjs.
   econstructor; mauto 2.
 Qed.
+
+
+Corollary wf_exp_eq_nat_sub' {P} : forall {Γ : ctx P} {s} {r : Ru_nat P s}  σ Δ,
+    {{ Γ ⊢s σ : Δ }} ->
+    {{ Γ ⊢ ℕ[σ] ≈ ℕ : Sort@s }}.
+Proof.
+  intros.
+  mauto.
+Qed.
+
+#[export]
+Hint Resolve wf_exp_eq_nat_sub' : mcpts.
+#[export]
+Remove Hints wf_exp_eq_nat_sub : mcpts.
+
+
+Corollary wf_exp_eq_natrec_cong' {P} : forall {Γ : ctx P} {A A' MZ MZ' MS MS' M M' s s'} {r : Ru_nat P s},
+    {{ Γ, ℕ@s ⊢ A : Sort@s' }} ->
+    {{ Γ, ℕ@s ⊢ A' : Sort@s' }} ->
+    {{ Γ, ℕ@s ⊢ A ≈ A' : Sort@s' }} ->
+    {{ Γ ⊢ MZ ≈ MZ' : A[Id,,zero] }} ->
+    {{ Γ, ℕ@s, A@s' ⊢ MS ≈ MS' : A[Wk∘Wk,,succ #1] }} ->
+    {{ Γ ⊢ M ≈ M' : ℕ }} ->
+    {{ Γ ⊢ rec M return A | zero -> MZ | succ -> MS end ≈ rec M' return A' | zero -> MZ' | succ -> MS' end : A[Id,,M] }}.
+Proof.
+  try impl_opt_constructor.
+Qed.
+
+#[export]
+Hint Resolve wf_exp_eq_natrec_cong' : mcpts.
+#[export]
+Remove Hints wf_exp_eq_natrec_cong : mcpts.
+
+Corollary wf_exp_eq_natrec_sub' {P} : forall {Γ : ctx P} {σ Δ A MZ MS M s s'} {r : Ru_nat P s},
+    {{ Γ ⊢s σ : Δ }} ->
+    {{ Δ, ℕ@s ⊢ A : Sort@s' }} ->
+    {{ Δ ⊢ MZ : A[Id,,zero] }} ->
+    {{ Δ, ℕ@s, A@s' ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
+    {{ Δ ⊢ M : ℕ }} ->
+    {{ Γ ⊢ rec M return A | zero -> MZ | succ -> MS end[σ] ≈ rec M[σ] return A[q σ] | zero -> MZ[σ] | succ -> MS[q (q σ)] end : A[σ,,M[σ]] }}.
+Proof.
+  impl_opt_constructor.
+Qed.
+
+#[export]
+Hint Resolve wf_exp_eq_natrec_sub' : mcpts.
+#[export]
+Remove Hints wf_exp_eq_natrec_sub : mcpts.
+
+Corollary wf_exp_eq_nat_beta_zero' {P} : forall {Γ : ctx P} {A MZ MS s s'} {r : Ru_nat P s},
+    {{ Γ, ℕ@s ⊢ A : Sort@s' }} ->
+    {{ Γ ⊢ MZ : A[Id,,zero] }} ->
+    {{ Γ, ℕ@s, A@s' ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
+    {{ Γ ⊢ rec zero return A | zero -> MZ | succ -> MS end ≈ MZ : A[Id,,zero] }}.
+Proof.
+  impl_opt_constructor.
+Qed.
+
+#[export]
+Hint Resolve wf_exp_eq_nat_beta_zero' : mcpts.
+#[export]
+Remove Hints wf_exp_eq_nat_beta_zero : mcpts.
+
+
+Corollary wf_exp_eq_nat_beta_succ' {P} : forall {Γ : ctx P} {A MZ MS M s s'} {r : Ru_nat P s},
+    {{ Γ, ℕ@s ⊢ A : Sort@s' }} ->
+    {{ Γ ⊢ MZ : A[Id,,zero] }} ->
+    {{ Γ, ℕ@s, A@s' ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
+    {{ Γ ⊢ M : ℕ }} ->
+    {{ Γ ⊢ rec (succ M) return A | zero -> MZ | succ -> MS end ≈ MS[Id,,M,,rec M return A | zero -> MZ | succ -> MS end] : A[Id,,succ M] }}.
+Proof.
+  impl_opt_constructor.
+Qed.
+
+#[export]
+Hint Resolve wf_exp_eq_nat_beta_succ' : mcpts.
+#[export]
+Remove Hints wf_exp_eq_nat_beta_succ : mcpts.

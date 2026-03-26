@@ -93,6 +93,27 @@ Definition sort_glu_typ_pred {P : PtsSig} (pred_P : PredicativeSig P) (s1 s2 : P
 Arguments sort_glu_typ_pred {P} pred_P s1 s2 Γ A/.
 Transparent sort_glu_typ_pred.
 
+Inductive glu_nat {P} {s} (r : Ru_nat P s) : ctx P -> exp P -> domain P -> Prop :=
+| glu_nat_zero :
+  `{ {{ Γ ⊢ M ≈ zero : ℕ }} ->
+     glu_nat r Γ M d{{{ zero }}} }
+| glu_nat_succ :
+  `{ {{ Γ ⊢ M ≈ succ M' : ℕ }} ->
+     glu_nat r Γ M' m' ->
+     glu_nat r Γ M d{{{ succ m' }}} }
+| glu_nat_neut :
+  `{ per_bot m m ->
+     (forall {Δ σ M'}, {{ Δ ⊢w σ : Γ }} -> {{ Rne m in length Δ ↘ M' }} -> {{ Δ ⊢ M[σ] ≈ M' : ℕ }}) ->
+     glu_nat r Γ M d{{{ ⇑ a m }}} }.
+
+#[export]
+Hint Constructors glu_nat : mcpts.
+
+Definition nat_glu_typ_pred {P : PtsSig} {s} (r : Ru_nat P s) : glu_typ_pred P := fun Γ A => {{ Γ ⊢ A ≈ ℕ : Sort@s }}.
+Arguments nat_glu_typ_pred {P} {s} r Γ A/.
+
+Definition nat_glu_exp_pred {P : PtsSig} {s} (r : Ru_nat P s) : glu_exp_pred P := fun Γ A M m => {{ Γ ⊢ A ® nat_glu_typ_pred r }} /\ glu_nat r Γ M m.
+Arguments nat_glu_exp_pred {P} {s} r Γ A M m/.
 
 Section Gluing.
   Context
@@ -143,6 +164,12 @@ Section Gluing.
           el_rel <∙> pi_glu_exp_pred r in_rel IP IEL elem_rel OEL ->
           {{ DG Π r a ρ B ∈ glu_sort_elem_core ↘ typ_rel ↘ el_rel }} }
 
+  | glu_sort_elem_core_nat :
+    `{ forall (r : Ru_nat P s) typ_rel el_rel,
+          typ_rel <∙> nat_glu_typ_pred r ->
+          el_rel <∙> nat_glu_exp_pred r ->
+          {{ DG ℕ ∈ glu_sort_elem_core ↘ typ_rel ↘ el_rel }} }
+
   | glu_sort_elem_core_neut :
     `{ forall typ_rel el_rel,
           {{ Dom b ≈ b ∈ per_bot }} ->
@@ -182,6 +209,12 @@ Section Gluing.
           el_rel <∙> pi_glu_exp_pred r in_rel IP IEL elem_rel OEL ->
           motive typ_rel el_rel d{{{ Π r a ρ B }}} )
 
+      (case_nat :
+        forall (r : Ru_nat P s) typ_rel el_rel,
+          typ_rel <∙> nat_glu_typ_pred r ->
+          el_rel <∙> nat_glu_exp_pred r ->
+          motive typ_rel el_rel d{{{ ℕ }}})
+
       (case_neut :
         forall {b}
           typ_rel el_rel,
@@ -194,7 +227,7 @@ Section Gluing.
   
   #[derive(equations=no, eliminator=no)]
   Equations glu_sort_elem_core_strong_ind typ_rel exp_rel a (H : glu_sort_elem_core typ_rel exp_rel a) : motive typ_rel exp_rel a :=
-  | typ_rel, exp_rel, a, (glu_sort_elem_core_sort typ_rel exp_rel ax_s'_s HT HE) => (case_sort typ_rel exp_rel ax_s'_s HT HE);
+  | typ_rel, exp_rel, a, (glu_sort_elem_core_sort typ_rel exp_rel ax_s'_s HT HE) => (case_sort typ_rel exp_rel ax_s'_s HT HE)
   | typ_rel, exp_rel, a, (glu_sort_elem_core_pi r in_rel IP IEL OP OEL typ_rel exp_rel elem_rel glu_a Ha glu_B HPi Htyp Hexp) =>
       (case_pi r
          in_rel
@@ -213,7 +246,8 @@ Section Gluing.
             conj (fun eq => conj _ (glu_sort_elem_core_strong_ind _ _ _ (HB' eq))) _)
          HPi
          Htyp
-         Hexp);
+         Hexp)
+  | typ_rel, exp_rel, a, (glu_sort_elem_core_nat r typ_rel exp_rel Htyp Hexp) => (case_nat r typ_rel exp_rel Htyp Hexp)
   | typ_rel, exp_rel, a, (glu_sort_elem_core_neut typ_rel exp_rel Hb Htyp Hexp) => (case_neut typ_rel exp_rel Hb Htyp Hexp)
   .
 End Gluing.
@@ -281,6 +315,12 @@ Section GluingInduction.
           exp_rel <∙> pi_glu_exp_pred r in_rel IP IEL elem_rel OEL ->
           motive s3 typ_rel exp_rel d{{{ Π r a ρ B }}} )
 
+      (case_nat :
+        forall s (r : Ru_nat P s) (typ_rel : glu_typ_pred P) (exp_rel : glu_exp_pred P),
+          typ_rel <∙> nat_glu_typ_pred r ->
+          exp_rel <∙> nat_glu_exp_pred r ->
+          motive s typ_rel exp_rel d{{{ ℕ }}})
+
       (case_neut :
         forall s b
           (typ_rel : glu_typ_pred P)
@@ -310,6 +350,7 @@ Section GluingInduction.
              HP'
              HEl')
         _ (* case_pi s *)
+        (case_nat s)
         (case_neut s)
         typ_rel exp_rel a _.
   Next Obligation.

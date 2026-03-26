@@ -8,7 +8,7 @@ Import Syntax_Notations.
 Lemma wf_pi_inversion {P : PtsSig} : forall {Γ : ctx P} {A B C s1 s2 s3} {r : Ru P s1 s2 s3},
     {{ Γ ⊢ Π r A B : C }} ->
     {{ Γ ⊢ A : Sort@s1 }} /\ {{ Γ, A@s1 ⊢ B : Sort@s2 }} /\ {{ Γ ⊢ Sort@s3 ≈ C }}.
-Proof with mautosolve 4.  
+Proof with mautosolve 4.
   intros * H.
   dependent induction H;
     gen_core_presups; mauto.
@@ -35,7 +35,7 @@ Corollary wf_pi_inversion_typ {P} : forall {Γ : ctx P} {A B C s1 s2 s3} {r : Ru
 Proof.
   intros.
   assert ({{ Γ ⊢ A : Sort@s1 }} /\ {{ Γ, A@s1 ⊢ B : Sort@s2 }} /\ {{ Γ ⊢ Sort@s3 ≈ C }}) by (eapply wf_pi_inversion; mauto 2).
-  destruct_conjs; mauto 2.  
+  destruct_conjs; mauto 2.
 Qed.
 
 
@@ -97,7 +97,7 @@ Proof with mautosolve 4.
     econstructor; mauto 3.
   - assert (exists A0 B s1 s2 s3 r, {{ Γ ⊢ M : Π r A0 B }} /\ {{ Γ ⊢ N : A0 }} /\ {{ Γ ⊢ B[Id,,N] ≈ A }}) by (eapply IHwf_exp1; mauto).
     destruct_conjs.
-    do 6 eexists; repeat split; mauto.  
+    do 6 eexists; repeat split; mauto.
 Qed.
 
 #[export]
@@ -118,8 +118,81 @@ Proof with mautosolve 4.
 Qed.
 
 #[export]
-Hint Resolve wf_vlookup_inversion : mcpts.
-  
+  Hint Resolve wf_vlookup_inversion : mcpts.
+
+Lemma wf_nat_inversion {P} : forall {Γ : ctx P} {A},
+    {{ Γ ⊢ ℕ : A }} ->
+    exists s (r : Ru_nat P s),
+      {{ Γ ⊢ Sort@s ≈ A }}.
+Proof with mautosolve.
+  intros * H.
+  dependent induction H.
+  - eexists. mauto.
+  - specialize (IHwf_exp1 A0 ltac:(reflexivity) ltac:(reflexivity)).
+    destruct_conjs.
+    do 2 eexists. apply H3.
+    etransitivity; mauto.
+Qed.
+
+#[export]
+  Hint Resolve wf_nat_inversion : mcpts.
+
+Corollary wf_zero_inversion {P} : forall {Γ : ctx P} {A},
+    {{ Γ ⊢ zero : A }} ->
+    exists s (r : Ru_nat P s),
+      {{ Γ ⊢ ℕ ≈ A }}.
+Proof with mautosolve.
+  intros * H.
+  dependent induction H.
+  - eexists. mauto.
+  - specialize (IHwf_exp1 A0 ltac:(reflexivity) ltac:(reflexivity)).
+    destruct_conjs.
+    do 2 eexists. apply H3.
+    etransitivity; mauto.
+Qed.
+
+#[export]
+Hint Resolve wf_zero_inversion : mcpts.
+
+Corollary wf_succ_inversion {P} : forall {Γ : ctx P} {A M},
+    {{ Γ ⊢ succ M : A }} ->
+    {{ Γ ⊢ M : ℕ }} /\ {{ Γ ⊢ ℕ ≈ A }}.
+Proof with mautosolve.
+  intros * H.
+  dependent induction H.
+  - eexists; mautosolve.
+  - specialize (IHwf_exp1 A0 M ltac:(reflexivity) ltac:(reflexivity)).
+    destruct_conjs.
+    eexists. apply H3.
+    etransitivity; mauto.
+Qed.
+
+#[export]
+Hint Resolve wf_succ_inversion : mcpts.
+
+Lemma wf_natrec_inversion {P} : forall {Γ : ctx P} {A M A' MZ MS},
+    {{ Γ ⊢ rec M return A' | zero -> MZ | succ -> MS end : A }} ->
+    exists s s', {{ Γ ⊢ MZ : A'[Id,,zero] }} /\ {{ Γ, ℕ@s, A'@s' ⊢ MS : A'[Wk∘Wk,,succ(#1)] }} /\ {{ Γ ⊢ M : ℕ }} /\ {{ Γ ⊢ A'[Id,,M] ≈ A }}.
+Proof with mautosolve.
+  intros * H.
+  dependent induction H.
+  - do 2 eexists.
+    do 3 (eexists; mauto).
+    eapply wf_typ_eq_refl.
+    assert {{ Γ, ℕ@s ⊢ A' }}; mauto 2.
+    assert {{ Γ ⊢s Id,,M : Γ, ℕ@s }} by mauto 4.
+    mauto 3.
+  - specialize (IHwf_exp1 A0 M A' MZ MS ltac:(reflexivity) ltac:(reflexivity)).
+    destruct_conjs.
+    do 2 eexists.
+    repeat split; mauto.
+Qed.
+
+#[export]
+Hint Resolve wf_natrec_inversion : mcpts.
+
+
+
 (** Here, we get a disjunction because we cannot know in advance if A' is a sort or not *)
 Lemma wf_exp_sub_inversion {P : PtsSig} : forall {Γ : ctx P} {M σ A},
     {{ Γ ⊢ M[σ] : A }} ->
@@ -131,20 +204,20 @@ Proof with mautosolve 3.
     gen_core_presups.
   - assert {{ Γ ⊢ A0[σ] ≈ A0[σ] : Sort@s }} by mauto 3.
     do 3 eexists; repeat split; mauto 4.
-    
+
   - do 3 eexists; repeat split; mauto 4.
     right; split; mauto 3.
   - specialize (IHwf_exp1 M σ A0 ltac:(reflexivity) ltac:(reflexivity)) as [Δ [A' [s']]].
     destruct_conjs.
     do 3 eexists; repeat split; mauto.
     destruct H5; destruct_conjs.
-    + left; split; mauto 3.      
+    + left; split; mauto 3.
     + right; split; mauto 3.
 Qed.
 
 #[export]
-Hint Resolve wf_exp_sub_inversion : mcpts.  
-  
+Hint Resolve wf_exp_sub_inversion : mcpts.
+
 (** We omit [wf_conv] as they do not give useful inversions *)
 
 Lemma wf_sub_id_inversion {P : PtsSig} : forall (Γ : ctx P) Δ,
@@ -163,10 +236,10 @@ Lemma wf_sub_weaken_inversion {P : PtsSig} : forall {Γ : ctx P} {Δ},
     exists Γ' A s, {{ ⊢ Γ ≈ Γ', A@s }} /\ {{ ⊢ Γ' ≈ Δ }}.
 Proof.
   intros * H.
-  
+
   dependent induction H;
     firstorder;
-    progressive_inversion.  
+    progressive_inversion.
   - repeat eexists; mauto 2.
   - assert (exists Γ' A s, {{ ⊢ Γ ≈ Γ', A@s }} /\ {{ ⊢ Γ' ≈ Δ0 }}) by (eapply IHwf_sub; mauto).
     destruct_conjs.
@@ -205,4 +278,3 @@ Qed.
 
 #[export]
 Hint Resolve wf_sub_extend_inversion : mcpts.
-    

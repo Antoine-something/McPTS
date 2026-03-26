@@ -150,6 +150,27 @@ with wf_exp_ann {P} : ctx P -> typ P -> SortOption P -> exp P -> Prop :=
      {{ #x : A@s ∈ Γ }} ->
      {{ Γ ⊫ #x : A @ ^(Some s) }} )
 
+(** Naturals *)
+| wfa_nat :
+  `( forall (r : Ru_nat P sn),
+        {{ ⊫ Γ }} ->
+        {{ Γ ⊫ ℕ : Sort@sn @ ^None }} )
+| wfa_zero :
+  `( forall (r : Ru_nat P sn),
+        {{ ⊫ Γ }} ->
+        {{ Γ ⊫ zero : ℕ @ ^(Some sn) }} )
+| wfa_succ :
+  `( forall (r : Ru_nat P sn),
+        {{ Γ ⊫ M : ℕ @ ^(Some sn) }} ->
+        {{ Γ ⊫ succ M : ℕ @ ^(Some sn) }} )
+| wfa_rec :
+  `( forall (r : Ru_nat P sn),
+        {{ Γ, ℕ@sn ⊫ A : Sort@sa @ so1 }} ->
+        {{ Γ ⊫ MZ : A[Id,,zero] @ ^(Some sa) }} ->
+        {{ Γ, ℕ@sn, A@sa ⊫ MS : A[Wk∘Wk,,succ #1] @ ^(Some sa) }} ->
+        {{ Γ ⊫ M : ℕ @ ^(Some sn) }} ->
+        {{ Γ ⊫ rec M return A | zero -> MZ | succ -> MS end : A[Id,,M] @ ^(Some sa) }} )
+
 (** explicit substitutions *)
 | wfa_exp_sub_typ :
   `( {{ Γ ⊫s σ : Δ }} ->
@@ -261,6 +282,59 @@ Ltac gen_sort_none P :=
     end;
   unmark_all.
 
+Lemma ctx_ann_decomp {P : PtsSig} : forall {Γ : ctx P} {A s}, {{ ⊫ Γ, A@s }} -> {{ ⊫ Γ }} /\ exists so, {{ Γ ⊫ A : Sort@s @ so }}.
+Proof with now eauto.
+  inversion 1...
+Qed.
+
+#[local]
+Hint Resolve ctx_ann_decomp : mcpts.
+
+Corollary ctx_ann_decomp_left {P : PtsSig} : forall {Γ : ctx P} {A s}, {{ ⊫ Γ, A@s }} -> {{ ⊫ Γ }}.
+Proof with easy.
+  intros * ?%ctx_ann_decomp...
+Qed.
+
+Corollary ctx_ann_decomp_right {P : PtsSig} : forall {Γ : ctx P} {A s}, {{ ⊫ Γ, A@s }} -> exists so, {{ Γ ⊫ A : Sort@s @ so }}.
+Proof with easy.
+  intros * ?%ctx_ann_decomp...
+Qed.
+
+#[local]
+Hint Resolve ctx_ann_decomp_left ctx_ann_decomp_right : mcpts.
+
+Lemma presup_sub_ann_ctx_ann {P} : forall {Γ : ctx P} {σ Δ},
+    {{ Γ ⊫s σ : Δ }} -> {{ ⊫ Γ }} /\ {{ ⊫ Δ }}.
+Proof.
+  induction 1; destruct_conjs; split; mauto 3.
+Qed.
+
+#[local]
+Hint Resolve presup_sub_ann_ctx_ann : mcpts.
+
+Lemma presup_sub_ann_ctx_ann_left {P} : forall {Γ : ctx P} {σ Δ},
+    {{ Γ ⊫s σ : Δ }} -> {{ ⊫ Γ }}.
+Proof with easy.
+  intros * ?%presup_sub_ann_ctx_ann...
+Qed.
+
+Lemma presup_sub_ann_ctx_ann_right {P} : forall {Γ : ctx P} {σ Δ},
+    {{ Γ ⊫s σ : Δ }} -> {{ ⊫ Δ }}.
+Proof with easy.
+  intros * ?%presup_sub_ann_ctx_ann...
+Qed.
+
+#[local]
+Hint Resolve presup_sub_ann_ctx_ann_left presup_sub_ann_ctx_ann_right : mcpts.
+
+Lemma presup_exp_ann_ctx_ann {P} : forall {Γ : ctx P} {M A so},
+    {{ Γ ⊫ M : A @ so }} -> {{ ⊫ Γ }}.
+Proof.
+  induction 1; mauto 3.
+Qed.
+
+#[local]
+Hint Resolve presup_exp_ann_ctx_ann : mcpts.
  
 Lemma wf_ctx_implies_wf_ctx_ann {P} : forall {Γ : ctx P},
     {{ ⊢ Γ }} -> {{ ⊫ Γ }}
@@ -282,6 +356,31 @@ Proof.
     assert {{ Γ ⊫ A0 @ ^(Some s1) }} by mauto 2.
     assert {{ Γ ⊫ N : A0 @ ^(Some s1) }} by mauto 2.
     eexists; mauto 2.
+  - eexists; econstructor; mauto 3.
+    eapply wfa_exp_conv_ann; mauto 3.
+    do 2 (econstructor; mauto 3).
+  - assert {{ Γ ⊫s Id : Γ }} by mauto 3.
+    assert {{ Γ ⊫ zero : ℕ[Id] @ ^(Some s) }} by (eapply wfa_exp_conv; mauto 4; mauto).
+    assert {{ Γ ⊫s Id,,zero : Γ, ℕ@s }} by (econstructor; mauto 3).
+    assert {{ Γ ⊫ A0[Id,,zero] @ ^(Some s') }} by mauto 3.
+    assert {{ Γ ⊫ MZ : A0[Id,,zero] @ ^(Some s') }} by mauto 3.
+    assert {{ Γ ⊢ ℕ : Sort@s }} by mauto 3.
+    assert {{ Γ ⊫ ℕ @ ^(Some s) }} by mauto 4.
+    assert {{ Γ, ℕ@s ⊢s Wk : Γ }} by mauto 3.
+    assert {{ Γ, ℕ@s ⊫s Wk : Γ }} by mauto 3.
+    assert {{ Γ, ℕ@s, A0@s' ⊢s Wk : Γ, ℕ@s }} by mauto 3.
+    assert {{ Γ, ℕ@s, A0@s' ⊫s Wk : Γ, ℕ@s }} by mauto 3.
+    assert {{ Γ, ℕ@s, A0@s' ⊫s Wk∘Wk : Γ }} by mauto 3.
+    assert {{ Γ, ℕ@s, A0@s' ⊢ ℕ[Wk][Wk] ≈ ℕ : Sort@s }} by mauto 3.
+    assert {{ Γ, ℕ@s, A0@s' ⊢ ℕ[Wk][Wk] ≈ ℕ[Wk∘Wk] : Sort@s }} by mauto 3.
+    assert {{ Γ, ℕ@s, A0@s' ⊫ #1 : ℕ[Wk][Wk] @ ^(Some s) }} by mauto 4.
+    assert {{ Γ, ℕ@s, A0@s' ⊫ #1 : ℕ @ ^(Some s) }} by (eapply wfa_exp_conv; mauto 4).
+    assert {{ Γ, ℕ@s, A0@s' ⊫ succ #1 : ℕ @ ^(Some s) }} by mauto 3.
+    assert {{ Γ, ℕ@s, A0@s' ⊫ succ #1 : ℕ[Wk∘Wk] @ ^(Some s) }} by (eapply wfa_exp_conv; mauto 4).
+    assert {{ Γ, ℕ@s, A0@s' ⊫s Wk∘Wk,,succ #1 : Γ, ℕ@s }} by (econstructor; mauto 3).
+    assert {{ Γ, ℕ@s, A0@s' ⊫ A0[Wk∘Wk,,succ #1] @ ^(Some s') }} by mauto 3.
+    assert {{ Γ, ℕ@s, A0@s' ⊫ MS : A0[Wk∘Wk,,succ #1] @ ^(Some s') }} by mauto 3.
+    eexists; econstructor; mauto 3.
   - assert {{ Δ ⊫ A0 @ ^(Some s) }} by mauto 2.
     assert {{ Δ ⊫ M0 : A0 @ ^(Some s) }} by mauto 2.
     eexists; mauto 2. 
@@ -294,49 +393,6 @@ Qed.
 
 #[export]
 Hint Resolve wf_ctx_implies_wf_ctx_ann wf_exp_implies_wf_exp_ann wf_sub_implies_wf_sub_ann : mcpts.
- 
-(* Lemma wf_ctx_implies_wf_ctx_ann {P} (full_P : FullSig P) : forall {Γ : ctx P}, *)
-(*     {{ ⊢ Γ }} -> {{ ⊫ Γ }} *)
-(* with wf_exp_implies_wf_exp_ann {P} (full_P : FullSig P) : forall {Γ : ctx P} {M A}, *)
-(*     {{ Γ ⊢ M : A }} -> exists s, {{ Γ ⊫ M : A @ s }} *)
-(* with wf_sub_implies_wf_sub_ann {P} (full_P : FullSig P) : forall {Γ : ctx P} {σ Δ}, *)
-(*     {{ Γ ⊢s σ : Δ }} -> {{ Γ ⊫s σ : Δ }}. *)
-(* Proof. *)
-(*   all: inversion_clear 1; *)
-(*     (on_all_hyp: gen_annotated_judg_IH P full_P wf_ctx_implies_wf_ctx_ann wf_exp_implies_wf_exp_ann wf_sub_implies_wf_sub_ann); *)
-(*     clear wf_ctx_implies_wf_ctx_ann wf_exp_implies_wf_exp_ann wf_sub_implies_wf_sub_ann; *)
-(*     destruct_conjs; *)
-(*     apply_fullness_all P full_P; *)
-(*     mauto 3. *)
-
-(*   - eexists; econstructor; mauto 3. *)
-(*   - assert {{ Γ ⊫ Π r A0 B : Sort@s3 @ s3' }} by mauto 3. *)
-(*     assert {{ Γ ⊫ Π r A0 B @ s3 }} by mauto 3. *)
-(*     assert {{ Γ ⊫ M0 : Π r A0 B @ s3 }} by mauto 2. *)
-(*     assert {{ Γ ⊫ A0 @ s1 }} by mauto 2. *)
-(*     assert {{ Γ ⊫ N : A0 @ s1 }} by mauto 2. *)
-(*     exists s2. mauto 3. *)
-(*   - assert {{ Δ ⊫ A0 @ s }} by mauto 2. *)
-(*     assert {{ Δ ⊫ M0 : A0 @ s }} by mauto 2. *)
-(*     eexists; econstructor; mauto 3. *)
-(*   - assert {{ Γ ⊫ M : A0 @ s }} by mauto 3. *)
-(*     eexists; mauto 3. *)
-(*   - econstructor; mauto 3. *)
-(*     assert {{ Γ ⊫ A[σ0] : Sort@s @ HM0 }} by mauto 3. *)
-(*     assert {{ Γ ⊫ A[σ0] @ s }} by mauto 2. *)
-(*     mauto 3. *)
-(* Qed. *)
-
-
-(* Lemma wf_typ_full_implies_wf_exp {P} (full_P : FullSig P) : forall {Γ : ctx P} {A}, *)
-(*     {{ Γ ⊢ A }} -> *)
-(*     exists s, {{ Γ ⊢ A : Sort@s }}. *)
-(* Proof. *)
-(*   inversion_clear 1; mauto 2. *)
-(*   assert (exists s', Ax P s s') as [s'] by (eapply full_P). *)
-(*   eexists; mauto 2. *)
-(* Qed. *)
-
 
 Lemma wf_typ_implies_wf_typ_ann {P} : forall {Γ : ctx P} {A},
     {{ Γ ⊢ A }} -> exists so, {{ Γ ⊫ A @ so }}.

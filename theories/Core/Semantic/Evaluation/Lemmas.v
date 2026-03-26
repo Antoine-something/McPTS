@@ -16,7 +16,7 @@ Section functional_eval.
     dependent induction H1;
       intros * H2; inversion H2; mauto 2.
   Qed.
-  
+
   Lemma functional_eval {P : PtsSig} :
     (forall (M : exp P) ρ m1,
         {{ ⟦ M ⟧ ρ ↘ m1 }} ->
@@ -28,15 +28,20 @@ Section functional_eval.
           forall e2,
             {{ $| m & n |↘ e2 }} ->
             e1 = e2) /\
+      (forall (A : exp P) MZ MS m ρ e1,
+          {{ rec m ⟦return A | zero -> MZ | succ -> MS end⟧ ρ ↘ e1 }} ->
+          forall e2,
+            {{ rec m ⟦return A | zero -> MZ | succ -> MS end⟧ ρ ↘ e2 }} ->
+            e1 = e2) /\
       (forall (σ : sub P) ρ ρσ1,
           {{ ⟦ σ ⟧s ρ ↘ ρσ1 }} ->
           forall ρσ2,
             {{ ⟦ σ ⟧s ρ ↘ ρσ2 }} ->
             ρσ1 = ρσ2).
-  Proof with ((on_all_hyp: fun H => erewrite H in *; eauto); solve [eauto]) using.    
+  Proof with ((on_all_hyp: fun H => erewrite H in *; eauto); solve [eauto]) using.
     apply eval_mut_ind; intros.
 
-    1,5,6,9-12: progressive_inversion; do 2 f_equal; try reflexivity...
+    1,5-9,10,13-19: progressive_inversion; do 2 f_equal; try reflexivity...
 
     - progressive_inversion.
       eapply env_lookup_functional; mauto 2.
@@ -45,9 +50,8 @@ Section functional_eval.
         use 'progressive_invert' on the relevant assumption instead *)
     - progressive_invert H0.
       assert (a = a0) by mauto.
-      subst.      
-      reflexivity.
-      
+      congruence.
+
     - progressive_invert H.
       reflexivity.
     - progressive_invert H0.
@@ -64,7 +68,7 @@ Section functional_eval.
   Proof.
     pose proof @functional_eval P; firstorder.
   Qed.
-  
+
   Corollary functional_eval_app {P : PtsSig} : forall (m : domain P) n e1 e2,
       {{ $| m & n |↘ e1 }} ->
       {{ $| m & n |↘ e2 }} ->
@@ -73,7 +77,15 @@ Section functional_eval.
     pose proof @functional_eval P; intuition.
     eapply H; mauto 2.
   Qed.
-  
+
+  Corollary functional_eval_natrec {P : PtsSig} : forall (A : exp P) MZ MS m ρ e1 e2,
+      {{ rec m ⟦return A | zero -> MZ | succ -> MS end⟧ ρ ↘ e1 }} ->
+      {{ rec m ⟦return A | zero -> MZ | succ -> MS end⟧ ρ ↘ e2 }} ->
+      e1 = e2.
+  Proof.
+    pose proof @functional_eval P; intuition.
+  Qed.
+
   Corollary functional_eval_sub {P : PtsSig} : forall (σ : sub P) ρ ρσ1 ρσ2,
       {{ ⟦ σ ⟧s ρ ↘ ρσ1 }} ->
       {{ ⟦ σ ⟧s ρ ↘ ρσ2 }} ->
@@ -97,6 +109,9 @@ Ltac functional_eval_rewrite_clear1 :=
       clean replace m2 with m1 by first [solve [mauto 2] | tactic_error m2 m1]; clear H2
   | H1 : {{ $| ^?m & ^?n |↘ ^?e1 }},
       H2 : {{ $| ^?m & ^?n |↘ ^?e2 }} |- _ =>
+      clean replace e2 with e1 by first [solve [mauto 2] | tactic_error e2 e1]; clear H2
+  | H1 : {{ rec ^?m ⟦return ^?A | zero -> ^?MZ | succ -> ^?MS end⟧ ^?ρ ↘ ^?e1 }},
+      H2 : {{ rec ^?m ⟦return ^?A | zero -> ^?MZ | succ -> ^?MS end⟧ ^?ρ ↘ ^?e2 }} |- _ =>
       clean replace e2 with e1 by first [solve [mauto 2] | tactic_error e2 e1]; clear H2
   | H1 : {{ ⟦ ^?σ ⟧s ^?ρ ↘ ^?ρσ1 }},
       H2 : {{ ⟦ ^?σ ⟧s ^?ρ ↘ ^?ρσ2 }} |- _ =>

@@ -145,6 +145,36 @@ Proof.
   - eauto using per_top_typ_trans.
 Qed.
 
+Lemma per_nat_sym {P} : forall m n : domain P,
+    {{ Dom m ≈ n ∈ per_nat }} ->
+    {{ Dom n ≈ m ∈ per_nat }}.
+Proof with mautosolve.
+  induction 1; econstructor...
+Qed.
+
+#[export]
+Hint Resolve per_nat_sym : mcpts.
+
+Lemma per_nat_trans {P} : forall m n l : domain P,
+    {{ Dom m ≈ n ∈ per_nat }} ->
+    {{ Dom n ≈ l ∈ per_nat }} ->
+    {{ Dom m ≈ l ∈ per_nat }}.
+Proof with mautosolve.
+  intros * H. gen l.
+  induction H; inversion_clear 1; econstructor...
+Qed.
+
+#[export]
+Hint Resolve per_nat_trans : mcpts.
+
+#[export]
+Instance per_nat_PER {P} : PER (@per_nat P).
+Proof.
+  split.
+  - eauto using per_nat_sym.
+  - eauto using per_nat_trans.
+Qed.
+
 Lemma per_ne_sym {P} : forall m n : domain P,
     {{ Dom m ≈ n ∈ per_ne }} ->
     {{ Dom n ≈ m ∈ per_ne }}.
@@ -179,7 +209,7 @@ Qed.
 
 Add Parametric Morphism {P} {pred_P : PredicativeSig P} s (per_sort_elem_rec : forall s', pred_rel pred_P s' s -> relation (domain P) -> relation (domain P)) : (per_sort_elem_core pred_P s per_sort_elem_rec)
     with signature (@relation_equivalence (domain P)) ==> eq ==> eq ==> iff as per_sort_elem_core_morphism_iff.
-Proof with mautosolve.
+Proof with mautosolve 3.
   simpl.
   intros R R' HRR'.
 
@@ -190,28 +220,27 @@ Proof with mautosolve.
     intros;
     destruct_rel_mod_eval;
     econstructor; mauto 3.
-  1-3: rewrite <- HRR'; mauto.
-  all: rewrite HRR'; mauto.
+  1-4: rewrite <- HRR'...
+  all: rewrite HRR'...
 Qed.
 
 Add Parametric Morphism {P} {pred_P : PredicativeSig P} s : (per_sort_elem pred_P s)
     with signature (@relation_equivalence (domain P)) ==> eq ==> eq ==> iff as per_sort_elem_morphism_iff.
-Proof with mautosolve.
+Proof with mautosolve 3.
   simp per_sort_elem.
   intros R R' HRR'.
 
   split; intros Horig; [gen R' | gen R];
-  
+
     induction Horig;
     eauto;
     try (etransitivity; [symmetry + idtac|]; eassumption);
     intros;
     destruct_rel_mod_eval;
     econstructor; mauto 3.
-  1-3: rewrite <- HRR'; mauto.
-  all: rewrite HRR'; mauto.
+  1-4: rewrite <- HRR'...
+  all: rewrite HRR'...
 Qed.
-
 
 Add Parametric Morphism {P} {pred_P : PredicativeSig P} s per_sort_rec : (per_sort_elem_core pred_P s per_sort_rec)
     with signature (@relation_equivalence (domain P)) ==> (@relation_equivalence (domain P)) as per_sort_elem_core_morphism_relation_equivalence.
@@ -378,7 +407,7 @@ Qed.
 
 #[local]
 Ltac per_sort_elem_econstructor' :=
-  (repeat intro; hnf; (eapply per_sort_elem_pi_econstructor)) + basic_per_sort_elem_econstructor.
+  (repeat intro; hnf; eapply per_sort_elem_pi_econstructor) + basic_per_sort_elem_econstructor.
 
 Lemma per_sort_elem_sym {P} {pred_P : PredicativeSig P} : forall {s R a b},
     {{ DF a ≈ b ∈ per_sort_elem pred_P s ↘ R }} ->
@@ -393,7 +422,7 @@ Proof with mautosolve.
   - split.
     + apply per_sort_elem_core_sort'; firstorder.
     + intros.
-      rewrite H0 in *.
+      rewrite_relation_equivalence_left.
       destruct_by_head (per_sort pred_P).
       eexists.
       eapply proj1...
@@ -404,10 +433,10 @@ Proof with mautosolve.
       assert (in_rel n' n) by eauto.
       assert (in_rel n n) by (etransitivity; eassumption).
       destruct_rel_mod_eval.
-      functional_eval_rewrite_clear.
+      simplify_evals.
       econstructor; eauto.
       per_sort_elem_right_irrel_assert.
-      apply_relation_equivalence.
+      rewrite_relation_equivalence_left.
       eassumption.
     + apply_relation_equivalence.
       intros.
@@ -415,18 +444,18 @@ Proof with mautosolve.
       assert (in_rel n n) by (etransitivity; eassumption).
       destruct_rel_mod_eval.
       destruct_rel_mod_app.
-      functional_eval_rewrite_clear.
+      simplify_evals.
       econstructor; eauto.
       per_sort_elem_right_irrel_assert.
       intuition.
-  - destruct_conjs.
-    split; [per_sort_elem_econstructor' | apply_relation_equivalence]; mauto 3.
+  - split; [per_sort_elem_econstructor' | apply_relation_equivalence]; mauto 3.
+  - split; [per_sort_elem_econstructor' | apply_relation_equivalence]; mauto 3.
 Qed.
 
 Corollary per_sort_sym {P} {pred_P : PredicativeSig P} : forall s R a b,
     {{ DF a ≈ b ∈ per_sort_elem pred_P s ↘ R }} ->
     {{ DF b ≈ a ∈ per_sort_elem pred_P s ↘ R }}.
-Proof.  
+Proof.
   intros * ?%per_sort_elem_sym.
   firstorder.
 Qed.
@@ -547,6 +576,8 @@ Proof with (per_sort_elem_econstructor'; mautosolve 4).
     handle_per_sort_elem_irrel.
     econstructor; eauto.
     intuition.
+  - (* nat case *)
+    idtac...
   - (* neut case *)
     idtac...
 Qed.
@@ -652,15 +683,16 @@ Proof.
     (on_all_hyp: destruct_rel_by_assumption in_rel0).
     econstructor; eauto.
     apply -> per_sort_elem_morphism_iff; eauto.
-    split; intuition.
-    destruct_by_head (rel_typ pred_P).
+    split; [| intuition].
+    intros.
+    destruct_by_head (@rel_typ P).
     handle_per_sort_elem_irrel.
     intuition.
   - split; intros;
       [assert (in_rel0 n n') by intuition; (on_all_hyp: destruct_rel_by_assumption in_rel0)
       | assert (in_rel n n') by intuition; (on_all_hyp: destruct_rel_by_assumption in_rel)];
       econstructor; intuition.
-    destruct_by_head (rel_typ pred_P).
+    destruct_by_head (@rel_typ P).
     handle_per_sort_elem_irrel.
     intuition.
 Qed.
@@ -675,7 +707,7 @@ Ltac invert_per_sort_elems := match_by_head per_sort_elem ltac:(fun H => directe
 Add Parametric Morphism {P : PtsSig} {pred_P : PredicativeSig P} : (per_typ_elem pred_P)
   with signature (@relation_equivalence (domain P)) ==> eq ==> eq ==> iff as per_typ_elem_morphism_iff.
 Proof with mautosolve.
-  intros R R' HRR'.  
+  intros R R' HRR'.
   split; intro Horig; [gen R' | gen R];
     induction Horig; econstructor;
     apply_relation_equivalence; try reflexivity; try eassumption.
@@ -723,7 +755,7 @@ Proof with mautosolve.
   - apply_relation_equivalence.
     intros.
     eapply per_sort_sym'; mauto.
-  - assert (per_sort_elem pred_P s R b a) by (eapply per_sort_sym; mauto).
+  - assert {{ DF b ≈ a ∈ per_sort_elem pred_P s ↘ R }} by (eapply per_sort_sym; mauto).
     econstructor; mauto.
   - intros.
     eapply per_elem_sym; mauto.
@@ -804,14 +836,14 @@ Proof with mautosolve.
   - split.
     + intros.
       mauto.
-    + apply_relation_equivalence.      
+    + apply_relation_equivalence.
       eapply per_sort_trans'; mauto.
   - split.
     + intros.
       dependent destruction H0.
       * apply_relation_equivalence.
         econstructor; mauto.
-      * assert (per_sort_elem pred_P s R a b) by (eapply per_sort_trans; mauto).
+      * assert {{ DF a ≈ b ∈ per_sort_elem pred_P s ↘ R }} by (eapply per_sort_trans; mauto).
         econstructor; mauto.
     + apply_relation_equivalence.
       eapply per_sort_elem_trans; mauto.
@@ -823,8 +855,8 @@ Proof.
   split.
   - intros x y H.
     eapply (per_typ_elem_sym H).
-  - intros x y z Hxy Hyz.
-    eapply (proj1 (per_typ_elem_trans R x y Hxy) z Hyz).
+  - intros x y **.
+    eapply (per_typ_elem_trans R x y ltac:(eassumption)); eassumption.
 Qed.
 
 
@@ -887,29 +919,16 @@ Proof with (destruct_rel_typ; handle_per_sort_elem_irrel; eexists; intuition).
     try reflexivity.
   specialize (IHHorig _ _ equiv_Γ_Γ'0).
   intros ρ ρ'.
-  split; intros Hcons; dependent destruction Hcons.
-  - assert {{ Dom ρ ↯ ≈ ρ' ↯ ∈ tail_rel0 }} by intuition.
-    assert (rel_typ pred_P s A _ A' _ (head_rel _ _ equiv_ρ_drop_ρ'_drop)) by mauto.
-    assert (rel_typ pred_P s A _ A'0 _ (head_rel0 _ _ H4)) by mauto.
-    inversion_clear H7.
-    inversion_clear H5.
-    simplify_evals.
-    handle_per_sort_elem_irrel.
-    econstructor; mauto.
-    
-    eapply H1.
-    eassumption.
-
-  - assert {{ Dom ρ ↯ ≈ ρ' ↯ ∈ tail_rel }} by intuition.
-    assert (rel_typ pred_P s A _ A' _ (head_rel _ _ H4)) by mauto.
-    assert (rel_typ pred_P s A _ A'0 _ (head_rel0 _ _ equiv_ρ_drop_ρ'_drop)) by mauto.
-    inversion_clear H7.
-    inversion_clear H5.
-    simplify_evals.
-    handle_per_sort_elem_irrel.
-    econstructor; mauto.
-    eapply H1.
-    eassumption.
+  split; intros Hcons; dependent destruction Hcons;
+    [ assert {{ Dom ρ ↯ ≈ ρ' ↯ ∈ tail_rel0 }} by intuition
+    | assert {{ Dom ρ ↯ ≈ ρ' ↯ ∈ tail_rel }} by intuition ];
+    assert (rel_typ pred_P s A _ A' _ (head_rel _ _ ltac:(eassumption))) by mauto 3;
+    assert (rel_typ pred_P s A _ A'0 _ (head_rel0 _ _ ltac:(eassumption))) by mauto 3;
+    inversion_clear_by_head (@rel_typ P);
+    simplify_evals;
+    handle_per_sort_elem_irrel;
+    econstructor; mauto 3;
+    intuition.
 Qed.
 
 Lemma per_ctx_env_sym {P : PtsSig} {pred_P : PredicativeSig P} : forall Γ Δ R,
@@ -1048,10 +1067,8 @@ Proof with solve [eauto using per_sort_trans].
     handle_per_sort_elem_irrel.
     eexists; [eassumption | eassumption |].
     apply_relation_equivalence.
-    
-    eapply per_sort_elem_trans; mauto.
-    + eapply H1; mauto.
-    + eapply H15; mauto.
+
+    eapply per_sort_elem_trans; intuition.
 Qed.
 
 Corollary per_ctx_trans {P : PtsSig} {pred_P : PredicativeSig P} : forall Γ1 Γ2 Γ3 R,
@@ -1101,7 +1118,7 @@ Lemma per_ctx_env_cons' {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ Γ
 Proof.
   intros.
   econstructor; eauto.
-  typeclasses eauto.  
+  typeclasses eauto.
 Qed.
 
 #[export]
@@ -1112,7 +1129,7 @@ Ltac per_ctx_env_econstructor :=
 
 Lemma per_ctx_env_cons_clean_inversion {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ Γ' env_relΓ A A' env_relΓA s},
     {{ EF Γ ≈ Γ' ∈ per_ctx_env pred_P ↘ env_relΓ }} ->
-    {{ EF Γ, A@s ≈ Γ', A'@s ∈ per_ctx_env pred_P ↘ env_relΓA }} -> 
+    {{ EF Γ, A@s ≈ Γ', A'@s ∈ per_ctx_env pred_P ↘ env_relΓA }} ->
     exists (head_rel : forall {ρ ρ'} (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}), relation (domain P)),
       (forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}),
           rel_typ pred_P s A ρ A' ρ' (head_rel equiv_ρ_ρ')) /\
@@ -1180,9 +1197,9 @@ Qed.
 Hint Resolve rel_typ_implies_rel_typ_unsorted : mcpts.
 
 
-Lemma per_ctx_env_cons_clean_inversion_unsorted {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ Γ' env_relΓ A A' env_relΓA s},
+Lemma per_ctx_env_cons_clean_inversion_unsorted {P : PtsSig} (pred_P : PredicativeSig P) : forall {Γ Γ' env_relΓ A A' env_relΓA s},
     {{ EF Γ ≈ Γ' ∈ per_ctx_env pred_P ↘ env_relΓ }} ->
-    {{ EF Γ, A@s ≈ Γ', A'@s ∈ per_ctx_env pred_P ↘ env_relΓA }} -> 
+    {{ EF Γ, A@s ≈ Γ', A'@s ∈ per_ctx_env pred_P ↘ env_relΓA }} ->
     exists (head_rel : forall {ρ ρ'} (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}), relation (domain P)),
       (forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}),
           rel_typ pred_P s A ρ A' ρ' (head_rel equiv_ρ_ρ')) /\
@@ -1199,7 +1216,7 @@ Proof with intuition.
 Qed.
 
 Ltac invert_per_ctx_env_unsorted H :=
-  (unshelve eapply (per_ctx_env_cons_clean_inversion_unsorted _) in H; [eassumption | |]; deex_in H; destruct H as [])
+  (unshelve eapply (per_ctx_env_cons_clean_inversion_unsorted _ _) in H; [eassumption | |]; deex_in H; destruct H as [])
   + (inversion H; subst).
 
 Ltac invert_per_ctx_envs_unsorted := match_by_head per_ctx_env ltac:(fun H => directed invert_per_ctx_env_unsorted H).

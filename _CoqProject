@@ -42,6 +42,7 @@ theories/Core/Completeness/SubstitutionCases.v
 theories/Core/Completeness/TermStructureCases.v
 theories/Core/Completeness/FunctionCases.v
 theories/Core/Completeness/VariableCases.v
+theories/Core/Completeness/NatCases.v
 theories/Core/Completeness/FundamentalTheorem.v
 theories/Core/Completeness.v
 
@@ -59,6 +60,7 @@ theories/Core/Soundness/TermStructureCases.v
 theories/Core/Soundness/SortCases.v
 theories/Core/Soundness/SubstitutionCases.v
 theories/Core/Soundness/FunctionCases.v
+theories/Core/Soundness/NatCases.v
 theories/Core/Soundness/Extension/SystemAnnotated.v
 theories/Core/Soundness/FundamentalTheorem.v
 theories/Core/Soundness.v
