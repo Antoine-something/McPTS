@@ -64,3 +64,9 @@ theories/Core/Soundness/NatCases.v
 theories/Core/Soundness/Extension/SystemAnnotated.v
 theories/Core/Soundness/FundamentalTheorem.v
 theories/Core/Soundness.v
+
+theories/Instantiations/STLC.v
+theories/Instantiations/LF.v
+theories/Instantiations/CumulMLTT.v
+theories/Instantiations/NonCumulMLTT.v
+theories/Instantiations/OmegaTwo.v

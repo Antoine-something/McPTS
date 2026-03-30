@@ -37,21 +37,14 @@ Section LFSig.
     split.
     - intros x Hx.
       inversion_clear Hx.
-    - intros x y z Hxy Hyz.
-      inversion_clear Hxy.
-      inversion_clear Hyz.
-      econstructor.
+    - intros x y z.
+      do 2 inversion_clear 1.
   Qed.
 
   Lemma wf_rel : well_founded pred_rel.
   Proof.
     intros a.
-    econstructor.
-    intros.
-    inversion_clear H.
-    econstructor.
-    intros.
-    inversion_clear H.
+    do 2 (econstructor; inversion_clear 1).
   Qed.
 
   Lemma ord_ax : forall (s1 s2 : St Sig_lf), Ax Sig_lf s1 s2 -> pred_rel s1 s2.
@@ -61,9 +54,7 @@ Section LFSig.
 
   Lemma ord_ru : forall (s1 s2 s3 : St Sig_lf), Ru Sig_lf s1 s2 s3 -> (pred_rel s1 s3 \/ s1 = s3) /\ (pred_rel s2 s3 \/ s2 = s3).
   Proof.
-    intros.
-    inversion_clear H;
-      split; only 1,2,4: (right; reflexivity).
+    inversion_clear 1; split; intuition.
     left; econstructor.
   Qed.
 

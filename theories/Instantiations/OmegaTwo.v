@@ -45,51 +45,43 @@ Section OmegaSig.
   Proof.
     split.
     - intros x Hx.
-      dependent destruction Hx;
-        eapply lt_irrefl in H; eassumption.
+      inversion Hx; subst; lia.
     - intros x y z Hxy.
       gen z.
-      induction Hxy;
-        intros z Hyz; inversion Hyz; subst.
-      1,3: assert (i < j0) by (eapply lt_trans; eauto).
-      all: econstructor; eauto.
+      induction Hxy; inversion 1; subst.
+      1,3: assert (i < j0) by lia.
+      all: econstructor; eassumption.
   Qed.
 
   Lemma wf_rel_om_fin : forall i, Acc pred_rel_om (fin i).
   Proof.
-    intros i.
     induction i.
     - econstructor.
-      intros.
-      inversion H; subst.
-      dependent destruction H2.
+      inversion 1; subst.
+      lia.
     - econstructor.
-      intros.
-      inversion H; subst.
-      inversion H2; subst; eauto.      
+      inversion 1; subst.
+      assert (i0 = i \/ i0 < i) as [-> | ?] by lia; [eassumption |].
       assert (pred_rel_om (fin i0) (fin i)) by (econstructor; lia).
-      eapply IHi; eauto.
+      intuition.
   Qed.
 
-  Lemma wf_rel_om_infin : forall i, Acc pred_rel_om (infin i).  
+  Lemma wf_rel_om_infin : forall i, Acc pred_rel_om (infin i).
   Proof.
-    intros i.
     induction i.
     - econstructor.
-      intros.
-      inversion H; subst.
-      + dependent destruction H2.
+      inversion 1; subst.
+      + lia.
       + eapply wf_rel_om_fin; eauto.
     - econstructor.
-      intros.
-      inversion H; subst.
-      + inversion H2; subst; eauto.      
+      inversion 1; subst.
+      + assert (i0 = i \/ i0 < i) as [-> | ?] by lia; [eassumption |].
         assert (pred_rel_om (infin i0) (infin i)) by (econstructor; lia).
-        eapply IHi; eauto.
+        intuition.
       + eapply wf_rel_om_fin.
-  Qed.        
-      
-    
+  Qed.
+
+
   Lemma wf_rel_om : well_founded pred_rel_om.
   Proof.
     intros x.
@@ -100,74 +92,34 @@ Section OmegaSig.
 
   Lemma ord_ax_om : forall (s1 s2 : St Sig_om), Ax Sig_om s1 s2 -> pred_rel_om s1 s2.
   Proof.
-    intros.
-    destruct H;
+    destruct 1;
       enough (i < S i) by (econstructor; eauto);
       econstructor.
   Qed.
 
-  Lemma ord_ru_om_helper : forall i j, i < j \/ i = j \/ j < i.
-  Proof.
-    intros i.
-    induction i.
-    - intros.
-      destruct j; eauto.
-      left; lia.
-    - intros.
-      destruct j.
-      + right; right; lia.
-      + specialize (IHi j).
-        destruct IHi; [left; lia |].
-        destruct H; right; [left | right]; eauto.
-        lia.
-  Qed.
-  
   Lemma ord_ru_om : forall (s1 s2 s3 : St Sig_om), Ru Sig_om s1 s2 s3 -> (pred_rel_om s1 s3 \/ s1 = s3) /\ (pred_rel_om s2 s3 \/ s2 = s3).
   Proof.
-    intros.
-    inversion H; subst.
-    - assert (i < j \/ i = j \/ j < i) by (eapply ord_ru_om_helper; eauto).
-      destruct H0; [| destruct H0].
-      + assert (Init.Nat.max i j = j) as -> by lia.
-        split.        
-        * left.
-          econstructor; eassumption.
-        * right.
-          reflexivity.
-      + subst.
-        assert (Init.Nat.max j j = j) as -> by lia.
-        split; right; reflexivity.
+    inversion 1; subst.
+    - assert (i < j \/ i = j \/ j < i) as [? | [-> | ?]] by lia.
+      + assert (max i j = j) as -> by lia.
+        split; [left | right]; econstructor; eassumption.
+      + assert (Init.Nat.max j j = j) as -> by lia.
+        intuition.
       + assert (Init.Nat.max i j = i) as -> by lia.
-        split.        
-        * right.
-          reflexivity.
-        * left.
-          econstructor; eassumption.
+        split; [right | left]; econstructor; eassumption.
 
-    - assert (i < j \/ i = j \/ j < i) by (eapply ord_ru_om_helper; eauto).
-      destruct H0; [| destruct H0].
+    - assert (i < j \/ i = j \/ j < i) as [? | [-> | ?]] by lia.
       + assert (Init.Nat.max i j = j) as -> by lia.
-        split.        
-        * left.
-          econstructor; eassumption.
-        * right.
-          reflexivity.
-      + subst.
-        assert (Init.Nat.max j j = j) as -> by lia.
-        split; right; reflexivity.
+        split; [left | right]; econstructor; eassumption.
+      + assert (Init.Nat.max j j = j) as -> by lia.
+        intuition.
       + assert (Init.Nat.max i j = i) as -> by lia.
-        split.        
-        * right.
-          reflexivity.
-        * left.
-          econstructor; eassumption.
+        split; [right | left]; econstructor; eassumption.
 
-    - split; [left; econstructor | right; reflexivity].
+    - split; [left | right]; econstructor.
   Qed.
 
   Definition pred_Sig_om : PredicativeSig Sig_om :=
     mkPredicativeSig Sig_om pred_rel_om ord_rel_om wf_rel_om ord_ax_om ord_ru_om
   .
 End OmegaSig.
-
-
