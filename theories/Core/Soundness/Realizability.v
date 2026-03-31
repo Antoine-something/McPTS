@@ -31,7 +31,8 @@ Lemma var_arith {P} : forall (Γ1 Γ2 : ctx P) (A : typ P) s,
     length (Γ1 ++ (A, s) :: Γ2) - length Γ2 - 1 = length Γ1.
 Proof.
   intros.
-  rewrite List.app_length. simpl.
+  rewrite List.length_app.
+  simpl.
   lia.
 Qed.
 
@@ -74,7 +75,7 @@ Proof.
     eapply wf_exp_eq_conv' with (A := {{{ ^ (iter (S (length Γ1)) (fun A1 : exp P => {{{ A1[Wk] }}}) A0)[Wk][τ] }}}); mauto 4.
 
     deepexec (@wf_ctx_sub_ctx_lookup P) ltac:(fun H => destruct H as [Γ1' [? [Γ2' [? [-> [? [-> []]]]]]]]).
-    repeat rewrite List.app_length in *.
+    repeat rewrite List.length_app in *.
 
     etransitivity.
     + assert {{ ⊢ ^ (app Γ1' {{{ Γ2',x@s0 }}}) }} by mauto 3.
