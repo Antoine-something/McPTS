@@ -14,102 +14,6 @@ Reserved Notation "Γ ⊫s σ : Δ" (in custom judg at level 80, Γ custom exp, 
 
 Generalizable All Variables.
 
-(* Inductive wf_ctx_ann {P} : ctx P -> Prop := *)
-(* | wfa_ctx_empty : {{ ⊫ ⋅ }} *)
-(* | wfa_ctx_enxtend : *)
-(*   `( {{ ⊫ Γ }} -> *)
-(*      {{ Γ ⊫ A : Sort@s @ s' }} -> *)
-(*      {{ ⊫ Γ, A@s }} ) *)
-(* where "⊫ Γ" := (wf_ctx_ann Γ) (in custom judg) : type_scope *)
-(* with wf_exp_ann {P} : ctx P -> typ P -> P -> exp P -> Prop := *)
-(* (** Sorts *) *)
-(* | wfa_st : *)
-(*   `( Ax P s1 s2 -> Ax P s2 s3 -> *)
-(*      {{ ⊫ Γ }} -> *)
-(*      {{ Γ ⊫ Sort@s1 : Sort@s2 @ s3 }} ) *)
-
-(* (** Functions *) *)
-(* | wfa_pi : *)
-(*   `( forall (r : Ru P s1 s2 s3), *)
-(*         Ax P s3 s3' -> *)
-(*         {{ Γ ⊫ A : Sort@s1 @ s1' }} -> *)
-(*         {{ Γ, A@s1 ⊫ B : Sort@s2 @ s2' }} -> *)
-(*         {{ Γ ⊫ Π r A B : Sort@s3 @ s3' }} ) *)
-(* | wfa_fn : *)
-(*   `( forall (r : Ru P s1 s2 s3), *)
-(*         {{ Γ ⊫ A : Sort@s1 @ s1' }} -> *)
-(*         {{ Γ, A@s1 ⊫ B : Sort@s2 @ s2' }} -> *)
-(*         {{ Γ, A@s1 ⊫ M : B @ s2 }} -> *)
-(*         {{ Γ ⊫ λ r A M : Π r A B @ s3 }} ) *)
-(* | wfa_app : *)
-(*   `( forall (r : Ru P s1 s2 s3), *)
-(*         {{ Γ ⊫ A : Sort@s1 @ s1' }} -> *)
-(*         {{ Γ, A@s1 ⊫ B : Sort@s2 @ s2' }} -> *)
-(*         {{ Γ ⊫ M : Π r A B @ s3 }} -> *)
-(*         {{ Γ ⊫ N : A @ s1 }} -> *)
-(*         {{ Γ ⊫ M N : B[Id,,N] @ s2 }} ) *)
-
-(* (** Variables *) *)
-(* | wfa_vlookup : *)
-(*   `( {{ ⊫ Γ }} -> *)
-(*      {{ #x : A@s ∈ Γ }} -> *)
-(*      {{ Γ ⊫ #x : A @ s }} ) *)
-
-(* (** explicit substitutions *) *)
-(* | wfa_exp_sub_typ : *)
-(*   `( {{ Γ ⊫s σ : Δ }} -> *)
-(*      {{ Δ ⊫ M : A @ s }} -> *)
-(*      {{ Δ ⊫ A : Sort@s @ s' }} -> *)
-(*      {{ Γ ⊫ M[σ] : A[σ] @ s }} ) *)
-(* | wfa_exp_sub_sort : *)
-(*   `( {{ Γ ⊫s σ : Δ }} -> *)
-(*      {{ Δ ⊫ A : Sort@s @ s' }} -> *)
-(*      {{ Γ ⊫ A[σ] : Sort@s @ s' }} ) *)
-
-(* (** Conversions *) *)
-(* | wfa_exp_conv : *)
-(*   `( {{ Γ ⊫ M : A @ s }} -> *)
-(*      {{ Γ ⊫ A' : Sort@s @ s' }} -> *)
-(*      {{ Γ ⊢ A ≈ A' : Sort@s }} -> *)
-(*      {{ Γ ⊫ M : A' @ s }} ) *)
-(* | wfa_exp_conv_ann : *)
-(*   `( {{ Γ ⊫ M : A @ s }} -> *)
-(*      {{ Γ ⊫ A @ s' }} -> *)
-(*      {{ Γ ⊫ M : A @ s' }} ) *)
-(* where "Γ ⊫ M : A @ s" := (wf_exp_ann Γ A s M) (in custom judg) : type_scope *)
-
-(* with wf_typ_ann {P} : ctx P -> typ P -> P -> Prop := *)
-(* | wfa_typ_st : *)
-(*   `( Ax P s s' -> *)
-(*      {{ ⊫ Γ }} -> *)
-(*      {{ Γ ⊫ Sort@s @ s' }} ) *)
-(* | wfa_typ_exp : *)
-(*   `( {{ Γ ⊫ A : Sort@s @ s' }} -> *)
-(*      {{ Γ ⊫ A @ s }} ) *)
-(* where "Γ ⊫ A @ s" := (wf_typ_ann Γ A s) (in custom judg) : type_scope *)
-(* with wf_sub_ann {P} : ctx P -> ctx P -> sub P -> Prop := *)
-(* | wfa_sub_id : *)
-(*   `( {{ ⊫ Γ }} -> *)
-(*      {{ Γ ⊫s Id : Γ }} ) *)
-(* | wfa_sub_weaken : *)
-(*   `( {{ ⊫ Γ, A@s }} -> *)
-(*      {{ Γ, A@s ⊫s Wk : Γ }} ) *)
-(* | wfa_sub_compose : *)
-(*   `( {{ Γ1 ⊫s σ2 : Γ2 }} -> *)
-(*      {{ Γ2 ⊫s σ1 : Γ3 }} -> *)
-(*      {{ Γ1 ⊫s σ1∘σ2 : Γ3 }} ) *)
-(* | wfa_sub_extend : *)
-(*   `( {{ Γ ⊫s σ : Δ }} -> *)
-(*      {{ Δ ⊫ A : Sort@s @ s' }} -> *)
-(*      {{ Γ ⊫ M : A[σ] @ s }} -> *)
-(*      {{ Γ ⊫s σ,,M : Δ, A@s }} ) *)
-(* | wfa_sub_conv : *)
-(*   `( {{ Γ ⊫s σ : Δ }} -> *)
-(*      {{ ⊫ Δ' }} -> *)
-(*      {{ ⊢ Δ ≈ Δ' }} -> *)
-(*      {{ Γ ⊫s σ : Δ' }} ) *)
-(* where "Γ ⊫s σ : Δ" := (wf_sub_ann Γ Δ σ) (in custom judg) : type_scope. *)
-
 Inductive wf_ctx_ann {P} : ctx P -> Prop :=
 | wfa_ctx_empty : {{ ⊫ ⋅ }}
 | wfa_ctx_enxtend :
@@ -335,7 +239,7 @@ Qed.
 
 #[local]
 Hint Resolve presup_exp_ann_ctx_ann : mcpts.
- 
+
 Lemma wf_ctx_implies_wf_ctx_ann {P} : forall {Γ : ctx P},
     {{ ⊢ Γ }} -> {{ ⊫ Γ }}
 with wf_exp_implies_wf_exp_ann {P} : forall {Γ : ctx P} {M A},
@@ -383,7 +287,7 @@ Proof.
     eexists; econstructor; mauto 3.
   - assert {{ Δ ⊫ A0 @ ^(Some s) }} by mauto 2.
     assert {{ Δ ⊫ M0 : A0 @ ^(Some s) }} by mauto 2.
-    eexists; mauto 2. 
+    eexists; mauto 2.
   - assert {{ Γ ⊫ M : A0 @ ^(Some s) }} by mauto 3.
     eexists; mauto 2.
   - assert {{ Γ ⊫ A[σ0] : Sort@s @ HM0 }} by mauto 3.
@@ -411,7 +315,7 @@ Hint Resolve wf_typ_implies_wf_typ_ann : mcpts.
 Lemma wf_judg_ann_implies_wf_judg {P} :
   (forall (Γ : ctx P), {{ ⊫ Γ }} -> {{ ⊢ Γ }}) /\
     (forall (Γ : ctx P) A so M, {{ Γ ⊫ M : A @ so }} -> {{ Γ ⊢ M : A }}) /\
-    (forall (Γ : ctx P) A so, {{ Γ ⊫ A @ so }} -> {{ Γ ⊢ A }}) /\    
+    (forall (Γ : ctx P) A so, {{ Γ ⊫ A @ so }} -> {{ Γ ⊢ A }}) /\
     (forall (Γ : ctx P) Δ σ, {{ Γ ⊫s σ : Δ }} -> {{ Γ ⊢s σ : Δ }}).
 Proof.
   eapply syntactic_wf_ann_mut_ind; mauto 2.

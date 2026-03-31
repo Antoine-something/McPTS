@@ -58,7 +58,7 @@ Proof.
   inversion_clear H4; apply_relation_equivalence; mauto.
   invert_per_sort_elem H1.
   apply_relation_equivalence.
-  eassumption.  
+  eassumption.
 Qed.
 
 Lemma rel_exp_of_typ_inversion2 {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ env_rel A A' s},
@@ -254,7 +254,7 @@ Proof.
     eapply per_sort_elem_core_sort'; mauto.
     reflexivity.
 Qed.
-  
+
 #[export]
 Hint Resolve rel_exp_axiom : mcpts.
 
@@ -277,7 +277,7 @@ Proof.
     reflexivity.
   - econstructor; mauto.
     econstructor; mauto.
-    eapply per_sort_elem_core_sort'; mauto.                       
+    eapply per_sort_elem_core_sort'; mauto.
     reflexivity.
 Qed.
 

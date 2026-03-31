@@ -82,11 +82,11 @@ Proof.
     split; intros; destruct_by_head (@rel_typ P); handle_per_sort_elem_irrel;
       assert (rel_typ pred_P s A ρ A' ρ' x1) by mauto;
       intuition.
-    
+
   - apply Equivalence_Reflexive.
 Qed.
 
-Lemma rel_ctx_extend' {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ A s},      
+Lemma rel_ctx_extend' {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ A s},
     {{ ⟪ pred_P ⟫ Γ ⊨u A : Sort@s }} ->
     {{ ⟪ pred_P ⟫ ⊨ Γ, A@s }}.
 Proof.

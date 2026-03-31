@@ -110,7 +110,7 @@ Proof.
   invert_glu_rel_exp HM.
   do 2 eexists; repeat split; mauto.
   - econstructor; mauto 3; try reflexivity.
-    
+
   - intros.
     destruct_glu_rel_sub_with_sub.
     destruct_glu_rel_exp_with_sub.
@@ -145,9 +145,9 @@ Proof.
       assert {{ Δ0 ⊢ #0[(σ∘σ0),,M[σ0]] ≈ M[σ0] : A[σ][σ0] }} as -> by (eapply wf_exp_eq_conv; mauto 4).
       eapply glu_sort_elem_exp_conv with (exp_rel := exp_rel); mauto 3.
       eapply glu_sort_elem_trm_typ; mauto 2.
-      
+
     + simpl.
-      eapply glu_ctx_env_sub_resp_sub_eq with (Sb := SbΔ) (σ := {{{ σ∘σ0 }}}); mauto 3.      
+      eapply glu_ctx_env_sub_resp_sub_eq with (Sb := SbΔ) (σ := {{{ σ∘σ0 }}}); mauto 3.
 Qed.
 
 #[export]
@@ -191,7 +191,7 @@ Proof.
     assert {{ Δ0 ⊢s Wk∘(σ,,M)∘σ0 ≈ (Wk∘(σ,,M))∘σ0 : Δ }} by (symmetry; econstructor; mauto 3).
     assert {{ Δ0 ⊢s (Wk∘(σ,,M))∘σ0 ≈ σ∘σ0 : Δ }} by (econstructor; mauto 3).
     assert {{ Δ0 ⊢s Wk∘(σ,,M)∘σ0 ≈ σ∘σ0 : Δ }} by (etransitivity; mauto 2).
-    
+
     econstructor; mauto 3.
     + assert {{ Γ ⊢s σ,,M : Δ, A@s }} by mauto 3.
       assert {{ Δ, A@s ⊢ A[Wk] : Sort@s }} by mauto 3.
@@ -202,9 +202,9 @@ Proof.
       assert {{ Γ ⊢ #0[σ,,M] ≈ M : A[σ] }} by mauto 3.
       assert {{ Δ0 ⊢ #0[σ,,M][σ0] ≈ M[σ0] : A[σ][σ0] }} by mauto 4.
       assert {{ Δ0 ⊢ #0[(σ,,M)∘σ0] ≈ #0[(σ,,M)][σ0] : A[Wk][(σ,,M)∘σ0] }} by (econstructor; mauto 3).
-      assert {{ Δ0 ⊢ A[Wk][(σ,,M)∘σ0] ≈ A[σ][σ0] : Sort@s }} by (etransitivity; mauto 3).        
+      assert {{ Δ0 ⊢ A[Wk][(σ,,M)∘σ0] ≈ A[σ][σ0] : Sort@s }} by (etransitivity; mauto 3).
       assert {{ Δ0 ⊢ #0[σ,,M][σ0] ≈ #0[(σ,,M)∘σ0] : A[σ][σ0] }} by (symmetry; mauto 3).
-      assert {{ Δ0 ⊢ #0[(σ,,M)∘σ0] ≈ M[σ0] : A[σ][σ0] }} as -> by mauto 3.        
+      assert {{ Δ0 ⊢ #0[(σ,,M)∘σ0] ≈ M[σ0] : A[σ][σ0] }} as -> by mauto 3.
       mauto 2.
     + apply_predicate_equivalence.
       simpl.
@@ -213,7 +213,7 @@ Proof.
 Qed.
 
 #[export]
-Hint Resolve glu_rel_sub_extend_unsorted : mcpts.  
+Hint Resolve glu_rel_sub_extend_unsorted : mcpts.
 
 Lemma glu_rel_sub_conv {P} (pred_P : PredicativeSig P) : forall {Γ σ Δ Δ'},
     {{ ⟪ pred_P ⟫ Γ ⊩s σ : Δ }} ->
@@ -235,4 +235,3 @@ Qed.
 
 #[export]
 Hint Resolve glu_rel_sub_conv : mcpts.
- 

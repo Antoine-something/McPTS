@@ -33,7 +33,7 @@ Definition rel_exp_under_ctx_unsorted {P} (pred_P : PredicativeSig P) (Γ : ctx 
     {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }} /\
       forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_rel }}),
       exists (elem_rel : relation (domain P)),
-        rel_typ_unsorted pred_P A ρ A ρ' elem_rel /\ rel_exp M ρ M' ρ' elem_rel.  
+        rel_typ_unsorted pred_P A ρ A ρ' elem_rel /\ rel_exp M ρ M' ρ' elem_rel.
 
 Definition valid_exp_under_ctx_unsorted {P : PtsSig} (pred_P : PredicativeSig P) Γ A M := rel_exp_under_ctx_unsorted pred_P Γ A M M.
 #[global]
@@ -58,7 +58,7 @@ Arguments valid_typ_under_ctx {_} _ _ _ /.
 Hint Transparent valid_typ_under_ctx : mcpts.
 #[export]
 Hint Unfold valid_typ_under_ctx : mcpts.
-              
+
 
 Inductive rel_sub {P : PtsSig} σ ρ σ' ρ' (R : relation (env P)) : Prop :=
 | mk_rel_sub : forall ρσ ρ'σ', {{ ⟦ σ ⟧s ρ ↘ ρσ }} -> {{ ⟦ σ' ⟧s ρ' ↘ ρ'σ' }} -> {{ Dom ρσ ≈ ρ'σ' ∈ R }} -> rel_sub σ ρ σ' ρ' R.

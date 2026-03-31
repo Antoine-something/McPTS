@@ -126,7 +126,7 @@ Section Gluing.
   (* Intuitively, glu_sort_typ_rec s' lt_s'_s a is gluing types with a *)
   Definition glu_sort_typ_rec {s'} (lt_s'_s : pred_rel pred_P s' s) (a : domain P) : glu_typ_pred P :=
     fun Γ A => exists typ_rel exp_rel, glu_sort_typ_elem_rec lt_s'_s typ_rel exp_rel a /\ {{ Γ ⊢ A ® typ_rel }}.
-  
+
   Definition sort_glu_exp_pred' {s'} (lt_s'_s : pred_rel pred_P s' s) : glu_exp_pred P :=
     fun Γ A M m =>
       {{ Γ ⊢ M : A }} /\
@@ -224,7 +224,7 @@ Section Gluing.
           motive typ_rel el_rel d{{{ ⇑ Sort@s b }}} )
   .
 
-  
+
   #[derive(equations=no, eliminator=no)]
   Equations glu_sort_elem_core_strong_ind typ_rel exp_rel a (H : glu_sort_elem_core typ_rel exp_rel a) : motive typ_rel exp_rel a :=
   | typ_rel, exp_rel, a, (glu_sort_elem_core_sort typ_rel exp_rel ax_s'_s HT HE) => (case_sort typ_rel exp_rel ax_s'_s HT HE)
@@ -251,7 +251,7 @@ Section Gluing.
   | typ_rel, exp_rel, a, (glu_sort_elem_core_neut typ_rel exp_rel Hb Htyp Hexp) => (case_neut typ_rel exp_rel Hb Htyp Hexp)
   .
 End Gluing.
-  
+
 #[export]
 Hint Constructors glu_sort_elem_core : mcpts.
 
@@ -259,7 +259,7 @@ Section Glu_sort_elem_def.
   Context `(pred_P : PredicativeSig P).
 
   Instance Glu_sort_elem_def_wf : WellFounded (pred_rel pred_P) := (wf_rel pred_P).
-  
+
   Equations glu_sort_elem (s : P) : glu_typ_pred P -> glu_exp_pred P -> domain P -> Prop by wf s :=
   | s => glu_sort_elem_core pred_P s (fun s' lt_s'_s typ_rel exp_rel a => {{ DG a ∈ glu_sort_elem s' ↘ typ_rel ↘ exp_rel }}).
 End Glu_sort_elem_def.
@@ -285,7 +285,7 @@ Section GluingInduction.
 
   Hypothesis
     (motive : P -> glu_typ_pred P -> glu_exp_pred P -> dom -> Prop)
-      
+
       (case_sort :
         forall s s'
           (typ_rel : glu_typ_pred P) (exp_rel : glu_exp_pred P) (ax_s'_s : Ax P s' s),
@@ -303,12 +303,12 @@ Section GluingInduction.
           (typ_rel : glu_typ_pred P) (exp_rel : glu_exp_pred P) (elem_rel : relation dom),
           {{ DG a ∈ glu_sort_elem pred_P s1 ↘ IP ↘ IEL }} ->
           motive s1 IP IEL a ->
-          {{ DF a ≈ a ∈ per_sort_elem pred_P s1 ↘ in_rel }} -> 
+          {{ DF a ≈ a ∈ per_sort_elem pred_P s1 ↘ in_rel }} ->
           (forall (c : dom) (equiv_c : {{ Dom c ≈ c ∈ in_rel }}) (b : dom),
               {{ ⟦ B ⟧ ρ ↦ c ↘ b }} ->
               {{ DG b ∈ glu_sort_elem pred_P s2 ↘ OP c equiv_c ↘ OEL c equiv_c }}) ->
           (forall (c : dom) (equiv_c : {{ Dom c ≈ c ∈ in_rel }}) (b : dom),
-              {{ ⟦ B ⟧ ρ ↦ c ↘ b }} -> 
+              {{ ⟦ B ⟧ ρ ↦ c ↘ b }} ->
               motive s2 (OP c equiv_c) (OEL c equiv_c) b) ->
           {{ DF Π r a ρ B ≈ Π r a ρ B ∈ per_sort_elem pred_P s3 ↘ elem_rel }} ->
           typ_rel <∙> pi_glu_typ_pred r in_rel IP IEL OP ->
@@ -335,7 +335,7 @@ Section GluingInduction.
   Ltac def_simp := simp glu_sort_elem in *; mauto 3.
 
   Instance Glu_sort_elem_ind_wf : WellFounded (pred_rel pred_P) := (wf_rel pred_P).
-  
+
   #[derive(equations=no, eliminator=no), tactic="def_simp"]
   Equations glu_sort_elem_ind s typ_rel exp_rel a
     (H : glu_sort_elem pred_P s typ_rel exp_rel a) : motive s typ_rel exp_rel a by wf s :=
@@ -356,7 +356,7 @@ Section GluingInduction.
   Next Obligation.
     eapply ord_ax; eassumption.
   Qed.
-  Next Obligation.    
+  Next Obligation.
     assert ((pred_rel pred_P s1 s \/ s1 = s) /\ (pred_rel pred_P s2 s \/ s2 = s)) by (eapply ord_ru; mauto).
     destruct_conjs.
     eapply (case_pi s1 s2 s r); def_simp; eauto.
@@ -375,8 +375,8 @@ Section GluingInduction.
       + assert (s2 = s ->
                 glu_sort_elem_core pred_P s
                   (fun (s' : P) (_ : pred_rel pred_P s' s) (typ_rel : ctx P -> exp P -> Prop)
-                       (exp_rel : ctx P -> exp P -> exp P -> domain P -> Prop) 
-                     (a : domain P) => glu_sort_elem pred_P s' typ_rel exp_rel a) (OP c equiv_c) 
+                       (exp_rel : ctx P -> exp P -> exp P -> domain P -> Prop)
+                     (a : domain P) => glu_sort_elem pred_P s' typ_rel exp_rel a) (OP c equiv_c)
                   (OEL c equiv_c) b /\ motive s (OP c equiv_c) (OEL c equiv_c) b) by (eapply H2; mauto).
         subst.
         eapply H10; mauto.
@@ -388,12 +388,12 @@ Section GluingInduction.
       + assert (s2 = s ->
      glu_sort_elem_core pred_P s
        (fun (s' : P) (_ : pred_rel pred_P s' s) (typ_rel : ctx P -> exp P -> Prop)
-          (exp_rel : ctx P -> exp P -> exp P -> domain P -> Prop) 
-          (a : domain P) => glu_sort_elem pred_P s' typ_rel exp_rel a) (OP c equiv_c) 
+          (exp_rel : ctx P -> exp P -> exp P -> domain P -> Prop)
+          (a : domain P) => glu_sort_elem pred_P s' typ_rel exp_rel a) (OP c equiv_c)
        (OEL c equiv_c) b /\ motive s (OP c equiv_c) (OEL c equiv_c) b) by (eapply H2; mauto).
         subst.
         eapply H10; mauto.
-  Qed.                   
+  Qed.
 End GluingInduction.
 
 
@@ -410,7 +410,7 @@ Definition top_sort_glu_exp_pred {P} (pred_P : PredicativeSig P) (s : P) : glu_e
 Arguments top_sort_glu_exp_pred {P} pred_P s Γ A M m/.
 Transparent top_sort_glu_exp_pred.
 
-(** 
+(**
     We still need annotations for the soundness proof, but top sorts cannot be annotated.
     The simple solution is to use a sort option for the annotation.
     The built-in option type in Rocq can only be used in Type, but our sorts are defined in Set.
@@ -492,7 +492,7 @@ Inductive glu_elem_bot_unsorted {P} (pred_P : PredicativeSig P) : SortOption P -
     {{ Γ ⊢ M : A ® m ∈ glu_elem_bot_unsorted pred_P (Some s) a }}.
 #[export]
 Hint Constructors glu_elem_bot_unsorted : mcpts.
-             
+
 Inductive glu_elem_top_unsorted {P} (pred_P : PredicativeSig P) : SortOption P -> domain P -> ctx P -> typ P -> exp P -> domain P -> Prop :=
 | glu_elem_top_unsorted_top_sort : forall a Γ A M m typ_rel exp_rel,
     (* (forall s', Ax P s s' -> False) -> *)

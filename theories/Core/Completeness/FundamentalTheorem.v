@@ -14,18 +14,18 @@ Import Domain_Notations.
 Section completeness_fundamental.
   Variable (P : PtsSig)
     (pred_P : PredicativeSig P).
-  
+
   Theorem completeness_fundamental :
     (forall Γ, {{ ⊢ Γ }} -> {{ ⟪ pred_P ⟫ ⊨ Γ }}) /\
       (forall Γ Δ, {{ ⊢ Γ ≈ Δ }} -> {{ ⟪ pred_P ⟫ ⊨ Γ ≈ Δ }}) /\
       (forall Γ A M, {{ Γ ⊢ M : A }} -> {{ ⟪ pred_P ⟫ Γ ⊨u M : A }}) /\
       (forall Γ A M M', {{ Γ ⊢ M ≈ M' : A }} -> {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : A }}) /\
       (forall Γ Δ σ, {{ Γ ⊢s σ : Δ }} -> {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }}) /\
-      (forall Γ Δ σ σ', {{ Γ ⊢s σ ≈ σ' : Δ }} -> {{ ⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Δ }}).      
+      (forall Γ Δ σ σ', {{ Γ ⊢s σ ≈ σ' : Δ }} -> {{ ⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Δ }}).
   Proof using Type.
     apply syntactic_wf_mut_ind;
       mauto 3.
-      
+
     intros.
     eapply valid_exp_var;
       mauto.
@@ -71,8 +71,8 @@ Section completeness_fundamental.
       destruct H2.
       destruct H4 as [R].
       eexists; econstructor; mauto 2.
-  Qed.      
-    
+  Qed.
+
   Theorem completeness_fundamental_typ_eq : forall Γ A A', {{ Γ ⊢ A ≈ A' }} -> {{ ⟪ pred_P ⟫ Γ ⊨ A ≈ A' }}.
   Proof using Type.
     intros.
@@ -94,5 +94,5 @@ Section completeness_fundamental.
     - assert {{ ⟪ pred_P ⟫ Γ ⊨u B ≈ C : Sort@s }} by solve_it.
       assert {{ ⟪ pred_P ⟫ Γ ⊨ B ≈ C }} by mauto 2.
       mauto 2.
-  Qed.      
+  Qed.
 End completeness_fundamental.

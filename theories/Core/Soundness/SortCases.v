@@ -100,7 +100,7 @@ Proof.
   intros.
   assert {{ Γ ⊢s σ : Δ }} by mauto 3.
   assert {{ ⟪ pred_P ⟫ Γ ⊩ A[σ] : Sort@s[σ] @ s' }} by mauto 4.
-  
+
   simpl in H2.
   destruct_conjs.
   eexists.
@@ -115,7 +115,7 @@ Proof.
 
   assert {{ ⊢ Γ }} by mauto 2.
   assert (Ax P s s') by (eapply glu_rel_exp_sort_implies_ax; mauto 2).
-  assert {{ Γ ⊢ Sort@s[σ] ≈ Sort@s : Sort@s' }} by mauto 4.  
+  assert {{ Γ ⊢ Sort@s[σ] ≈ Sort@s : Sort@s' }} by mauto 4.
   assert {{ Δ0 ⊢ Sort@s[σ][σ0] ≈ Sort@s[σ0] : Sort@s' }} as <- by mauto 4.
   eassumption.
 Qed.
@@ -156,7 +156,7 @@ Proof.
 Qed.
 
 #[export]
-Hint Resolve glu_rel_exp_sub_typ_unsorted : mcpts.  
+Hint Resolve glu_rel_exp_sub_typ_unsorted : mcpts.
 
 Lemma glu_rel_typ_sort {P} (pred_P : PredicativeSig P) : forall {Γ s s'},
     Ax P s s' ->
@@ -233,7 +233,7 @@ Proof.
   assert (glu_rel_exp_with_sub_unsorted pred_P so Δ A {{{ Sort@s }}} σ ρ) by mauto 2.
   dependent destruction H2.
   - inversion H5; subst.
-    simpl_glu_rel.    
+    simpl_glu_rel.
     econstructor; mauto 3.
 
   - simplify_evals.

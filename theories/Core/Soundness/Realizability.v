@@ -43,12 +43,12 @@ Lemma var_weaken_gen {P} : forall (Δ : ctx P) (σ : sub P) (Γ : ctx P),
 Proof.
   induction 1; intros; subst; gen_presups.
   - pose proof (app_ctx_vlookup _ _ _ _ _ ltac:(eassumption) eq_refl) as Hvar.
-    
+
     (* gen_presup Hvar. *)
     pose proof (app_ctx_lookup Γ1 A0 Γ2 (length Γ1) s0 ltac:(reflexivity)).
     assert {{ ⊢ ^ (app Γ1 {{{ Γ2, A0@s0 }}}) }} by mauto.
     pose proof (presup_ctx_lookup_typ H1 H0).
-    assert {{ ^(app Γ1 {{{ Γ2, A0@s0 }}}) ⊢ ^(iter (S (length Γ1)) (fun T : exp P => {{{ T[Wk] }}}) A0) }} by (eapply presup_exp_typ; mauto).   
+    assert {{ ^(app Γ1 {{{ Γ2, A0@s0 }}}) ⊢ ^(iter (S (length Γ1)) (fun T : exp P => {{{ T[Wk] }}}) A0) }} by (eapply presup_exp_typ; mauto).
     clear_dups.
     apply wf_sub_id_inversion in Hτ.
     pose proof (wf_ctx_sub_length _ _ Hτ).
@@ -67,7 +67,7 @@ Proof.
     assert {{ Δ', A@s ⊢s Wk : ^(Γ1 ++ {{{ Γ2, A0@s0 }}}) }} by mauto 3.
     transitivity {{{ #(length Γ1)[Wk∘τ] }}}; [mauto 4 |].
     eapply wf_exp_eq_conv' with (A := {{{ ^ (iter (S (length Γ1)) (fun A1 : exp P => {{{ A1[Wk] }}}) A0)[Wk∘τ] }}}); mauto 4.
-    
+
     etransitivity; [eapply wf_exp_eq_sub_compose_typ; mauto 3 |].
     pose proof (wf_ctx_sub_length _ _ H0).
 
@@ -78,7 +78,7 @@ Proof.
 
     etransitivity.
     + assert {{ ⊢ ^ (app Γ1' {{{ Γ2',x@s0 }}}) }} by mauto 3.
-      eapply wf_exp_eq_sub_cong_typ; [| eapply wf_exp_eq_conv' |mauto 3].      
+      eapply wf_exp_eq_sub_cong_typ; [| eapply wf_exp_eq_conv' |mauto 3].
       * eapply wf_exp_sub_sort; mauto 2.
       * eapply wf_exp_eq_var_weaken; [mauto 3|]; eauto.
       * mauto 4.
@@ -93,7 +93,7 @@ Qed.
 
 Lemma var_glu_elem_bot {P} (pred_P : PredicativeSig P) : forall a s typ_rel exp_rel Γ A,
     {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
-    {{ Γ ⊢ A ® typ_rel }} -> 
+    {{ Γ ⊢ A ® typ_rel }} ->
     {{ Γ, A@s ⊢ #0 : A[Wk] ® !(length Γ) ∈ glu_elem_bot pred_P s a }}.
 Proof.
   intros. saturate_glu_info.
@@ -224,7 +224,7 @@ Proof.
       progressive_invert H26.
       destruct (H15 _ _ _ _ _ ltac:(eassumption) ltac:(eassumption) ltac:(eassumption) equiv_n).
       handle_functional_glu_sort_elem P.
-      
+
       assert {{ Δ0 ⊢ OT[σ∘σ0,,N[σ0]] ≈ OT[σ,,N][σ0] : Sort@s2 }} by (transitivity {{{ OT[(σ,,N)∘σ0] }}}; mauto 4).
       enough {{ Δ0 ⊢ (M[σ] N)[σ0] ≈ ^ n{{{ M0 N0 }}} : OT[σ∘σ0,,N[σ0]] }} by mauto.
 
@@ -248,7 +248,7 @@ Proof.
           assert {{ Δ0 ⊢s Id,,N[σ0] : Δ0, IT[σ∘σ0]@s1 }} by mauto 4.
           eapply wf_exp_eq_sub_compose_sort; mauto 2.
         }
-        
+
         eapply wf_exp_eq_conv' with (A:= {{{ OT[q (σ∘σ0)][(Id,,N[σ0])] }}}); mauto 3.
         eapply wf_exp_eq_app_cong'.
         -- specialize (H12 _ {{{σ ∘ σ0}}} _ ltac:(mauto 3) ltac:(eassumption)).
@@ -259,7 +259,7 @@ Proof.
         -- assert (wf_typ Δ0 {{{ IT[σ∘σ0] }}}) by mauto.
            assert (wf_typ Δ0 {{{ IT[σ][σ0] }}}) by mauto 4.
            econstructor; mauto 3.
-           
+
   - handle_functional_glu_sort_elem P.
     handle_per_sort_elem_irrel.
     pose proof H8.
@@ -349,7 +349,7 @@ Proof.
       saturate_weakening_escape.
       bulky_rewrite.
       mauto using glu_nat_readback.
-      
+
   - econstructor; eauto.
     intros.
     progressive_inversion.
@@ -469,9 +469,9 @@ Proof.
         reflexivity.
       * intros.
         inversion_clear H10.
-        eapply H9; mauto 2.        
+        eapply H9; mauto 2.
 
-  - assert (glu_sort_elem pred_P s typ_rel exp_rel a) by eassumption. 
+  - assert (glu_sort_elem pred_P s typ_rel exp_rel a) by eassumption.
     eapply realize_glu_sort_elem_gen in H0.
     destruct_conjs.
     repeat split; intros.
@@ -482,7 +482,7 @@ Proof.
       }
       eapply H0; mauto 3.
       assert (per_sort pred_P s a a) as [] by mauto 2.
-      assert (per_sort_elem pred_P s R a a) by mauto 3. 
+      assert (per_sort_elem pred_P s R a a) by mauto 3.
       eassumption.
     + eapply H1; mauto 3.
       inversion_clear H4.
@@ -494,7 +494,7 @@ Proof.
       }
       eapply H2; mauto 3.
       assert (per_sort pred_P s a a) as [] by mauto 2.
-      assert (per_sort_elem pred_P s R a a) by mauto 3. 
+      assert (per_sort_elem pred_P s R a a) by mauto 3.
       eassumption.
 Qed.
 

@@ -23,29 +23,29 @@ Section soundness_fundamental.
 
   #[local]
   Ltac solve_it pred_P := pose proof soundness_fundamental pred_P; firstorder.
-  
+
   Corollary soundness_fundamental_ctx_ann {P} (pred_P : PredicativeSig P) :
     forall Γ, {{ ⊫ Γ }} -> {{ ⟪ pred_P ⟫ ⊩ Γ }}.
   Proof. solve_it pred_P. Qed.
-  
+
   Corollary soundness_fundamental_exp_ann {P} (pred_P : PredicativeSig P) :
     forall Γ A so M, {{ Γ ⊫ M : A @ so }} -> {{ ⟪ pred_P ⟫ Γ ⊩u M : A @ so }}.
   Proof. solve_it pred_P. Qed.
-  
+
   Corollary soundness_fundamental_typ_ann {P} (pred_P : PredicativeSig P) :
     forall Γ A so, {{ Γ ⊫ A @ so }} -> {{ ⟪ pred_P ⟫ Γ ⊩u A @ so }}.
   Proof. solve_it pred_P. Qed.
-  
+
   Corollary soundness_fundamental_sub_ann {P} (pred_P : PredicativeSig P) :
     forall Γ Δ σ, {{ Γ ⊫s σ : Δ }} -> {{ ⟪ pred_P ⟫ Γ ⊩s σ : Δ }}.
-  Proof. solve_it pred_P. Qed.  
+  Proof. solve_it pred_P. Qed.
 
-  
+
   Theorem soundness_fundamental_ctx {P} (pred_P : PredicativeSig P) :
     forall Γ, {{ ⊢ Γ }} -> {{ ⟪ pred_P ⟫ ⊩ Γ }}.
   Proof.
     intros.
-    assert {{ ⊫ Γ }} by mauto 2. 
+    assert {{ ⊫ Γ }} by mauto 2.
     eapply soundness_fundamental_ctx_ann; mauto 2.
   Qed.
 
@@ -66,12 +66,12 @@ Section soundness_fundamental.
     eexists.
     eapply soundness_fundamental_typ_ann; mauto 2.
   Qed.
-  
+
   Theorem soundness_fundamental_sub {P} (pred_P : PredicativeSig P) (full_P : FullSig P) :
     forall Γ σ Δ, {{ Γ ⊢s σ : Δ }} -> {{ ⟪ pred_P ⟫ Γ ⊩s σ : Δ }}.
   Proof.
     intros.
     assert {{ Γ ⊫s σ : Δ }} by mauto 2.
     eapply soundness_fundamental_sub_ann; mauto 2.
-  Qed.  
+  Qed.
 End soundness_fundamental.

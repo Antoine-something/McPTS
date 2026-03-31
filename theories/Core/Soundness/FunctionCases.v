@@ -49,9 +49,9 @@ Proof.
   assert {{ Δ ⊢s σ : Γ }} by mauto 4.
   split; mauto 3.
   destruct_glu_rel_exp_with_sub.
-  simplify_evals.  
+  simplify_evals.
   match_by_head (@glu_sort_elem P) ltac:(fun H => directed invert_glu_sort_elem H).
-  assert (typ_rel Δ {{{ Sort@s1[σ] }}}) by (eapply glu_sort_elem_trm_typ; mauto 3).  
+  assert (typ_rel Δ {{{ Sort@s1[σ] }}}) by (eapply glu_sort_elem_trm_typ; mauto 3).
   handle_functional_glu_sort_elem P.
   unfold sort_glu_typ_pred in *.
   unfold sort_glu_exp_pred' in *.
@@ -74,10 +74,10 @@ Proof.
   assert (per_sort_elem pred_P s1 (head_rel ρ ρ H21) a a) by mauto 2.
   handle_per_sort_elem_irrel.
   handle_functional_glu_sort_elem P.
-  econstructor; mauto 3.  
+  econstructor; mauto 3.
   - intros.
     eapply glu_sort_elem_typ_monotone; mauto 3.
-    
+
   - intros Δ' τ **.
     assert {{ Δ' ⊢s τ : Δ }} by mauto 2.
     assert {{ Dom ρ ↦ m ≈ ρ ↦ m ∈ env_relΓA }} as HrelΓA by (apply_relation_equivalence; mautosolve 2).
@@ -168,10 +168,10 @@ Proof.
   assert (per_sort_elem pred_P s1 (head_rel ρ ρ equiv_ρ_ρ) a a) by mauto 2.
   handle_per_sort_elem_irrel.
   handle_functional_glu_sort_elem P.
-  econstructor; mauto 3.  
+  econstructor; mauto 3.
   - intros.
     eapply glu_sort_elem_typ_monotone; mauto 3.
-    
+
   - intros Δ' τ **.
     assert {{ Δ' ⊢s τ : Δ }} by mauto 2.
     assert {{ Dom ρ ↦ m ≈ ρ ↦ m ∈ env_relΓA }} as HrelΓA by (apply_relation_equivalence; mautosolve 2).
@@ -226,7 +226,7 @@ Proof.
   assert {{ ⟪ pred_P ⟫ Γ, A@s1 ⊩u B : Sort@s2 @ ^None }} by mauto 2.
   eapply glu_rel_exp_pi_unsorted'; mauto 2.
 Qed.
-  
+
 #[export]
 Hint Resolve glu_rel_exp_pi_unsorted : mcpts.
 
@@ -298,7 +298,7 @@ Proof.
   intros * HA HB HM.
   assert {{ ⟪ pred_P ⟫ ⊩ Γ }} as [SbΓ] by mauto 3.
   assert {{ Γ ⊢ A : Sort@s1 }} by mauto 3.
-  inversion_clear HA as [SbΓ' []].  
+  inversion_clear HA as [SbΓ' []].
   handle_functional_glu_ctx_env P.
   rename SbΓ' into SbΓ.
   pose (SbΓA := cons_glu_sub_pred pred_P s1 Γ A SbΓ).
@@ -374,7 +374,7 @@ Proof.
       assert {{ Δ0 ⊢s q σ ∘ (σ0 ,, N) ≈ σ ∘ σ0 ,, N : Γ, A@s1 }} by (eapply sub_decompose_q; mauto 2).
       transitivity {{{ B[(q σ)∘(σ0,,N)] }}}; mauto 3.
       eapply wf_exp_eq_sub_compose_sort; mauto 3.
-    }    
+    }
 
     assert {{ Δ0 ⊢ (λ r A M)[σ][σ0] N ≈ M[(σ∘σ0),,N] : B[σ∘σ0,,N] }} as ->.
     {
@@ -436,7 +436,7 @@ Proof.
   intros * HA HB HM.
   assert {{ ⟪ pred_P ⟫ ⊩ Γ }} as [SbΓ] by mauto 3.
   assert {{ Γ ⊢ A : Sort@s1 }} by mauto 3.
-  inversion_clear HA as [SbΓ' []].  
+  inversion_clear HA as [SbΓ' []].
   handle_functional_glu_ctx_env P.
   rename SbΓ' into SbΓ.
   pose (SbΓA := cons_glu_sub_pred pred_P s1 Γ A SbΓ).
@@ -524,7 +524,7 @@ Proof.
       assert {{ Δ0 ⊢s q σ ∘ (σ0 ,, N) ≈ σ ∘ σ0 ,, N : Γ, A@s1 }} by (eapply sub_decompose_q; mauto 2).
       transitivity {{{ B[(q σ)∘(σ0,,N)] }}}; mauto 3.
       eapply wf_exp_eq_sub_compose_sort; mauto 3.
-    }    
+    }
 
     assert {{ Δ0 ⊢ (λ r A M)[σ][σ0] N ≈ M[(σ∘σ0),,N] : B[σ∘σ0,,N] }} as ->.
     {
@@ -640,7 +640,7 @@ Proof.
     assert ((pred_rel pred_P s1 s3 \/ s1 = s3) /\ (pred_rel pred_P s2 s3 \/ s2 = s3)) as [pr1 pr2] by (eapply ord_ru; mauto 2).
     destruct glu_a as [glu_a_eq glu_a_rel].
     destruct pr1;
-      [eapply glu_a_rel | subst; eapply glu_a_eq]; mauto 2.    
+      [eapply glu_a_rel | subst; eapply glu_a_eq]; mauto 2.
   }
   assert (forall c (equiv_c : in_rel c c) b,
              {{ ⟦ B ⟧ ρ ↦ c ↘ b }} ->
@@ -653,7 +653,7 @@ Proof.
     destruct pr2;
       [eapply glu_b_rel | subst; eapply glu_b_eq]; mauto 2.
   }
-  
+
   apply_predicate_equivalence.
   unfold sort_glu_exp_pred' in *.
   unfold glu_sort_typ_rec in *.
@@ -716,9 +716,9 @@ Proof.
     eapply cons_glu_sub_pred_helper; only 1-2: rewrite H6; mauto 3.
     enough (SbΓ'' Δ σ ρ) by (eapply glu_ctx_env_sub_resp_sub_eq; mauto 4); eassumption.
     assert {{ Δ ⊢ A[σ∘Id] ≈ A[σ][Id] : Sort@s1 }} by (eapply exp_eq_sub_compose_typ_sort; mauto 3).
-    enough (Ela Δ {{{ A[σ][Id] }}} {{{ N[σ] }}} n) by (eapply glu_sort_elem_trm_resp_typ_exp_eq; mauto 3); eassumption.    
+    enough (Ela Δ {{{ A[σ][Id] }}} {{{ N[σ] }}} n) by (eapply glu_sort_elem_trm_resp_typ_exp_eq; mauto 3); eassumption.
   }
-  
+
   (on_all_hyp: destruct_glu_rel_by_assumption SbΓA).
   simplify_evals.
   match_by_head1 (@glu_sort_elem P) ltac:(fun H => directed invert_glu_sort_elem H).
@@ -731,7 +731,7 @@ Proof.
   assert {{ Δ ⊢ N[σ] : A[σ] }} by mauto 2.
   assert {{ Δ ⊢ B[Id,,N][σ] ≈ B[(Id,,N)∘σ] : Sort@s2 }} by (symmetry; mauto 4).
   assert {{ Δ ⊢s (Id,,N)∘σ ≈ σ,,N[σ] : Γ, A@s1 }} by mauto 3.
-  assert {{ Δ ⊢ B[(Id,,N)∘σ] ≈ B[σ,,N[σ]] : Sort@s2 }} by mauto 3. 
+  assert {{ Δ ⊢ B[(Id,,N)∘σ] ≈ B[σ,,N[σ]] : Sort@s2 }} by mauto 3.
   assert {{ Δ ⊢ B[Id,,N][σ] ≈ B[σ,,N[σ]] : Sort@s2 }} as -> by mauto 3.
   assert {{ Δ ⊢ (M N)[σ] ≈ M[σ] N[σ] : B[σ,,N[σ]] }} as -> by mauto 2.
   assert {{ Δ ⊢ M[σ][Id] N[σ] ≈ M[σ] N[σ] : B[σ,,N[σ]] }} as <-.
@@ -828,8 +828,8 @@ Proof.
 
   match_by_head (@glu_sort_elem) ltac:(fun H => directed invert_glu_sort_elem H).
   simpl_glu_rel.
-  
-  
+
+
   assert (glu_sort_elem pred_P s1 IP IEL a).
   {
     assert ((pred_rel pred_P s1 s3 \/ s1 = s3) /\ (pred_rel pred_P s2 s3 \/ s2 = s3)) as [pr1 pr2] by (eapply ord_ru; mauto 2).
@@ -845,7 +845,7 @@ Proof.
               (pred_rel pred_P s2 s3 -> glu_sort_elem pred_P s2 (OP c equiv_c) (OEL c equiv_c) b)) as [glu_b_eq glu_b_rel] by mauto 2.
     destruct pr2; [| subst]; mauto 2.
   }
-  
+
   apply_predicate_equivalence.
   (* unfold sort_glu_exp_pred' in *. *)
   (* unfold glu_sort_typ_rec in *. *)
@@ -885,8 +885,8 @@ Proof.
   (* inversion H30. *)
   (* subst. *)
   (* rename s into s2. *)
-  
-  
+
+
   match goal with
   | _: {{ ⟦ B ⟧ ρ ↦ n ↘ ^?b' }},
       _: {{ $| m & n |↘ ^?mn' }} |- _ =>
@@ -934,7 +934,7 @@ Proof.
     - eapply glu_ctx_env_sub_monotone; mauto 3.
     - assert {{ Δ ⊢ A[σ∘Id] ≈ A[σ] : Sort@s1 }} as -> by mauto 4.
       mauto 2.
-  }      
+  }
   (*   only 1-2: rewrite H6; mauto 3. *)
   (*   enough (SbΓ'' Δ σ ρ) by (eapply glu_ctx_env_sub_resp_sub_eq; mauto 4); eassumption. *)
   (*   assert {{ Δ ⊢ A[σ∘Id] ≈ A[σ][Id] : Sort@s1 }} by (eapply exp_eq_sub_compose_typ_sort; mauto 3). *)
@@ -945,7 +945,7 @@ Proof.
   inversion H46.
   subst.
   rename s into s2.
-  
+
   (* (on_all_hyp: destruct_glu_rel_by_assumption SbΓA). *)
   simplify_evals.
   match_by_head (@glu_sort_elem P) ltac:(fun H => directed invert_glu_sort_elem H).
@@ -959,7 +959,7 @@ Proof.
   assert {{ Δ ⊢ N[σ] : A[σ] }} by mauto 2.
   assert {{ Δ ⊢ B[Id,,N][σ] ≈ B[(Id,,N)∘σ] : Sort@s2 }} by (symmetry; mauto 4).
   assert {{ Δ ⊢s (Id,,N)∘σ ≈ σ,,N[σ] : Γ, A@s1 }} by mauto 3.
-  assert {{ Δ ⊢ B[(Id,,N)∘σ] ≈ B[σ,,N[σ]] : Sort@s2 }} by mauto 3. 
+  assert {{ Δ ⊢ B[(Id,,N)∘σ] ≈ B[σ,,N[σ]] : Sort@s2 }} by mauto 3.
   assert {{ Δ ⊢ B[Id,,N][σ] ≈ B[σ,,N[σ]] : Sort@s2 }} as -> by mauto 3.
   assert {{ Δ ⊢ (M N)[σ] ≈ M[σ] N[σ] : B[σ,,N[σ]] }} as -> by mauto 2.
   assert {{ Δ ⊢ M[σ][Id] N[σ] ≈ M[σ] N[σ] : B[σ,,N[σ]] }} as <-.
@@ -1005,6 +1005,6 @@ Proof.
   assert {{ ⟪ pred_P ⟫ Γ, A@s1 ⊩u B : Sort@s2 @ ^None }} by mauto 2.
   eapply glu_rel_exp_app_unsorted'; mauto 2.
 Qed.
-  
+
 #[export]
 Hint Resolve glu_rel_exp_app_unsorted : mcpts.

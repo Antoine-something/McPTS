@@ -61,7 +61,7 @@ Proof.
     assert (rel_mod_eval
       (fun (R : relation (domain P)) (b b' : domain P) =>
        (s2 = s3 -> per_sort_elem pred_P s3 R b b') /\
-       (pred_rel pred_P s2 s3 -> per_sort_elem pred_P s2 R b b')) B d{{{ 
+       (pred_rel pred_P s2 s3 -> per_sort_elem pred_P s2 R b b')) B d{{{
       ρ ↦ c }}} B d{{{ ρ' ↦ c' }}} (out_rel c c' equiv_c_c')) by mauto.
     unfold rel_typ.
     inversion_clear H9.
@@ -230,14 +230,14 @@ Proof with mautosolve.
   handle_per_typ_elem_irrel.
   per_sort_elem_econstructor; eauto.
   - eapply rel_exp_pi_core; eauto; try reflexivity.
-    intros.    
+    intros.
     assert (Hequiv : {{ Dom ρσ ↦ c ≈ ρ'σ' ↦ c' ∈ (cons_per_ctx_env env_relΔ elem_relA) }}) by (econstructor; mauto; econstructor; mauto).
-    apply_relation_equivalence;     
+    apply_relation_equivalence;
       (on_all_hyp: fun H => destruct (H _ _ Hequiv));
       destruct_conjs;
       destruct_by_head (@rel_typ P);
       destruct_by_head (@rel_exp P).
-    repeat (econstructor; mauto).    
+    repeat (econstructor; mauto).
   - solve_refl.
 Qed.
 
@@ -251,10 +251,10 @@ Lemma rel_exp_unsorted_fn_cong {P : PtsSig} {pred_P : PredicativeSig P} : forall
     {{ ⟪ pred_P ⟫ Γ, A@s1 ⊨u B : Sort@s2 }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u λ r A M ≈ λ r A' M' : Π r A B }}.
 Proof with mautosolve.
-  intros * [env_relΓ]%rel_exp_unsorted_of_typ_inversion1 [] [env_relΓA]%rel_exp_unsorted_of_typ_inversion1.  
+  intros * [env_relΓ]%rel_exp_unsorted_of_typ_inversion1 [] [env_relΓA]%rel_exp_unsorted_of_typ_inversion1.
   destruct_conjs.
   invert_per_ctx_envs.
-  
+
   match goal with
   | _: _ <~> cons_per_ctx_env env_relΓ ?x |- _ =>
       rename x into elem_relA
@@ -287,15 +287,15 @@ Proof with mautosolve.
       simpl; mauto.
       handle_per_sort_elem_irrel.
       handle_per_typ_elem_irrel.
-      apply_relation_equivalence.      
-      eapply H20; mauto.      
+      apply_relation_equivalence.
+      eapply H20; mauto.
     }
     apply_relation_equivalence;
       (on_all_hyp: fun H => destruct (H _ _ Hequiv));
       destruct_conjs;
       destruct_by_head (@rel_typ_unsorted P);
       destruct_by_head (@rel_exp P).
-    
+
     econstructor; eauto.
     assert (rel_exp B d{{{ ρ ↦ c }}} B d{{{ ρ' ↦ c' }}} (per_sort pred_P s2)).
     {
@@ -304,7 +304,7 @@ Proof with mautosolve.
         econstructor; mauto.
     }
     destruct_by_head (@rel_exp P).
-    
+
     destruct_by_head (@per_sort P).
     functional_eval_rewrite_clear.
     eexists; mauto.
@@ -320,14 +320,14 @@ Proof with mautosolve.
     }
     extract_output_info_with P ρ c ρ' c' (cons_per_ctx_env env_relΓ elem_relA).
 
-    
+
     assert (exists elem_rel : relation (domain P),
                rel_typ_unsorted pred_P B d{{{ ρ ↦ c }}} B d{{{ ρ' ↦ c' }}} elem_rel /\ rel_exp M d{{{ ρ ↦ c }}} M' d{{{ ρ' ↦ c' }}} elem_rel) by mauto.
 
     destruct_conjs.
     destruct_by_head (@rel_exp).
     econstructor; mauto.
-    
+
     intros.
     destruct_by_head (@rel_typ_unsorted P).
     destruct_by_head (@rel_typ P).
@@ -353,20 +353,20 @@ Proof with mautosolve.
   pose env_relΔA.
   invert_per_ctx_envs.
   handle_per_ctx_env_irrel.
-  eexists; split; [eassumption|].    
+  eexists; split; [eassumption|].
   intros.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
   (on_all_hyp: destruct_rel_by_assumption env_relΔ').
   simplify_evals.
   inversion_clear H19.
-  
+
   assert (rel_typ_unsorted pred_P A ρσ A ρ'σ' (head_rel ρσ ρ'σ' H10)) by mauto.
   assert (rel_typ_unsorted pred_P A ρσ A ρ'σ' (head_rel0 ρσ ρ'σ' H10)) by mauto.
   destruct_by_head (@rel_typ_unsorted P).
   simplify_evals.
-  handle_per_typ_elem_irrel. 
-  
-  eexists.  
+  handle_per_typ_elem_irrel.
+
+  eexists.
   split; econstructor; mauto 4.
   - econstructor; mauto.
     per_sort_elem_econstructor; [| | apply Equivalence_Reflexive]; eauto.
@@ -384,7 +384,7 @@ Proof with mautosolve.
       econstructor; mauto.
       simpl; mauto.
       handle_per_typ_elem_irrel.
-      eapply H18; mauto.      
+      eapply H18; mauto.
     }
     apply_relation_equivalence;
       (on_all_hyp: fun H => destruct (H _ _ Hequiv));
@@ -392,14 +392,14 @@ Proof with mautosolve.
       destruct_by_head (@rel_typ P);
       destruct_by_head (@rel_typ_unsorted P);
       destruct_by_head (@rel_exp P).
-                       
+
     econstructor; eauto.
-    
+
     assert (rel_exp B d{{{ ρσ ↦ c }}} B d{{{ ρ'σ' ↦ c' }}} (per_sort pred_P s2)) by mauto.
     destruct_by_head (@rel_exp P).
     functional_eval_rewrite_clear.
     assumption.
-    
+
   - intros ? **.
     assert (per_sort_elem pred_P s1 (head_rel0 ρσ ρ'σ' H10) a a') by mauto.
     assert (Hequiv : {{ Dom ρσ ↦ c ≈ ρ'σ' ↦ c' ∈ env_relΔA }}).
@@ -409,7 +409,7 @@ Proof with mautosolve.
       simpl; mauto.
       handle_per_sort_elem_irrel.
       apply_relation_equivalence.
-      eapply H17; mauto.      
+      eapply H17; mauto.
     }
     apply_relation_equivalence;
       (on_all_hyp: fun H => destruct (H _ _ Hequiv));
@@ -451,7 +451,7 @@ Proof.
   destruct_conjs.
   destruct_by_head (@rel_typ_unsorted P).
   destruct_by_head (@rel_exp).
-  
+
   assert (exists aρ, a = d{{{ Π r aρ ρ B }}}).
   {
     inversion H4.
@@ -482,12 +482,12 @@ Proof.
       destruct H0.
       * eapply H12; mauto.
       * rewrite -> H0.
-        eapply H11; mauto.        
+        eapply H11; mauto.
   - intros.
     assert (rel_mod_eval
       (fun (R : relation (domain P)) (b b' : domain P) =>
        (s2 = s3 -> per_sort_elem pred_P s3 R b b') /\
-       (pred_rel pred_P s2 s3 -> per_sort_elem pred_P s2 R b b')) B d{{{ 
+       (pred_rel pred_P s2 s3 -> per_sort_elem pred_P s2 R b b')) B d{{{
       ρ ↦ c }}} B d{{{ ρ' ↦ c' }}} (out_rel c c' equiv_c_c')) by mauto.
     unfold rel_typ.
     inversion_clear H11.
@@ -578,7 +578,7 @@ Proof with mautosolve.
   intros.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
   destruct_by_head (@rel_typ P).
-  destruct_by_head (@rel_typ_unsorted P).  
+  destruct_by_head (@rel_typ_unsorted P).
   handle_per_sort_elem_irrel.
   destruct_by_head (@rel_exp P).
   assert (per_typ_elem pred_P (head_rel ρ ρ' equiv_ρ_ρ') a a') by mauto.

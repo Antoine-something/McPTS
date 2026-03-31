@@ -111,7 +111,7 @@ Proof with mautosolve.
   assert (per_typ_elem pred_P (head_rel ρ'0 ρ'σ' H11) m a') by mauto 2.
   handle_per_typ_elem_irrel.
   clear_dups.
-  
+
   destruct_by_head (@rel_exp P).
   econstructor; mauto.
 Qed.
@@ -193,7 +193,7 @@ Proof with mautosolve.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ'').
   assert (rel_typ_unsorted pred_P {{{ A[σ] }}} ρσ {{{ A[σ] }}} ρ'σ' elem_rel) by mauto.
   destruct_by_head (@rel_typ_unsorted P).
-  
+
   simplify_evals.
   match_by_head (@per_typ_elem P) ltac:(fun H => directed inversion_clear H); subst.
   clear_dups.
@@ -201,7 +201,7 @@ Proof with mautosolve.
   assert (per_typ_elem pred_P (head_rel ρ'0 ρ'1 H15) m m0) by mauto 2.
   handle_per_typ_elem_irrel.
   clear_dups.
-  
+
   destruct_by_head (@rel_exp P).
   econstructor; mauto.
 Qed.
@@ -228,8 +228,8 @@ Proof with mautosolve.
   clear_dups.
   clear_refl_eqs.
   handle_per_typ_elem_irrel.
-  clear_dups.  
-  
+  clear_dups.
+
   destruct_by_head (@rel_exp P).
   econstructor...
 Qed.
