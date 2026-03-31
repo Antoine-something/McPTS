@@ -1427,7 +1427,6 @@ Proof.
   - eapply presup_exp; mauto 2.
 Qed.
 
-
 (** *** Consistency Helper *)
 
 Lemma no_closed_neutral {P : PtsSig} : forall {A : exp P} {W : ne P},

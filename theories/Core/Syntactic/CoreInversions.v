@@ -11,10 +11,11 @@ Lemma wf_pi_inversion {P : PtsSig} : forall {Γ : ctx P} {A B C s1 s2 s3} {r : R
 Proof with mautosolve 4.
   intros * H.
   dependent induction H;
-    gen_core_presups; mauto.
-  split; [|split];
-    [| | transitivity A0; mauto 2];
-    eapply IHwf_exp1; mauto 2.
+    gen_core_presups; mauto 3.
+  - mauto.
+  - split; [|split];
+      [| | transitivity A0; mauto 2];
+      eapply IHwf_exp1; mauto 2.
 Qed.
 
 #[export]
@@ -38,7 +39,6 @@ Proof.
   destruct_conjs; mauto 2.
 Qed.
 
-
 #[export]
 Hint Resolve wf_pi_inversion' wf_pi_inversion_typ : mcpts.
 
@@ -46,7 +46,7 @@ Corollary wf_typ_pi_inversion {P : PtsSig} : forall {Γ : ctx P} {A B s1 s2 s3} 
     {{ Γ ⊢ Π r A B }} ->
     {{ Γ ⊢ A : Sort@s1 }} /\ {{ Γ, A@s1 ⊢ B : Sort@s2 }}.
 Proof.
-  intros * H; inversion H; mauto 2.
+  inversion 1; mauto 2.
 Qed.
 
 #[export]
@@ -56,7 +56,7 @@ Corollary wf_typ_pi_inversion' {P : PtsSig} : forall {Γ : ctx P} {A B s1 s2 s3}
     {{ Γ ⊢ Π r A B }} ->
     {{ Γ ⊢ Π r A B : Sort@s3 }}.
 Proof.
-  intros * H.
+  intros.
   assert ({{ Γ ⊢ A : Sort@s1 }} /\ {{ Γ, A@s1 ⊢ B : Sort@s2 }}) by mauto 2.
   destruct_conjs.
   econstructor; mauto 2.
@@ -177,7 +177,7 @@ Proof with mautosolve.
   intros * H.
   dependent induction H.
   - do 2 eexists.
-    do 3 (eexists; mauto).
+    do 3 (eexists; mauto 2).
     eapply wf_typ_eq_refl.
     assert {{ Γ, ℕ@s ⊢ A' }}; mauto 2.
     assert {{ Γ ⊢s Id,,M : Γ, ℕ@s }} by mauto 4.
@@ -190,8 +190,6 @@ Qed.
 
 #[export]
 Hint Resolve wf_natrec_inversion : mcpts.
-
-
 
 (** Here, we get a disjunction because we cannot know in advance if A' is a sort or not *)
 Lemma wf_exp_sub_inversion {P : PtsSig} : forall {Γ : ctx P} {M σ A},

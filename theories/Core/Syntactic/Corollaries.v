@@ -4,7 +4,6 @@ From McPTS.Core Require Import Base.
 From McPTS.Core.Syntactic Require Export SystemOpt.
 Import Syntax_Notations.
 
-
 Corollary sub_id_typ {P : PtsSig} : forall (Γ : ctx P) M A s,
     {{ Γ ⊢ A : Sort@s }} ->
     {{ Γ ⊢ M : A }} ->
@@ -12,7 +11,7 @@ Corollary sub_id_typ {P : PtsSig} : forall (Γ : ctx P) M A s,
 Proof.
   intros.
   gen_presups.
-  mauto 4.
+  mauto 3.
 Qed.
 
 #[export]
@@ -140,7 +139,7 @@ Proof.
   - econstructor; mauto 4.
   - assert {{ #0 : A[σ][Wk]@s ∈ Γ, A[σ]@s }} by mauto.
     assert {{ Γ, A[σ]@s ⊢ #0 ≈ #0 : A[σ][Wk] }} by mauto.
-    eapply wf_exp_eq_conv'; mauto.
+    eapply wf_exp_eq_conv'; mauto 4.
 Qed.
 #[export]
 Hint Resolve sub_q_eq : mcpts.
@@ -172,13 +171,14 @@ Proof.
     }
     assert {{ Δ' ⊢s σ∘(Wk∘(τ,,M)) ≈ σ∘τ : Γ }} by (eapply wf_sub_eq_compose_cong; mauto).
     assert {{ Δ' ⊢s (σ∘Wk)∘(τ,,M) ≈ σ∘τ : Γ}} by (etransitivity; mauto).
-    assert {{ Δ' ⊢ #0[τ,,M] ≈ M : A[σ][τ] }} by (eapply wf_exp_eq_var_0_sub; mauto).
+    assert {{ Δ' ⊢ #0[τ,,M] ≈ M : A[σ][τ] }} by (eapply wf_exp_eq_var_0_sub; mauto 3).
     eapply wf_sub_eq_extend_cong; mauto 2.
     assert {{ Γ ⊢ A ≈ A : Sort@s }} by mauto.
     assert {{ Δ' ⊢ A[σ][τ] ≈ A[σ∘τ] : Sort@s }} by mauto.
     assert {{ Δ' ⊢ A[σ∘τ] ≈ A[(σ∘Wk)∘(τ,,M)] : Sort@s }} by mauto 4.
     assert {{ Δ' ⊢ A[σ][τ] ≈ A[(σ∘Wk)∘(τ,,M)] : Sort@s }} by (etransitivity; mauto).
-    eapply wf_exp_eq_conv; mauto 4.
+    eapply wf_exp_eq_conv; mauto 3.
+    mauto 4.
   - mauto 5.
   - assert {{ Δ, A[σ]@s ⊢ A[σ][Wk] ≈ A[σ∘Wk] : Sort@s }} by (symmetry; mauto).
     assert {{ #0 : A[σ][Wk]@s ∈ Δ, A[σ]@s }} by mauto.

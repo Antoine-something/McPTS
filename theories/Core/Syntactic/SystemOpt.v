@@ -25,8 +25,7 @@ Corollary wf_exp_conv_typ {P} : forall {Γ : ctx P} {A B M},
     {{ Γ ⊢ A ≈ B }} ->
     {{ Γ ⊢ M : B }}.
 Proof.
-  intros.
-  induction H0; subst; gen_presups; mauto 2.
+  induction 2; subst; gen_presups; mauto 2.
   assert {{ Γ ⊢ M : B }} by mauto 2.
   mauto 3.
 Qed.
@@ -36,8 +35,7 @@ Corollary wf_exp_eq_conv_typ {P} : forall {Γ : ctx P} {A B M M'},
     {{ Γ ⊢ A ≈ B }} ->
     {{ Γ ⊢ M ≈ M' : B }}.
 Proof.
-  intros.
-  induction H0; subst; gen_presups; mauto 2.
+  induction 2; subst; gen_presups; mauto 2.
   assert {{ Γ ⊢ M ≈ M' : B }} by mauto 2.
   mauto 3.
 Qed.
