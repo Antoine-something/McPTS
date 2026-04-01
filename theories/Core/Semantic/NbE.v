@@ -58,6 +58,21 @@ Qed.
 #[export]
 Hint Resolve initial_env_spec : mcpts.
 
+Lemma initial_env_spec_subst {P} : forall x (Γ : ctx P) ρ A s,
+    initial_env Γ ρ ->
+    {{ #x : A@s ∈ Γ }} ->
+    exists a, {{ #| ρ[x] |↘ ⇑! a (length Γ - x - 1) }}.
+Proof.
+  intros.
+  eapply initial_env_spec in H0; eauto.
+  destruct_conjs.
+  subst.  
+  eexists; mauto 2.
+Qed.
+
+#[export]
+Hint Resolve initial_env_spec_subst : mcpts.
+
 Ltac functional_initial_env_rewrite_clear1 :=
   let tactic_error o1 o2 := fail 3 "functional_initial_env equality between" o1 "and" o2 "cannot be solved by mauto" in
   match goal with

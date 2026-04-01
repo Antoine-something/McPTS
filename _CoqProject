@@ -65,6 +65,9 @@ theories/Core/Soundness/Extension/SystemAnnotated.v
 theories/Core/Soundness/FundamentalTheorem.v
 theories/Core/Soundness.v
 
+theories/Core/Completeness/Consequences/Types.v
+theories/Core/Completeness/Consequences/Rules.v
+
 theories/Instantiations/STLC.v
 theories/Instantiations/LF.v
 theories/Instantiations/CumulMLTT.v
