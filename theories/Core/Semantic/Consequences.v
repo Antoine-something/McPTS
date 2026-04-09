@@ -83,7 +83,83 @@ Proof.
   functional_read_rewrite_clear.
   etransitivity; [| symmetry]; eauto.
 Qed.
-  
+
+Lemma adjust_typ_eq_level {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {A A' s},
+    {{ Γ ⊢ A ≈ A' }} ->
+    {{ Γ ⊢ A : Sort@s }} ->
+    {{ Γ ⊢ A' : Sort@s }} ->
+    {{ Γ ⊢ A ≈ A' : Sort@s }}.
+Proof.
+  intros * ?%(@completeness_typ_unsorted P pred_P) ?%(@soundness P pred_P) ?%(@soundness P pred_P).
+  destruct_conjs.
+  dir_inversion_by_head @nbe; dir_inversion_by_head @nbe_ty; subst.
+  match_by_head @eval_exp ltac:(fun H => progressive_invert H).
+  match_by_head @read_nf ltac:(fun H => progressive_invert H).
+  functional_initial_env_rewrite_clear.
+  functional_eval_rewrite_clear.
+  functional_read_rewrite_clear.
+  etransitivity; [| symmetry]; eauto.
+Qed.
+
+Lemma wf_var_inversion_helper {P} : forall {Γ : ctx P} {x A},
+    {{ Γ ⊢ #x : A }} ->
+    exists B s, {{ #x : B@s ∈ Γ }} /\ {{ Γ ⊢ A ≈ B }}.
+Proof.
+  intros * HA.
+  dependent induction HA.
+  - do 2 eexists; split; mauto 3.
+  - specialize (IHHA1 x A0 ltac:(reflexivity) ltac:(reflexivity)) as [B [s' []]].
+    do 2 eexists; split; mauto 3.
+    symmetry.
+    symmetry in H1.
+    solve [econstructor; mauto 2].
+Qed.
+
+(* Lemma wf_var_inversion {P} : forall {Γ : ctx P} {x A s}, *)
+(*     {{ #x : A @ s ∈ Γ }} -> *)
+(*     forall B, {{ Γ ⊢ #x : B }} -> *)
+(*          {{ Γ ⊢ B : Sort@s }}. *)
+(* Proof. *)
+(*   intros * HA B HB. *)
+(*   dependent induction HB. *)
+(*   - assert (A = B /\ s = s0) as [] by (eapply functional_ctx_lookup; mauto 2); subst. *)
+(*     eassumption. *)
+(*   - assert (exists B' s', {{ #x : B'@s' ∈ Γ }} /\ {{ Γ ⊢ A0 ≈ B' }}) as [B' [s' []]] by (eapply wf_var_inversion_helper; mauto 2). *)
+(*     assert  *)
+    
+(* Lemma wf_var_inversion {P} : forall {Γ : ctx P} {x A}, *)
+(*     {{ Γ ⊢ #x : A }} -> *)
+(*     exists B s, {{ #x : B@s ∈ Γ }} /\ {{ Γ ⊢ A ≈ B : Sort@s }}. *)
+(* Proof. *)
+(*   intros * HA. *)
+(*   assert (exists B s, {{ #x : B@s ∈ Γ }} /\ {{ Γ ⊢ A ≈ B }}) as [B [s []]] by (eapply wf_var_inversion_helper; mauto 2). *)
+(*   dependent induction HA. *)
+(*   - assert (A = B /\ s = s0) as [] by (eapply functional_ctx_lookup; mauto 2); subst. *)
+(*     do 2 eexists; split; mauto 2. *)
+(*   - assert {{ Γ ⊢ A0 ≈ B }} by mauto 3. *)
+(*     specialize (IHHA1 x A0 ltac:(reflexivity) ltac:(reflexivity) B s0 ltac:(eassumption) ltac:(eassumption)) as [B' [s' []]]. *)
+(*     assert (B = B' /\ s0 = s') as [] by (eapply functional_ctx_lookup; mauto 2); subst. *)
+(* Admitted. *)
+
+
+
+(* Lemma exp_eq_sort_wf_sort_wf {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {A s}, *)
+(*     {{ Γ ⊢ A : Sort@s }} -> *)
+(*     forall A' s', *)
+(*       {{ Γ ⊢ A ≈ A' : Sort@s' }} -> *)
+(*       {{ Γ ⊢ A' : Sort@s }}. *)
+(* Proof. *)
+(*   intros * HA. *)
+(*   dependent induction HA; intros; gen_presups; mauto 2. *)
+(*   - admit. *)
+(*   - assert {{ Γ ⊢ Sort@s ≈ Sort@s' }} by mauto 2. *)
+(*     assert (s = s') by mauto 2. *)
+(*     subst. *)
+(*     eassumption. *)
+(*   -  *)
+
+
+    
 Lemma exp_eq_pi_inversion {P} (pred_P : PredicativeSig P) : forall {Γ A B A' B' s1 s2 s3} {r : Ru P s1 s2 s3},
     {{ Γ ⊢ Π r A B ≈ Π r A' B' : Sort@s3 }} ->
     {{ Γ ⊢ A ≈ A' : Sort@s1 }} /\ {{ Γ, A@s1 ⊢ B ≈ B' : Sort@s2 }}.
@@ -272,67 +348,72 @@ Hint Resolve canonical_form_of_typ : mcpts.
 (* Hint Resolve subtyp_spec : mcpts. *)
 
 
-(** STOPPED HERE, 
-    proof does not work as is because the dependent induction does not generate the same IH as in McTT
- *)
-Lemma consistency_ne_helper {P} (pred_P : PredicativeSig P) : forall {s s' : P} {A A'} {W : ne P},
+(* STOPPED HERE
+ * proof does not work as is because the dependent induction does not generate the same IH as in McTT  *)
+Lemma consistency_ne_helper {P} (pred_P : PredicativeSig P) : forall {s1 s2 : P} {A A'} {W : ne P},
     is_typ_constr A' ->
-    (forall s'', A' <> {{{ Sort@s'' }}}) ->
-    {{ ⋅, Sort@s @ s' ⊢ A ≈ A' }} ->
-    ~ {{ ⋅, Sort@s @ s' ⊢ W : A }}.
+    (forall s, A' <> {{{ Sort@s }}}) ->
+    {{ ⋅, Sort@s1 @ s2 ⊢ A ≈ A' }} ->
+    ~ {{ ⋅, Sort@s1 @ s2 ⊢ W : A }}.
 Proof with (congruence + mautosolve 3).
-  intros * HA' HA'eq Heq HW. gen A'.  
+  intros * HA' HA'eq Heq HW. gen A'.
   dependent induction HW; intros; mauto 3; try directed dependent destruction HA';
     try (destruct W; simpl in *; congruence).
   - destruct W; simpl in *; autoinjections.
-    eapply IHHW3; [| | | | mauto 4]...
+    eapply (IHHW3 _ _ _ _ ltac:(reflexivity) ltac:(reflexivity) ltac:(reflexivity) {{{ Π r A0 B }}}).
+    + econstructor.
+    + intros * H.
+      inversion H.
+    + gen_presup HW3. econstructor; mauto 2.
+
   - destruct W; simpl in *; autoinjections.
-    eapply IHHW3; [| | | | mauto 4]...
+    do 2 match_by_head @ctx_lookup ltac:(fun H => dependent destruction H).
+    inversion_clear H.
+    assert (exists s2', Ax P s1 s2' /\ {{ ⋅ ⊢ Sort@s2' ≈ Sort@s2 }}) as [s2' []] by mauto 2.
+    assert (s2 = s2') as <- by mauto 3.
+    assert {{ ⋅, Sort@s1 @ s2 ⊢ Sort@s1[Wk] ≈ Sort@s1 : Sort@s2 }} by mauto 4.
+    clear H2.
+    assert {{ ⋅, Sort@s1@s2 ⊢ A' ≈ Sort@s1 }} by mauto 3.
+    assert (A' = {{{ Sort@s1 }}}) by mauto 2.
+    eapply HA'eq; eassumption.
+
   - destruct W; simpl in *; autoinjections.
-    eapply IHHW3; [| | | | mauto 4]...
-  - destruct W; simpl in *; autoinjections.
-    eapply IHHW3; [| | | | mauto 4]...
-  - destruct W; simpl in *; autoinjections.
-    do 2 match_by_head ctx_lookup ltac:(fun H => dependent destruction H).
-    assert {{ ⋅, Sort@i ⊢ Sort@i[Wk] ≈ Sort@i : Sort@(S i) }} by mauto 3.
-    eapply subtyp_spec in Heq as [| []]; destruct_conjs;
-      try (eapply HA'eq; mautosolve 4).
-    destruct H1.
-    + destruct_all.
-      assert {{ ⋅, Sort@i ⊢ Sort@i ≈ Π ^_ ^_ : Sort@_ }} by mauto 3.
-      assert ({{{ Π ^_ ^_ }}} = {{{ Sort@i }}}) by mauto 3...
-    + destruct_all.
-      assert {{ ⋅, Sort@i ⊢ Sort@i ≈ Σ ^_ ^_ : Sort@_ }} by mauto 3.
-      assert ({{{ Σ ^_ ^_ }}} = {{{ Sort@i }}}) by mauto 3...
-  - destruct W; simpl in *; autoinjections.
-    eapply IHHW6; [| | | | mauto 4]...
+    eapply (IHHW4 _ _ _ _ ltac:(reflexivity) ltac:(reflexivity) ltac:(reflexivity) {{{ ℕ }}}).
+    + econstructor.
+    + intros * H.
+      inversion H.
+    + do 2 econstructor; mauto 3.
+
+  - eapply (IHHW1 _ _ _ _ ltac:(reflexivity) ltac:(reflexivity) ltac:(reflexivity)).
+    + eassumption.
+    + eassumption.
+    + mauto 3.
 Qed.
 
-Theorem consistency : forall {i} M,
-    ~ {{ ⋅ ⊢ M : Π Sort@i #0 }}.
+Theorem consistency {P} (pred_P : PredicativeSig P) : forall s1 s2 s3 s (r : Ru P s1 s2 s3) M,
+    ~ {{ ⋅ ⊢ M : Π r Sort@s #0 }}.
 Proof with (congruence + mautosolve 3).
   intros * HW.
-  assert (exists W1 W2, nbe {{{ ⋅ }}} M {{{ Π Sort@i #0 }}} n{{{ λ W1 W2 }}}) as [W1 [W2 Hnbe]] by mauto 3.
-  assert (exists W, nbe {{{ ⋅ }}} M {{{ Π Sort@i #0 }}} W /\ {{ ⋅ ⊢ M ≈ W : Π Sort@i #0 }}) as [? []] by mauto 3 using soundness.
+  assert (exists W1 W2, nbe {{{ ⋅ }}} M {{{ Π r Sort@s #0 }}} n{{{ λ r W1 W2 }}}) as [W1 [W2 Hnbe]] by mauto 3.
+  assert (exists W, nbe {{{ ⋅ }}} M {{{ Π r Sort@s #0 }}} W /\ {{ ⋅ ⊢ M ≈ W : Π r Sort@s #0 }}) as [? []] by mauto 3 using soundness.
   gen_presups.
   functional_nbe_rewrite_clear.
   dependent destruction Hnbe.
   invert_rel_typ_body.
-  match_by_head read_nf ltac:(fun H => directed dependent destruction H).
-  match_by_head read_typ ltac:(fun H => directed dependent destruction H).
+  match_by_head @read_nf ltac:(fun H => directed dependent destruction H).
+  match_by_head @read_typ ltac:(fun H => directed dependent destruction H).
   invert_rel_typ_body.
-  match_by_head read_nf ltac:(fun H => directed dependent destruction H).
+  match_by_head @read_nf ltac:(fun H => directed dependent destruction H).
   simpl in *.
-  assert (exists B, {{ ⋅, Sort@i ⊢ M0 : B }} /\ {{ ⋅ ⊢ Π Sort@i B ⊆ Π Sort@i #0 }}) as [B [? [| [|]]%subtyp_spec]] by mauto 3;
-    destruct_all;
-    try assert ({{{ Π ^_ ^_ }}} = {{{ Sort@_ }}}) by mauto 3;
-    try congruence.
-  - assert (_ /\ {{ ^_ ⊢ B ≈ #0 : ^_ }}) as [_ ?] by mauto 3 using exp_eq_pi_inversion.
-    eapply consistency_ne_helper...
-  - assert (_ /\ {{ ^_ ⊢ B ≈ ^_ : ^_ }}) as [_ ?] by mauto 3 using exp_eq_pi_inversion.
-    assert (_ /\ {{ ^_ ⊢ ^_ ≈ #0 : ^_ }}) as [? ?] by mauto 3 using exp_eq_pi_inversion.
-    assert {{ ^_ ⊢ B ⊆ #0 }} by (etransitivity; [| eapply ctxeq_subtyp]; mauto 4).
-    eapply consistency_ne_helper...
-  - eapply is_typ_constr_and_exp_eq_pi_implies_eq_pi in H6; mauto 3.
-    destruct_all...
+  assert (exists B, {{ ⋅, Sort@s @ s1 ⊢ M0 : B }} /\ {{ ⋅ ⊢ Π r Sort@s B ≈ Π r Sort@s #0 }}) as [B []] by mauto 2.
+
+  assert {{ ⋅, Sort@s@s1 ⊢ B ≈ #0 : Sort@s2 }}.
+  {
+    gen_presup H4.
+    assert {{ ⋅ ⊢ Π r Sort@s B : Sort@s3 }} by mauto 3.
+    assert {{ ⋅ ⊢ Π r Sort@s #0 : Sort@s3 }} by mauto 3.
+    assert {{ ⋅ ⊢ Π r Sort@s B ≈ Π r Sort@s #0 : Sort@s3 }} by (eapply adjust_typ_eq_level; mauto 2).
+    eapply exp_eq_pi_inversion; mauto 2.
+  }
+  eapply consistency_ne_helper...  
 Qed.
