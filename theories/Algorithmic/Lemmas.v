@@ -13,19 +13,20 @@ Lemma functional_alg_type_infer {P} : forall {Γ : ctx P} {A A' M},
     A = A'.
 Proof.
   intros * HM1 HM2. gen A'.
-  induction HM1; intros;
-    inversion_clear HM2;
+  induction HM1;
+    
+  intros;
+    directed inversion HM2; subst;
     functional_nbe_rewrite_clear;
     f_equiv;
     try reflexivity;
     intuition.
-  - assert (A = A0) as <- by (eapply functional_ctx_lookup; eassumption).
-    functional_nbe_rewrite_clear.
+  - assert (A = A') as <- by (eapply functional_ctx_lookup; eassumption).
     reflexivity.
-  - assert (n{{{ Π r A B }}} = n{{{ Π r0 A0 B0 }}}) by intuition.
-    inversion H4; subst.
-    functional_nbe_rewrite_clear.
+  - assert ({{{ Π r A B }}} = {{{ Π r0 A0 B0 }}}) by intuition.
+    inversion H2; subst.
     reflexivity.
+  - 
 Qed.
 
 #[local]
