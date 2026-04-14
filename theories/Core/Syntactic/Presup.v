@@ -446,6 +446,19 @@ Proof with mautosolve 5.
     try (eexists; unshelve solve [mauto 4]; constructor).
 
   all: try (econstructor; mautosolve 4).
+  (* - assert {{ Δ ⊢ Π r A0 B : Sort@s3 }} by mauto 3. *)
+  (*   assert {{ Δ ⊢ Π r'' A0 B : Sort@s3 }} by mauto 3. *)
+  (*   assert {{ Δ ⊢ Π r A0 B ≈ Π r'' A0 B : Sort@s3 }} by (eapply exp_eq_pi_rule_irrelevance; mauto 2). *)
+  (*   assert {{ Δ ⊢ λ r A0 M0 : Π r A0 B }} by mauto 3. *)
+  (*   assert {{ Δ ⊢ λ r A0 M0 : Π r'' A0 B }} by mauto 3. *)
+  (*   mauto 3. *)
+  (* - assert {{ Γ ⊢ λ r' A0[σ] M0[q σ] : Π r' A0[σ] B[q σ] }} by (econstructor; mauto 3). *)
+  (*   assert {{ Γ ⊢ Π r' A0[σ] B[q σ] : Sort@s3 }} by (econstructor; mauto 3). *)
+  (*   assert {{ Δ ⊢ Π r'' A0 B : Sort@s3 }} by mauto 3. *)
+  (*   assert {{ Γ ⊢ (Π r'' A0 B)[σ] : Sort@s3 }} by mauto 2. *)
+  (*   enough {{ Γ ⊢ Π r' A0[σ] B[q σ] ≈ (Π r'' A0 B)[σ] : Sort@s3 }} by mauto 3. *)
+  (*   symmetry. *)
+  (*   mauto 3. *)
   - assert {{ Γ ⊢ succ M0 : ℕ }} by mauto 2.
     assert {{ Γ ⊢s Id,,succ M0 : Γ, ℕ@s }} by mauto 3.
     econstructor; mauto 3.

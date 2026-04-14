@@ -16,7 +16,7 @@ Section functional_eval.
     dependent induction H1;
       intros * H2; inversion H2; mauto 2.
   Qed.
-
+  
   Lemma functional_eval {P : PtsSig} :
     (forall (M : exp P) ρ m1,
         {{ ⟦ M ⟧ ρ ↘ m1 }} ->

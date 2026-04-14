@@ -136,11 +136,11 @@ Qed.
 #[export]
 Hint Resolve wf_pi : mcpts.
 
-Corollary wf_fn' {P : PtsSig} : forall {Γ : ctx P} {A M B s1 s2 s3} {r : Ru P s1 s2 s3},
+Corollary wf_fn' {P : PtsSig} : forall {Γ : ctx P} {A M B s1 s2 s3} {r r' : Ru P s1 s2 s3},
     {{ Γ ⊢ A : Sort@s1 }} ->
     {{ Γ, A@s1 ⊢ M : B }} ->
     {{ Γ, A@s1 ⊢ B : Sort@s2 }} ->
-    {{ Γ ⊢ λ r A M : Π r A B }}.
+    {{ Γ ⊢ λ r A M : Π r' A B }}.
 Proof.
   impl_opt_constructor.
 Qed.
@@ -197,10 +197,10 @@ Hint Resolve wf_typ_eq_sort_sub' : mcpts.
 #[export]
 Hint Rewrite -> @wf_typ_eq_sort_sub' using solve [lia | mauto 3] : mcpts.
 
-Corollary wf_exp_eq_pi_cong' {P} : forall {Γ A A' s1 s2 s3 B B'} {r : Ru P s1 s2 s3},
+Corollary wf_exp_eq_pi_cong' {P} : forall {Γ A A' s1 s2 s3 B B'} {r r' : Ru P s1 s2 s3},
     {{ Γ ⊢ A ≈ A' : Sort@s1 }} ->
     {{ Γ, A@s1 ⊢ B ≈ B' : Sort@s2 }} ->
-    {{ Γ ⊢ Π r A B ≈ Π r A' B' : Sort@s3 }}.
+    {{ Γ ⊢ Π r A B ≈ Π r' A' B' : Sort@s3 }}.
 Proof.
   impl_opt_constructor.
 Qed.
@@ -210,11 +210,11 @@ Hint Resolve wf_exp_eq_pi_cong' : mcpts.
 #[export]
 Remove Hints wf_exp_eq_pi_cong : mcpts.
 
-Corollary wf_exp_eq_fn_cong' {P : PtsSig} : forall {Γ : ctx P} {A A' s1 s2 s3 B M M'} {r : Ru P s1 s2 s3},
+Corollary wf_exp_eq_fn_cong' {P : PtsSig} : forall {Γ : ctx P} {A A' s1 s2 s3 B M M'} {r r' r'' : Ru P s1 s2 s3},
     {{ Γ ⊢ A ≈ A' : Sort@s1 }} ->
     {{ Γ, A@s1 ⊢ M ≈ M' : B }} ->
     {{ Γ, A@s1 ⊢ B : Sort@s2 }} ->
-    {{ Γ ⊢ λ r A M ≈ λ r A' M' : Π r A B }}.
+    {{ Γ ⊢ λ r A M ≈ λ r' A' M' : Π r'' A B }}.
 Proof.
   intros.
   econstructor; mauto 2.
@@ -229,12 +229,12 @@ Hint Resolve wf_exp_eq_fn_cong' : mcpts.
 #[export]
 Remove Hints wf_exp_eq_fn_cong : mcpts.
 
-Corollary wf_exp_eq_fn_sub' {P : PtsSig} : forall {Γ : ctx P} {σ Δ A M B s1 s2 s3} {r : Ru P s1 s2 s3},
+Corollary wf_exp_eq_fn_sub' {P : PtsSig} : forall {Γ : ctx P} {σ Δ A M B s1 s2 s3} {r r' r'' : Ru P s1 s2 s3},
     {{ Γ ⊢s σ : Δ }} ->
     {{ Δ ⊢ A : Sort@s1 }} ->
     {{ Δ, A@s1 ⊢ M : B }} ->
     {{ Δ, A@s1 ⊢ B : Sort@s2 }} ->
-    {{ Γ ⊢ (λ r A M)[σ] ≈ λ r A[σ] M[q σ] : (Π r A B)[σ] }}.
+    {{ Γ ⊢ (λ r A M)[σ] ≈ λ r' A[σ] M[q σ] : (Π r'' A B)[σ] }}.
 Proof.
   impl_opt_constructor.
 Qed.
@@ -294,15 +294,18 @@ Hint Resolve wf_exp_eq_pi_beta' : mcpts.
 #[export]
 Remove Hints wf_exp_eq_pi_beta : mcpts.
 
-Corollary wf_exp_eq_pi_eta' {P : PtsSig} : forall {Γ : ctx P} {A B M s1 s2 s3} {r : Ru P s1 s2 s3},
+Corollary wf_exp_eq_pi_eta' {P : PtsSig} : forall {Γ : ctx P} {A B M s1 s2 s3} {r r' r'' : Ru P s1 s2 s3},
     {{ Γ ⊢ M : Π r A B }} ->
-    {{ Γ ⊢ M ≈ λ r A (M[Wk] #0) : Π r A B }}.
+    {{ Γ ⊢ M ≈ λ r' A (M[Wk] #0) : Π r'' A B }}.
 Proof.
   intros.
   gen_presups.
+  inversion_clear HAwf.
   assert ({{ Γ ⊢ A : Sort@s1 }} /\ {{ Γ, A@s1 ⊢ B : Sort@s2 }}) by mauto 2.
   destruct_conjs.
-  econstructor; mauto 2.
+  assert {{ Γ ⊢ Π r A B ≈ Π r' A B : Sort@s3 }} by mauto 2.
+  assert {{ Γ ⊢ Π r' A B ≈ Π r'' A B : Sort@s3 }} by mauto 2.
+  econstructor; mauto 3.
 Qed.
 
 

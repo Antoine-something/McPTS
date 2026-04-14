@@ -280,6 +280,20 @@ Qed.
 #[export]
 Hint Resolve exp_eq_sub_cong_typ1_sorted exp_eq_sub_cong_typ2_sorted exp_eq_sub_compose_typ_sorted : mcpts.
 
+Lemma exp_eq_pi_rule_irrelevance {P} : forall {Γ s1 s2 s3 A B} {r r' : Ru P s1 s2 s3},
+    {{ Γ ⊢ A : Sort@s1 }} ->
+    {{ Γ, A@s1 ⊢ B : Sort@s2 }} ->
+    {{ Γ ⊢ Π r A B ≈ Π r' A B : Sort@s3 }}.
+Proof.
+  intros.
+  assert {{ Γ ⊢ A ≈ A : Sort@s1 }} by mauto 2.
+  assert {{ Γ, A@s1 ⊢ B ≈ B : Sort@s2 }} by mauto 2.
+  mauto 2.
+Qed.
+
+#[export]
+Hint Resolve exp_eq_pi_rule_irrelevance : mcpts.
+
 Lemma exp_eq_sub_compose_weaken_extend_typ {P : PtsSig} : forall {Γ : ctx P} {s s' σ Δ A B M},
     {{ Γ ⊢s σ : Δ }} ->
     {{ Δ ⊢ A : Sort@s }} ->

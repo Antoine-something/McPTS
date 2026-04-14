@@ -322,7 +322,7 @@ Lemma exp_pi_sub_lhs {P : PtsSig} : forall {Γ : ctx P} {σ Δ A B s1 s2 s3} {r 
     {{ Γ ⊢ (Π r A B)[σ] : Sort@s3 }}.
 Proof.
   intros.
-  mauto 4.
+  mauto 3.
 Qed.
 
 #[export]
@@ -335,7 +335,7 @@ Lemma exp_pi_sub_rhs {P : PtsSig} : forall {Γ : ctx P} {σ Δ A B s1 s2 s3} {r 
     {{ Γ ⊢ Π r A[σ] B[q σ] : Sort@s3 }}.
 Proof.
   intros.
-  econstructor; mauto 4.
+  econstructor; mauto 3.
 Qed.
 
 #[export]
@@ -357,7 +357,7 @@ Proof.
   transitivity {{{ B[Wk∘Id,,#0] }}}.
   {
     symmetry.
-    eapply sub_decompose_q_typ; mauto 4.
+    eapply sub_decompose_q_typ; mauto 3.
     eapply wf_conv' with (A := {{{ A[Wk] }}}); mauto 3.
     symmetry.
     assert {{ Γ, A@s1 ⊢ A[Wk] : Sort@s1 }} by mauto 3.
@@ -413,7 +413,7 @@ Proof.
   assert {{ Δ ⊢ C[q σ][Id,,N] ≈ C[σ,,N] : Sort@sc }} by mauto.
   assert {{ Δ ⊢s q (q σ)∘(Id,,N,,L) ≈ (q σ∘(Id,,N)),,L : Γ, B@sb, C@sc }} by (eapply sub_decompose_q; mauto 3).
   assert {{ Δ ⊢s q (q σ)∘(Id,,N,,L) ≈ σ,,N,,L : Γ, B@sb, C@sc }} by (bulky_rewrite; mauto 4).
-  assert {{ Δ ⊢ A[q (q σ)][Id,,N,,L] ≈ A[q (q σ)∘(Id,,N,,L)] : Sort@sa }} by mauto.
+  assert {{ Δ ⊢ A[q (q σ)][Id,,N,,L] ≈ A[q (q σ)∘(Id,,N,,L)] : Sort@sa }} by mauto 4.
   assert {{ Δ ⊢ A[q (q σ)∘(Id,,N,,L)] ≈ A[σ,,N,,L] : Sort@sa }} by mauto.
   assert {{ Δ ⊢ M[q (q σ)][Id,,N,,L] ≈ M[q (q σ)∘(Id,,N,,L)] : A[q (q σ)∘(Id,,N,,L)] }} by mauto.
   assert {{ Δ ⊢ M[q (q σ)][Id,,N,,L] ≈ M[σ,,N,,L] : A[q (q σ)∘(Id,,N,,L)] }} by (bulky_rewrite; mauto 4).
@@ -421,7 +421,7 @@ Proof.
 Qed.
 
 #[export]
-  Hint Resolve exp_sub_decompose_double_q_with_id_double_extend : mcpts.
+Hint Resolve exp_sub_decompose_double_q_with_id_double_extend : mcpts.
 
 Lemma exp_eq_natrec_cong_rhs_typ {P} : forall {Γ : ctx P} {M M' A A' s s'} {r : Ru_nat P s},
     {{ Γ, ℕ@s ⊢ A ≈ A' : Sort@s' }} ->
@@ -437,7 +437,7 @@ Proof.
 Qed.
 
 #[export]
-  Hint Resolve exp_eq_natrec_cong_rhs_typ : mcpts.
+Hint Resolve exp_eq_natrec_cong_rhs_typ : mcpts.
 
 Lemma exp_eq_nat_beta_succ_rhs_typ_gen {P} : forall {Γ : ctx P} {σ Δ A M N s s'} {r : Ru_nat P s},
     {{ Γ ⊢s σ : Δ }} ->
@@ -465,7 +465,7 @@ Proof.
   assert {{ Γ ⊢ (succ #1)[σ,,M,,N] ≈ succ (#0[σ,,M]) : ℕ }} by (bulky_rewrite; mauto 4).
   assert {{ Γ ⊢ (succ #1)[σ,,M,,N] ≈ succ M : ℕ }} by (bulky_rewrite; mauto 3).
   assert {{ Γ ⊢s (Wk∘Wk)∘(σ,,M,,N),,(succ #1)[σ,,M,,N] ≈ σ,,succ M : Δ, ℕ@s }} by mauto 3.
-  mauto 5.
+  do 2 (etransitivity; mauto 2).
 Qed.
 #[export]
 Hint Resolve exp_eq_nat_beta_succ_rhs_typ_gen : mcpts.
