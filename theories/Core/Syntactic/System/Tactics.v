@@ -7,13 +7,13 @@ Import Syntax_Notations.
 #[local]
 Ltac invert_wf_ctx1 H :=
   match type of H with
-  | {{ ⊢ ^?Γ, ^?A@^?K }} =>
+  | {{ ⊢ ^?Γ, ^?A }} =>
       let HΓ := fresh "HΓ" in
       let HAs := fresh "HAs" in
       pose proof ctx_decomp H as [HΓ HAs];
       match goal with
-      | _: {{ Γ ⊢ A }} |- _ => clear HAs
-      | _: __mark__ _ {{ Γ ⊢ A }} |- _ => clear HAs
+      (* | _: {{ Γ ⊢ A }} |- _ => clear HAs *)
+      (* | _: __mark__ _ {{ Γ ⊢ A }} |- _ => clear HAs *)
       | _: {{ Γ ⊢ A : Sort@_ }} |- _ => clear HAs
       | _: __mark__ _ {{ Γ ⊢ A : Sort@_ }} |- _ => clear HAs
       | _ =>
@@ -55,7 +55,7 @@ Ltac gen_core_presup H :=
 
 Ltac gen_lookup_presup H :=
   match type of H with
-  | {{ #?x : ^?A@^?K ∈ ^?Γ }} =>
+  | {{ #?x : ^?A ∈ ^?Γ }} =>
       match goal with
       | _: {{ Γ ⊢ A }} |- _ => fail
       | _: {{ Γ ⊢ A : Sort@_ }} |- _ => fail
