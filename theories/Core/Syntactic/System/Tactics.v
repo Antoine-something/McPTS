@@ -33,6 +33,10 @@ Ltac gen_core_presup H :=
       let HΓ := fresh "HΓ" in
       let HΔ := fresh "HΔ" in
       pose proof presup_ctx_eq H as [HΓ HΔ]
+  | {{ ⊢ ^?Γ ⊆ ^?Δ }} =>
+      let HΓ := fresh "HΓ" in
+      let HΔ := fresh "HΔ" in
+      pose proof presup_ctx_sub H as [HΓ HΔ]
   | {{ ^?Γ ⊢ ^?M : ^?A }} =>
       let HΓ := fresh "HΓ" in
       let HAwf := fresh "HAwf" in
