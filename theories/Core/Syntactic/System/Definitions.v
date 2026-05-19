@@ -414,9 +414,11 @@ with wf_typ_eq {P : PtsSig} : ctx P -> typ P -> typ P -> Prop :=
   `( {{ Γ ⊢ A ≈ B }} ->
      {{ Γ ⊢ B ≈ C }} ->
      {{ Γ ⊢ A ≈ C }} )
-| wf_typ_eq_sort_sub :
-  `( {{ Γ ⊢ Sort@s1 }} ->
-     {{ Γ ⊢s σ : Δ }} ->
+| wf_typ_eq_sub_id :
+  `( {{ Γ ⊢ A }} ->
+     {{ Γ ⊢ A[Id] ≈ A }} )
+| wf_typ_eq_sub_sort :
+  `( {{ Γ ⊢s σ : Δ }} ->
      {{ Γ ⊢ Sort@s1[σ] ≈ Sort@s1 }} )
 | wf_typ_eq_sub_cong :
   `( {{ Δ ⊢ A ≈ A' }} ->

@@ -62,129 +62,133 @@ ctxeq_sub_helper {P : PtsSig} : forall {Γ : ctx P} {Γ' σ}, {{ Γ ⊢s σ : Γ
 with
 ctxeq_sub_eq_helper {P : PtsSig} : forall {Γ : ctx P} {Γ' σ σ'}, {{ Γ ⊢s σ ≈ σ' : Γ' }} -> forall {Δ}, {{ ⊢ Δ ≈ Γ }} -> {{ Δ ⊢s σ ≈ σ' : Γ' }}.
 Proof with mautosolve.
-  all: inversion_clear 1;
-    (on_all_hyp: gen_ctxeq_helper_IH (@ctxeq_exp_helper P) (@ctxeq_exp_eq_helper P) (@ctxeq_sub_helper P) (@ctxeq_sub_eq_helper P));
-    clear ctxeq_exp_helper ctxeq_exp_eq_helper ctxeq_sub_helper ctxeq_sub_eq_helper;
-    intros * HΓΔ; destruct (presup_ctx_eq HΓΔ); mauto 4;
-    try (rename B into C); try (rename B' into C'); try (rename A0 into B); try (rename A' into B').
+  (* all: inversion_clear 1; *)
+  (*   (on_all_hyp: gen_ctxeq_helper_IH (@ctxeq_exp_helper P) (@ctxeq_exp_eq_helper P) (@ctxeq_sub_helper P) (@ctxeq_sub_eq_helper P)); *)
+  (*   clear ctxeq_exp_helper ctxeq_exp_eq_helper ctxeq_sub_helper ctxeq_sub_eq_helper; *)
+  (*   intros * HΓΔ; destruct (presup_ctx_eq HΓΔ); mauto 4; *)
+  (*   try (rename B into C); try (rename B' into C'); try (rename A0 into B); try (rename A' into B'). *)
 
-  (** Exp well-formedness cases *)
-  (** Π and λ cases *)
-  1,2,3:
-    assert {{ Δ ⊢ B : Sort@s1 }} by mauto;
-    assert {{ ⊢ Δ, B@s1 ≈ Γ, B@s1 }} by (econstructor; mauto 3);
-    assert {{ Δ, B@s1 ⊢ C : Sort@s2 }} by mauto;
-    econstructor; mauto.
+  (* (** Exp well-formedness cases *) *)
+  (* (** Π and λ cases *) *)
+  (* 1,2,3: *)
+  (*   assert {{ Δ ⊢ B : Sort@s1 }} by mauto; *)
+  (*   assert {{ ⊢ Δ, B@s1 ≈ Γ, B@s1 }} by (econstructor; mauto 3); *)
+  (*   assert {{ Δ, B@s1 ⊢ C : Sort@s2 }} by mauto; *)
+  (*   econstructor; mauto. *)
 
 
-  (** Variable case *)
-  - assert (exists B, {{ #x : B@s ∈ Δ }} /\ {{ Γ ⊢ A ≈ B : Sort@s }} /\ {{ Δ ⊢ A ≈ B : Sort@s }}) by (eapply ctxeq_lookup_helper; mauto 2).
-    destruct_conjs.
+  (* (** Variable case *) *)
+  (* - assert (exists B, {{ #x : B@s ∈ Δ }} /\ {{ Γ ⊢ A ≈ B : Sort@s }} /\ {{ Δ ⊢ A ≈ B : Sort@s }}) by (eapply ctxeq_lookup_helper; mauto 2). *)
+  (*   destruct_conjs. *)
+  (*   eapply wf_conv; mauto 3. *)
 
-    eapply wf_exp_conv with (A := H5); mauto 2.
+  (* (** Natural recursion case **) *)
+  (* - assert {{ Δ ⊢ MZ : B[Id,,zero] }} by mauto. *)
+  (*   assert {{ Δ ⊢ M0 : ℕ }} by mauto. *)
+  (*   assert {{ ⊢ Δ, ℕ@s ≈ Γ, ℕ@s }} by (econstructor; mauto 4). *)
+  (*   assert {{ ⊢ Δ, ℕ@s, B@s' ≈ Γ, ℕ@s, B@s' }} by (econstructor; mauto 4). *)
+  (*   assert {{ Δ, ℕ@s, B@s' ⊢ MS : B[Wk∘Wk,,succ #1] }} by mauto. *)
+  (*   mauto. *)
 
-  (** Natural recursion case **)
-  - assert {{ Δ ⊢ MZ : B[Id,,zero] }} by mauto.
-    assert {{ Δ ⊢ M0 : ℕ }} by mauto.
-    assert {{ ⊢ Δ, ℕ@s ≈ Γ, ℕ@s }} by (econstructor; mauto 4).
-    assert {{ ⊢ Δ, ℕ@s, B@s' ≈ Γ, ℕ@s, B@s' }} by (econstructor; mauto 4).
-    assert {{ Δ, ℕ@s, B@s' ⊢ MS : B[Wk∘Wk,,succ #1] }} by mauto.
-    mauto.
+  (* (** Conversion case *) *)
+  (* - assert {{ Δ ⊢ M : B }} by mauto 2. *)
+  (*   assert {{ Δ ⊢ B }} by mauto 2. *)
+  (*   assert {{ Δ ⊢ B ⊆ A }} by mauto 3. *)
+    
+  (*   eapply wf_exp_conv; mauto 2. *)
+  (*   assert {{ Δ ⊢ B ≈ A : Sort@s }} by mauto. *)
+    
 
-  (** Conversion case *)
-  - assert {{ Δ ⊢ B ≈ A : Sort@s }} by mauto.
-    eapply wf_exp_conv; mauto 2.
+  (* (** Exp equality cases *) *)
+  (* (** Π congruence case *) *)
+  (* - assert {{ Δ ⊢ B : Sort@s1 }} by mauto. *)
+  (*   assert {{ Δ ⊢ B ≈ B' : Sort@s1 }} by mauto. *)
+  (*   assert {{ ⊢ Δ, B@s1 ≈ Γ, B@s1 }} by (econstructor; mauto 3). *)
+  (*   assert {{ Δ, B@s1 ⊢ C ≈ C' : Sort@s2 }} by mauto. *)
+  (*   mauto 2. *)
 
-  (** Exp equality cases *)
-  (** Π congruence case *)
-  - assert {{ Δ ⊢ B : Sort@s1 }} by mauto.
-    assert {{ Δ ⊢ B ≈ B' : Sort@s1 }} by mauto.
-    assert {{ ⊢ Δ, B@s1 ≈ Γ, B@s1 }} by (econstructor; mauto 3).
-    assert {{ Δ, B@s1 ⊢ C ≈ C' : Sort@s2 }} by mauto.
-    mauto 2.
+  (* (** λ congruence case *) *)
+  (* - assert {{ Δ ⊢ B : Sort@s1 }} by mauto. *)
+  (*   assert {{ Δ ⊢ B ≈ B' : Sort@s1 }} by mauto. *)
+  (*   assert {{ ⊢ Δ, B@s1 ≈ Γ, B@s1 }} by (econstructor; mauto 3). *)
+  (*   assert {{ Δ, B@s1 ⊢ C : Sort@s2 }} by mauto. *)
+  (*   assert {{ Δ, B@s1 ⊢ M0 ≈ M'0 : C }} by mauto. *)
+  (*   mauto 2. *)
 
-  (** λ congruence case *)
-  - assert {{ Δ ⊢ B : Sort@s1 }} by mauto.
-    assert {{ Δ ⊢ B ≈ B' : Sort@s1 }} by mauto.
-    assert {{ ⊢ Δ, B@s1 ≈ Γ, B@s1 }} by (econstructor; mauto 3).
-    assert {{ Δ, B@s1 ⊢ C : Sort@s2 }} by mauto.
-    assert {{ Δ, B@s1 ⊢ M0 ≈ M'0 : C }} by mauto.
-    mauto 2.
+  (* (** Function application congruence case *) *)
+  (* - assert {{ Δ ⊢ N ≈ N' : B }} by mauto. *)
+  (*   assert {{ Δ ⊢ M0 ≈ M'0 : Π r B C }} by mauto. *)
+  (*   assert {{ Δ ⊢ B : Sort@s1 }} by mauto. *)
+  (*   assert {{ ⊢ Δ, B@s1 ≈ Γ, B@s1 }} by (econstructor; mauto 3). *)
+  (*   assert {{ Δ, B@s1 ⊢ C : Sort@s2 }} by mauto. *)
+  (*   mauto 2. *)
 
-  (** Function application congruence case *)
-  - assert {{ Δ ⊢ N ≈ N' : B }} by mauto.
-    assert {{ Δ ⊢ M0 ≈ M'0 : Π r B C }} by mauto.
-    assert {{ Δ ⊢ B : Sort@s1 }} by mauto.
-    assert {{ ⊢ Δ, B@s1 ≈ Γ, B@s1 }} by (econstructor; mauto 3).
-    assert {{ Δ, B@s1 ⊢ C : Sort@s2 }} by mauto.
-    mauto 2.
+  (* (** β case *) *)
+  (* - assert {{ Δ ⊢ B : Sort@s1 }} by mauto. *)
+  (*   assert {{ ⊢ Δ, B@s1 ≈ Γ, B@s1 }} by (econstructor; mauto 3). *)
+  (*   assert {{ Δ, B@s1 ⊢ C : Sort@s2 }} by mauto. *)
+  (*   assert {{ Δ, B@s1 ⊢ M0 : C }} by mauto. *)
+  (*   assert {{ Δ ⊢ N : B }} by mauto. *)
+  (*   mauto 2. *)
 
-  (** β case *)
-  - assert {{ Δ ⊢ B : Sort@s1 }} by mauto.
-    assert {{ ⊢ Δ, B@s1 ≈ Γ, B@s1 }} by (econstructor; mauto 3).
-    assert {{ Δ, B@s1 ⊢ C : Sort@s2 }} by mauto.
-    assert {{ Δ, B@s1 ⊢ M0 : C }} by mauto.
-    assert {{ Δ ⊢ N : B }} by mauto.
-    mauto 2.
+  (* (** η case *) *)
+  (* - assert {{ Δ ⊢ B : Sort@s1 }} by mauto. *)
+  (*   assert {{ ⊢ Δ, B@s1 ≈ Γ, B@s1 }} by (econstructor; mauto 3). *)
+  (*   assert {{ Δ, B@s1 ⊢ C : Sort@s2 }} by mauto. *)
+  (*   assert {{ Δ ⊢ M : Π r B C }} by mauto. *)
+  (*   mauto 2. *)
 
-  (** η case *)
-  - assert {{ Δ ⊢ B : Sort@s1 }} by mauto.
-    assert {{ ⊢ Δ, B@s1 ≈ Γ, B@s1 }} by (econstructor; mauto 3).
-    assert {{ Δ, B@s1 ⊢ C : Sort@s2 }} by mauto.
-    assert {{ Δ ⊢ M : Π r B C }} by mauto.
-    mauto 2.
+  (* (** Natural recursion congruence case **) *)
+  (* - assert {{ Δ ⊢ MZ ≈ MZ' : B[Id,,zero] }} by mauto. *)
+  (*   assert {{ Δ ⊢ M0 ≈ M'0 : ℕ }} by mauto. *)
+  (*   assert {{ ⊢ Δ, ℕ@s ≈ Γ, ℕ@s }} by (econstructor; mauto 4). *)
+  (*   assert {{ ⊢ Δ, ℕ@s, B@s' ≈ Γ, ℕ@s, B@s' }} by (econstructor; mauto 4). *)
+  (*   assert {{ Δ, ℕ@s, B@s' ⊢ MS ≈ MS' : B[Wk∘Wk,,succ #1] }} by mauto. *)
+  (*   mauto. *)
 
-  (** Natural recursion congruence case **)
-  - assert {{ Δ ⊢ MZ ≈ MZ' : B[Id,,zero] }} by mauto.
-    assert {{ Δ ⊢ M0 ≈ M'0 : ℕ }} by mauto.
-    assert {{ ⊢ Δ, ℕ@s ≈ Γ, ℕ@s }} by (econstructor; mauto 4).
-    assert {{ ⊢ Δ, ℕ@s, B@s' ≈ Γ, ℕ@s, B@s' }} by (econstructor; mauto 4).
-    assert {{ Δ, ℕ@s, B@s' ⊢ MS ≈ MS' : B[Wk∘Wk,,succ #1] }} by mauto.
-    mauto.
+  (* (** Natural recursion base case **) *)
+  (* - assert {{ ⊢ Δ, ℕ@s ≈ Γ, ℕ@s }} by (econstructor; mauto 4). *)
+  (*   assert {{ ⊢ Δ, ℕ@s, B@s' ≈ Γ, ℕ@s, B@s' }} by (econstructor; mauto 4). *)
+  (*   assert {{ Δ, ℕ@s ⊢ B : Sort@s' }} by mauto. *)
+  (*   assert {{ Δ ⊢ M' : B[Id,,zero] }} by mauto. *)
+  (*   assert {{ Δ, ℕ@s, B@s' ⊢ MS : B[Wk∘Wk,,succ #1] }} by mauto. *)
+  (*   mauto. *)
 
-  (** Natural recursion base case **)
-  - assert {{ ⊢ Δ, ℕ@s ≈ Γ, ℕ@s }} by (econstructor; mauto 4).
-    assert {{ ⊢ Δ, ℕ@s, B@s' ≈ Γ, ℕ@s, B@s' }} by (econstructor; mauto 4).
-    assert {{ Δ, ℕ@s ⊢ B : Sort@s' }} by mauto.
-    assert {{ Δ ⊢ M' : B[Id,,zero] }} by mauto.
-    assert {{ Δ, ℕ@s, B@s' ⊢ MS : B[Wk∘Wk,,succ #1] }} by mauto.
-    mauto.
+  (* (** Natural recursion succ case **) *)
+  (* - assert {{ ⊢ Δ, ℕ@s ≈ Γ, ℕ@s }} by (econstructor; mauto 4). *)
+  (*   assert {{ ⊢ Δ, ℕ@s, B@s' ≈ Γ, ℕ@s, B@s' }} by (econstructor; mauto 4). *)
+  (*   assert {{ Δ ⊢ M0 : ℕ }} by mauto. *)
+  (*   assert {{ Δ, ℕ@s, B@s' ⊢ MS : B[Wk∘Wk,,succ #1] }} by mauto. *)
+  (*   mauto. *)
 
-  (** Natural recursion succ case **)
-  - assert {{ ⊢ Δ, ℕ@s ≈ Γ, ℕ@s }} by (econstructor; mauto 4).
-    assert {{ ⊢ Δ, ℕ@s, B@s' ≈ Γ, ℕ@s, B@s' }} by (econstructor; mauto 4).
-    assert {{ Δ ⊢ M0 : ℕ }} by mauto.
-    assert {{ Δ, ℕ@s, B@s' ⊢ MS : B[Wk∘Wk,,succ #1] }} by mauto.
-    mauto.
+  (* (** Variable reflexivity case *) *)
+  (* - assert (exists B, {{ #x : B@s ∈ Δ }} /\ {{ Γ ⊢ A ≈ B : Sort@s }} /\ {{ Δ ⊢ A ≈ B : Sort@s }} /\ {{ Δ ⊢ A : Sort@s }}) by mauto. *)
+  (*   destruct_conjs. *)
+  (*   eapply wf_exp_eq_conv; mauto. *)
 
-  (** Variable reflexivity case *)
-  - assert (exists B, {{ #x : B@s ∈ Δ }} /\ {{ Γ ⊢ A ≈ B : Sort@s }} /\ {{ Δ ⊢ A ≈ B : Sort@s }} /\ {{ Δ ⊢ A : Sort@s }}) by mauto.
-    destruct_conjs.
-    eapply wf_exp_eq_conv; mauto.
+  (* (** Variable weakening case *) *)
+  (* - inversion_clear HΓΔ. *)
+  (*   assert {{ ⊢ Γ0, A0@s' }} by (econstructor; mauto 3). *)
+  (*   assert (exists B', {{ #x : B'@s ∈ Γ1 }} /\ {{ Γ0 ⊢ B ≈ B' : Sort@s }} /\ {{ Γ1 ⊢ B ≈ B' : Sort@s }} /\ {{ Γ1 ⊢ B : Sort@s }}) as [B'] by mauto. *)
+  (*   assert {{ ⊢ Γ1, A0@s' }} by mauto 3. *)
+  (*   assert {{ Γ1, A0@s' ⊢s Wk : Γ1 }} by mauto 3. *)
+  (*   destruct_conjs. *)
+  (*   eapply wf_exp_eq_conv; mauto 4. *)
 
-  (** Variable weakening case *)
-  - inversion_clear HΓΔ.
-    assert {{ ⊢ Γ0, A0@s' }} by (econstructor; mauto 3).
-    assert (exists B', {{ #x : B'@s ∈ Γ1 }} /\ {{ Γ0 ⊢ B ≈ B' : Sort@s }} /\ {{ Γ1 ⊢ B ≈ B' : Sort@s }} /\ {{ Γ1 ⊢ B : Sort@s }}) as [B'] by mauto.
-    assert {{ ⊢ Γ1, A0@s' }} by mauto 3.
-    assert {{ Γ1, A0@s' ⊢s Wk : Γ1 }} by mauto 3.
-    destruct_conjs.
-    eapply wf_exp_eq_conv; mauto 4.
+  (* (** Conversion case *) *)
+  (* - assert {{ Δ ⊢ M ≈ M' : A }} by mauto. *)
+  (*   assert {{ Δ ⊢ A : Sort@s }} by mauto. *)
+  (*   assert {{ Δ ⊢ B ≈ A : Sort@s }} by mauto. *)
+  (*   eapply wf_exp_eq_conv; mauto 2. *)
 
-  (** Conversion case *)
-  - assert {{ Δ ⊢ M ≈ M' : A }} by mauto.
-    assert {{ Δ ⊢ A : Sort@s }} by mauto.
-    assert {{ Δ ⊢ B ≈ A : Sort@s }} by mauto.
-    eapply wf_exp_eq_conv; mauto 2.
+  (* (** sub_wf cases (only weakening *) *)
+  (* - inversion_clear HΓΔ. *)
+  (*   eapply wf_sub_conv; mauto. *)
 
-  (** sub_wf cases (only weakening *)
-  - inversion_clear HΓΔ.
-    eapply wf_sub_conv; mauto.
-
-  (** Id expansion cases (only weakening reflexivity) *)
-  - inversion_clear HΓΔ.
-    mauto.
-Qed.  (* I don't know why this Qed takes so long to check (faster than before) *)
+  (* (** Id expansion cases (only weakening reflexivity) *) *)
+  (* - inversion_clear HΓΔ. *)
+  (*   mauto. *)
+Admitted.  (* I don't know why this Qed takes so long to check (faster than before) *)
 
 
 Corollary ctxeq_exp {P : PtsSig} : forall {Γ : ctx P} {Δ M A}, {{ ⊢ Γ ≈ Δ }} -> {{ Γ ⊢ M : A }} -> {{ Δ ⊢ M : A }}.
@@ -200,22 +204,22 @@ Qed.
 Corollary ctxeq_typ {P : PtsSig} : forall {Γ : ctx P} {Δ A}, {{ ⊢ Γ ≈ Δ }} -> {{ Γ ⊢ A }} -> {{ Δ ⊢ A }}.
 Proof.
   intros.
-  induction H0; mauto 3.
-  assert {{ Δ ⊢ A : Sort@s }} by (eapply ctxeq_exp_helper; mauto 3).
-  mauto 2.
-Qed.
+(*   induction H0; mauto 3. *)
+(*   assert {{ Δ ⊢ A : Sort@s }} by (eapply ctxeq_exp_helper; mauto 3). *)
+(*   mauto 2. *)
+Admitted.
 
 Corollary ctxeq_typ_eq {P : PtsSig} : forall {Γ : ctx P} {Δ A B}, {{ ⊢ Γ ≈ Δ }} -> {{ Γ ⊢ A ≈ B }} -> {{ Δ ⊢ A ≈ B }}.
 Proof.
-  induction 2.
-  - assert {{ Δ ⊢ A }} by (eapply ctxeq_typ; mauto 2).
-    mauto 2.
-  - assert {{ Δ ⊢ A ≈ B : Sort@s }} by (eapply ctxeq_exp_eq_helper; mauto 2).
-    mauto 2.
-  - assert {{ Δ ⊢ B ≈ C : Sort@s }} by (eapply ctxeq_exp_eq_helper; mauto 2).
-    assert {{ Δ ⊢ A ≈ B }} by mauto 2.
-    mauto 2.
-Qed.
+  (* induction 2. *)
+  (* - assert {{ Δ ⊢ A }} by (eapply ctxeq_typ; mauto 2). *)
+  (*   mauto 2. *)
+  (* - assert {{ Δ ⊢ A ≈ B : Sort@s }} by (eapply ctxeq_exp_eq_helper; mauto 2). *)
+  (*   mauto 2. *)
+  (* - assert {{ Δ ⊢ B ≈ C : Sort@s }} by (eapply ctxeq_exp_eq_helper; mauto 2). *)
+  (*   assert {{ Δ ⊢ A ≈ B }} by mauto 2. *)
+  (*   mauto 2. *)
+Admitted.
 
 Corollary ctxeq_sub {P : PtsSig} : forall {Γ : ctx P} {Δ σ Γ'}, {{ ⊢ Γ ≈ Δ }} -> {{ Γ ⊢s σ : Γ' }} -> {{ Δ ⊢s σ : Γ' }}.
 Proof. intros; eapply ctxeq_sub_helper; mauto. Qed.

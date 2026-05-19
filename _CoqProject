@@ -8,14 +8,15 @@ theories/Core/Base.v
 
 theories/Core/Syntactic/Syntax.v
 theories/Core/Syntactic/System/Definitions.v
-# theories/Core/Syntactic/System/Lemmas.v
-# theories/Core/Syntactic/System/Tactics.v
-# theories/Core/Syntactic/System.v
-# theories/Core/Syntactic/CtxEq.v
-# theories/Core/Syntactic/CoreInversions.v
-# theories/Core/Syntactic/Presup.v
-# theories/Core/Syntactic/SystemOpt.v
-# theories/Core/Syntactic/Corollaries.v
+theories/Core/Syntactic/System/Lemmas.v
+theories/Core/Syntactic/System/Tactics.v
+theories/Core/Syntactic/System.v
+theories/Core/Syntactic/CtxSub.v
+theories/Core/Syntactic/CtxEq.v
+theories/Core/Syntactic/CoreInversions.v
+theories/Core/Syntactic/Presup.v
+theories/Core/Syntactic/SystemOpt.v
+theories/Core/Syntactic/Corollaries.v
 
 # theories/Core/Semantic/Domain.v
 # theories/Core/Semantic/Evaluation/Definitions.v
