@@ -40,7 +40,7 @@ with wf_ctx_sub {P : PtsSig} : ctx P -> ctx P -> Prop :=
   `( {{ ⊢ Γ ⊆ Δ }} ->
      {{ Γ ⊢ A : Sort@s }} ->
      {{ Δ ⊢ A' : Sort@s }} ->
-     {{ Γ ⊢ A ⊆ A' @ s }} ->
+     {{ Γ ⊢ A ⊆ A' }} ->
      {{ ⊢ Γ, A@s ⊆ Δ, A'@s }} )
 where "⊢ Γ ⊆ Γ'" := (wf_ctx_sub Γ Γ') (in custom judg) : type_scope
                                                            
@@ -102,18 +102,15 @@ with wf_exp {P : PtsSig} : ctx P -> typ P -> exp P -> Prop :=
 | wf_exp_sub_typ :
   `( {{ Γ ⊢s σ : Δ }} ->
      {{ Δ ⊢ M : A }} ->
-     {{ Δ ⊢ A : Sort@s }} ->
+     {{ Δ ⊢ A }} ->
      {{ Γ ⊢ M[σ] : A[σ] }} )
-| wf_exp_sub_sort :
-  `( {{ Γ ⊢s σ : Δ }} ->
-     {{ Δ ⊢ A : Sort@s }} ->
-     {{ Γ ⊢ A[σ] : Sort@s }} )
+
 | wf_exp_conv :
   `( {{ Γ ⊢ M : A }} ->
      (** We have these extra argument for soundness. *)
-     {{ Γ ⊢ A : Sort@s }} ->
-     {{ Γ ⊢ A' : Sort@s }} ->
-     {{ Γ ⊢ A ⊆ A' @ s }} ->
+     {{ Γ ⊢ A }} ->
+     {{ Γ ⊢ A' }} ->
+     {{ Γ ⊢ A ⊆ A' }} ->
      {{ Γ ⊢ M : A' }} )
 where "Γ ⊢ M : A" := (wf_exp Γ A M) (in custom judg) : type_scope
 
@@ -156,7 +153,7 @@ where "⊢ Γ ≈ Γ'" := (wf_ctx_eq Γ Γ') (in custom judg) : type_scope
 
 with wf_exp_eq {P : PtsSig} : ctx P -> typ P -> exp P -> exp P -> Prop :=
 | wf_exp_eq_typ_sub :
-  `( Ax P s1 s2 ->
+  `( {{ Γ ⊢ Sort@s1 : Sort@s2 }} ->
      {{ Γ ⊢s σ : Δ }} ->
      {{ Γ ⊢ Sort@s1[σ] ≈ Sort@s1 : Sort@s2 }} )
 
@@ -283,35 +280,24 @@ with wf_exp_eq {P : PtsSig} : ctx P -> typ P -> exp P -> exp P -> Prop :=
   `( {{ ⊢ Γ, B@s' }} ->
      {{ #x : A@s ∈ Γ }} ->
      {{ Γ, B@s' ⊢ #x[Wk] ≈ #(S x) : A[Wk] }} )
-(** This rule needs to be duplicated to handle top sorts *)
 | wf_exp_eq_sub_cong_typ :
-  `( {{ Δ ⊢ A : Sort@s }} ->
+  `( {{ Δ ⊢ A }} ->
      {{ Δ ⊢ M ≈ M' : A }} ->
      {{ Γ ⊢s σ ≈ σ' : Δ }} ->
      {{ Γ ⊢ M[σ] ≈ M'[σ'] : A[σ] }} )
-| wf_exp_eq_sub_cong_sort :
-  `( {{ Δ ⊢ A ≈ A' : Sort@s }} ->
-     {{ Γ ⊢s σ ≈ σ' : Δ }} ->
-     {{ Γ ⊢ A[σ] ≈ A'[σ'] : Sort@s }} )
 | wf_exp_eq_sub_id :
   `( {{ Γ ⊢ M : A }} ->
      {{ Γ ⊢ M[Id] ≈ M : A }} )
-(** This rule needs to be duplicated to handle top sorts *)
 | wf_exp_eq_sub_compose_typ :
   `( {{ Γ ⊢s τ : Γ' }} ->
      {{ Γ' ⊢s σ : Γ'' }} ->
      {{ Γ'' ⊢ M : A }} ->
-     {{ Γ'' ⊢ A : Sort@s }} ->
+     {{ Γ'' ⊢ A }} ->
      {{ Γ ⊢ M[σ∘τ] ≈ M[σ][τ] : A[σ∘τ] }} )
-| wf_exp_eq_sub_compose_sort :
-  `( {{ Γ ⊢s τ : Γ' }} ->
-     {{ Γ' ⊢s σ : Γ'' }} ->
-     {{ Γ'' ⊢ A : Sort@s }} ->
-     {{ Γ ⊢ A[σ∘τ] ≈ A[σ][τ] : Sort@s }} )
 | wf_exp_eq_conv :
   `( {{ Γ ⊢ M ≈ M' : A }} ->
-     {{ Γ ⊢ A' : Sort@s }} ->
-     {{ Γ ⊢ A ⊆ A' @ s }} ->
+     {{ Γ ⊢ A' }} ->
+     {{ Γ ⊢ A ⊆ A' }} ->
      {{ Γ ⊢ M ≈ M' : A' }} )
 | wf_exp_eq_sym :
   `( {{ Γ ⊢ M ≈ M' : A }} ->
@@ -377,29 +363,18 @@ with wf_sub_eq {P : PtsSig} : ctx P -> ctx P -> sub P -> sub P -> Prop :=
      {{ Γ ⊢s σ ≈ σ' : Δ' }} )
 where "Γ ⊢s σ ≈ σ' : Δ" := (wf_sub_eq Γ Δ σ σ') (in custom judg) : type_scope
 
-with wf_subtyp {P : PtsSig} : ctx P -> P -> typ P -> typ P -> Prop :=
-| wf_subtyp_refl_typ :
-  (** We need this extra argument in order to prove the lemmas
-      in CtxSub.v independently. We can prove those and
-      presupposition lemmas mutually dependently, but that would
-      be more messy.
-
-      The main point of this assumption gives presupposition for
-      RHS directly so that we can remove the extra arguments in
-      type checking rules immediately.
-   *)
-  `( {{ Γ ⊢ A' : Sort@s }} ->
-     {{ Γ ⊢ A ≈ A' : Sort@s }} ->
-     {{ Γ ⊢ A ⊆ A' @ s }} )
+with wf_subtyp {P : PtsSig} : ctx P -> typ P -> typ P -> Prop :=
+| wf_subtyp_refl :
+  `( {{ Γ ⊢ A ≈ B }} ->
+     {{ Γ ⊢ A ⊆ B }} )
 | wf_subtyp_trans :
-  `( {{ Γ ⊢ A ⊆ A' @ s }} ->
-     {{ Γ ⊢ A' ⊆ A'' @ s }} ->
-     {{ Γ ⊢ A ⊆ A'' @ s }} )
+  `( {{ Γ ⊢ A ⊆ B }} ->
+     {{ Γ ⊢ B ⊆ C }} ->
+     {{ Γ ⊢ A ⊆ C }} )
 | wf_subtyp_sort_sub :
   `( {{ ⊢ Γ }} ->
      Ru_sub P s1 s2 ->
-     Ax P s2 s3 ->
-     {{ Γ ⊢ Sort@s1 ⊆ Sort@s2 @ s3 }} )
+     {{ Γ ⊢ Sort@s1 ⊆ Sort@s2 }} )
 | wf_subtyp_pi :
   `( forall {r : Ru P s1 s2 s3},
         {{ Γ ⊢ A : Sort@s1 }} ->
@@ -407,45 +382,53 @@ with wf_subtyp {P : PtsSig} : ctx P -> P -> typ P -> typ P -> Prop :=
         {{ Γ ⊢ A ≈ A' : Sort@s1 }} ->
         {{ Γ, A@s1 ⊢ B : Sort@s2 }} ->
         {{ Γ, A'@s1 ⊢ B' : Sort@s2 }} ->
-        {{ Γ, A'@s1 ⊢ B ⊆ B' @ s2 }} ->
-        {{ Γ ⊢ Π r A B ⊆ Π r A' B' @ s3 }} )
-where "Γ ⊢ A ⊆ A' @ s" := (wf_subtyp Γ s A A') (in custom judg) : type_scope.
+        {{ Γ, A'@s1 ⊢ B ⊆ B' }} ->
+        {{ Γ ⊢ Π r A B ⊆ Π r A' B' }} )
+where "Γ ⊢ A ⊆ A'" := (wf_subtyp Γ A A') (in custom judg) : type_scope
 
 (** Unsorted judgments for types *)
-Inductive wf_typ {P : PtsSig} : ctx P -> typ P -> Prop :=
+with wf_typ {P : PtsSig} : ctx P -> typ P -> Prop :=
 | wf_typ_st :
   `( {{ ⊢ Γ }} ->
      {{ Γ ⊢ Sort@s }})
 | wf_typ_exp :
   `( {{ Γ ⊢ A : Sort@s }} ->
      {{ Γ ⊢ A }})
-where "Γ ⊢ A" := (wf_typ Γ A) (in custom judg) : type_scope.
+| wf_typ_sub_sort :
+  `( {{ Γ ⊢s σ : Δ }} ->
+     {{ Δ ⊢ A }} ->
+     {{ Γ ⊢ A[σ] }} )
+where "Γ ⊢ A" := (wf_typ Γ A) (in custom judg) : type_scope
 
-Inductive wf_typ_eq {P : PtsSig} : ctx P -> typ P -> typ P -> Prop :=
+with wf_typ_eq {P : PtsSig} : ctx P -> typ P -> typ P -> Prop :=
 | wf_typ_eq_refl :
   `( {{ Γ ⊢ A }} ->
      {{ Γ ⊢ A ≈ A }} )
+| wf_typ_eq_sym :
+  `( {{ Γ ⊢ A ≈ B }} ->
+     {{ Γ ⊢ B ≈ A }} )
 | wf_typ_eq_sorted :
   `( {{ Γ ⊢ A ≈ B : Sort@s }} ->
      {{ Γ ⊢ A ≈ B }} )
-| wf_tp_eq_trans_sorted :
+| wf_typ_eq_trans :
   `( {{ Γ ⊢ A ≈ B }} ->
-     {{ Γ ⊢ B ≈ C : Sort@s }} ->
+     {{ Γ ⊢ B ≈ C }} ->
      {{ Γ ⊢ A ≈ C }} )
+| wf_typ_eq_sort_sub :
+  `( {{ Γ ⊢ Sort@s1 }} ->
+     {{ Γ ⊢s σ : Δ }} ->
+     {{ Γ ⊢ Sort@s1[σ] ≈ Sort@s1 }} )
+| wf_typ_eq_sub_cong :
+  `( {{ Δ ⊢ A ≈ A' }} ->
+     {{ Γ ⊢s σ ≈ σ' : Δ }} ->
+     {{ Γ ⊢ A[σ] ≈ A'[σ'] }} )
+| wf_typ_eq_sub_compose :
+  `( {{ Γ ⊢s τ : Γ' }} ->
+     {{ Γ' ⊢s σ : Γ'' }} ->
+     {{ Γ'' ⊢ A  }} ->
+     {{ Γ ⊢ A[σ∘τ] ≈ A[σ][τ] }} )
 where "Γ ⊢ A ≈ A'" := (wf_typ_eq Γ A A') (in custom judg) : type_scope.
 
-Inductive wf_typ_subtyp {P} : ctx P -> typ P -> typ P -> Prop :=
-| wf_typ_subtyp_refl :
-  `( {{ Γ ⊢ A ≈ B }} ->
-     {{ Γ ⊢ A ⊆ B }} )
-| wf_typ_subtyp_subtyp :
-  `( {{ Γ ⊢ A ⊆ A' @ s}} ->
-     {{ Γ ⊢ A ⊆ A' }} )
-| wf_typ_subtyp_trans :
-  `( {{ Γ ⊢ A ⊆ B }} ->
-     {{ Γ ⊢ B ⊆ C @ s }} ->
-     {{ Γ ⊢ A ⊆ C }} )
-where "Γ ⊢ A ⊆ A'" := (wf_typ_subtyp Γ A A') (in custom judg) : type_scope.
 
 Scheme wf_ctx_mut_ind := Induction for wf_ctx Sort Prop
 with wf_ctx_sub_mut_ind := Induction for wf_ctx_sub Sort Prop
@@ -454,7 +437,9 @@ with wf_exp_mut_ind := Induction for wf_exp Sort Prop
 with wf_exp_eq_mut_ind := Induction for wf_exp_eq Sort Prop
 with wf_sub_mut_ind := Induction for wf_sub Sort Prop
 with wf_sub_eq_mut_ind := Induction for wf_sub_eq Sort Prop
-with wf_subtyp_mut_ind := Induction for wf_subtyp Sort Prop.
+with wf_subtyp_mut_ind := Induction for wf_subtyp Sort Prop
+with wf_typ_mut_ind := Induction for wf_typ Sort Prop
+with wf_typ_eq_mut_ind := Induction for wf_typ_eq Sort Prop.
 Combined Scheme syntactic_wf_mut_ind from
   wf_ctx_mut_ind,
   wf_ctx_sub_mut_ind,
@@ -463,7 +448,9 @@ Combined Scheme syntactic_wf_mut_ind from
   wf_exp_eq_mut_ind,
   wf_sub_mut_ind,
   wf_sub_eq_mut_ind,
-  wf_subtyp_mut_ind.
+  wf_subtyp_mut_ind,
+  wf_typ_mut_ind,
+  wf_typ_eq_mut_ind.
 
 Scheme wf_ctx_mut_ind' := Induction for wf_ctx Sort Prop
 with wf_exp_mut_ind' := Induction for wf_exp Sort Prop
@@ -475,7 +462,7 @@ Combined Scheme syntactic_wf_mut_ind' from
 
 
 #[export]
-Hint Constructors wf_ctx wf_ctx_sub wf_ctx_eq wf_exp wf_typ wf_sub wf_exp_eq wf_typ_eq wf_sub_eq wf_subtyp wf_typ_subtyp ctx_lookup : mcpts.
+Hint Constructors wf_ctx wf_ctx_sub wf_ctx_eq wf_exp wf_typ wf_sub wf_exp_eq wf_typ_eq wf_sub_eq wf_subtyp ctx_lookup : mcpts.
 
 #[export]
 Instance wf_exp_eq_PER {P : PtsSig} (Γ : ctx P) A : PER (wf_exp_eq Γ A).
@@ -494,34 +481,6 @@ Proof.
   - eauto using wf_sub_eq_trans.
 Qed.
 
-
-Lemma wf_typ_eq_trans {P} : forall {Γ : ctx P} {A B C},
-    {{ Γ ⊢ A ≈ B }} ->
-    {{ Γ ⊢ B ≈ C }} ->
-    {{ Γ ⊢ A ≈ C }}.
-Proof.
-  intros * HAB HBC.
-  gen A.
-  induction HBC; intros; mauto 2.
-  - assert {{ Γ ⊢ A0 ≈ B }} by mauto 2.
-    mauto 2.
-Qed.
-
-Lemma wf_typ_eq_sym {P} : forall {Γ : ctx P} {A B},
-    {{ Γ ⊢ A ≈ B }} ->
-    {{ Γ ⊢ B ≈ A }}.
-Proof.
-  induction 1; mauto 2.
-  - symmetry in H.
-    mauto 2.
-  - symmetry in H0.
-    assert {{ Γ ⊢ C ≈ B }} by mauto 2.
-    eapply wf_typ_eq_trans; mauto 2.
-Qed.
-
-#[export]
-Hint Resolve wf_typ_eq_sym wf_typ_eq_trans : mcpts.
-
 #[export]
 Instance wf_typ_eq_PER {P : PtsSig} (Γ : ctx P) : PER (wf_typ_eq Γ).
 Proof.
@@ -536,7 +495,7 @@ Proof.
 Qed.
 
 #[export]
-Instance wf_subtyp_Transitive {P : PtsSig} Γ s : Transitive (@wf_subtyp P Γ s).
+Instance wf_subtyp_Transitive {P : PtsSig} Γ : Transitive (@wf_subtyp P Γ).
 Proof.
   hnf; mauto.
 Qed.
@@ -591,10 +550,10 @@ Qed.
 #[export]
 Hint Resolve presup_wf_ctx_eq_right : mcpts.
 
-Lemma presup_subtyp_right {P} : forall {Γ : ctx P} {A B s}, {{ Γ ⊢ A ⊆ B @ s }} -> {{ Γ ⊢ B : Sort@s }}.
+Lemma presup_subtyp_right {P} : forall {Γ : ctx P} {A B}, {{ Γ ⊢ A ⊆ B }} -> {{ Γ ⊢ B }}.
 Proof with mautosolve.
-  induction 1...
-Qed.
+  (* induction 1... *)
+Admitted.
 
 #[export]
 Hint Resolve presup_subtyp_right : mcpts.
