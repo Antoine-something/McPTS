@@ -15,7 +15,6 @@ Reserved Notation "Γ ⊢ A ≈ A'" (in custom judg at level 80, Γ custom exp, 
 Reserved Notation "Γ ⊢s σ : Δ" (in custom judg at level 80, Γ custom exp, σ custom exp, Δ custom exp).
 Reserved Notation "Γ ⊢s σ ≈ σ' : Δ" (in custom judg at level 80, Γ custom exp, σ custom exp, σ' custom exp, Δ custom exp).
 Reserved Notation "⊢ Γ ⊆ Γ'" (in custom judg at level 80, Γ custom exp, Γ' custom exp).
-Reserved Notation "Γ ⊢ A ⊆ A' @ s" (in custom judg at level 80, Γ custom exp, A custom exp, A' custom exp, s custom exp).
 Reserved Notation "Γ ⊢ A ⊆ A'" (in custom judg at level 80, Γ custom exp, A custom exp, A' custom exp).
 Reserved Notation "'#' x : A @ s ∈ Γ" (in custom judg at level 80, x constr at level 0, A custom exp, s custom exp, Γ custom exp at level 50).
 
@@ -366,6 +365,7 @@ where "Γ ⊢s σ ≈ σ' : Δ" := (wf_sub_eq Γ Δ σ σ') (in custom judg) : t
 with wf_subtyp {P : PtsSig} : ctx P -> typ P -> typ P -> Prop :=
 | wf_subtyp_refl :
   `( {{ Γ ⊢ A ≈ B }} ->
+     {{ Γ ⊢ B }} ->
      {{ Γ ⊢ A ⊆ B }} )
 | wf_subtyp_trans :
   `( {{ Γ ⊢ A ⊆ B }} ->
@@ -552,8 +552,8 @@ Hint Resolve presup_wf_ctx_eq_right : mcpts.
 
 Lemma presup_subtyp_right {P} : forall {Γ : ctx P} {A B}, {{ Γ ⊢ A ⊆ B }} -> {{ Γ ⊢ B }}.
 Proof with mautosolve.
-  (* induction 1... *)
-Admitted.
+  induction 1...
+Qed.
 
 #[export]
 Hint Resolve presup_subtyp_right : mcpts.
