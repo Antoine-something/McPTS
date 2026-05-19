@@ -1352,38 +1352,28 @@ Proof. mauto. Qed.
   Hint Resolve wf_subtyp_refl : mcpts.
 
 Lemma wf_subtyp_sub {P} : forall {Δ : ctx P} {A A'},
-    {{ Δ ⊢ A }} ->
     {{ Δ ⊢ A' }} ->
     {{ Δ ⊢ A ⊆ A' }} ->
     forall Γ σ,
       {{ Γ ⊢s σ : Δ }} ->
       {{ Γ ⊢ A[σ] ⊆ A'[σ] }}.
 Proof.
-  intros.
-  induction H1; mauto.
-  (* induction 3; intros; mauto 4. *)
-  - assert {{ Γ0 ⊢ B }} by mauto 2.
-    specialize (IHwf_subtyp1 H H1 H2) as ?.
-    specialize (IHwf_subtyp2 H1 H0 H2) as ?.    
+  induction 2; intros; mauto 4.
+  - assert {{ Γ ⊢ B }} by mauto 2.
+    specialize (IHwf_subtyp1 H1 Γ0 σ H0).
+    specialize (IHwf_subtyp2 H Γ0 σ H0).    
     mauto.
   - assert {{ ⊢ Γ0 }} by mauto 2.
-    assert {{ Γ ⊢ Sort@s1[σ] ≈ Sort@s1 }} by mauto.
-    assert {{ Γ ⊢ Sort@s2[σ] ≈ Sort@s2 }} by mauto.
+    assert {{ Γ ⊢ Sort@s1 ⊆ Sort@s2 }} by mauto.
+    assert {{ Γ ⊢ Sort@s1 }} by mauto.
+    assert {{ Γ0 ⊢ Sort@s1[σ] ≈ Sort@s1 }} by mauto.
+    assert {{ Γ0 ⊢ Sort@s2[σ] ≈ Sort@s2 }} by mauto.
     transitivity {{{ Sort@s1 }}}; mauto 3.
     transitivity {{{ Sort@s2 }}}; mauto 3.
   - transitivity {{{ Π r (A[σ]) (B[q σ]) }}}; [econstructor; mauto 3|].
     transitivity {{{ Π r (A'[σ]) (B'[q σ]) }}}; [ | econstructor; mauto 4].
-    
-    assert {{ Γ0, A@s1 ⊢ B }} by mauto.
-    assert {{ Γ0, A'@s1 ⊢ B' }} by mauto.
-    assert {{ ⊢ Γ0, A@s1 ≈ Γ0, A'@s1 }} by mauto.
-    assert {{ ⊢ Γ0, A@s1 ⊆ Γ0, A'@s1 }} by mauto.
     eapply wf_subtyp_pi; mauto.
-    assert {{ Γ, A'[σ]@s1 ⊢ B'[q σ] }} by mauto.
-    assert {{ Γ, A[σ]@s1 ⊢ B[q σ] }} by mauto.
-    assert {{ ⊢ Γ ≈ Γ }} by mauto.
-    assert {{ ⊢ Γ, A[σ]@s1 ≈ Γ, A'[σ]@s1 }} by admit.    
-Admitted.
+Qed.
 
 #[export]
 Hint Resolve wf_subtyp_sub : mcpts.
