@@ -10,7 +10,7 @@ Record PtsSig : Type :=
       Ru_nat : St -> Set;
       (** Subtyping *)
       Ru_sub : St -> St -> Prop;
-      Ru_sub_backwards_ax : forall s1 s2, Ru_sub s1 s2 -> forall s3, Ax s2 s3 -> Ax s1 s3;
+      (* Ru_sub_backwards_ax : forall s1 s2, Ru_sub s1 s2 -> forall s3, Ax s2 s3 -> Ax s1 s3; *)
     }.
 
 Record PredicativeSig (P : PtsSig) : Type :=
