@@ -168,6 +168,18 @@ Qed.
 #[export]
 Hint Resolve wf_conv : mcpts.
 
+Lemma wf_conv_unsorted {P} : forall (Γ : ctx P) M A A',
+    {{ Γ ⊢ M : A }} ->
+    (** The next two arguments will be removed in SystemOpt *)
+    {{ Γ ⊢ A }} ->
+    {{ Γ ⊢ A' }} ->
+    {{ Γ ⊢ A ≈ A'  }} ->
+    {{ Γ ⊢ M : A' }}.
+Proof. mauto. Qed.
+
+#[export]
+Hint Resolve wf_conv_unsorted : mcpts.
+
 
 Lemma wf_sub_conv {P : PtsSig} : forall (Γ : ctx P) σ Δ Δ',
   {{ Γ ⊢s σ : Δ }} ->
@@ -206,6 +218,19 @@ Proof. mauto. Qed.
 
 #[export]
 Hint Resolve wf_eq_conv : mcpts.
+
+Lemma wf_eq_conv_unsorted {P} : forall (Γ : ctx P) M M' A A',
+    {{ Γ ⊢ M ≈ M' : A }} ->
+    (** The next two arguments will be removed in SystemOpt *)
+    {{ Γ ⊢ A }} -> 
+    {{ Γ ⊢ A' }} ->
+    {{ Γ ⊢ A ≈ A' }} ->
+    {{ Γ ⊢ M ≈ M' : A' }}.
+Proof. mauto. Qed. 
+
+#[export]
+Hint Resolve wf_eq_conv_unsorted : mcpts.
+
 
 Lemma wf_sub_eq_conv {P : PtsSig} : forall (Γ : ctx P) σ σ' Δ Δ',
     {{ Γ ⊢s σ ≈ σ' : Δ }} ->
@@ -271,6 +296,7 @@ Qed.
 
 #[export]
 Hint Resolve wf_exp_sort_sub : mcpts.
+
 
 Lemma exp_eq_sub_compose_typ_sort {P} : forall {Γ Γ' Γ'' : ctx P} {A A' σ τ s},
     {{ Γ'' ⊢ A' : Sort@s }} ->
@@ -946,6 +972,24 @@ Qed.
 #[export]
 Hint Resolve exp_eq_sub_sub_compose_cong_typ : mcpts.
 
+Lemma typ_eq_sub_sub_compose_cong_typ {P : PtsSig} : forall {Γ : ctx P} {Δ Δ' Ψ σ τ σ' τ' A},
+    {{ Ψ ⊢ A }} ->
+    {{ Δ ⊢s σ : Ψ }} ->
+    {{ Δ' ⊢s σ' : Ψ }} ->
+    {{ Γ ⊢s τ : Δ }} ->
+    {{ Γ ⊢s τ' : Δ' }} ->
+    {{ Γ ⊢s σ∘τ ≈ σ'∘τ' : Ψ }} ->
+    {{ Γ ⊢ A[σ][τ] ≈ A[σ'][τ'] }}.
+Proof with mautosolve 3.
+  intros.
+  assert {{ Γ ⊢ A[σ][τ] ≈ A[σ∘τ] }} by mauto 3.
+  assert {{ Γ ⊢ A[σ∘τ] ≈ A[σ'∘τ'] }} by mauto 3.
+  enough {{ Γ ⊢ A[σ'∘τ'] ≈ A[σ'][τ'] }}...
+Qed.
+
+#[export]
+Hint Resolve typ_eq_sub_sub_compose_cong_typ : mcpts.
+
 
 (** *** Other Tedious Lemmas *)
 
@@ -993,6 +1037,29 @@ Qed.
 #[export]
 Hint Resolve exp_eq_sub_sub_compose_cong : mcpts.
 
+Lemma exp_eq_sub_sub_compose_cong_unsorted {P : PtsSig} : forall {Γ : ctx P} {Δ Δ' Ψ σ τ σ' τ' M A},
+    {{ Ψ ⊢ A }} ->
+    {{ Ψ ⊢ M : A }} ->
+    {{ Δ ⊢s σ : Ψ }} ->
+    {{ Δ' ⊢s σ' : Ψ }} ->
+    {{ Γ ⊢s τ : Δ }} ->
+    {{ Γ ⊢s τ' : Δ' }} ->
+    {{ Γ ⊢s σ∘τ ≈ σ'∘τ' : Ψ }} ->
+    {{ Γ ⊢ M[σ][τ] ≈ M[σ'][τ'] : A[σ∘τ] }}.
+Proof with mautosolve 3.
+  intros.
+  assert {{ Γ ⊢ A[σ∘τ] ≈ A[σ'∘τ'] }} by mauto.
+  assert {{ Γ ⊢ M[σ][τ] ≈ M[σ∘τ] : A[σ∘τ] }} by mauto.
+  assert {{ Γ ⊢ M[σ∘τ] ≈ M[σ'∘τ'] : A[σ∘τ] }} by mauto.
+  assert {{ Γ ⊢ M[σ'∘τ'] ≈ M[σ'][τ'] : A[σ'∘τ'] }} by mauto.
+  enough {{ Γ ⊢ M[σ'∘τ'] ≈ M[σ'][τ'] : A[σ∘τ] }} by mauto.
+  eapply wf_exp_eq_conv; mauto 4.
+  enough {{ Γ ⊢ A[σ'∘τ'] ≈ A[σ∘τ] }} by (econstructor; mauto 4).
+  mauto 4.
+Qed.
+
+#[export]
+Hint Resolve exp_eq_sub_sub_compose_cong_unsorted : mcpts.
 
 Lemma ctxeq_ctx_lookup {P : PtsSig} : forall {Γ : ctx P} {Δ A x s},
     {{ ⊢ Γ ≈ Δ }} ->
@@ -1039,6 +1106,21 @@ Qed.
 #[export]
 Hint Resolve sub_id_on_typ : mcpts.
 
+Lemma sub_id_on_typ_unsorted {P : PtsSig} : forall {Γ : ctx P} {M A},
+    {{ Γ ⊢ A }} ->
+    {{ Γ ⊢ M : A }} ->
+    {{ Γ ⊢ M : A[Id] }}.
+Proof with mautosolve 3.
+  intros.
+  assert {{ ⊢ Γ }} by mauto 2.
+  assert {{ Γ ⊢ A[Id] ≈ A }} by mauto 2.
+  eapply wf_conv_unsorted; mauto 3.
+Qed.
+
+#[export]
+Hint Resolve sub_id_on_typ_unsorted : mcpts.
+
+
 Lemma sub_id_extend {P : PtsSig} : forall {Γ : ctx P} {M A s},
     {{ Γ ⊢ A : Sort@s }} ->
     {{ Γ ⊢ M : A }} ->
@@ -1064,6 +1146,20 @@ Qed.
 
 #[export]
 Hint Resolve sub_eq_id_on_typ : mcpts.
+
+Lemma sub_eq_id_on_typ_unsorted {P : PtsSig} : forall {Γ : ctx P} {M M' A},
+    {{ Γ ⊢ A }} ->
+    {{ Γ ⊢ M ≈ M' : A }} ->
+    {{ Γ ⊢ M ≈ M' : A[Id] }}.
+Proof with mautosolve 4.
+  intros.
+  assert {{ ⊢ Γ }} by mauto 3.
+  eapply wf_exp_eq_conv; mauto 3;
+    econstructor...
+Qed.
+
+#[export]
+Hint Resolve sub_eq_id_on_typ_unsorted : mcpts.
 
 Lemma sub_eq_id_extend_cong {P : PtsSig} : forall {Γ : ctx P} {M M' A s},
     {{ Γ ⊢ A : Sort@s }} ->
@@ -1501,6 +1597,136 @@ Lemma wf_typ_sort_weaken {P : PtsSig} : forall {Γ : ctx P} {s A s'},
     {{ ⊢ Γ, A@s' }} ->
     {{ Γ, A@s' ⊢ Sort@s ≈ Sort@s }}.
 Proof. mauto. Qed.
+
+Lemma wf_typ_sort_sub {P} : forall {Γ Γ' : ctx P} {A σ},
+    {{ Γ ⊢s σ : Γ' }} ->
+    {{ Γ' ⊢ A }} ->
+    {{ Γ ⊢ A[σ] }}.
+Proof. mauto. Qed.
+
+#[export]
+Hint Resolve wf_typ_sort_sub : mcpts.
+
+Lemma wf_typ_eq_sub_unsorted {P : PtsSig} : forall {Δ : ctx P} {A A'},
+    {{ Δ ⊢ A ≈ A' }} ->
+    forall Γ σ,
+    {{ Γ ⊢s σ : Δ }} ->
+    {{ Γ ⊢ A[σ] ≈ A'[σ] }}.
+Proof. mauto. Qed.
+
+#[export]
+Hint Resolve wf_typ_eq_sub_unsorted : mcpts.
+
+Lemma typ_eq_sub_cong_typ1 {P : PtsSig} : forall {Δ : ctx P} {Γ A A' σ},
+    {{ Δ ⊢ A ≈ A' }} ->
+    {{ Γ ⊢s σ : Δ }} ->
+    {{ Γ ⊢ A[σ] ≈ A'[σ] }}.
+Proof. mauto. Qed.
+
+Lemma typ_eq_sub_cong_typ2  {P} : forall {Δ : ctx P} {Γ A σ τ},
+    {{ Δ ⊢ A }} ->
+    {{ Γ ⊢s σ : Δ }} ->
+    {{ Γ ⊢s σ ≈ τ : Δ }} ->
+    {{ Γ ⊢ A[σ] ≈ A[τ] }}.
+Proof. mauto. Qed.
+
+Lemma typ_eq_sub_compose_typ  {P : PtsSig} : forall {Ψ : ctx P} {Δ Γ A σ τ},
+    {{ Ψ ⊢ A  }} ->
+    {{ Δ ⊢s σ : Ψ }} ->
+    {{ Γ ⊢s τ : Δ }} ->
+    {{ Γ ⊢ A[σ][τ] ≈ A[σ∘τ] }}.
+Proof. mauto. Qed.
+
+#[export]
+  Hint Resolve typ_eq_sub_cong_typ1 typ_eq_sub_cong_typ2 typ_eq_sub_compose_typ : mcpts.
+
+Lemma typ_eq_sub_compose_weaken_extend_typ {P : PtsSig} : forall {Γ : ctx P} {σ Δ A B M s},
+    {{ Γ ⊢s σ : Δ }} ->
+    {{ Δ ⊢ A }} ->
+    {{ Δ ⊢ B : Sort@s }} ->
+    {{ Γ ⊢ M : B[σ] }} ->
+    {{ Γ ⊢ A[Wk][σ,,M] ≈ A[σ] }}.
+Proof with mautosolve 3.
+  intros.  
+  assert {{ Δ, B@s ⊢s Wk : Δ }} by mauto 4.
+  transitivity {{{ A[Wk∘(σ,,M)] }}}; [mautosolve 4 |].
+  eapply typ_eq_sub_cong_typ2...
+Qed.
+
+#[export]
+Hint Resolve typ_eq_sub_compose_weaken_extend_typ : mcpts.
+
+Lemma typ_eq_sub_compose_weaken_id_extend_typ {P : PtsSig} : forall {Γ : ctx P} {s A B M},
+    {{ Γ ⊢ A }} ->
+    {{ Γ ⊢ B : Sort@s }} ->
+    {{ Γ ⊢ M : B }} ->
+    {{ Γ ⊢ A[Wk][Id,,M] ≈ A }}.
+Proof with mautosolve 3.
+  intros.
+  assert {{ ⊢ Γ }} by mauto 2.
+  assert {{ Γ ⊢ B[Id] : Sort@s }} by (econstructor; mauto).
+  assert {{ Γ ⊢ B ≈ B[Id] : Sort@s }} by mauto 3.
+  assert {{ Γ ⊢ M : B[Id] }} by mauto 2.
+  transitivity {{{ A[Id] }}}...
+Qed.
+
+#[export]
+Hint Resolve typ_eq_sub_compose_weaken_id_extend_typ : mcpts.
+
+Lemma typ_eq_sub_compose_double_weaken_double_extend_typ {P : PtsSig} : forall {Γ : ctx P} {s s' σ Δ A B M C N},
+    {{ Γ ⊢s σ : Δ }} ->
+    {{ Δ ⊢ A }} ->
+    {{ Δ ⊢ B : Sort@s }} ->
+    {{ Γ ⊢ M : B[σ] }} ->
+    {{ Δ, B@s ⊢ C : Sort@s' }} ->
+    {{ Γ ⊢ N : C[σ,,M] }} ->
+    {{ Γ ⊢ A[Wk∘Wk][σ,,M,,N] ≈ A[σ] }}.
+Proof with mautosolve 3.
+  intros.
+  assert {{ ⊢ Γ }} by mauto 2.
+  assert {{ ⊢ Δ }} by mauto 2.
+  assert {{ Δ, B@s ⊢s Wk : Δ }} by mauto 3.
+  assert {{ Δ, B@s, C@s' ⊢s Wk : Δ, B@s }} by mauto 4.
+  assert {{ Δ, B@s ⊢ A[Wk] }} by (econstructor; mauto).
+  transitivity {{{ A[Wk][Wk][σ,,M,,N] }}}; [eapply typ_eq_sub_cong_typ1; mautosolve 3 |].
+  transitivity {{{ A[Wk][σ,,M] }}}...
+Qed.
+
+#[export]
+Hint Resolve typ_eq_sub_compose_double_weaken_double_extend_typ : mcpts.
+
+Lemma typ_eq_sub_compose_double_weaken_id_double_extend_typ {P : PtsSig} : forall {Γ : ctx P} {s s' A B M C N},
+    {{ Γ ⊢ A }} ->
+    {{ Γ ⊢ B : Sort@s }} ->
+    {{ Γ ⊢ M : B }} ->
+    {{ Γ, B@s ⊢ C : Sort@s' }} ->
+    {{ Γ ⊢ N : C[Id,,M] }} ->
+    {{ Γ ⊢ A[Wk∘Wk][Id,,M,,N] ≈ A }}.
+Proof with mautosolve 3.
+  intros.
+  assert {{ ⊢ Γ }} by mauto 2.
+  assert {{ Γ ⊢ B[Id] : Sort@s }} by (econstructor; mauto).
+  assert {{ Γ ⊢ B ≈ B[Id] : Sort@s }} by mauto 3.
+  assert {{ Γ ⊢ M : B[Id] }} by mauto 3.
+  transitivity {{{ A[Id] }}}...
+Qed.
+
+#[export]
+Hint Resolve typ_eq_sub_compose_double_weaken_id_double_extend_typ : mcpts.
+
+Lemma typ_eq_typ_sub_sub {P : PtsSig} : forall {Γ : ctx P} {Δ Ψ σ τ s1},
+    {{ Δ ⊢s σ : Ψ }} ->
+    {{ Γ ⊢s τ : Δ }} ->
+    {{ Γ ⊢ Sort@s1[σ][τ] ≈ Sort@s1 }}.
+Proof.
+  intros.
+  transitivity {{{ Sort@s1[σ∘τ] }}}; mauto.
+Qed.
+
+#[export]
+Hint Resolve typ_eq_typ_sub_sub : mcpts.
+#[export]
+Hint Rewrite -> @typ_eq_typ_sub_sub using mauto 4 : mcpts.
 
 Lemma var_compose_subs {P : PtsSig} : forall {Γ : ctx P} {τ Δ σ Ψ A x s},
     {{ Ψ ⊢ A : Sort@s }} ->
