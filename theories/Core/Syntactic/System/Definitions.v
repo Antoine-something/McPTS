@@ -153,6 +153,7 @@ where "⊢ Γ ≈ Γ'" := (wf_ctx_eq Γ Γ') (in custom judg) : type_scope
 with wf_exp_eq {P : PtsSig} : ctx P -> typ P -> exp P -> exp P -> Prop :=
 | wf_exp_eq_typ_sub :
   `( {{ Γ ⊢ Sort@s1 : Sort@s2 }} ->
+     {{ Δ ⊢ Sort@s1 : Sort@s2 }} ->
      {{ Γ ⊢s σ : Δ }} ->
      {{ Γ ⊢ Sort@s1[σ] ≈ Sort@s1 : Sort@s2 }} )
 
