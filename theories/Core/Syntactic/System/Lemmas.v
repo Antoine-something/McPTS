@@ -1539,13 +1539,13 @@ Hint Resolve sub_eq_q_sigma_compose_weak_weak_extend_succ_var_1 : mcpts.
 
 (** *** Lemmas for [wf_subtyp] *)
 
-Fact wf_subtyp_refl {P} : forall {Γ : ctx P} {A s},
+Fact wf_subtyp_refl_sorted {P} : forall {Γ : ctx P} {A s},
     {{ Γ ⊢ A : Sort@s }} ->
     {{ Γ ⊢ A ⊆ A }}.
 Proof. mauto. Qed.
 
 #[export]
-Hint Resolve wf_subtyp_refl : mcpts.
+Hint Resolve wf_subtyp_refl_sorted : mcpts.
 
 Lemma wf_subtyp_sub {P} : forall {Δ : ctx P} {A A'},
     {{ Δ ⊢ A ⊆ A' }} ->
