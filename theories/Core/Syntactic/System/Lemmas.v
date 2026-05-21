@@ -209,7 +209,7 @@ Proof. mauto. Qed.
 Hint Resolve wf_conv_unsorted : mcpts.
 
 
-Lemma wf_sub_conv {P : PtsSig} : forall (Γ : ctx P) σ Δ Δ',
+Lemma wf_sub_conv_eq {P : PtsSig} : forall (Γ : ctx P) σ Δ Δ',
   {{ Γ ⊢s σ : Δ }} ->
   {{ ⊢ Δ ≈ Δ' }} ->
   {{ Γ ⊢s σ : Δ' }}.
@@ -220,7 +220,7 @@ Proof.
 Qed.
 
 #[export]
-Hint Resolve wf_sub_conv : mcpts.
+Hint Resolve wf_sub_conv_eq : mcpts.
 
 Lemma wf_exp_eq_sort_subtyp {P} : forall {Γ : ctx P} {A B s},
     {{ Γ ⊢ A ≈ B : Sort@s }} ->
@@ -260,14 +260,14 @@ Proof. mauto. Qed.
 Hint Resolve wf_eq_conv_unsorted : mcpts.
 
 
-Lemma wf_sub_eq_conv {P : PtsSig} : forall (Γ : ctx P) σ σ' Δ Δ',
+Lemma wf_sub_eq_conv_eq {P : PtsSig} : forall (Γ : ctx P) σ σ' Δ Δ',
     {{ Γ ⊢s σ ≈ σ' : Δ }} ->
     {{ ⊢ Δ ≈ Δ' }} ->
     {{ Γ ⊢s σ ≈ σ' : Δ' }}.
 Proof. mauto. Qed.
 
 #[export]
-Hint Resolve wf_sub_eq_conv : mcpts.
+Hint Resolve wf_sub_eq_conv_eq : mcpts.
 
 Add Parametric Morphism {P : PtsSig} (Γ : ctx P) : (wf_sub_eq Γ)
     with signature wf_ctx_eq ==> eq ==> eq ==> iff as wf_sub_eq_morphism_iff3.
@@ -1548,25 +1548,20 @@ Proof. mauto. Qed.
 Hint Resolve wf_subtyp_refl : mcpts.
 
 Lemma wf_subtyp_sub {P} : forall {Δ : ctx P} {A A'},
-    {{ Δ ⊢ A' }} ->
     {{ Δ ⊢ A ⊆ A' }} ->
     forall Γ σ,
       {{ Γ ⊢s σ : Δ }} ->
       {{ Γ ⊢ A[σ] ⊆ A'[σ] }}.
 Proof.
-  induction 2; intros; mauto 4.
+  induction 1; intros; mauto 4.
   - assert {{ Γ0 ⊢ A[σ] ≈ B[σ] }} by mauto 3.
     assert {{ Γ0 ⊢ B[σ] }} by mauto 3.
     mauto 3.
-  - assert {{ Γ ⊢ B }} by mauto 2.
-    specialize (IHwf_subtyp1 H1 Γ0 σ H0).
-    specialize (IHwf_subtyp2 H Γ0 σ H0).    
-    mauto.
   - assert {{ ⊢ Γ0 }} by mauto 2.
     assert {{ Γ ⊢ Sort@s1 ⊆ Sort@s2 }} by mauto.
     assert {{ Γ ⊢ Sort@s1 }} by mauto.
     assert {{ Γ0 ⊢ Sort@s1[σ] ≈ Sort@s1 }} by mauto.
-    assert {{ Γ0 ⊢ Sort@s2[σ] ≈ Sort@s2 }} by mauto.
+    assert {{ Γ0 ⊢ Sort@s2 ≈ Sort@s2[σ] }} by (symmetry; mauto).
     transitivity {{{ Sort@s1 }}}; mauto 3.
     transitivity {{{ Sort@s2 }}}; mauto 3.
     mauto 4.
@@ -1590,7 +1585,6 @@ Lemma wf_subtyp_sort_weaken {P} : forall {Γ : ctx P} {s1 s2 A s},
 Proof.    
   intros.
   assert {{ Γ ⊢ Sort@s2  }} by mauto 2.
-  (* assert (exists s3', Ax P s2 s3' /\ {{ Γ ⊢ Sort@s3' ⊆ Sort@s3 }}) as [s3' []] by mauto 2. *)
   assert {{ Γ, A@s ⊢s Wk : Γ }} by mauto 2.
   dependent induction H; mauto 2.
   - assert {{ Γ, A@s ⊢ Sort@s1[Wk] ≈ Sort@s2[Wk] }} by mauto.
@@ -1605,24 +1599,23 @@ Proof.
     transitivity {{{ Sort@s1[Wk] }}}; mauto.
 Qed.
 
-(* Lemma ctx_sub_ctx_lookup {P} : forall {Γ Δ : ctx P}, *)
-(*     {{ ⊢ Δ ⊆ Γ }} -> *)
-(*     forall {A x s}, *)
-(*       {{ #x : A@s ∈ Γ }} -> *)
-(*       exists B, *)
-(*         {{ #x : B@s ∈ Δ }} /\ *)
-(*           {{ Δ ⊢ B ⊆ A }}. *)
-(* Proof with (do 2 eexists; repeat split; mautosolve). *)
-(*   induction 1; intros * Hx; progressive_inversion. *)
-(*   dependent destruction Hx. *)
-(*   - eexists; split; mauto 3. *)
-    
-(*     idtac... *)
-(*   - edestruct IHwf_ctx_sub as [? []]; try eassumption... *)
-(* Qed. *)
+Lemma ctx_sub_ctx_lookup {P} : forall {Γ Δ : ctx P},
+    {{ ⊢ Δ ⊆ Γ }} ->
+    forall {A x s},
+      {{ #x : A@s ∈ Γ }} ->
+      exists B,
+        {{ #x : B@s ∈ Δ }} /\
+          {{ Δ ⊢ B ⊆ A }}.
+Proof with (do 2 eexists; repeat split; mautosolve).
+  induction 1; intros * Hx; progressive_inversion.
+  dependent destruction Hx.
+  - eexists; split; mauto 3.
+    eapply wf_subtyp_sub; mauto 4.
+  - edestruct IHwf_ctx_sub as [? []]; try eassumption...
+Qed.
 
-(* #[export] *)
-(* Hint Resolve ctx_sub_ctx_lookup : mcpts. *)
+#[export]
+Hint Resolve ctx_sub_ctx_lookup : mcpts.
 
 (** *** Lemmas for [wf_typ_eq] *)
 
