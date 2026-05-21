@@ -8,8 +8,8 @@ Reserved Notation "'env'".
 
 Inductive domain (P : PtsSig) : Set :=
 | d_sort : P -> domain P
-| d_pi : forall (s1 s2 s3 : P), Ru P s1 s2 s3 -> domain P -> env P -> exp P -> domain P
-| d_fn : forall (s1 s2 s3 : P), Ru P s1 s2 s3 ->  env P -> exp P -> domain P
+| d_pi : forall (s1 s2 s3 : P), Ru_pi P s1 s2 s3 -> domain P -> env P -> exp P -> domain P
+| d_fn : forall (s1 s2 s3 : P), Ru_pi P s1 s2 s3 ->  env P -> exp P -> domain P
 | d_nat : domain P
 | d_zero : domain P
 | d_succ : domain P -> domain P

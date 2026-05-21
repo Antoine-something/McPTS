@@ -29,11 +29,11 @@ Inductive eval_exp {P : PtsSig} : exp P -> env P -> domain P -> Prop :=
   `({{ #| ρ[x] |↘ m }} ->
     {{ ⟦ #x ⟧ ρ ↘ m }} )
 | eval_exp_pi :
-  `( forall r : Ru P s1 s2 s3,
+  `( forall r : Ru_pi P s1 s2 s3,
         {{ ⟦ A ⟧ ρ ↘ a }} ->
         {{ ⟦ Π r A B ⟧ ρ ↘ Π r a ρ B }} )
 | eval_exp_fn :
-  `( forall r : Ru P s1 s2 s3,
+  `( forall r : Ru_pi P s1 s2 s3,
       {{ ⟦ λ r A M ⟧ ρ ↘ λ r ρ M }} )
 | eval_exp_app :
   `( {{ ⟦ M ⟧ ρ ↘ m }} ->
@@ -58,11 +58,11 @@ Inductive eval_exp {P : PtsSig} : exp P -> env P -> domain P -> Prop :=
 where "'⟦' M '⟧' ρ '↘' m" := (eval_exp M ρ m) (in custom judg)
 with eval_app {P : PtsSig} : domain P -> domain P -> domain P -> Prop :=
 | eval_app_fn :
-  `( forall r : Ru P s1 s2 s3,
+  `( forall r : Ru_pi P s1 s2 s3,
       {{ ⟦ M ⟧ ρ ↦ n ↘ m }} ->
       {{ $| λ r ρ M & n |↘ m }} )
 | eval_app_neut :
-  `( forall r : Ru P s1 s2 s3,
+  `( forall r : Ru_pi P s1 s2 s3,
       {{ ⟦ B ⟧ ρ ↦ n ↘ b }} ->
       {{ $| ⇑ (Π r a ρ B) m & n |↘ ⇑ b (m (⇓ a n)) }} )
 where "'$|' m '&' n '|↘' m'" := (eval_app m n m') (in custom judg)

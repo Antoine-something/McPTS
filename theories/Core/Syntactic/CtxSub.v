@@ -82,8 +82,7 @@ Module ctxsub_judg.
       assert {{ Δ, B'@s1 ⊢ C' : Sort@s2 }} by mauto 2.
       assert {{ Δ, A@s1 ⊢ C : Sort@s2 }} by mauto 2.
       assert {{ Δ ⊢ A ≈ B' : Sort@s1 }} by mauto 2.
-      econstructor...
-      
+      econstructor...    
   Qed.
 
   

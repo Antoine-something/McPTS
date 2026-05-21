@@ -3,7 +3,7 @@ From McPTS.Core Require Import Base.
 From McPTS.Core.Syntactic Require Export CtxEq.
 Import Syntax_Notations.
 
-Lemma presup_exp_eq_fn_cong_right {P : PtsSig} : forall {Γ : ctx P} {s1 A A' s2 B M' s3} (r : Ru P s1 s2 s3),
+Lemma presup_exp_eq_fn_cong_right {P : PtsSig} : forall {Γ : ctx P} {s1 A A' s2 B M' s3} (r : Ru_pi P s1 s2 s3),
     {{ ⊢ Γ }} ->
     {{ Γ ⊢ A : Sort@s1 }} ->
     {{ Γ ⊢ A' : Sort@s1 }} ->
@@ -25,7 +25,7 @@ Qed.
 #[local]
 Hint Resolve presup_exp_eq_fn_cong_right : mcpts.
 
-Lemma presup_exp_eq_fn_sub_right {P : PtsSig} : forall {Γ : ctx P} {σ Δ s1 A s2 B M s3} {r : Ru P s1 s2 s3},
+Lemma presup_exp_eq_fn_sub_right {P : PtsSig} : forall {Γ : ctx P} {σ Δ s1 A s2 B M s3} {r : Ru_pi P s1 s2 s3},
     {{ ⊢ Γ }} ->
     {{ ⊢ Δ }} ->
     {{ Γ ⊢s σ : Δ }} ->
@@ -48,7 +48,7 @@ Qed.
 #[local]
 Hint Resolve presup_exp_eq_fn_sub_right : mcpts.
 
-Lemma presup_exp_eq_app_cong_right {P : PtsSig} : forall {Γ : ctx P} {s1 A B M' N N' s2 s3} {r : Ru P s1 s2 s3},
+Lemma presup_exp_eq_app_cong_right {P : PtsSig} : forall {Γ : ctx P} {s1 A B M' N N' s2 s3} {r : Ru_pi P s1 s2 s3},
     {{ ⊢ Γ }} ->
     {{ Γ ⊢ A : Sort@s1 }} ->
     {{ ⊢ Γ, A@s1 }} ->
@@ -72,7 +72,7 @@ Qed.
 #[local]
 Hint Resolve presup_exp_eq_app_cong_right : mcpts.
 
-Lemma presup_exp_eq_app_sub_left {P : PtsSig} : forall {Γ : ctx P} {σ Δ s1 A B M N s2 s3} {r : Ru P s1 s2 s3},
+Lemma presup_exp_eq_app_sub_left {P : PtsSig} : forall {Γ : ctx P} {σ Δ s1 A B M N s2 s3} {r : Ru_pi P s1 s2 s3},
     {{ ⊢ Γ }} ->
     {{ ⊢ Δ }} ->
     {{ Γ ⊢s σ : Δ }} ->
@@ -111,7 +111,7 @@ Qed.
 #[local]
 Hint Resolve presup_exp_eq_app_sub_left : mcpts.
 
-Lemma presup_exp_eq_app_sub_right {P : PtsSig} : forall {Γ : ctx P} {σ Δ s1 A B M N s2 s3} {r : Ru P s1 s2 s3},
+Lemma presup_exp_eq_app_sub_right {P : PtsSig} : forall {Γ : ctx P} {σ Δ s1 A B M N s2 s3} {r : Ru_pi P s1 s2 s3},
     {{ ⊢ Γ }} ->
     {{ ⊢ Δ }} ->
     {{ Γ ⊢s σ : Δ }} ->
@@ -141,7 +141,7 @@ Qed.
 #[local]
 Hint Resolve presup_exp_eq_app_sub_right : mcpts.
 
-Lemma presup_exp_eq_pi_eta_right {P : PtsSig} : forall {Γ : ctx P} {s1 A B M s2 s3} {r : Ru P s1 s2 s3},
+Lemma presup_exp_eq_pi_eta_right {P : PtsSig} : forall {Γ : ctx P} {s1 A B M s2 s3} {r : Ru_pi P s1 s2 s3},
     {{ ⊢ Γ }} ->
     {{ Γ ⊢ A : Sort@s1 }} ->
     {{ ⊢ Γ, A@s1 }} ->

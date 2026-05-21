@@ -5,28 +5,34 @@ From Equations Require Import Equations.
 Record PtsSig : Type :=
   mkPtsSig {
       St :> Set;
-      Ax : St -> St -> Prop;
-      Ru : St -> St -> St -> Set;
+      (** Typing and subtyping axioms *)
+      Ax_typ : St -> St -> Prop;
+      Ax_sub : St -> St -> Prop;
+      (** Rules for type constructors *)
+      Ru_pi : St -> St -> St -> Set;
       Ru_nat : St -> Set;
-      (** Subtyping *)
-      Ru_sub : St -> St -> Prop;
-      (* Ru_sub_backwards_ax : forall s1 s2, Ru_sub s1 s2 -> forall s3, Ax s2 s3 -> Ax s1 s3; *)
     }.
+
+Inductive st_subtyp {P : PtsSig} : P -> P -> Prop :=
+| st_subtyp_refl : forall s, st_subtyp s s
+| st_subtyp_trans : forall s1 s2 s3, Ax_sub P s1 s2 -> st_subtyp s2 s3 ->
+                                st_subtyp s1 s3.
 
 Record PredicativeSig (P : PtsSig) : Type :=
   mkPredicativeSig {
       pred_rel : relation P;
       ord_rel : StrictOrder pred_rel;
       wf_rel : well_founded pred_rel;
-      ord_ax : forall {s1 s2 : P}, Ax P s1 s2 -> pred_rel s1 s2;
-      ord_ru : forall {s1 s2 s3 : P}, Ru P s1 s2 s3 -> (pred_rel s1 s3 \/ s1 = s3) /\ (pred_rel s2 s3 \/ s2 = s3);
-      resp_by_sub : forall {s1 s2 : P}, Ru_sub P s1 s2 -> pred_rel s1 s2;
+      ord_ax_typ : forall {s1 s2 : P}, Ax_typ P s1 s2 -> pred_rel s1 s2;
+      resp_by_sub : forall {s1 s2 : P}, Ax_sub P s1 s2 -> pred_rel s1 s2;
+      ord_ru_pi : forall {s1 s2 s3 : P}, Ru_pi P s1 s2 s3 -> (pred_rel s1 s3 \/ s1 = s3) /\ (pred_rel s2 s3 \/ s2 = s3);
+
     }.
 Arguments pred_rel {_}.
 Arguments ord_rel {_}.
 Arguments wf_rel {_}.
-Arguments ord_ax {_} _ {_ _}.
-Arguments ord_ru {_} _ {_ _ _}.
+Arguments ord_ax_typ {_} _ {_ _}.
+Arguments ord_ru_pi {_} _ {_ _ _}.
 Arguments resp_by_sub {_} _ {_ _}.
 
 Section OrderProperties.
@@ -66,7 +72,7 @@ Section OrderProperties.
   Qed.
 End OrderProperties.
 
-Definition FullSig (P : PtsSig) : Type := forall s, exists s', Ax P s s'.
+(* Definition FullSig (P : PtsSig) : Type := forall s, exists s', Ax P s s'. *)
 
 
 (* Section SignatureExtension. *)

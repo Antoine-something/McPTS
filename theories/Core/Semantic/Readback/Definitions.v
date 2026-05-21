@@ -15,7 +15,7 @@ Inductive read_nf {P : PtsSig} : nat -> domain_nf P -> nf P -> Prop :=
   `( {{ Rtyp a in i ↘ A }} ->
      {{ Rnf ⇓ Sort@s a in i ↘ A }} )
 | read_nf_fn :
-  `( forall r : Ru P s1 s2 s3,
+  `( forall r : Ru_pi P s1 s2 s3,
         (** Normal form of arg type *)
         {{ Rtyp a in i ↘ A }} ->
         (** Normal form of eta-expanded body *)
@@ -62,7 +62,7 @@ with read_typ {P : PtsSig} : nat -> domain P -> nf P -> Prop :=
 | read_typ_univ :
   `( {{ Rtyp Sort@s in i ↘ Sort@s }} )
 | read_typ_pi :
-  `( forall r : Ru P s1 s2 s3,
+  `( forall r : Ru_pi P s1 s2 s3,
         (** Normal form of arg type *)
         {{ Rtyp a in i ↘ A }} ->
         (** Normal form of ret type *)

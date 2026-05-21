@@ -4,8 +4,6 @@ From McPTS.Core Require Import Base.
 From McPTS.Core.Syntactic Require Export CoreInversions Presup.
 Import Syntax_Notations.
 
-
-
 Add Parametric Morphism {P : PtsSig} (s : P) Γ : (wf_exp Γ)
     with signature wf_exp_eq Γ {{{ Sort@s }}} ==> eq ==> iff as wf_exp_morphism_iff3.
 Proof with mautosolve.
@@ -142,7 +140,7 @@ Hint Resolve wf_ctx_eq_extend' : mcpts.
 Remove Hints wf_ctx_eq_extend : mcpts.
 
 
-Corollary wf_pi {P : PtsSig} : forall {Γ : ctx P} {A B s1 s2 s3} {r : Ru P s1 s2 s3},
+Corollary wf_pi {P : PtsSig} : forall {Γ : ctx P} {A B s1 s2 s3} {r : Ru_pi P s1 s2 s3},
     {{ Γ ⊢ A : Sort@s1 }} ->
     {{ Γ, A@s1 ⊢ B : Sort@s2 }} ->
     {{ Γ ⊢ Π r A B : Sort@s3 }}.
@@ -153,7 +151,7 @@ Qed.
 #[export]
 Hint Resolve wf_pi : mcpts.
 
-Corollary wf_fn' {P : PtsSig} : forall {Γ : ctx P} {A M B s1 s2 s3} {r : Ru P s1 s2 s3},
+Corollary wf_fn' {P : PtsSig} : forall {Γ : ctx P} {A M B s1 s2 s3} {r : Ru_pi P s1 s2 s3},
     {{ Γ ⊢ A : Sort@s1 }} ->
     {{ Γ, A@s1 ⊢ M : B }} ->
     {{ Γ, A@s1 ⊢ B : Sort@s2 }} ->
@@ -167,7 +165,7 @@ Hint Resolve wf_fn' : mcpts.
 #[export]
 Remove Hints wf_fn : mcpts.
 
-Corollary wf_app' {P : PtsSig} : forall {Γ : ctx P} {M N A B s1 s2 s3} {r : Ru P s1 s2 s3},
+Corollary wf_app' {P : PtsSig} : forall {Γ : ctx P} {M N A B s1 s2 s3} {r : Ru_pi P s1 s2 s3},
     {{ Γ ⊢ M : Π r A B }} ->
     {{ Γ ⊢ N : A }} ->
     {{ Γ ⊢ M N : B[Id,,N] }}.
@@ -212,7 +210,7 @@ Hint Resolve wf_typ_eq_sort_sub' : mcpts.
 #[export]
 Hint Rewrite -> @wf_typ_eq_sort_sub' using solve [lia | mauto 3] : mcpts.
 
-Corollary wf_exp_eq_pi_cong' {P} : forall {Γ A A' s1 s2 s3 B B'} {r : Ru P s1 s2 s3},
+Corollary wf_exp_eq_pi_cong' {P} : forall {Γ A A' s1 s2 s3 B B'} {r : Ru_pi P s1 s2 s3},
     {{ Γ ⊢ A ≈ A' : Sort@s1 }} ->
     {{ Γ, A@s1 ⊢ B ≈ B' : Sort@s2 }} ->
     {{ Γ ⊢ Π r A B ≈ Π r A' B' : Sort@s3 }}.
@@ -225,7 +223,7 @@ Hint Resolve wf_exp_eq_pi_cong' : mcpts.
 #[export]
 Remove Hints wf_exp_eq_pi_cong : mcpts.
 
-Corollary wf_exp_eq_fn_cong' {P : PtsSig} : forall {Γ : ctx P} {A A' s1 s2 s3 B M M'} {r : Ru P s1 s2 s3},
+Corollary wf_exp_eq_fn_cong' {P : PtsSig} : forall {Γ : ctx P} {A A' s1 s2 s3 B M M'} {r : Ru_pi P s1 s2 s3},
     {{ Γ ⊢ A ≈ A' : Sort@s1 }} ->
     {{ Γ, A@s1 ⊢ M ≈ M' : B }} ->
     {{ Γ, A@s1 ⊢ B : Sort@s2 }} ->
@@ -244,7 +242,7 @@ Hint Resolve wf_exp_eq_fn_cong' : mcpts.
 #[export]
 Remove Hints wf_exp_eq_fn_cong : mcpts.
 
-Corollary wf_exp_eq_fn_sub' {P : PtsSig} : forall {Γ : ctx P} {σ Δ A M B s1 s2 s3} {r : Ru P s1 s2 s3},
+Corollary wf_exp_eq_fn_sub' {P : PtsSig} : forall {Γ : ctx P} {σ Δ A M B s1 s2 s3} {r : Ru_pi P s1 s2 s3},
     {{ Γ ⊢s σ : Δ }} ->
     {{ Δ ⊢ A : Sort@s1 }} ->
     {{ Δ, A@s1 ⊢ M : B }} ->
@@ -259,7 +257,7 @@ Hint Resolve wf_exp_eq_fn_sub' : mcpts.
 #[export]
 Remove Hints wf_exp_eq_fn_sub : mcpts.
 
-Corollary wf_exp_eq_app_cong' {P : PtsSig} : forall {Γ : ctx P} {A B M M' N N' s1 s2 s3} {r : Ru P s1 s2 s3},
+Corollary wf_exp_eq_app_cong' {P : PtsSig} : forall {Γ : ctx P} {A B M M' N N' s1 s2 s3} {r : Ru_pi P s1 s2 s3},
     {{ Γ ⊢ M ≈ M' : Π r A B }} ->
     {{ Γ ⊢ N ≈ N' : A }} ->
     {{ Γ ⊢ M N ≈ M' N' : B[Id,,N] }}.
@@ -276,7 +274,7 @@ Hint Resolve wf_exp_eq_app_cong' : mcpts.
 #[export]
 Remove Hints wf_exp_eq_app_cong : mcpts.
 
-Corollary wf_exp_eq_app_sub' {P : PtsSig} : forall {Γ : ctx P} {σ Δ A B M N s1 s2 s3} {r : Ru P s1 s2 s3},
+Corollary wf_exp_eq_app_sub' {P : PtsSig} : forall {Γ : ctx P} {σ Δ A B M N s1 s2 s3} {r : Ru_pi P s1 s2 s3},
     {{ Γ ⊢s σ : Δ }} ->
     {{ Δ ⊢ M : Π r A B }} ->
     {{ Δ ⊢ N : A }} ->
@@ -294,7 +292,7 @@ Hint Resolve wf_exp_eq_app_sub' : mcpts.
 #[export]
 Remove Hints wf_exp_eq_app_sub : mcpts.
 
-Corollary wf_exp_eq_pi_beta' {P : PtsSig} : forall {Γ : ctx P} {A B M N s1 s2 s3} {r : Ru P s1 s2 s3},
+Corollary wf_exp_eq_pi_beta' {P : PtsSig} : forall {Γ : ctx P} {A B M N s1 s2 s3} {r : Ru_pi P s1 s2 s3},
     {{ Γ ⊢ A : Sort@s1 }} ->
     {{ Γ, A@s1 ⊢ M : B }} ->
     {{ Γ, A@s1 ⊢ B : Sort@s2 }} ->
@@ -309,7 +307,7 @@ Hint Resolve wf_exp_eq_pi_beta' : mcpts.
 #[export]
 Remove Hints wf_exp_eq_pi_beta : mcpts.
 
-Corollary wf_exp_eq_pi_eta' {P : PtsSig} : forall {Γ : ctx P} {A B M s1 s2 s3} {r : Ru P s1 s2 s3},
+Corollary wf_exp_eq_pi_eta' {P : PtsSig} : forall {Γ : ctx P} {A B M s1 s2 s3} {r : Ru_pi P s1 s2 s3},
     {{ Γ ⊢ M : Π r A B }} ->
     {{ Γ ⊢ M ≈ λ r A (M[Wk] #0) : Π r A B }}.
 Proof.
@@ -411,7 +409,7 @@ Hint Resolve wf_subtyp_refl' : mcpts.
 #[export]
 Remove Hints wf_subtyp_refl : mcpts.
 
-Corollary wf_subtyp_pi' {P} : forall {Γ : ctx P} {A A' B B' s1 s2 s3} {r : Ru P s1 s2 s3},
+Corollary wf_subtyp_pi' {P} : forall {Γ : ctx P} {A A' B B' s1 s2 s3} {r : Ru_pi P s1 s2 s3},
     {{ Γ ⊢ A ≈ A' : Sort@s1 }} ->
     {{ Γ, A@s1 ⊢ B : Sort@s2 }} ->
         {{ Γ, A'@s1 ⊢ B' : Sort@s2 }} ->

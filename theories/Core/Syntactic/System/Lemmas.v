@@ -514,7 +514,7 @@ Hint Rewrite -> @exp_eq_typ_sub_sub using mauto 4 : mcpts.
 Lemma wf_exp_sort_sort_implies_axiom {P} : forall {Γ : ctx P} {s1 K},
     {{ Γ ⊢ Sort@s1 : K }} ->
     exists s2,
-      Ax P s1 s2 /\
+      Ax_typ P s1 s2 /\
         {{ Γ ⊢ Sort@s2 ⊆ K }}.
 Proof.
   intros * H.
@@ -857,7 +857,7 @@ Hint Resolve exp_eq_sub_sub_compose_cong_nat : mcpts.
 (** Lemmas about variables *)
 
 Lemma vlookup_0_typ {P : PtsSig} : forall {Γ : ctx P} {s1 s2},
-    Ax P s1 s2 ->
+    Ax_typ P s1 s2 ->
     {{ ⊢ Γ }} ->
     {{ Γ, Sort@s1@s2 ⊢ #0 : Sort@s1 }}.
 Proof with mautosolve 4.
@@ -868,7 +868,7 @@ Proof with mautosolve 4.
 Qed.
 
 Lemma vlookup_1_typ {P : PtsSig} : forall {Γ : ctx P} {s1 s2 s3 A},
-    Ax P s1 s2 ->
+    Ax_typ P s1 s2 ->
     {{ Γ, Sort@s1@s2 ⊢ A : Sort@s3 }} ->
     {{ Γ, Sort@s1@s2, A@s3 ⊢ #1 : Sort@s1 }}.
 Proof with mautosolve 3.
@@ -889,7 +889,7 @@ Qed.
 Hint Resolve vlookup_0_typ vlookup_1_typ : mcpts.
 
 Lemma exp_sub_typ_helper {P : PtsSig} : forall {Γ : ctx P} {σ Δ M s s'},
-    Ax P s s' ->
+    Ax_typ P s s' ->
     {{ Γ ⊢s σ : Δ }} ->
     {{ Γ ⊢ M : Sort@s }} ->
     {{ Γ ⊢ M : Sort@s[σ] }}.
@@ -902,7 +902,7 @@ Qed.
 Hint Resolve exp_sub_typ_helper : mcpts.
 
 Lemma exp_eq_var_0_sub_typ {P : PtsSig} : forall {Γ : ctx P} {σ Δ M s1 s2},
-    Ax P s1 s2 ->
+    Ax_typ P s1 s2 ->
     {{ Γ ⊢s σ : Δ }} ->
     {{ Γ ⊢ M : Sort@s1 }} ->
     {{ Γ ⊢ #0[σ,,M] ≈ M : Sort@s1 }}.
@@ -915,7 +915,7 @@ Proof with mautosolve 3.
 Qed.
 
 Lemma exp_eq_var_1_sub_typ {P : PtsSig} : forall {Γ : ctx P} {σ Δ A s1 M s2 s3},
-    Ax P s2 s3 ->
+    Ax_typ P s2 s3 ->
     {{ Γ ⊢s σ : Δ }} ->
     {{ Δ ⊢ A : Sort@s1 }} ->
     {{ Γ ⊢ M : A[σ] }} ->
@@ -937,7 +937,7 @@ Hint Resolve exp_eq_var_0_sub_typ exp_eq_var_1_sub_typ : mcpts.
 Hint Rewrite -> @exp_eq_var_0_sub_typ @exp_eq_var_1_sub_typ : mcpts.
 
 Lemma exp_eq_var_0_weaken_typ {P : PtsSig} : forall {Γ : ctx P} {A s s' s''},
-    Ax P s s' ->
+    Ax_typ P s s' ->
     {{ ⊢ Γ, A@s'' }} ->
     {{ #0 : Sort@s[Wk]@s' ∈ Γ }} ->
     {{ Γ, A@s'' ⊢ #0[Wk] ≈ #1 : Sort@s }}.
@@ -956,7 +956,7 @@ Qed.
 Hint Resolve exp_eq_var_0_weaken_typ : mcpts.
 
 Lemma sub_extend_typ {P : PtsSig} : forall {Γ : ctx P} {σ Δ M s1 s2},
-    Ax P s1 s2 ->
+    Ax_typ P s1 s2 ->
     {{ Γ ⊢s σ : Δ }} ->
     {{ Γ ⊢ M : Sort@s1 }} ->
     {{ Γ ⊢s σ,,M : Δ, Sort@s1@s2 }}.
@@ -969,7 +969,7 @@ Qed.
 Hint Resolve sub_extend_typ : mcpts.
 
 Lemma sub_eq_extend_cong_typ {P : PtsSig} : forall {Γ : ctx P} {σ σ' Δ M M' s1 s2},
-    Ax P s1 s2 ->
+    Ax_typ P s1 s2 ->
     {{ Γ ⊢s σ : Δ }} ->
     {{ Γ ⊢s σ ≈ σ' : Δ }} ->
     {{ Γ ⊢ M ≈ M' : Sort@s1 }} ->
@@ -983,7 +983,7 @@ Proof with mautosolve 3.
 Qed.
 
 Lemma sub_eq_extend_compose_typ {P : PtsSig} : forall {Γ : ctx P} {τ Γ' σ Γ'' A s1 s2 s3 M},
-    Ax P s2 s3 ->
+    Ax_typ P s2 s3 ->
     {{ Γ' ⊢s σ : Γ'' }} ->
     {{ Γ'' ⊢ A : Sort@s1 }} ->
     {{ Γ' ⊢ M : Sort@s2 }} ->
@@ -995,7 +995,7 @@ Proof with mautosolve 3.
 Qed.
 
 Lemma sub_eq_p_extend_typ {P : PtsSig} : forall {Γ : ctx P} {σ Γ' M s1 s2},
-    Ax P s1 s2 ->
+    Ax_typ P s1 s2 ->
     {{ Γ' ⊢s σ : Γ }} ->
     {{ Γ' ⊢ M : Sort@s1 }} ->
     {{ Γ' ⊢s Wk∘(σ,,M) ≈ σ : Γ }}.
@@ -1257,7 +1257,7 @@ Proof with mautosolve 3.
 Qed.
 
 Lemma sub_q_typ {P : PtsSig} : forall {Γ : ctx P} {σ Δ s s'},
-    Ax P s s' ->
+    Ax_typ P s s' ->
     {{ Γ ⊢s σ : Δ }} ->
     {{ Γ, Sort@s@s' ⊢s q σ : Δ, Sort@s@s' }}.
 Proof with mautosolve 3.
@@ -1916,7 +1916,7 @@ Lemma wf_exp_sort_sort_all_ctx {P} : forall {Γ Δ : ctx P} {s1 s2},
     {{ Δ ⊢ Sort@s1 : Sort@s2 }}.
 Proof.
   intros.
-  assert (exists s3, Ax P s1 s3 /\ {{ Γ ⊢ Sort@s3 ⊆ Sort@s2 }}) as [s3 []] by mauto 2.
+  assert (exists s3, Ax_typ P s1 s3 /\ {{ Γ ⊢ Sort@s3 ⊆ Sort@s2 }}) as [s3 []] by mauto 2.
   assert {{ Δ ⊢ Sort@s3 ⊆ Sort@s2 }} by admit.   (** Not convinced this is provable *)
   assert {{ Δ ⊢ Sort@s1 : Sort@s3 }} by mauto 2.
   eapply wf_exp_conv; mauto 2.

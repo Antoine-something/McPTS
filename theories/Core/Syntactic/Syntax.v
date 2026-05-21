@@ -9,8 +9,8 @@ Module Cst.
   (** Sorts *)
   | st : P -> obj P
   (** Functions *)
-  | pi : forall s1 s2 s3 (r : Ru P s1 s2 s3), string -> obj P -> obj P -> obj P
-  | fn : forall s1 s2 s3 (r : Ru P s1 s2 s3), string -> obj P -> obj P -> obj P
+  | pi : forall s1 s2 s3 (r : Ru_pi P s1 s2 s3), string -> obj P -> obj P -> obj P
+  | fn : forall s1 s2 s3 (r : Ru_pi P s1 s2 s3), string -> obj P -> obj P -> obj P
   | app : obj P -> obj P -> obj P
   (** Variables *)
   | var : string -> obj P
@@ -37,8 +37,8 @@ Inductive exp (P : PtsSig) : Set :=
 (** Sorts *)
 | a_st : P -> exp P
 (** Functions *)
-| a_pi : forall (s1 s2 s3 : P), Ru P s1 s2 s3 -> exp P -> exp P -> exp P
-| a_fn : forall (s1 s2 s3 : P), Ru P s1 s2 s3 -> exp P -> exp P -> exp P
+| a_pi : forall (s1 s2 s3 : P), Ru_pi P s1 s2 s3 -> exp P -> exp P -> exp P
+| a_fn : forall (s1 s2 s3 : P), Ru_pi P s1 s2 s3 -> exp P -> exp P -> exp P
 | a_app : exp P -> exp P -> exp P
 (** Variable *)
 | a_var : nat -> exp P
@@ -110,8 +110,8 @@ Combined Scheme syntax_mut_ind from
 (** ** Syntactic Normal/Neutral Form *)
 Inductive nf (P : PtsSig) : Set :=
 | nf_st : P -> nf P
-| nf_pi : forall (s1 s2 s3 : P), Ru P s1 s2 s3 -> nf P -> nf P -> nf P
-| nf_fn : forall (s1 s2 s3 : P), Ru P s1 s2 s3 -> nf P -> nf P -> nf P
+| nf_pi : forall (s1 s2 s3 : P), Ru_pi P s1 s2 s3 -> nf P -> nf P -> nf P
+| nf_fn : forall (s1 s2 s3 : P), Ru_pi P s1 s2 s3 -> nf P -> nf P -> nf P
 | nf_nat : nf P
 | nf_zero : nf P
 | nf_succ : nf P -> nf P

@@ -704,6 +704,20 @@ Ltac invert_per_sort_elem H :=
 Ltac invert_per_sort_elems := match_by_head per_sort_elem ltac:(fun H => directed invert_per_sort_elem H).
 
 
+Lemma per_sort_elem_cumu {P} {pred_P : PredicativeSig P} : forall s1 s2 a b R,
+    Ru_sub P s1 s2 ->
+    {{ DF a ≈ b ∈ per_sort_elem pred_P s1 ↘ R }} ->
+    {{ DF a ≈ b ∈ per_sort_elem pred_P s2 ↘ R }}.
+Proof.
+  simpl.
+  induction 2 using per_sort_elem_ind; subst.
+  - per_sort_elem_econstructor; eauto.
+  - admit.
+  - per_sort_elem_econstructor; eauto.
+    admit.
+  - per_sort_elem_econstructor; eauto.
+    
+(** Lemmas for per_typ_elem and per_typ *)
 Add Parametric Morphism {P : PtsSig} {pred_P : PredicativeSig P} : (per_typ_elem pred_P)
   with signature (@relation_equivalence (domain P)) ==> eq ==> eq ==> iff as per_typ_elem_morphism_iff.
 Proof with mautosolve.
@@ -907,6 +921,8 @@ Proof.
   reflexivity.
 Qed.
 
+
+(** Lemmas for per_ctx_env and per_ctx *)
 Lemma per_ctx_env_right_irrel {P : PtsSig} {pred_P : PredicativeSig P} : forall Γ Δ Δ' R R',
     {{ DF Γ ≈ Δ ∈ per_ctx_env pred_P ↘ R }} ->
     {{ DF Γ ≈ Δ' ∈ per_ctx_env pred_P ↘ R' }} ->
