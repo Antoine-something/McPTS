@@ -389,11 +389,7 @@ Proof.
   assert {{ Γ, ℕ@s, A[q σ]@s' ⊢ MS[q (q σ)] : A[q σ][Wk∘Wk,,succ #1] }} by (eapply wf_conv; mauto 4).
   (* Final *)
   assert {{ Γ ⊢ A[σ,,M[σ]] }} by mauto 4.
-  enough {{ Γ ⊢ rec M[σ] return A[q σ] | zero -> MZ[σ] | succ -> MS[q (q σ)] end : A[q σ][Id,,M[σ]] }}.
-  {
-    eapply wf_exp_conv; mauto 2.
-    econstructor; mauto 3.
-  }
+  enough {{ Γ ⊢ rec M[σ] return A[q σ] | zero -> MZ[σ] | succ -> MS[q (q σ)] end : A[q σ][Id,,M[σ]] }} by (eapply wf_exp_conv; mauto 2).
   econstructor; mauto 2.
 Qed.
 #[local]
@@ -448,7 +444,7 @@ Qed.
 Hint Resolve presup_exp_eq_beta_succ_right : mcpts.
 
 #[local]
-Ltac gen_presup_IH presup_exp_eq presup_sub_eq H :=
+Ltac gen_presup_IH presup_exp_eq presup_sub_eq presup_subtyp presup_typ_eq H :=
   match type of H with
   | {{ ^?Γ ⊢ ^?M ≈ ^?N : ^?A }} =>
       let HΓ := fresh "HΓ" in
@@ -462,29 +458,42 @@ Ltac gen_presup_IH presup_exp_eq presup_sub_eq H :=
       let Hτ := fresh "Hτ" in
       let HΔ := fresh "HΔ" in
       pose proof presup_sub_eq _ _ _ _ _ H as [HΓ [Hσ [Hτ HΔ]]]
+  | {{ ^?Γ ⊢ ^?A ⊆ ^?B }} =>
+      let HΓ := fresh "HΓ" in
+      let HA := fresh "HA" in
+      let HB := fresh "HB" in
+      pose proof presup_subtyp _ _ _ _ H as [HΓ [HA HB]]
+  | {{ ^?Γ ⊢ ^?A ≈ ^?B }} =>
+      let HΓ := fresh "HΓ" in
+      let HA := fresh "HA" in
+      let HB := fresh "HB" in
+      pose proof presup_typ_eq _ _ _ _ H as [HΓ [HA HB]]
   end.
 
 Lemma presup_exp_eq {P : PtsSig} : forall {Γ : ctx P} {M M' A}, {{ Γ ⊢ M ≈ M' : A }} -> {{ ⊢ Γ }} /\ {{ Γ ⊢ M : A }} /\ {{ Γ ⊢ M' : A }} /\ {{ Γ ⊢ A }}
-with presup_sub_eq {P : PtsSig} : forall {Γ : ctx P} {Δ σ σ'}, {{ Γ ⊢s σ ≈ σ' : Δ }} -> {{ ⊢ Γ }} /\ {{ Γ ⊢s σ : Δ }} /\ {{ Γ ⊢s σ' : Δ }} /\ {{ ⊢ Δ }}.
+with presup_sub_eq {P : PtsSig} : forall {Γ : ctx P} {Δ σ σ'}, {{ Γ ⊢s σ ≈ σ' : Δ }} -> {{ ⊢ Γ }} /\ {{ Γ ⊢s σ : Δ }} /\ {{ Γ ⊢s σ' : Δ }} /\ {{ ⊢ Δ }}
+with presup_subtyp {P} : forall {Γ : ctx P} {A B}, {{ Γ ⊢ A ⊆ B }} -> {{ ⊢ Γ }} /\ {{ Γ ⊢ A }} /\ {{ Γ ⊢ B }}
+with presup_typ_eq {P} : forall {Γ : ctx P} {A B}, {{ Γ ⊢ A ≈ B }} -> {{ ⊢ Γ }} /\ {{ Γ ⊢ A }} /\ {{ Γ ⊢ B }}.
 Proof with mautosolve 5.
   all: inversion_clear 1;
-    (on_all_hyp: gen_presup_IH presup_exp_eq presup_sub_eq);
+    (on_all_hyp: gen_presup_IH presup_exp_eq presup_sub_eq presup_subtyp presup_typ_eq);
     gen_core_presups;
-    clear presup_exp_eq presup_sub_eq;
+    clear presup_exp_eq presup_sub_eq presup_subtyp presup_typ_eq;
     repeat split; try mautosolve 4;
     try (eexists; unshelve solve [mauto 4]; constructor).
 
   all: try (econstructor; mautosolve 4).
-  - admit.
-  - admit.
+  - assert {{ Γ ⊢ M'0[σ'] : A0[σ'] }} by mauto 3.
+    assert {{ Γ ⊢ A0[σ] ≈ A0[σ'] }} by mauto 3.
+    eapply wf_conv_unsorted; mauto 3.
+    
   - assert {{ Γ' ⊢ M0[σ] : A0[σ] }} by mauto 3.
     assert {{ Γ ⊢ M0[σ][τ] : A0[σ][τ] }} by mauto 3.
     assert {{ Γ ⊢ A0[σ∘τ] ≈ A0[σ][τ] }} by mauto 3.
     eapply wf_exp_conv; mauto 3.
     econstructor; mauto 3.
   - econstructor; mauto 3.
-    eapply wf_exp_conv; mauto 3.
-    admit.
+    eapply wf_conv; mauto 3.
   - econstructor; mauto 3.
     assert {{ Γ ⊢ A[σ0∘τ] }} by mauto 4.
     assert {{ Γ ⊢ M[τ] : A[σ0][τ] }} by mauto 3.
@@ -497,40 +506,10 @@ Proof with mautosolve 5.
     eapply wf_conv with (A := {{{ A[Wk][σ] }}}); mauto 3.
     econstructor; mauto 2.
     econstructor; mauto 3.
-    
-  (* - assert {{ Γ ⊢ succ M0 : ℕ }} by mauto 2. *)
-  (*   assert {{ Γ ⊢s Id,,succ M0 : Γ, ℕ@s }} by mauto 3. *)
-  (*   econstructor; mauto 3. *)
-  (* - econstructor; mauto 3. *)
-  (*   eapply wf_exp_conv; mauto 3. *)
-  (* - econstructor; mauto 3. *)
-  (*   assert {{ Γ ⊢ A[σ0∘τ] : Sort@s }} by mauto 3. *)
-  (*   assert {{ Γ ⊢ A[σ0][τ] : Sort@s }} by mauto 3. *)
-  (*   assert {{ Γ ⊢ A[σ0∘τ] ≈ A[σ0][τ] : Sort@s }} by mauto 3. *)
-  (*   assert {{ Γ ⊢ M[τ] : A[σ0][τ] }} by mauto 3. *)
-  (*   mauto 3. *)
-  (* - econstructor; mauto 3. *)
-  (*   assert {{ Γ0 ⊢ A : Sort@s }} by mauto 2. *)
-  (*   assert {{ Γ ⊢s Wk∘σ : Γ0 }} by mauto 3. *)
-  (*   assert {{ Γ ⊢ A[Wk∘σ] : Sort@s }} by mauto 3. *)
-  (*   eapply wf_exp_conv with (A := {{{ A[Wk][σ] }}}); mauto 3. *)
-  (*   econstructor; mauto 2. *)
-Qed.
+Qed.    
 
-Corollary presup_typ_eq {P} : forall {Γ : ctx P} {A B}, {{ Γ ⊢ A ≈ B }} -> {{ ⊢ Γ }} /\ {{ Γ ⊢ A }} /\ {{ Γ ⊢ B }}.
-Proof.
-  intros * H.
-  induction H.
-  - repeat split; mauto 2.
-  - assert ({{ ⊢ Γ }} /\ {{ Γ ⊢ A : Sort@s }} /\ {{ Γ ⊢ B : Sort@s }} /\ {{ Γ ⊢ Sort@s }}) by (eapply presup_exp_eq; mauto 2).
-    destruct_conjs.
-    repeat split; mauto 2.
-  - assert ({{ ⊢ Γ }} /\ {{ Γ ⊢ B : Sort@s }} /\ {{ Γ ⊢ C : Sort@s }} /\ {{ Γ ⊢ Sort@s }}) by (eapply presup_exp_eq; mauto 2).
-    destruct_conjs.
-    repeat split; mauto 2.
-Qed.
 
-Ltac gen_presup_IH' presup_exp_eq presup_sub_eq presup_typ_eq H :=
+Ltac gen_presup_IH' presup_exp_eq presup_sub_eq presup_subtyp presup_typ_eq H :=
   match type of H with
   | {{ ^?Γ ⊢ ^?M ≈ ^?N : ^?A }} =>
       let HΓ := fresh "HΓ" in
@@ -544,6 +523,11 @@ Ltac gen_presup_IH' presup_exp_eq presup_sub_eq presup_typ_eq H :=
       let Hτ := fresh "Hτ" in
       let HΔ := fresh "HΔ" in
       pose proof presup_sub_eq _ _ _ _ _ H as [HΓ [Hσ [Hτ HΔ]]]
+  | {{ ^?Γ ⊢ ^?A ⊆ ^?B }} =>
+      let HΓ := fresh "HΓ" in
+      let HA := fresh "HA" in
+      let HB := fresh "HB" in
+      pose proof presup_subtyp _ _ _ _ H as [HΓ [HA HB]]
   | {{ ^?Γ ⊢ ^?A ≈ ^?B }} =>
       let HΓ := fresh "HΓ" in
       let HA := fresh "HA" in
@@ -552,6 +536,6 @@ Ltac gen_presup_IH' presup_exp_eq presup_sub_eq presup_typ_eq H :=
   end.
 
 
-Ltac gen_presup H := gen_presup_IH' @presup_exp_eq @presup_sub_eq @presup_typ_eq H + gen_core_presup H.
+Ltac gen_presup H := gen_presup_IH' @presup_exp_eq @presup_sub_eq @presup_subtyp @presup_typ_eq H + gen_core_presup H.
 
 Ltac gen_presups := (on_all_hyp: fun H => gen_presup H); invert_wf_ctx; (on_all_hyp: fun H => gen_lookup_presup H); clear_dups.

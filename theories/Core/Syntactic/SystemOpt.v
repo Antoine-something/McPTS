@@ -10,60 +10,57 @@ Add Parametric Morphism {P : PtsSig} (s : P) Γ : (wf_exp Γ)
     with signature wf_exp_eq Γ {{{ Sort@s }}} ==> eq ==> iff as wf_exp_morphism_iff3.
 Proof with mautosolve.
   split; intros; gen_presups;
-    eapply wf_exp_conv; mauto 3.
+    eapply wf_conv; mauto 3.
 Qed.
 
 Add Parametric Morphism {P : PtsSig} (s : P) Γ : (wf_exp_eq Γ)
     with signature wf_exp_eq Γ {{{ Sort@s }}} ==> eq ==> eq ==> iff as wf_exp_eq_morphism_iff3.
 Proof with mautosolve.
   split; intros; gen_presups;
-    eapply wf_exp_eq_conv; mauto 3.
+    eapply wf_eq_conv; mauto 3.
 Qed.
-
-Corollary wf_exp_conv_typ {P} : forall {Γ : ctx P} {A B M},
-    {{ Γ ⊢ M : A }} ->
-    {{ Γ ⊢ A ≈ B }} ->
-    {{ Γ ⊢ M : B }}.
-Proof.
-  induction 2; subst; gen_presups; mauto 2.
-  assert {{ Γ ⊢ M : B }} by mauto 2.
-  mauto 3.
-Qed.
-
-Corollary wf_exp_eq_conv_typ {P} : forall {Γ : ctx P} {A B M M'},
-    {{ Γ ⊢ M ≈ M' : A }} ->
-    {{ Γ ⊢ A ≈ B }} ->
-    {{ Γ ⊢ M ≈ M' : B }}.
-Proof.
-  induction 2; subst; gen_presups; mauto 2.
-  assert {{ Γ ⊢ M ≈ M' : B }} by mauto 2.
-  mauto 3.
-Qed.
-
-#[export]
-Hint Resolve wf_exp_conv_typ wf_exp_eq_conv_typ : mcpts.
-
-
-Add Parametric Morphism {P} Γ : (@wf_exp P Γ)
-  with signature wf_typ_eq Γ ==> eq ==> iff as wf_exp_morphism_iff3_typ.
-Proof with mautosolve.
-  split; intros; gen_presups;
-  eapply wf_exp_conv_typ; mauto 3.
-Qed.
-
-Add Parametric Morphism {P} Γ : (@wf_exp_eq P Γ)
-    with signature wf_typ_eq Γ ==> eq ==> eq ==> iff as wf_exp_eq_morphism_iff3_typ.
-Proof with mautosolve.
-  split; intros; gen_presups;
-    eapply wf_exp_eq_conv_typ; mauto 3.
-Qed.
-
 
 #[local]
 Ltac impl_opt_constructor :=
   intros;
   gen_presups;
   mautosolve 4.
+
+
+Corollary wf_exp_conv' {P} : forall {Γ : ctx P} {A B M},
+    {{ Γ ⊢ M : A }} ->
+    {{ Γ ⊢ A ⊆ B }} ->
+    {{ Γ ⊢ M : B }}.
+Proof.
+  impl_opt_constructor.
+Qed.
+
+Corollary wf_exp_eq_conv' {P} : forall {Γ : ctx P} {A B M M'},
+    {{ Γ ⊢ M ≈ M' : A }} ->
+    {{ Γ ⊢ A ≈ B }} ->
+    {{ Γ ⊢ M ≈ M' : B }}.
+Proof.
+  impl_opt_constructor.
+Qed.
+
+#[export]
+Hint Resolve wf_exp_conv' wf_exp_eq_conv' : mcpts.
+#[export]
+Remove Hints wf_exp_conv wf_exp_eq_conv : mcpts.
+
+Add Parametric Morphism {P} Γ : (@wf_exp P Γ)
+  with signature wf_typ_eq Γ ==> eq ==> iff as wf_exp_morphism_iff3_typ.
+Proof with mautosolve.
+  split; intros; gen_presups;
+  eapply wf_exp_conv'; mauto 3.
+Qed.
+
+Add Parametric Morphism {P} Γ : (@wf_exp_eq P Γ)
+    with signature wf_typ_eq Γ ==> eq ==> eq ==> iff as wf_exp_eq_morphism_iff3_typ.
+Proof with mautosolve.
+  split; intros; gen_presups;
+    eapply wf_exp_eq_conv'; mauto 3.
+Qed.
 
 
 Corollary wf_vlookup' {P} : forall {Γ : ctx P} {x A s},
@@ -93,9 +90,9 @@ Qed.
 #[export]
 Hint Resolve wf_conv' : mcpts.
 #[export]
-Remove Hints wf_exp_conv : mcpts.
+Remove Hints wf_conv : mcpts.
 
-Corollary wf_exp_eq_conv' {P : PtsSig} : forall (Γ : ctx P) M M' A A' s,
+Corollary eq_conv' {P : PtsSig} : forall (Γ : ctx P) M M' A A' s,
    {{ Γ ⊢ M ≈ M' : A }} ->
    {{ Γ ⊢ A ≈ A' : Sort@s }} ->
    {{ Γ ⊢ M ≈ M' : A' }}.
@@ -104,10 +101,30 @@ Proof.
 Qed.
 
 #[export]
-Hint Resolve wf_exp_eq_conv' : mcpts.
+Hint Resolve eq_conv' : mcpts.
 #[export]
-Remove Hints wf_exp_eq_conv : mcpts.
+Remove Hints wf_eq_conv : mcpts.
 
+Corollary wf_conv_typ {P} : forall {Γ : ctx P} {M A A'},
+    {{ Γ ⊢ M : A }} ->
+    {{ Γ ⊢ A ≈ A' }} ->
+    {{ Γ ⊢ M : A' }}.
+Proof.
+  impl_opt_constructor.
+Qed.
+
+Corollary eq_conv_typ {P} : forall {Γ : ctx P} {M M' A A'},
+    {{ Γ ⊢ M ≈ M' : A }} ->
+    {{ Γ ⊢ A ≈ A' }} ->
+    {{ Γ ⊢ M ≈ M' : A' }}.
+Proof.
+  impl_opt_constructor.
+Qed.
+
+#[export]
+Hint Resolve wf_conv_typ eq_conv_typ : mcpts.
+#[export]
+Remove Hints wf_conv_unsorted wf_eq_conv_unsorted : mcpts. 
 
 Corollary wf_ctx_eq_extend' {P : PtsSig} : forall {Γ : ctx P} {Δ A A' s},
     {{ ⊢ Γ ≈ Δ }} ->
@@ -158,7 +175,7 @@ Proof.
   intros.
   gen_presups.
   inversion_clear HAwf0.
-  assert ({{ Γ ⊢ A : Sort@s1 }} /\ {{ Γ, A@s1 ⊢ B : Sort@s2 }} /\ {{ Γ ⊢ Sort@s3 ≈ Sort@s }}) as [] by (eapply wf_pi_inversion; mauto 2).
+  assert ({{ Γ ⊢ A : Sort@s1 }} /\ {{ Γ, A@s1 ⊢ B : Sort@s2 }} /\ {{ Γ ⊢ Sort@s3 ⊆ Sort@s }}) as [] by (eapply wf_pi_inversion; mauto 2).
   destruct_conjs.
   econstructor; mauto 2.
 Qed.
@@ -169,12 +186,12 @@ Hint Resolve wf_app' : mcpts.
 Remove Hints wf_app : mcpts.
 
 Lemma wf_exp_eq_sort_sub' {P : PtsSig} : forall (Γ : ctx P) σ Δ s s',
-    Ax P s s' ->
+    {{ Δ ⊢ Sort@s : Sort@s' }} ->
+    {{ Γ ⊢ Sort@s : Sort@s' }} ->
     {{ Γ ⊢s σ : Δ }} ->
     {{ Γ ⊢ Sort@s[σ] ≈ Sort@s : Sort@s' }}.
 Proof.
-  intros.
-  econstructor; mauto 2.
+  impl_opt_constructor.
 Qed.
 
 #[export]
@@ -182,13 +199,11 @@ Hint Resolve wf_exp_eq_sort_sub' : mcpts.
 #[export]
 Hint Rewrite -> @wf_exp_eq_sort_sub' using solve [lia | mauto 3] : mcpts.
 
-Lemma wf_typ_eq_sort_sub' {P} : forall (Γ : ctx P) σ Δ s s',
-    Ax P s s' ->
+Lemma wf_typ_eq_sort_sub' {P} : forall (Γ : ctx P) σ Δ s,
     {{ Γ ⊢s σ : Δ }} ->
     {{ Γ ⊢ Sort@s[σ] ≈ Sort@s }}.
 Proof.
-  intros.
-  econstructor; mauto 2.
+  impl_opt_constructor.
 Qed.
 
 #[export]
@@ -382,3 +397,31 @@ Qed.
 Hint Resolve wf_exp_eq_nat_beta_succ' : mcpts.
 #[export]
 Remove Hints wf_exp_eq_nat_beta_succ : mcpts.
+
+(** Optimized constructors for wf_subtyp *)
+Corollary wf_subtyp_refl' {P} : forall {Γ : ctx P} {A B},
+    {{ Γ ⊢ A ≈ B }} ->
+    {{ Γ ⊢ A ⊆ B }}.
+Proof.
+  impl_opt_constructor.
+Qed.
+
+#[export]
+Hint Resolve wf_subtyp_refl' : mcpts.
+#[export]
+Remove Hints wf_subtyp_refl : mcpts.
+
+Corollary wf_subtyp_pi' {P} : forall {Γ : ctx P} {A A' B B' s1 s2 s3} {r : Ru P s1 s2 s3},
+    {{ Γ ⊢ A ≈ A' : Sort@s1 }} ->
+    {{ Γ, A@s1 ⊢ B : Sort@s2 }} ->
+        {{ Γ, A'@s1 ⊢ B' : Sort@s2 }} ->
+        {{ Γ, A'@s1 ⊢ B ⊆ B' }} ->
+        {{ Γ ⊢ Π r A B ⊆ Π r A' B' }}.
+Proof.
+  impl_opt_constructor.
+Qed.
+
+#[export]
+Hint Resolve wf_subtyp_pi' : mcpts.
+#[export]
+Remove Hints wf_subtyp_pi : mcpts.
