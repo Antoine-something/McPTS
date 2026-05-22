@@ -417,7 +417,7 @@ Ltac per_sort_elem_right_irrel_assert1 :=
 #[local]
 Ltac per_sort_elem_right_irrel_assert := repeat per_sort_elem_right_irrel_assert1.
 
-Lemma per_sort_elem_pi_econstructor {P} {pred_P : PredicativeSig P} : forall {s_in s_out s a ρ B a' ρ' B'} (r : Ru_pi P s_in s_out s) {in_rel} (out_rel : forall {n n'}, {{ Dom n ≈ n' ∈ in_rel }} -> relation (domain P)) {elem_rel} (equiv_a_a' : {{ DF a ≈ a' ∈ per_sort_elem pred_P s_in ↘ in_rel }}),
+Lemma per_sort_elem_pi_econstructor {P} {pred_P : PredicativeSig P} : forall {s_in s_out s_pi s a ρ B a' ρ' B'} (r : Ru_pi P s_in s_out s_pi) (sub : st_subtyp s_pi s) {in_rel} (out_rel : forall {n n'}, {{ Dom n ≈ n' ∈ in_rel }} -> relation (domain P)) {elem_rel} (equiv_a_a' : {{ DF a ≈ a' ∈ per_sort_elem pred_P s_in ↘ in_rel }}),
     PER in_rel ->
     (forall {n n'} (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}),
         rel_mod_eval (per_sort_elem pred_P s_out) B d{{{ ρ ↦ n }}} B' d{{{ ρ' ↦ n' }}} (out_rel equiv_n_n')) ->
@@ -425,8 +425,8 @@ Lemma per_sort_elem_pi_econstructor {P} {pred_P : PredicativeSig P} : forall {s_
     {{ DF Π r a ρ B ≈ Π r a' ρ' B' ∈ per_sort_elem pred_P s ↘ elem_rel }}.
 Proof.
   intros.
-  rewrite <- (per_sort_elem_pi_arg_helper r) in equiv_a_a'.
-  rewrite <- (per_sort_elem_pi_ret_helper _ r) in H0.
+  rewrite <- (per_sort_elem_pi_arg_helper r sub) in equiv_a_a'.
+  rewrite <- (per_sort_elem_pi_ret_helper _ r sub) in H0.
   basic_per_sort_elem_econstructor; eauto.
 Qed.
 
@@ -582,17 +582,28 @@ Proof with (per_sort_elem_econstructor'; mautosolve 4).
     intuition.
   - (* pi case *)
     destruct_conjs.
+    pose proof (ord_ru_pi_sub pred_P r sub0) as [ord_dom ord_im].
+    assert (per_sort_elem pred_P s_in in_rel0 a' a'0) by (destruct ord_dom; subst; mauto 2).
     per_sort_elem_econstructor'; eauto.
     + handle_per_sort_elem_irrel.
       intuition.
     + intros.
+      pose proof (H4 n n' equiv_n_n').
+      inversion_clear H11.
+      destruct_conjs.
+      assert (per_sort_elem pred_P s_out (out_rel0 n n' equiv_n_n') a0 a'1) by (destruct ord_im; subst; mauto 2).
       handle_per_sort_elem_irrel.
       assert (in_rel n n') by firstorder.
       assert (in_rel n n) by intuition.
       assert (in_rel0 n n') by intuition.
-      destruct_rel_mod_eval.
+      pose proof (H1 n n' H0).
+      inversion_clear H18.
+      pose proof (H1 n n H5).
+      inversion_clear H18.
+      destruct_conjs.
       functional_eval_rewrite_clear.
-      handle_per_sort_elem_irrel...
+      handle_per_sort_elem_irrel.
+      econstructor; mauto 2.
   - (* fun case *)
     intros.
     assert (in_rel n n) by intuition.
@@ -662,7 +673,7 @@ Qed.
 
 (** These lemmas get rid of the unnecessary PER premises. *)
 Lemma per_sort_elem_pi' {P : PtsSig} {pred_P : PredicativeSig P} :
-  forall s_in s_out s (r : Ru_pi P s_in s_out s) a a' ρ B ρ' B'
+  forall s_in s_out s_pi s (r : Ru_pi P s_in s_out s_pi) (sub : st_subtyp s_pi s) a a' ρ B ρ' B'
     (in_rel : relation (domain P))
     (out_rel : forall {c c'} (equiv_c_c' : {{ Dom c ≈ c' ∈ in_rel }}), relation (domain P))
     elem_rel,
@@ -683,7 +694,7 @@ Ltac per_sort_elem_econstructor :=
 #[export]
 Hint Resolve per_sort_elem_pi' : mcpts.
 
-Lemma per_sort_elem_pi_clean_inversion {P : PtsSig} {pred_P : PredicativeSig P} : forall {s_in s_out s} {r : Ru_pi P s_in s_out s} {a a' in_rel ρ ρ' B B' elem_rel},
+Lemma per_sort_elem_pi_clean_inversion {P : PtsSig} {pred_P : PredicativeSig P} : forall {s_in s_out s_pi s} {r : Ru_pi P s_in s_out s_pi} {sub : st_subtyp s_pi s} {a a' in_rel ρ ρ' B B' elem_rel},
     {{ DF a ≈ a' ∈ per_sort_elem pred_P s_in ↘ in_rel }} ->
     {{ DF Π r a ρ B ≈ Π r a' ρ' B' ∈ per_sort_elem pred_P s ↘ elem_rel }} ->
     exists (out_rel : forall {n n'} (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}), relation (domain P)),
@@ -691,7 +702,7 @@ Lemma per_sort_elem_pi_clean_inversion {P : PtsSig} {pred_P : PredicativeSig P} 
           rel_mod_eval (per_sort_elem pred_P s_out) B d{{{ ρ ↦ n }}} B' d{{{ ρ' ↦ n' }}} (out_rel equiv_n_n')) /\
         (elem_rel <~> fun f f' => forall n n' (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}), rel_mod_app f n f' n' (out_rel equiv_n_n')).
 Proof.
-  intros * Ha HΠ.
+  intros * sub * Ha HΠ.
   (unshelve eapply per_sort_elem_pi_left_inversion in HΠ; shelve_unifiable; deex_in HΠ; destruct HΠ as [_ [Heq [? []]]]; inversion Heq; subst).
   rename a'0 into a'.
   rename ρ'0 into ρ'.
@@ -736,13 +747,198 @@ Lemma per_sort_elem_cumu {P} {pred_P : PredicativeSig P} : forall s1 s2 a b R,
 Proof.
   simpl.
   induction 2 using per_sort_elem_ind; subst.
+  - eapply per_sort_elem_core_sort'; eauto.
+    transitivity s_elem; eauto.
   - per_sort_elem_econstructor; eauto.    
-  - admit.
+    + transitivity s_elem; eauto.
+    + intros.
+      destruct_rel_mod_eval.
+      econstructor; eauto.
   - per_sort_elem_econstructor; eauto.
     transitivity s_elem; mauto 2.
   - per_sort_elem_econstructor; eauto.
+Qed.
 
+#[export]
+Hint Resolve per_sort_elem_cumu : mcpts.
+ 
+Lemma per_subtyp_to_sort_elem {P} {pred_P : PredicativeSig P} : forall a b s,
+    {{ ⟪ pred_P ⟫ Subs a <: b at s }} ->
+    exists R R',
+      {{ DF a ≈ a ∈ per_sort_elem pred_P s ↘ R }} /\
+        {{ DF b ≈ b ∈ per_sort_elem pred_P s ↘ R' }}.
+Proof.
+  destruct 1;
+    match_by_head @per_sort ltac:(fun H => destruct H);
+    repeat eexists; mauto 2;
+    per_sort_elem_econstructor; try reflexivity;
+    etransitivity; try eassumption; symmetry; eassumption.
+Qed.
+
+
+Lemma per_elem_subtyping {P} {pred_P : PredicativeSig P} : forall A B s,
+    {{ ⟪ pred_P ⟫ Subs A <: B at s }} ->
+    forall R R' a b,
+      {{ DF A ≈ A ∈ per_sort_elem pred_P s ↘ R }} ->
+      {{ DF B ≈ B ∈ per_sort_elem pred_P s ↘ R' }} ->
+      R a b ->
+      R' a b.
+Proof.  
+  induction 1; intros;
+    match_by_head (@per_sort) ltac:(fun H => destruct H);
+    handle_per_sort_elem_irrel;
+    saturate_refl;
+    (on_all_hyp: fun H => directed invert_per_sort_elem H);
+    handle_per_sort_elem_irrel;
+    clear_refl_eqs;
+    trivial.
+  - unfold per_sort_rec in *.    
+    firstorder mauto.
+      
+  - intros.
+    destruct_conjs.
+    pose proof (ord_ru_pi_sub pred_P r sub1) as [ord_dom ord_im].
+    assert (per_sort_elem pred_P s1 in_rel1 a' a') by (destruct ord_dom; subst; mauto 2).
+    assert (per_sort_elem pred_P s1 in_rel0 a a) by (destruct ord_dom; subst; mauto 2).
+    handle_per_sort_elem_irrel.
+    assert (in_rel0 n n') as equiv0_n_n' by (apply_relation_equivalence; mauto 2).
+    clear ord_dom ord_im.
+    destruct_rel_mod_eval.
+    pose proof (ord_ru_pi_sub pred_P r sub1) as [ord_dom ord_im].
+    assert (per_sort_elem pred_P s2 (out_rel0 n n' equiv_n_n') a1 a'0) by (destruct ord_im; subst; mauto 2).
+    assert (per_sort_elem pred_P s2 (out_rel n n' equiv0_n_n') a2 a'1) by (destruct ord_im; subst; mauto 2).
+    saturate_refl_for (@per_sort_elem P).
+    clear ord_dom ord_im.
+    handle_per_sort_elem_irrel.    
+    destruct_rel_mod_app.
+    simplify_evals.
+    econstructor; intuition.
+Qed.
+
+
+Lemma per_elem_subtyping_gen {P} {pred_P : PredicativeSig P} : forall a b s a' b' R R' m n,
+    {{ ⟪ pred_P ⟫ Subs a <: b at s }} ->
+    {{ DF a ≈ a' ∈ per_sort_elem pred_P s ↘ R }} ->
+    {{ DF b ≈ b' ∈ per_sort_elem pred_P s ↘ R' }} ->
+    R m n ->
+    R' m n.
+Proof.
+  intros.
+  eapply per_elem_subtyping; saturate_refl; try eassumption.
+Qed.
+
+Lemma per_subtyp_refl1 {P} {pred_P : PredicativeSig P} : forall a b s R,
+    {{ DF a ≈ b ∈ per_sort_elem pred_P s ↘ R }} ->
+    {{ ⟪ pred_P ⟫ Subs a <: b at s }}.
+Proof.
+  simpl; induction 1 using per_sort_elem_ind;
+    subst;
+    mauto;
+    destruct_all.
+  - assert (st_subtyp s1' s1') by econstructor.
+    econstructor; mauto 4.    
     
+  - assert ({{ DF Π r a ρ B ≈ Π r a' ρ' B' ∈ per_sort_elem pred_P s_elem ↘ elem_rel }})
+      by (per_sort_elem_econstructor; intuition; destruct_rel_mod_eval; mauto).
+    saturate_refl_for (@per_sort_elem P).
+    econstructor; eauto.
+    intros;
+      destruct_rel_mod_eval;
+      functional_eval_rewrite_clear;
+      trivial.
+  - econstructor; mauto 3.
+    eexists.
+    per_sort_elem_econstructor; eauto.
+Qed.
+
+#[export]
+Hint Resolve per_subtyp_refl1 : mcpts.
+
+Lemma per_subtyp_refl2 {P} {pred_P : PredicativeSig P} : forall a b s R,
+    {{ DF a ≈ b ∈ per_sort_elem pred_P s ↘ R }} ->
+    {{ ⟪ pred_P ⟫ Subs b <: a at s }}.
+Proof.
+  intros.
+  symmetry in H.
+  eauto using per_subtyp_refl1.
+Qed.
+
+#[export]
+Hint Resolve per_subtyp_refl2 : mcpts.
+
+Lemma per_subtyp_trans {P} {pred_P : PredicativeSig P} : forall a1 a2 s,
+    {{ ⟪ pred_P ⟫ Subs a1 <: a2 at s }} ->
+    forall a3,
+      {{ ⟪ pred_P ⟫ Subs a2 <: a3 at s }} ->
+      {{ ⟪ pred_P ⟫ Subs a1 <: a3 at s }}.
+Proof.
+  induction 1; intros ? Hsub; simpl in *.
+  (* Universe, nat and neutral cases *)
+  1,2,4: progressive_inversion; mauto.
+  - econstructor; mauto 2.
+    transitivity s2; mauto 2.
+  - dependent destruction Hsub; subst.
+    handle_per_sort_elem_irrel.
+    econstructor; eauto.
+    + etransitivity; eassumption.
+    + intros.
+      saturate_refl_for (@per_sort_elem P).
+      saturate_refl_for in_rel0.
+      (on_all_hyp: fun H => directed invert_per_sort_elem H).
+      destruct_conjs.
+      assert (per_sort_elem pred_P s1 in_rel1 a' a').
+      {
+        pose proof (ord_ru_pi_sub pred_P r sub) as [ord_dom ord_im].
+        destruct ord_dom; subst; mauto 2.
+      }
+      assert (per_sort_elem pred_P s1 in_rel2 a'0 a'0).
+      {
+        pose proof (ord_ru_pi_sub pred_P r sub) as [ord_dom ord_im].
+        destruct ord_dom; subst; mauto 2.
+      }
+      handle_per_sort_elem_irrel.
+      destruct_rel_mod_eval.
+      handle_per_sort_elem_irrel.
+      assert (per_sort_elem pred_P s2 (out_rel1 c' c' H19) b' b').
+      {
+        pose proof (ord_ru_pi_sub pred_P r sub2) as [ord_dom ord_im].
+        destruct ord_im; subst; mauto 2.
+      }
+      assert (per_sort_elem pred_P s2 (out_rel1 c c' H13) a1 b').
+      {
+        pose proof (ord_ru_pi_sub pred_P r sub2) as [ord_dom ord_im].
+        destruct ord_im; subst; mauto 2.
+      }
+      assert (per_sort_elem pred_P s2 (out_rel1 c c H18) a1 a1).
+      {
+        pose proof (ord_ru_pi_sub pred_P r sub2) as [ord_dom ord_im].
+        destruct ord_im; subst; mauto 2.
+      }
+      handle_per_sort_elem_irrel.      
+      saturate_refl_for in_rel1.
+      destruct_rel_mod_eval.
+      intuition.
+Qed.
+
+#[export]
+Hint Resolve per_subtyp_trans : mctt.
+
+#[export]
+Instance per_subtyp_trans_ins i : Transitive (per_subtyp i).
+Proof.
+  eauto using per_subtyp_trans.
+Qed.
+
+Lemma per_subtyp_transp : forall a b i a' b' R R',
+    {{ Sub a <: b at i }} ->
+    {{ DF a ≈ a' ∈ per_univ_elem i ↘ R }} ->
+    {{ DF b ≈ b' ∈ per_univ_elem i ↘ R' }} ->
+    {{ Sub a' <: b' at i }}.
+Proof.
+  mauto using per_subtyp_refl1, per_subtyp_refl2.
+Qed.
+
+
 (** Lemmas for per_typ_elem and per_typ *)
 Add Parametric Morphism {P : PtsSig} {pred_P : PredicativeSig P} : (per_typ_elem pred_P)
   with signature (@relation_equivalence (domain P)) ==> eq ==> eq ==> iff as per_typ_elem_morphism_iff.

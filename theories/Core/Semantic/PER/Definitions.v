@@ -100,7 +100,8 @@ Section Per_sort_elem_core_def.
   (** Defines 'a = b ∈ Sort_s ↘ R' in the paper *)
   Inductive per_sort_elem_core : relation dom -> dom -> dom -> Prop :=
   | per_sort_elem_core_sort :
-    `{ forall (ax : Ax_typ P s1 s2)
+    `{ forall (s2 : P)
+         (ax : Ax_typ P s1 s2)
          (sub : st_subtyp s2 s_elem)
          (elem_rel : relation dom),
           s1 = s1' ->
@@ -170,7 +171,7 @@ Section Per_sort_elem_core_def.
   #[derive(equations=no, eliminator=no)]
   Equations per_sort_elem_core_strong_ind R a b (H : {{ DF a ≈ b ∈ per_sort_elem_core ↘ R }})
     : {{ DF a ≈ b ∈ motive ↘ R }} :=
-  | R, a, b, (per_sort_elem_core_sort ax sub _ HE eq) => case_sort ax sub HE eq;
+  | R, a, b, (per_sort_elem_core_sort s2 ax sub _ HE eq) => case_sort ax sub HE eq;
   | R, a, b, (per_sort_elem_core_pi r sub _ out_rel _ equiv_a_a' per HT HE) =>
       case_Pi r sub out_rel
         (let 'conj HA _ := equiv_a_a' in
@@ -321,7 +322,8 @@ Reserved Notation "⟪ pred_P ⟫ 'Sub' a <: b" (in custom judg at level 90, pre
 
 Inductive per_subtyp_sorted `(pred_P : PredicativeSig P) : P -> domain P -> domain P -> Prop :=
 | per_subtyp_sorted_sort :
-  `( {{ Dom Sort@s1 ≈ Sort@s1 ∈ per_sort pred_P s }} ->
+  `( st_subtyp s1 s2 ->
+     {{ Dom Sort@s1 ≈ Sort@s1 ∈ per_sort pred_P s }} ->
      {{ Dom Sort@s2 ≈ Sort@s2 ∈ per_sort pred_P s }} ->
      {{ ⟪ pred_P ⟫ Subs Sort@s1 <: Sort@s2 at s }} )
 | per_subtyp_sorted_nat :
@@ -329,16 +331,17 @@ Inductive per_subtyp_sorted `(pred_P : PredicativeSig P) : P -> domain P -> doma
      {{ ⟪ pred_P ⟫ Subs ℕ <: ℕ at s }} )
 | per_subtyp_sorted_pi :
   `( forall {r : Ru_pi P s1 s2 s3}
+       {sub : st_subtyp s3 s}
        (in_rel : relation (domain P)) elem_rel elem_rel',
-        {{ DF a ≈ a' ∈ per_sort_elem pred_P s ↘ R }} ->
+        {{ DF a ≈ a' ∈ per_sort_elem pred_P s1 ↘ in_rel }} ->
         (forall c c' b b',
             {{ Dom c ≈ c' ∈ in_rel }} ->
             {{ ⟦ B ⟧ (ρ ↦ c) ↘ b }} ->
             {{ ⟦ B' ⟧ (ρ' ↦ c') ↘ b' }} ->
             {{ ⟪ pred_P ⟫ Subs b <: b' at s2 }}) ->
-        {{ DF Π r a ρ B ≈ Π r a ρ B ∈ per_sort_elem pred_P s3 ↘ elem_rel }} ->
-        {{ DF Π r a' ρ' B' ≈ Π r a' ρ' B' ∈ per_sort_elem pred_P s3 ↘ elem_rel' }} ->
-        {{ ⟪ pred_P ⟫ Subs Π r a ρ B <: Π r a' ρ' B' at s3 }})
+        {{ DF Π r a ρ B ≈ Π r a ρ B ∈ per_sort_elem pred_P s ↘ elem_rel }} ->
+        {{ DF Π r a' ρ' B' ≈ Π r a' ρ' B' ∈ per_sort_elem pred_P s ↘ elem_rel' }} ->
+        {{ ⟪ pred_P ⟫ Subs Π r a ρ B <: Π r a' ρ' B' at s }})
 | per_subtyp_sorted_neut :
   `( {{ Dom e ≈ e' ∈ per_bot }} ->
      {{ ⟪ pred_P ⟫ Subs ⇑ a e <: ⇑ a' e' at s }} )
