@@ -169,7 +169,7 @@ Hint Resolve wf_subtyp_subst_eq wf_subtyp_subst : mctt.
 
 
 Lemma exp_typ_sub_lhs {P : PtsSig} : forall {Γ σ Δ s1 s2},
-    Ax P s1 s2 ->
+    Ax_typ P s1 s2 ->
     {{ Γ ⊢s σ : Δ }} ->
     {{ Γ ⊢ Sort@s1[σ] : Sort@s2 }}.
 Proof.
@@ -403,7 +403,7 @@ Qed.
 #[export]
 Hint Resolve exp_eq_sub_cong_typ2_sorted : mcpts.
 
-Lemma exp_pi_sub_lhs {P : PtsSig} : forall {Γ : ctx P} {σ Δ A B s1 s2 s3} {r : Ru P s1 s2 s3},
+Lemma exp_pi_sub_lhs {P : PtsSig} : forall {Γ : ctx P} {σ Δ A B s1 s2 s3} {r : Ru_pi P s1 s2 s3},
     {{ Γ ⊢s σ : Δ }} ->
     {{ Δ ⊢ A : Sort@s1 }} ->
     {{ Δ, A@s1 ⊢ B : Sort@s2 }} ->
@@ -416,7 +416,7 @@ Qed.
 #[export]
 Hint Resolve exp_pi_sub_lhs : mcpts.
 
-Lemma exp_pi_sub_rhs {P : PtsSig} : forall {Γ : ctx P} {σ Δ A B s1 s2 s3} {r : Ru P s1 s2 s3},
+Lemma exp_pi_sub_rhs {P : PtsSig} : forall {Γ : ctx P} {σ Δ A B s1 s2 s3} {r : Ru_pi P s1 s2 s3},
     {{ Γ ⊢s σ : Δ }} ->
     {{ Δ ⊢ A : Sort@s1 }} ->
     {{ Δ, A@s1 ⊢ B : Sort@s2 }} ->
@@ -429,7 +429,7 @@ Qed.
 #[export]
 Hint Resolve exp_pi_sub_rhs : mcpts.
 
-Lemma exp_pi_eta_rhs_body {P : PtsSig} : forall {Γ : ctx P} {A B M s1 s2 s3} {r : Ru P s1 s2 s3},
+Lemma exp_pi_eta_rhs_body {P : PtsSig} : forall {Γ : ctx P} {A B M s1 s2 s3} {r : Ru_pi P s1 s2 s3},
     {{ Γ ⊢ M : Π r A B }} ->
     {{ Γ, A@s1 ⊢ M[Wk] #0 : B }}.
 Proof.
