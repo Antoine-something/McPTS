@@ -762,7 +762,7 @@ Qed.
 #[export]
 Hint Resolve per_sort_elem_cumu : mcpts.
  
-Lemma per_subtyp_to_sort_elem {P} {pred_P : PredicativeSig P} : forall a b s,
+Lemma per_subtyp_sorted_to_sort_elem {P} {pred_P : PredicativeSig P} : forall a b s,
     {{ ⟪ pred_P ⟫ Subs a <: b at s }} ->
     exists R R',
       {{ DF a ≈ a ∈ per_sort_elem pred_P s ↘ R }} /\
@@ -776,7 +776,7 @@ Proof.
 Qed.
 
 
-Lemma per_elem_subtyping {P} {pred_P : PredicativeSig P} : forall A B s,
+Lemma per_elem_subtyping_sorted {P} {pred_P : PredicativeSig P} : forall A B s,
     {{ ⟪ pred_P ⟫ Subs A <: B at s }} ->
     forall R R' a b,
       {{ DF A ≈ A ∈ per_sort_elem pred_P s ↘ R }} ->
@@ -816,7 +816,7 @@ Proof.
 Qed.
 
 
-Lemma per_elem_subtyping_gen {P} {pred_P : PredicativeSig P} : forall a b s a' b' R R' m n,
+Lemma per_elem_subtyping_sorted_gen {P} {pred_P : PredicativeSig P} : forall a b s a' b' R R' m n,
     {{ ⟪ pred_P ⟫ Subs a <: b at s }} ->
     {{ DF a ≈ a' ∈ per_sort_elem pred_P s ↘ R }} ->
     {{ DF b ≈ b' ∈ per_sort_elem pred_P s ↘ R' }} ->
@@ -824,10 +824,10 @@ Lemma per_elem_subtyping_gen {P} {pred_P : PredicativeSig P} : forall a b s a' b
     R' m n.
 Proof.
   intros.
-  eapply per_elem_subtyping; saturate_refl; try eassumption.
+  eapply per_elem_subtyping_sorted; saturate_refl; try eassumption.
 Qed.
 
-Lemma per_subtyp_refl1 {P} {pred_P : PredicativeSig P} : forall a b s R,
+Lemma per_subtyp_sorted_refl1 {P} {pred_P : PredicativeSig P} : forall a b s R,
     {{ DF a ≈ b ∈ per_sort_elem pred_P s ↘ R }} ->
     {{ ⟪ pred_P ⟫ Subs a <: b at s }}.
 Proof.
@@ -852,21 +852,21 @@ Proof.
 Qed.
 
 #[export]
-Hint Resolve per_subtyp_refl1 : mcpts.
+Hint Resolve per_subtyp_sorted_refl1 : mcpts.
 
-Lemma per_subtyp_refl2 {P} {pred_P : PredicativeSig P} : forall a b s R,
+Lemma per_subtyp_sorted_refl2 {P} {pred_P : PredicativeSig P} : forall a b s R,
     {{ DF a ≈ b ∈ per_sort_elem pred_P s ↘ R }} ->
     {{ ⟪ pred_P ⟫ Subs b <: a at s }}.
 Proof.
   intros.
   symmetry in H.
-  eauto using per_subtyp_refl1.
+  eauto using per_subtyp_sorted_refl1.
 Qed.
 
 #[export]
-Hint Resolve per_subtyp_refl2 : mcpts.
+Hint Resolve per_subtyp_sorted_refl2 : mcpts.
 
-Lemma per_subtyp_trans {P} {pred_P : PredicativeSig P} : forall a1 a2 s,
+Lemma per_subtyp_sorted_trans {P} {pred_P : PredicativeSig P} : forall a1 a2 s,
     {{ ⟪ pred_P ⟫ Subs a1 <: a2 at s }} ->
     forall a3,
       {{ ⟪ pred_P ⟫ Subs a2 <: a3 at s }} ->
@@ -882,10 +882,16 @@ Proof.
     econstructor; eauto.
     + etransitivity; eassumption.
     + intros.
+      (* (on_all_hyp: fun H => directed invert_per_sort_elem H).       *)
       saturate_refl_for (@per_sort_elem P).
       saturate_refl_for in_rel0.
       (on_all_hyp: fun H => directed invert_per_sort_elem H).
       destruct_conjs.
+      assert (per_sort_elem pred_P s1 in_rel a a).
+      {
+        pose proof (ord_ru_pi_sub pred_P r sub) as [ord_dom ord_im].
+        destruct ord_dom; subst; mauto 2.
+      }
       assert (per_sort_elem pred_P s1 in_rel1 a' a').
       {
         pose proof (ord_ru_pi_sub pred_P r sub) as [ord_dom ord_im].
@@ -914,32 +920,65 @@ Proof.
         pose proof (ord_ru_pi_sub pred_P r sub2) as [ord_dom ord_im].
         destruct ord_im; subst; mauto 2.
       }
-      handle_per_sort_elem_irrel.      
+      handle_per_sort_elem_irrel.
+      assert (in_rel c c') by (apply_relation_equivalence; eassumption).
+      assert (in_rel1 c c') by (apply_relation_equivalence; eassumption).
+      assert (PER in_rel).
+      {
+        split.
+        - intros x y Hxy.
+          eapply H29 in Hxy.
+          eapply H29.
+          symmetry.
+          eassumption.
+        - intros x y z Hxy Hyz.
+          eapply H29.
+          eapply H29 in Hxy.
+          eapply H29 in Hyz.
+          transitivity y; eassumption.
+      }
+      saturate_refl_for in_rel.
       saturate_refl_for in_rel1.
-      saturate_refl_for in_rel2.
       destruct_rel_mod_eval.
       simplify_evals.
-      eapply H6; mauto 2.
-      intuition.
+      
+      assert {{ ⟪ pred_P ⟫ Subs b <: a5 at s2 }} by (eapply (H0 c c); mauto 3).
+      assert {{ ⟪ pred_P ⟫ Subs a5 <: b' at s2 }} by (eapply (H6 c c'); mauto 3).
+      eapply (H1 c c'); mauto 3.
 Qed.
 
 #[export]
-Hint Resolve per_subtyp_trans : mctt.
+Hint Resolve per_subtyp_sorted_trans : mcpts.
 
 #[export]
-Instance per_subtyp_trans_ins i : Transitive (per_subtyp i).
+Instance per_subtyp_sorted_trans_ins {P} {pred_P : PredicativeSig P} s : Transitive (per_subtyp_sorted pred_P s).
 Proof.
-  eauto using per_subtyp_trans.
+  eauto using per_subtyp_sorted_trans.
 Qed.
 
-Lemma per_subtyp_transp : forall a b i a' b' R R',
-    {{ Sub a <: b at i }} ->
-    {{ DF a ≈ a' ∈ per_univ_elem i ↘ R }} ->
-    {{ DF b ≈ b' ∈ per_univ_elem i ↘ R' }} ->
-    {{ Sub a' <: b' at i }}.
+Lemma per_subtyp_sorted_transp {P} {pred_P : PredicativeSig P} : forall a b s a' b' R R',
+    {{ ⟪ pred_P ⟫ Subs a <: b at s }} ->
+    {{ DF a ≈ a' ∈ per_sort_elem pred_P s ↘ R }} ->
+    {{ DF b ≈ b' ∈ per_sort_elem pred_P s ↘ R' }} ->
+    {{ ⟪ pred_P ⟫ Subs a' <: b' at s }}.
 Proof.
-  mauto using per_subtyp_refl1, per_subtyp_refl2.
+  mauto using per_subtyp_sorted_refl1, per_subtyp_sorted_refl2.
 Qed.
+
+Lemma per_subtyp_sorted_cumu {P} {pred_P : PredicativeSig P} : forall a1 a2 s,
+    {{ ⟪ pred_P ⟫ Subs a1 <: a2 at s }} ->
+    forall s',
+      st_subtyp s s' ->
+      {{ ⟪ pred_P ⟫ Subs a1 <: a2 at s' }}.
+Proof.
+  induction 1; intros; econstructor; mauto;
+    match_by_head (@per_sort P) ltac:(fun H => destruct H);
+    only 4: (etransitivity; eassumption);
+    eexists; mauto 2.
+Qed.
+
+#[export]
+Hint Resolve per_subtyp_sorted_cumu : mcpts.
 
 
 (** Lemmas for per_typ_elem and per_typ *)

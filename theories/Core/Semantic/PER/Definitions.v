@@ -320,6 +320,7 @@ End Per_sort_elem_ind_def.
 Reserved Notation "⟪ pred_P ⟫ 'Subs' a <: b 'at' s" (in custom judg at level 90, pred_P constr, a custom domain, b custom domain, s constr).
 Reserved Notation "⟪ pred_P ⟫ 'Sub' a <: b" (in custom judg at level 90, pred_P constr, a custom domain, b custom domain).
 
+(* Not sure if we want this or just the unsorted version (like for syntactic judgments) *)
 Inductive per_subtyp_sorted `(pred_P : PredicativeSig P) : P -> domain P -> domain P -> Prop :=
 | per_subtyp_sorted_sort :
   `( st_subtyp s1 s2 ->
