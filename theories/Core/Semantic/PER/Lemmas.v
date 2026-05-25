@@ -916,7 +916,10 @@ Proof.
       }
       handle_per_sort_elem_irrel.      
       saturate_refl_for in_rel1.
+      saturate_refl_for in_rel2.
       destruct_rel_mod_eval.
+      simplify_evals.
+      eapply H6; mauto 2.
       intuition.
 Qed.
 
