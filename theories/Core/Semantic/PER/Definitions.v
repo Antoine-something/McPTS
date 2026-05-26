@@ -350,7 +350,8 @@ where "⟪ pred_P ⟫ 'Subs' a <: b 'at' s" := (per_subtyp_sorted pred_P s a b) 
 
 Inductive per_subtyp `(pred_P : PredicativeSig P) : domain P -> domain P -> Prop :=
 | per_subtyp_sort :
-  `( {{ ⟪ pred_P ⟫ Sub Sort@s <: Sort@s }} )
+  `( st_subtyp s1 s2 ->
+     {{ ⟪ pred_P ⟫ Sub Sort@s1 <: Sort@s2 }} )
 | per_subtyp_from_sorted :
   `( {{ ⟪ pred_P ⟫ Subs a <: b at s }} ->
      {{ ⟪ pred_P ⟫ Sub a <: b }} )

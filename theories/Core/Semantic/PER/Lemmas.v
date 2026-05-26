@@ -1195,8 +1195,8 @@ Proof with (destruct_rel_typ; handle_per_sort_elem_irrel; eexists; intuition).
   intros * Horig; gen Δ' R'.
   induction Horig; intros * Hright;
     inversion Hright; subst;
-    apply_relation_equivalence;
-    try reflexivity.
+    apply_relation_equivalence; 
+   try reflexivity.
   specialize (IHHorig _ _ equiv_Γ_Γ'0).
   intros ρ ρ'.
   split; intros Hcons; dependent destruction Hcons;
@@ -1518,3 +1518,136 @@ Qed.
 
 #[export]
 Hint Resolve per_typ_elem_and_per_sort_elem_implies_per_sort_elem : mcpts.
+
+
+
+Lemma per_subtyp_to_typ_elem {P} {pred_P : PredicativeSig P} : forall a b,
+    {{ ⟪ pred_P ⟫ Sub a <: b }} ->
+    exists R R',
+      {{ DF a ≈ a ∈ per_typ_elem pred_P ↘ R }} /\
+        {{ DF b ≈ b ∈ per_typ_elem pred_P ↘ R' }}.
+Proof.
+  destruct 1.
+  - repeat eexists; econstructor; reflexivity.
+  - pose proof (per_subtyp_sorted_to_sort_elem a b s H).
+    destruct_conjs.
+    repeat eexists; econstructor; eassumption.
+Qed.
+
+
+Lemma per_elem_subtyping {P} {pred_P : PredicativeSig P} : forall A B,
+    {{ ⟪ pred_P ⟫ Sub A <: B }} ->
+    forall R R' a b,
+      {{ DF A ≈ A ∈ per_typ_elem pred_P ↘ R }} ->
+      {{ DF B ≈ B ∈ per_typ_elem pred_P ↘ R' }} ->
+      R a b ->
+      R' a b.
+Proof.
+  destruct 1.
+  - intros.
+    assert (per_typ_elem pred_P (per_sort pred_P s1) d{{{ Sort@s1 }}} d{{{ Sort@s1 }}}) by (econstructor; reflexivity).
+    assert (per_typ_elem pred_P (per_sort pred_P s2) d{{{ Sort@s2 }}} d{{{ Sort@s2 }}}) by (econstructor; reflexivity).
+    handle_per_typ_elem_irrel.
+    destruct H2 as [R].
+    eexists; mauto 2.
+  - intros.
+    pose proof (per_subtyp_sorted_to_sort_elem a b s H).
+    destruct_conjs.
+    assert (per_typ_elem pred_P H3 a a) by mauto 2.
+    assert (per_typ_elem pred_P H4 b b) by mauto 2.
+    handle_per_typ_elem_irrel.
+    eapply per_elem_subtyping_sorted; mauto 2.
+Qed.    
+
+
+Lemma per_elem_subtyping_gen {P} {pred_P : PredicativeSig P} : forall a b a' b' R R' m n,
+    {{ ⟪ pred_P ⟫ Sub a <: b }} ->
+    {{ DF a ≈ a' ∈ per_typ_elem pred_P ↘ R }} ->
+    {{ DF b ≈ b' ∈ per_typ_elem pred_P ↘ R' }} ->
+    R m n ->
+    R' m n.
+Proof.
+  intros.
+  eapply per_elem_subtyping; saturate_refl; try eassumption.
+Qed.
+
+Lemma per_subtyp_refl1 {P} {pred_P : PredicativeSig P} : forall a b R,
+    {{ DF a ≈ b ∈ per_typ_elem pred_P ↘ R }} ->
+    {{ ⟪ pred_P ⟫ Sub a <: b }}.
+Proof.
+  simpl; destruct 1.
+  - econstructor; mauto 2.
+    econstructor; mauto 2.
+  - pose proof (per_subtyp_sorted_refl1 _ _ _ _ H).
+    econstructor; mauto 2.
+Qed.
+
+#[export]
+Hint Resolve per_subtyp_refl1 : mcpts.
+
+Lemma per_subtyp_refl2 {P} {pred_P : PredicativeSig P} : forall a b R,
+    {{ DF a ≈ b ∈ per_typ_elem pred_P ↘ R }} ->
+    {{ ⟪ pred_P ⟫ Sub b <: a }}.
+Proof.
+  intros.
+  symmetry in H.
+  eauto using per_subtyp_refl1.
+Qed.
+
+#[export]
+Hint Resolve per_subtyp_refl2 : mcpts.
+
+  
+Lemma per_subtyp_trans_helper {P} {pred_P : PredicativeSig P} : forall {a1 a2 s},
+    {{ ⟪ pred_P ⟫ Subs a1 <: a2 at s }} ->
+    forall a3 s',
+      {{ ⟪ pred_P ⟫ Subs a2 <: a3 at s' }} ->
+      {{ ⟪ pred_P ⟫ Sub a1 <: a3 }}.
+Proof.
+  induction 1; intros ? ? Hsub; simpl in *.
+  - dependent destruction Hsub.
+    assert (st_subtyp s1 s3) by (transitivity s2; eauto).
+    econstructor; mauto 2.
+  - econstructor; mauto 2.
+  - admit.
+  - econstructor; mauto 3.
+Admitted.
+
+Lemma per_subtyp_trans {P} {pred_P : PredicativeSig P} : forall a1 a2,
+    {{ ⟪ pred_P ⟫ Sub a1 <: a2 }} ->
+    forall a3,
+      {{ ⟪ pred_P ⟫ Sub a2 <: a3 }} ->
+      {{ ⟪ pred_P ⟫ Sub a1 <: a3 }}.
+Proof.
+  destruct 1; intros ? Hsub; simpl in *; mauto 2.
+  - assert {{ ⟪ pred_P ⟫ Sub Sort@s1 <: Sort@s2 }} by mauto 2.
+    dependent destruction Hsub.
+    + econstructor; mauto 2.
+      transitivity s2; eauto.
+    + dependent destruction H0.
+      econstructor; mauto 2.
+      transitivity s2; eauto.
+  - destruct Hsub.
+    + dependent destruction H.
+      econstructor.
+      etransitivity; eauto.
+    + eapply per_subtyp_trans_helper; mauto 2.
+Qed.
+  
+#[export]
+Hint Resolve per_subtyp_trans : mcpts.
+
+#[export]
+Instance per_subtyp_trans_ins {P} {pred_P : PredicativeSig P} : Transitive (per_subtyp pred_P).
+Proof.
+  eauto using per_subtyp_trans.
+Qed.
+
+Lemma per_subtyp_transp {P} {pred_P : PredicativeSig P} : forall a b a' b' R R',
+    {{ ⟪ pred_P ⟫ Sub a <: b }} ->
+    {{ DF a ≈ a' ∈ per_typ_elem pred_P ↘ R }} ->
+    {{ DF b ≈ b' ∈ per_typ_elem pred_P ↘ R' }} ->
+    {{ ⟪ pred_P ⟫ Sub a' <: b' }}.
+Proof.
+  mauto using per_subtyp_refl1, per_subtyp_refl2.
+Qed.
