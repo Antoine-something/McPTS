@@ -355,11 +355,9 @@ Proof with mautosolve 4.
   induction 1; inversion_clear HΓ.
   - assert {{ Γ, A@s ⊢s Wk : Γ }} by mauto 3.
     econstructor; mauto 3.
-    econstructor...
   - assert {{ Γ, B@s' ⊢s Wk : Γ }} by mauto 3.
     assert {{ Γ ⊢ A : Sort@s }} by (eapply IHctx_lookup; eauto).
     econstructor; mauto 3.
-    econstructor...
 Qed.
 
 #[export]
@@ -520,8 +518,6 @@ Proof.
   intros * H.
   dependent induction H.
   - eexists; split; mauto 2.
-    assert {{ Γ ⊢ Sort@s2 }} by mauto 3.
-    mauto 3.
   - specialize (IHwf_exp s1 A ltac:(reflexivity) ltac:(reflexivity)) as [s2 []].
     eexists; mauto.
 Qed.

@@ -17,6 +17,8 @@ Inductive st_subtyp {P : PtsSig} : P -> P -> Prop :=
 | st_subtyp_refl : forall s, st_subtyp s s
 | st_subtyp_trans : forall s1 s2 s3, Ax_sub P s1 s2 -> st_subtyp s2 s3 ->
                                 st_subtyp s1 s3.
+#[export]
+Hint Constructors st_subtyp : mcpts.
 
 #[export]
 Instance st_subtyp_transtive {P} : Transitive (@st_subtyp P).
