@@ -330,7 +330,7 @@ Qed.
 
 Lemma rel_sub_eq_subtyp {P : PtsSig} {pred_P : PredicativeSig P} : forall Γ σ σ' Δ Δ',
     {{ ⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Δ }} ->
-    {{ per ⟪ pred_P ⟫ SubE Δ <: Δ' }} ->
+    {{ ⟪ pred_P ⟫ SubE Δ <: Δ' }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Δ' }}.
 Proof.
   intros * [env_relΓ] HSub.

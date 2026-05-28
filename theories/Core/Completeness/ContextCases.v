@@ -100,15 +100,15 @@ Qed.
 Hint Resolve rel_ctx_extend rel_ctx_extend_het rel_ctx_extend' : mcpts.
 
 Lemma rel_ctx_sub_empty {P : PtsSig} {pred_P : PredicativeSig P} :
-  {{per ⟪ pred_P ⟫ SubE ⋅ <: ⋅ }}.
+  {{⟪ pred_P ⟫ SubE ⋅ <: ⋅ }}.
 Proof. mauto. Qed.
 
 Lemma rel_ctx_sub_extend {P : PtsSig} {pred_P : PredicativeSig P} : forall (Γ : ctx P) Δ s A A',
-  {{ per ⟪ pred_P ⟫ SubE Γ <: Δ }} ->
+  {{ ⟪ pred_P ⟫ SubE Γ <: Δ }} ->
   {{ ⟪ pred_P ⟫ Γ ⊨u A : Sort@s }} ->
   {{ ⟪ pred_P ⟫ Δ ⊨u A' : Sort@s }} ->
   {{ ⟪ pred_P ⟫ Γ ⊨ A ⊆ A' }} ->
-  {{ per ⟪ pred_P ⟫ SubE Γ , A@s <: Δ , A'@s }}.
+  {{ ⟪ pred_P ⟫ SubE Γ , A@s <: Δ , A'@s }}.
 Proof.
   intros * ? []%rel_ctx_extend' []%rel_ctx_extend' [env_relΓ].
   pose env_relΓ.

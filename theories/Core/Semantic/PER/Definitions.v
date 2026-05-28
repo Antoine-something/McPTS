@@ -326,10 +326,10 @@ Inductive per_subtyp_sorted `(pred_P : PredicativeSig P) : P -> domain P -> doma
   `( st_subtyp s1 s2 ->
      {{ Dom Sort@s1 ≈ Sort@s1 ∈ per_sort pred_P s }} ->
      {{ Dom Sort@s2 ≈ Sort@s2 ∈ per_sort pred_P s }} ->
-     {{ per ⟪ pred_P ⟫ Subs Sort@s1 <: Sort@s2 at s }} )
+     {{ ⟪ pred_P ⟫ Subs Sort@s1 <: Sort@s2 at s }} )
 | per_subtyp_sorted_nat :
   `( {{ Dom ℕ ≈ ℕ ∈ per_sort pred_P s }} ->
-     {{ per ⟪ pred_P ⟫ Subs ℕ <: ℕ at s }} )
+     {{ ⟪ pred_P ⟫ Subs ℕ <: ℕ at s }} )
 | per_subtyp_sorted_pi :
   `( forall {r : Ru_pi P s1 s2 s3}
        {sub : st_subtyp s3 s}
@@ -339,23 +339,23 @@ Inductive per_subtyp_sorted `(pred_P : PredicativeSig P) : P -> domain P -> doma
             {{ Dom c ≈ c' ∈ in_rel }} ->
             {{ ⟦ B ⟧ (ρ ↦ c) ↘ b }} ->
             {{ ⟦ B' ⟧ (ρ' ↦ c') ↘ b' }} ->
-            {{ per ⟪ pred_P ⟫ Subs b <: b' at s2 }}) ->
+            {{ ⟪ pred_P ⟫ Subs b <: b' at s2 }}) ->
         {{ DF Π r a ρ B ≈ Π r a ρ B ∈ per_sort_elem pred_P s ↘ elem_rel }} ->
         {{ DF Π r a' ρ' B' ≈ Π r a' ρ' B' ∈ per_sort_elem pred_P s ↘ elem_rel' }} ->
-        {{ per ⟪ pred_P ⟫ Subs Π r a ρ B <: Π r a' ρ' B' at s }})
+        {{ ⟪ pred_P ⟫ Subs Π r a ρ B <: Π r a' ρ' B' at s }})
 | per_subtyp_sorted_neut :
   `( {{ Dom e ≈ e' ∈ per_bot }} ->
-     {{ per ⟪ pred_P ⟫ Subs ⇑ a e <: ⇑ a' e' at s }} )
-where "'per' ⟪ pred_P ⟫ 'Subs' a <: b 'at' s" := (per_subtyp_sorted pred_P s a b) (in custom judg) : type_scope.
+     {{ ⟪ pred_P ⟫ Subs ⇑ a e <: ⇑ a' e' at s }} )
+where "⟪ pred_P ⟫ 'Subs' a <: b 'at' s" := (per_subtyp_sorted pred_P s a b) (in custom judg) : type_scope.
 
 Inductive per_subtyp `(pred_P : PredicativeSig P) : domain P -> domain P -> Prop :=
 | per_subtyp_sort :
   `( st_subtyp s1 s2 ->
-     {{ per ⟪ pred_P ⟫ Sub Sort@s1 <: Sort@s2 }} )
+     {{ ⟪ pred_P ⟫ Sub Sort@s1 <: Sort@s2 }} )
 | per_subtyp_from_sorted :
-  `( {{ per ⟪ pred_P ⟫ Subs a <: b at s }} ->
-     {{ per ⟪ pred_P ⟫ Sub a <: b }} )
-where "'per' ⟪ pred_P ⟫ 'Sub' a <: b" := (per_subtyp pred_P a b) (in custom judg) : type_scope.
+  `( {{ ⟪ pred_P ⟫ Subs a <: b at s }} ->
+     {{ ⟪ pred_P ⟫ Sub a <: b }} )
+where "⟪ pred_P ⟫ 'Sub' a <: b" := (per_subtyp pred_P a b) (in custom judg) : type_scope.
 
 #[export]
 Hint Constructors per_subtyp_sorted per_subtyp : mcpts.
@@ -457,20 +457,20 @@ Reserved Notation "⟪ pred_P ⟫ 'SubE' Γ <: Δ" (in custom judg at level 80, 
 
 Inductive per_ctx_subtyp `(pred_P : PredicativeSig P) : ctx P -> ctx P -> Prop :=
 | per_ctx_subtyp_nil :
-  {{ per ⟪ pred_P ⟫ SubE ⋅ <: ⋅ }}
+  {{ ⟪ pred_P ⟫ SubE ⋅ <: ⋅ }}
 | per_ctx_subtyp_cons :
   `{ forall tail_rel env_rel env_rel',
-        {{ per ⟪ pred_P ⟫ SubE Γ <: Γ' }} ->
+        {{ ⟪ pred_P ⟫ SubE Γ <: Γ' }} ->
         {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ tail_rel }} ->
         (forall ρ ρ' a a'
            (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ tail_rel }}),
             {{ ⟦ A ⟧ ρ ↘ a }} ->
             {{ ⟦ A' ⟧ ρ' ↘ a' }} ->
-            {{ per ⟪ pred_P ⟫ Sub a <: a' }}) ->
+            {{ ⟪ pred_P ⟫ Sub a <: a' }}) ->
         {{ EF Γ, A@s ≈ Γ, A@s ∈ per_ctx_env pred_P ↘ env_rel }} ->
         {{ EF Γ', A'@s ≈ Γ', A'@s ∈ per_ctx_env pred_P ↘ env_rel' }} ->
-        {{ per ⟪ pred_P ⟫ SubE Γ, A@s <: Γ', A'@s }} }
-where "'per' ⟪ pred_P ⟫ 'SubE' Γ <: Δ" := (per_ctx_subtyp pred_P Γ Δ) (in custom judg) : type_scope.
+        {{ ⟪ pred_P ⟫ SubE Γ, A@s <: Γ', A'@s }} }
+where "⟪ pred_P ⟫ 'SubE' Γ <: Δ" := (per_ctx_subtyp pred_P Γ Δ) (in custom judg) : type_scope.
 
 #[export]
 Hint Constructors per_ctx_subtyp : mcpts.

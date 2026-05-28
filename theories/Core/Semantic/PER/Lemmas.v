@@ -763,7 +763,7 @@ Qed.
 Hint Resolve per_sort_elem_cumu : mcpts.
  
 Lemma per_subtyp_sorted_to_sort_elem {P} {pred_P : PredicativeSig P} : forall a b s,
-    {{ per ⟪ pred_P ⟫ Subs a <: b at s }} ->
+    {{ ⟪ pred_P ⟫ Subs a <: b at s }} ->
     exists R R',
       {{ DF a ≈ a ∈ per_sort_elem pred_P s ↘ R }} /\
         {{ DF b ≈ b ∈ per_sort_elem pred_P s ↘ R' }}.
@@ -776,7 +776,7 @@ Proof.
 Qed.
 
 Lemma per_elem_subtyping_sorted {P} {pred_P : PredicativeSig P} : forall A B s,
-    {{ per ⟪ pred_P ⟫ Subs A <: B at s }} ->
+    {{ ⟪ pred_P ⟫ Subs A <: B at s }} ->
     forall R R' a b,
       {{ DF A ≈ A ∈ per_sort_elem pred_P s ↘ R }} ->
       {{ DF B ≈ B ∈ per_sort_elem pred_P s ↘ R' }} ->
@@ -816,7 +816,7 @@ Qed.
 
 
 Lemma per_elem_subtyping_sorted_gen {P} {pred_P : PredicativeSig P} : forall a b s a' b' R R' m n,
-    {{ per ⟪ pred_P ⟫ Subs a <: b at s }} ->
+    {{ ⟪ pred_P ⟫ Subs a <: b at s }} ->
     {{ DF a ≈ a' ∈ per_sort_elem pred_P s ↘ R }} ->
     {{ DF b ≈ b' ∈ per_sort_elem pred_P s ↘ R' }} ->
     R m n ->
@@ -828,7 +828,7 @@ Qed.
 
 Lemma per_subtyp_sorted_refl1 {P} {pred_P : PredicativeSig P} : forall a b s R,
     {{ DF a ≈ b ∈ per_sort_elem pred_P s ↘ R }} ->
-    {{ per ⟪ pred_P ⟫ Subs a <: b at s }}.
+    {{ ⟪ pred_P ⟫ Subs a <: b at s }}.
 Proof.
   simpl; induction 1 using per_sort_elem_ind;
     subst;
@@ -855,7 +855,7 @@ Hint Resolve per_subtyp_sorted_refl1 : mcpts.
 
 Lemma per_subtyp_sorted_refl2 {P} {pred_P : PredicativeSig P} : forall a b s R,
     {{ DF a ≈ b ∈ per_sort_elem pred_P s ↘ R }} ->
-    {{ per ⟪ pred_P ⟫ Subs b <: a at s }}.
+    {{ ⟪ pred_P ⟫ Subs b <: a at s }}.
 Proof.
   intros.
   symmetry in H.
@@ -866,10 +866,10 @@ Qed.
 Hint Resolve per_subtyp_sorted_refl2 : mcpts.
 
 Lemma per_subtyp_sorted_trans {P} {pred_P : PredicativeSig P} : forall a1 a2 s,
-    {{ per ⟪ pred_P ⟫ Subs a1 <: a2 at s }} ->
+    {{ ⟪ pred_P ⟫ Subs a1 <: a2 at s }} ->
     forall a3,
-      {{ per ⟪ pred_P ⟫ Subs a2 <: a3 at s }} ->
-      {{ per ⟪ pred_P ⟫ Subs a1 <: a3 at s }}.
+      {{ ⟪ pred_P ⟫ Subs a2 <: a3 at s }} ->
+      {{ ⟪ pred_P ⟫ Subs a1 <: a3 at s }}.
 Proof.
   induction 1; intros ? Hsub; simpl in *.
   (* Universe, nat and neutral cases *)
@@ -941,8 +941,8 @@ Proof.
       destruct_rel_mod_eval.
       simplify_evals.
       
-      assert {{ per ⟪ pred_P ⟫ Subs b <: a5 at s2 }} by (eapply (H0 c c); mauto 3).
-      assert {{ per ⟪ pred_P ⟫ Subs a5 <: b' at s2 }} by (eapply (H6 c c'); mauto 3).
+      assert {{ ⟪ pred_P ⟫ Subs b <: a5 at s2 }} by (eapply (H0 c c); mauto 3).
+      assert {{ ⟪ pred_P ⟫ Subs a5 <: b' at s2 }} by (eapply (H6 c c'); mauto 3).
       eapply (H1 c c'); mauto 3.
 Qed.
 
@@ -956,19 +956,19 @@ Proof.
 Qed.
 
 Lemma per_subtyp_sorted_transp {P} {pred_P : PredicativeSig P} : forall a b s a' b' R R',
-    {{ per ⟪ pred_P ⟫ Subs a <: b at s }} ->
+    {{ ⟪ pred_P ⟫ Subs a <: b at s }} ->
     {{ DF a ≈ a' ∈ per_sort_elem pred_P s ↘ R }} ->
     {{ DF b ≈ b' ∈ per_sort_elem pred_P s ↘ R' }} ->
-    {{ per ⟪ pred_P ⟫ Subs a' <: b' at s }}.
+    {{ ⟪ pred_P ⟫ Subs a' <: b' at s }}.
 Proof.
   mauto using per_subtyp_sorted_refl1, per_subtyp_sorted_refl2.
 Qed.
 
 Lemma per_subtyp_sorted_cumu {P} {pred_P : PredicativeSig P} : forall a1 a2 s,
-    {{ per ⟪ pred_P ⟫ Subs a1 <: a2 at s }} ->
+    {{ ⟪ pred_P ⟫ Subs a1 <: a2 at s }} ->
     forall s',
       st_subtyp s s' ->
-      {{ per ⟪ pred_P ⟫ Subs a1 <: a2 at s' }}.
+      {{ ⟪ pred_P ⟫ Subs a1 <: a2 at s' }}.
 Proof.
   induction 1; intros; econstructor; mauto;
     match_by_head (@per_sort P) ltac:(fun H => destruct H);
@@ -1455,7 +1455,7 @@ Proof.
 Qed.
 
 Lemma per_ctx_subtyp_to_env {P : PtsSig} {pred_P : PredicativeSig P} : forall Γ Δ,
-    {{ per ⟪ pred_P ⟫ SubE Γ <: Δ }} ->
+    {{ ⟪ pred_P ⟫ SubE Γ <: Δ }} ->
     exists R R',
       {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ R }} /\
         {{ EF Δ ≈ Δ ∈ per_ctx_env pred_P ↘ R' }}.
@@ -1531,7 +1531,7 @@ Hint Resolve per_typ_elem_and_per_sort_elem_implies_per_sort_elem : mcpts.
 
 
 Lemma per_subtyp_to_typ_elem {P} {pred_P : PredicativeSig P} : forall a b,
-    {{ per ⟪ pred_P ⟫ Sub a <: b }} ->
+    {{ ⟪ pred_P ⟫ Sub a <: b }} ->
     exists R R',
       {{ DF a ≈ a ∈ per_typ_elem pred_P ↘ R }} /\
         {{ DF b ≈ b ∈ per_typ_elem pred_P ↘ R' }}.
@@ -1545,7 +1545,7 @@ Qed.
 
 
 Lemma per_elem_subtyping {P} {pred_P : PredicativeSig P} : forall A B,
-    {{ per ⟪ pred_P ⟫ Sub A <: B }} ->
+    {{ ⟪ pred_P ⟫ Sub A <: B }} ->
     forall R R' a b,
       {{ DF A ≈ A ∈ per_typ_elem pred_P ↘ R }} ->
       {{ DF B ≈ B ∈ per_typ_elem pred_P ↘ R' }} ->
@@ -1570,7 +1570,7 @@ Qed.
 
 
 Lemma per_elem_subtyping_gen {P} {pred_P : PredicativeSig P} : forall a b a' b' R R' m n,
-    {{ per ⟪ pred_P ⟫ Sub a <: b }} ->
+    {{ ⟪ pred_P ⟫ Sub a <: b }} ->
     {{ DF a ≈ a' ∈ per_typ_elem pred_P ↘ R }} ->
     {{ DF b ≈ b' ∈ per_typ_elem pred_P ↘ R' }} ->
     R m n ->
@@ -1582,7 +1582,7 @@ Qed.
 
 Lemma per_subtyp_refl1 {P} {pred_P : PredicativeSig P} : forall a b R,
     {{ DF a ≈ b ∈ per_typ_elem pred_P ↘ R }} ->
-    {{ per ⟪ pred_P ⟫ Sub a <: b }}.
+    {{ ⟪ pred_P ⟫ Sub a <: b }}.
 Proof.
   simpl; destruct 1.
   - econstructor; mauto 2.
@@ -1595,7 +1595,7 @@ Hint Resolve per_subtyp_refl1 : mcpts.
 
 Lemma per_subtyp_refl2 {P} {pred_P : PredicativeSig P} : forall a b R,
     {{ DF a ≈ b ∈ per_typ_elem pred_P ↘ R }} ->
-    {{ per ⟪ pred_P ⟫ Sub b <: a }}.
+    {{ ⟪ pred_P ⟫ Sub b <: a }}.
 Proof.
   intros.
   symmetry in H.
@@ -1607,10 +1607,10 @@ Hint Resolve per_subtyp_refl2 : mcpts.
 
     
 Lemma per_subtyp_trans_helper {P} {pred_P : PredicativeSig P} : forall {a1 a2 s},
-    {{ per ⟪ pred_P ⟫ Subs a1 <: a2 at s }} ->
+    {{ ⟪ pred_P ⟫ Subs a1 <: a2 at s }} ->
     forall a3 s',
-      {{ per ⟪ pred_P ⟫ Subs a2 <: a3 at s' }} ->
-      {{ per ⟪ pred_P ⟫ Sub a1 <: a3 }}.
+      {{ ⟪ pred_P ⟫ Subs a2 <: a3 at s' }} ->
+      {{ ⟪ pred_P ⟫ Sub a1 <: a3 }}.
 Proof.
   induction 1; intros ? ? Hsub; simpl in *.
   - dependent destruction Hsub.
@@ -1662,13 +1662,13 @@ Proof.
 Qed.
 
 Lemma per_subtyp_trans {P} {pred_P : PredicativeSig P} : forall a1 a2,
-    {{ per ⟪ pred_P ⟫ Sub a1 <: a2 }} ->
+    {{ ⟪ pred_P ⟫ Sub a1 <: a2 }} ->
     forall a3,
-      {{ per ⟪ pred_P ⟫ Sub a2 <: a3 }} ->
-      {{ per ⟪ pred_P ⟫ Sub a1 <: a3 }}.
+      {{ ⟪ pred_P ⟫ Sub a2 <: a3 }} ->
+      {{ ⟪ pred_P ⟫ Sub a1 <: a3 }}.
 Proof.
   destruct 1; intros ? Hsub; simpl in *; mauto 2.
-  - assert {{ per ⟪ pred_P ⟫ Sub Sort@s1 <: Sort@s2 }} by mauto 2.
+  - assert {{ ⟪ pred_P ⟫ Sub Sort@s1 <: Sort@s2 }} by mauto 2.
     dependent destruction Hsub.
     + econstructor; mauto 2.
       transitivity s2; eauto.
@@ -1692,16 +1692,16 @@ Proof.
 Qed.
 
 Lemma per_subtyp_transp {P} {pred_P : PredicativeSig P} : forall a b a' b' R R',
-    {{ per ⟪ pred_P ⟫ Sub a <: b }} ->
+    {{ ⟪ pred_P ⟫ Sub a <: b }} ->
     {{ DF a ≈ a' ∈ per_typ_elem pred_P ↘ R }} ->
     {{ DF b ≈ b' ∈ per_typ_elem pred_P ↘ R' }} ->
-    {{ per ⟪ pred_P ⟫ Sub a' <: b' }}.
+    {{ ⟪ pred_P ⟫ Sub a' <: b' }}.
 Proof.
   mauto using per_subtyp_refl1, per_subtyp_refl2.
 Qed.
 
 Lemma per_ctx_env_subtyping {P : PtsSig} {pred_P : PredicativeSig P} : forall Γ Δ,
-    {{ per ⟪ pred_P ⟫ SubE Γ <: Δ }} ->
+    {{ ⟪ pred_P ⟫ SubE Γ <: Δ }} ->
     forall R R' ρ ρ',
       {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ R }} ->
       {{ EF Δ ≈ Δ ∈ per_ctx_env pred_P ↘ R' }} ->
@@ -1729,7 +1729,7 @@ Qed.
 
 Lemma per_ctx_subtyp_refl1 {P : PtsSig} {pred_P : PredicativeSig P} : forall Γ Δ R,
     {{ EF Γ ≈ Δ ∈ per_ctx_env pred_P ↘ R }} ->
-    {{ per ⟪ pred_P ⟫ SubE Γ <: Δ }}.
+    {{ ⟪ pred_P ⟫ SubE Γ <: Δ }}.
 Proof.
   induction 1; mauto.
 
@@ -1745,16 +1745,16 @@ Qed.
 
 Lemma per_ctx_subtyp_refl2 {P : PtsSig} {pred_P : PredicativeSig P} : forall Γ Δ R,
     {{ EF Γ ≈ Δ ∈ per_ctx_env pred_P ↘ R }} ->
-    {{ per ⟪ pred_P ⟫ SubE Δ <: Γ }}.
+    {{ ⟪ pred_P ⟫ SubE Δ <: Γ }}.
 Proof.
   intros. symmetry in H. eauto using per_ctx_subtyp_refl1.
 Qed.
 
 Lemma per_ctx_subtyp_trans {P : PtsSig} {pred_P : PredicativeSig P} : forall Γ1 Γ2,
-    {{ per ⟪ pred_P ⟫ SubE Γ1 <: Γ2 }} ->
+    {{ ⟪ pred_P ⟫ SubE Γ1 <: Γ2 }} ->
     forall Γ3,
-      {{ per ⟪ pred_P ⟫ SubE Γ2 <: Γ3 }} ->
-      {{ per ⟪ pred_P ⟫ SubE Γ1 <: Γ3 }}.
+      {{ ⟪ pred_P ⟫ SubE Γ2 <: Γ3 }} ->
+      {{ ⟪ pred_P ⟫ SubE Γ1 <: Γ3 }}.
 Proof.
   induction 1; intros;
     dir_inversion_by_head (@per_ctx_subtyp P); subst;
