@@ -83,6 +83,13 @@ Hint Transparent valid_sub_under_ctx : mcpts.
 #[export]
 Hint Unfold valid_sub_under_ctx : mcpts.
 
+Definition subtyp_under_ctx {P : PtsSig} (pred_P : PredicativeSig P) (Γ : ctx P) M M' :=
+  exists env_rel,
+    {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }} /\
+      forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_rel }}),
+        exists R R', rel_typ_unsorted pred_P M ρ M ρ' R /\ rel_typ_unsorted pred_P M' ρ M' ρ' R' /\ rel_exp M ρ M' ρ' (per_subtyp pred_P).
+                                  
+
 Notation "⟪ pred_P ⟫ ⊨ Γ ≈ Γ'" := (per_ctx pred_P Γ Γ')  (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, Γ' custom exp).
 Notation "⟪ pred_P ⟫ ⊨ Γ" := (valid_ctx pred_P Γ) (in custom judg at level 80, pred_P constr at level 0, Γ custom exp).
 Notation "⟪ pred_P ⟫ Γ ⊨ M ≈ M' : A" := (rel_exp_under_ctx pred_P Γ A M M') (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, M custom exp, M' custom exp, A custom exp).
@@ -93,3 +100,5 @@ Notation "⟪ pred_P ⟫ Γ ⊨ A ≈ A'" := (rel_typ_under_ctx pred_P Γ A A') 
 Notation "⟪ pred_P ⟫ Γ ⊨ A" := (valid_typ_under_ctx pred_P Γ A) (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, A custom exp).
 Notation "⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Δ" := (rel_sub_under_ctx pred_P Γ Δ σ σ') (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, σ custom exp, σ' custom exp, Δ custom exp).
 Notation "⟪ pred_P ⟫ Γ ⊨s σ : Δ" := (valid_sub_under_ctx pred_P Γ Δ σ) (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, σ custom exp, Δ custom exp).
+Notation "⟪ pred_P ⟫ Γ ⊨ M ⊆ M'" := (subtyp_under_ctx pred_P Γ M M') (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, M custom exp, M' custom exp).
+           

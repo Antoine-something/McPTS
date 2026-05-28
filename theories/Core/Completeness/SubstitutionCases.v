@@ -327,3 +327,22 @@ Proof with mautosolve.
     etransitivity; only 2,3: symmetry;
     econstructor...
 Qed.
+
+Lemma rel_sub_eq_subtyp {P : PtsSig} {pred_P : PredicativeSig P} : forall Γ σ σ' Δ Δ',
+    {{ ⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Δ }} ->
+    {{ per ⟪ pred_P ⟫ SubE Δ <: Δ' }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Δ' }}.
+Proof.
+  intros * [env_relΓ] HSub.
+  pose proof (per_ctx_subtyp_to_env _ _ HSub).
+  destruct_conjs.
+  handle_per_ctx_env_irrel.
+  eexists_rel_sub.
+  intros.
+  (on_all_hyp: destruct_rel_by_assumption env_relΓ).
+  econstructor; eauto.
+  eapply per_ctx_env_subtyping; eauto.
+Qed.
+
+#[export]
+Hint Resolve rel_sub_eq_subtyp : mctt.

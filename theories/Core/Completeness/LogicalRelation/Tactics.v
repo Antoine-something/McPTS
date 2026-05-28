@@ -23,6 +23,11 @@ Ltac eexists_rel_sub :=
   eexists;
   split; [eassumption |].
 
+Ltac eexists_subtyp :=
+  eexists;
+  split; [eassumption |];
+  eexists.
+
 Ltac invert_rel_typ_body :=
   simplify_evals;
   match_by_head per_sort_elem ltac:(fun H => directed invert_per_sort_elem H); subst;

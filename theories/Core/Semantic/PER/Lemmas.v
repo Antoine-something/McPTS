@@ -775,7 +775,6 @@ Proof.
     etransitivity; try eassumption; symmetry; eassumption.
 Qed.
 
-
 Lemma per_elem_subtyping_sorted {P} {pred_P : PredicativeSig P} : forall A B s,
     {{ per ⟪ pred_P ⟫ Subs A <: B at s }} ->
     forall R R' a b,
@@ -1185,7 +1184,6 @@ Proof.
   reflexivity.
 Qed.
 
-
 (** Lemmas for per_ctx_env and per_ctx *)
 Lemma per_ctx_env_right_irrel {P : PtsSig} {pred_P : PredicativeSig P} : forall Γ Δ Δ' R R',
     {{ DF Γ ≈ Δ ∈ per_ctx_env pred_P ↘ R }} ->
@@ -1456,6 +1454,17 @@ Proof.
   induction H; simpl; congruence.
 Qed.
 
+Lemma per_ctx_subtyp_to_env {P : PtsSig} {pred_P : PredicativeSig P} : forall Γ Δ,
+    {{ per ⟪ pred_P ⟫ SubE Γ <: Δ }} ->
+    exists R R',
+      {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ R }} /\
+        {{ EF Δ ≈ Δ ∈ per_ctx_env pred_P ↘ R' }}.
+Proof.
+  destruct 1; destruct_all.
+  - repeat eexists; econstructor; apply Equivalence_Reflexive.
+  - eauto.
+Qed.
+
 Add Parametric Morphism {P} {pred_P : PredicativeSig P} A ρ A' ρ' : (rel_typ_unsorted pred_P A ρ A' ρ')
     with signature (@relation_equivalence (domain P)) ==> iff as rel_typ_unsorted_morphism.
 Proof.
@@ -1649,4 +1658,92 @@ Lemma per_subtyp_transp {P} {pred_P : PredicativeSig P} : forall a b a' b' R R',
     {{ per ⟪ pred_P ⟫ Sub a' <: b' }}.
 Proof.
   mauto using per_subtyp_refl1, per_subtyp_refl2.
+Qed.
+
+Lemma per_ctx_env_subtyping {P : PtsSig} {pred_P : PredicativeSig P} : forall Γ Δ,
+    {{ per ⟪ pred_P ⟫ SubE Γ <: Δ }} ->
+    forall R R' ρ ρ',
+      {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ R }} ->
+      {{ EF Δ ≈ Δ ∈ per_ctx_env pred_P ↘ R' }} ->
+      R ρ ρ' ->
+      R' ρ ρ'.
+Proof.
+  induction 1; intros;
+    handle_per_ctx_env_irrel;
+    invert_per_ctx_envs;
+    apply_relation_equivalence;
+    trivial.
+
+  inversion H6.
+  assert {{ Dom ρ ↯ ≈ ρ' ↯ ∈ tail_rel0 }} by intuition.
+  eexists; try eassumption.
+   
+  destruct_rel_typ.
+  eapply per_elem_subtyping; try eassumption.
+  - eauto using per_subtyp_sorted_cumu.
+  - saturate_refl.
+    mauto.
+  - saturate_refl.
+    mauto.
+Qed.
+
+Lemma per_ctx_subtyp_refl1 {P : PtsSig} {pred_P : PredicativeSig P} : forall Γ Δ R,
+    {{ EF Γ ≈ Δ ∈ per_ctx_env pred_P ↘ R }} ->
+    {{ per ⟪ pred_P ⟫ SubE Γ <: Δ }}.
+Proof.
+  induction 1; mauto.
+
+  assert (exists R, {{ EF Γ , A@s ≈ Γ' , A'@s ∈ per_ctx_env pred_P ↘ R }}) by
+    (eexists; eapply per_ctx_env_cons'; eassumption).
+  destruct_all.
+  econstructor; try solve [saturate_refl; mauto 2].
+  intros.
+  destruct_rel_typ.
+  simplify_evals.
+  mauto.
+Qed.
+
+Lemma per_ctx_subtyp_refl2 {P : PtsSig} {pred_P : PredicativeSig P} : forall Γ Δ R,
+    {{ EF Γ ≈ Δ ∈ per_ctx_env pred_P ↘ R }} ->
+    {{ per ⟪ pred_P ⟫ SubE Δ <: Γ }}.
+Proof.
+  intros. symmetry in H. eauto using per_ctx_subtyp_refl1.
+Qed.
+
+Lemma per_ctx_subtyp_trans {P : PtsSig} {pred_P : PredicativeSig P} : forall Γ1 Γ2,
+    {{ per ⟪ pred_P ⟫ SubE Γ1 <: Γ2 }} ->
+    forall Γ3,
+      {{ per ⟪ pred_P ⟫ SubE Γ2 <: Γ3 }} ->
+      {{ per ⟪ pred_P ⟫ SubE Γ1 <: Γ3 }}.
+Proof.
+  induction 1; intros;
+    dir_inversion_by_head (@per_ctx_subtyp P); subst;
+    repeat invert_per_ctx_envs;
+    mauto 1; clear_PER.
+
+  handle_per_ctx_env_irrel.
+  econstructor; try eassumption.
+  - firstorder.
+  - intros.
+    assert {{ Dom ρ ≈ ρ' ∈ tail_rel0 }}
+      by (apply_relation_equivalence; eapply per_ctx_env_subtyping; revgoals; eassumption).
+    saturate_refl_for tail_rel.
+    destruct_rel_typ.
+    handle_per_sort_elem_irrel.
+    etransitivity; intuition mauto using per_subtyp_sorted_cumu.
+  - econstructor; intuition.
+    + typeclasses eauto.
+    + solve_refl.
+  - econstructor; mauto 3.
+    + typeclasses eauto.
+    + solve_refl.
+Qed.
+
+#[export]
+Hint Resolve per_ctx_subtyp_trans : mctt.
+
+#[export]
+Instance per_ctx_subtyp_trans_ins {P : PtsSig} {pred_P : PredicativeSig P} : Transitive (@per_ctx_subtyp P pred_P).
+Proof.
+  eauto using per_ctx_subtyp_trans.
 Qed.

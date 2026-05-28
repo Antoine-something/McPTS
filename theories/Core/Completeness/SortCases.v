@@ -237,7 +237,7 @@ Hint Resolve rel_exp_typ_sub : mcpts.
 
 
 Lemma rel_exp_axiom {P} {pred_P : PredicativeSig P} : forall {s1 s2 Γ},
-    Ax P s1 s2 ->
+    Ax_typ P s1 s2 ->
     {{ ⟪ pred_P ⟫ ⊨ Γ }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u Sort@s1 : Sort@s2 }}.
 Proof.
@@ -260,7 +260,7 @@ Hint Resolve rel_exp_axiom : mcpts.
 
 
 Lemma rel_exp_axiom_sub {P} {pred_P : PredicativeSig P} : forall {Γ Δ σ s1 s2},
-    Ax P s1 s2 ->
+    Ax_typ P s1 s2 ->
     {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u Sort@s1[σ] ≈ Sort@s1 : Sort@s2 }}.
 Proof.

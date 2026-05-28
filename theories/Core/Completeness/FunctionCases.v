@@ -5,7 +5,7 @@ From McPTS.Core Require Import Base.
 From McPTS.Core.Completeness Require Import LogicalRelation TermStructureCases SortCases.
 Import Domain_Notations.
 
-Lemma rel_exp_of_pi_inversion {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M M' A B s1 s2 s3} {r : Ru P s1 s2 s3},
+Lemma rel_exp_of_pi_inversion {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M M' A B s1 s2 s3} {r : Ru_pi P s1 s2 s3},
     {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ M' : Π r A B }} ->
     exists env_rel,
       {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }} /\
@@ -17,7 +17,7 @@ Lemma rel_exp_of_pi_inversion {P : PtsSig} {pred_P : PredicativeSig P} : forall 
               (fun f f' : domain P => forall (c c' : domain P) (equiv_c_c' : in_rel c c'), rel_mod_app f c f' c' (out_rel c c' equiv_c_c')).
 Proof.
   intros * [env_relΓ].
-  assert ((pred_rel pred_P s1 s3 \/ s1 = s3) /\ (pred_rel pred_P s2 s3 \/ s2 = s3)) by (eapply ord_ru; mauto).
+  assert ((pred_rel pred_P s1 s3 \/ s1 = s3) /\ (pred_rel pred_P s2 s3 \/ s2 = s3)) by (eapply ord_ru_pi; mauto).
   destruct_conjs.
   exists env_relΓ.
   split; mauto.
@@ -46,31 +46,38 @@ Proof.
   destruct_conjs; subst.
   rename H5 into a.
   rename H10 into a'.
+  rename H2 into s4.
   invert_per_sort_elem H9.
+  assert ((pred_rel pred_P s1 s4 \/ s1 = s4) /\ (pred_rel pred_P s2 s4 \/ s2 = s4)) by (eapply ord_ru_pi_sub; mauto).
+  destruct H9.
   exists in_rel; exists out_rel.
   repeat split; mauto.
   - econstructor.
     + inversion H7; mauto.
-    + inversion H2; mauto.
+    + inversion H8; mauto.
     + destruct equiv_a_a'.
       destruct H0.
-      * eapply H10; mauto.
+      * destruct H9; mauto.
+        subst; eapply H11; mauto.
       * rewrite -> H0.
-        eapply H9; mauto.
+        subst.
+        destruct H9; mauto.
+        subst; eapply H11; mauto.
   - intros.
     assert (rel_mod_eval
       (fun (R : relation (domain P)) (b b' : domain P) =>
-       (s2 = s3 -> per_sort_elem pred_P s3 R b b') /\
-       (pred_rel pred_P s2 s3 -> per_sort_elem pred_P s2 R b b')) B d{{{
+       (s2 = s4 -> per_sort_elem pred_P s4 R b b') /\
+       (pred_rel pred_P s2 s4 -> per_sort_elem pred_P s2 R b b')) B d{{{
       ρ ↦ c }}} B d{{{ ρ' ↦ c' }}} (out_rel c c' equiv_c_c')) by mauto.
     unfold rel_typ.
-    inversion_clear H9.
+    inversion_clear H11.
     destruct_conjs.
     econstructor; mauto.
     destruct H1.
-    + eapply H12; mauto.
-    + rewrite -> H1.
-      eapply H9; mauto.
+    + destruct H10; mauto.
+      subst; eapply H11; mauto.
+    + destruct H10; mauto.
+      subst; eapply H11; mauto.
   - handle_per_sort_elem_irrel.
     eapply H6.
 Qed.
