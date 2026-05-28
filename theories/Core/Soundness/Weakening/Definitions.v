@@ -13,7 +13,7 @@ Inductive weakening {P : PtsSig} : ctx P -> sub P -> ctx P -> Prop :=
      {{ Γ ⊢w σ : Δ }} )
 | wk_p :
   `( {{ Γ ⊢w τ : Δ', A@s }} ->
-     {{ ⊢ Δ' ≈ Δ }} ->
+     {{ ⊢ Δ' ⊆ Δ }} ->
      {{ Γ ⊢s σ ≈ Wk ∘ τ : Δ }} ->
      {{ Γ ⊢w σ : Δ }} )
 where "Γ ⊢w σ : Δ" := (weakening Γ σ Δ) (in custom judg) : type_scope.

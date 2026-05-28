@@ -19,6 +19,12 @@ Inductive st_subtyp {P : PtsSig} : P -> P -> Prop :=
                                 st_subtyp s1 s3.
 
 #[export]
+Instance st_Subtyp_reflexive {P} : Reflexive (@st_subtyp P).
+Proof.
+  intros x; econstructor.
+Qed.
+
+#[export]
 Instance st_subtyp_transtive {P} : Transitive (@st_subtyp P).
 Proof.
   induction 1; intros; eauto.
