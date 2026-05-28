@@ -29,9 +29,9 @@ theories/Core/Semantic/Readback.v
 theories/Core/Semantic/NbE.v
 theories/Core/Semantic/PER/Definitions.v
 theories/Core/Semantic/PER/CoreTactics.v
-# theories/Core/Semantic/PER/Lemmas.v
-# theories/Core/Semantic/PER.v
-# theories/Core/Semantic/Realizability.v
+theories/Core/Semantic/PER/Lemmas.v
+theories/Core/Semantic/PER.v
+theories/Core/Semantic/Realizability.v
 
 # theories/Core/Completeness/LogicalRelation/Definitions.v
 # theories/Core/Completeness/LogicalRelation/Tactics.v

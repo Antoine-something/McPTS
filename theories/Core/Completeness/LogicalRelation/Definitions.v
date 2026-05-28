@@ -83,13 +83,13 @@ Hint Transparent valid_sub_under_ctx : mcpts.
 #[export]
 Hint Unfold valid_sub_under_ctx : mcpts.
 
-Notation "⟪ pred_P ⟫ ⊨ Γ ≈ Γ'" := (per_ctx pred_P Γ Γ')  (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, Γ' custom exp).
-Notation "⟪ pred_P ⟫ ⊨ Γ" := (valid_ctx pred_P Γ) (in custom judg at level 80, pred_P constr at level 0, Γ custom exp).
-Notation "⟪ pred_P ⟫ Γ ⊨ M ≈ M' : A" := (rel_exp_under_ctx pred_P Γ A M M') (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, M custom exp, M' custom exp, A custom exp).
-Notation "⟪ pred_P ⟫ Γ ⊨ M : A" := (valid_exp_under_ctx pred_P Γ A M) (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, M custom exp, A custom exp).
-Notation "⟪ pred_P ⟫ Γ ⊨u M ≈ M' : A" := (rel_exp_under_ctx_unsorted pred_P Γ A M M') (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, M custom exp, M' custom exp, A custom exp).
-Notation "⟪ pred_P ⟫ Γ ⊨u M : A" := (valid_exp_under_ctx_unsorted pred_P Γ A M) (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, M custom exp, A custom exp).
-Notation "⟪ pred_P ⟫ Γ ⊨ A ≈ A'" := (rel_typ_under_ctx pred_P Γ A A') (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, A custom exp, A' custom exp).
-Notation "⟪ pred_P ⟫ Γ ⊨ A" := (valid_typ_under_ctx pred_P Γ A) (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, A custom exp).
-Notation "⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Δ" := (rel_sub_under_ctx pred_P Γ Δ σ σ') (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, σ custom exp, σ' custom exp, Δ custom exp).
-Notation "⟪ pred_P ⟫ Γ ⊨s σ : Δ" := (valid_sub_under_ctx pred_P Γ Δ σ) (in custom judg at level 80, pred_P constr at level 0, Γ custom exp, σ custom exp, Δ custom exp).
+Notation "⟪ pred_P ⟫ ⊨ Γ ≈ Γ'" := (per_ctx pred_P Γ Γ')  (in custom judg at level 80, pred_P constr, Γ custom exp, Γ' custom exp).
+Notation "⟪ pred_P ⟫ ⊨ Γ" := (valid_ctx pred_P Γ) (in custom judg at level 80, pred_P constr, Γ custom exp).
+Notation "⟪ pred_P ⟫ Γ ⊨ M ≈ M' : A" := (rel_exp_under_ctx pred_P Γ A M M') (in custom judg at level 80, pred_P constr, Γ custom exp, M custom exp, M' custom exp, A custom exp).
+Notation "⟪ pred_P ⟫ Γ ⊨ M : A" := (valid_exp_under_ctx pred_P Γ A M) (in custom judg at level 80, pred_P constr, Γ custom exp, M custom exp, A custom exp).
+Notation "⟪ pred_P ⟫ Γ ⊨u M ≈ M' : A" := (rel_exp_under_ctx_unsorted pred_P Γ A M M') (in custom judg at level 80, pred_P constr, Γ custom exp, M custom exp, M' custom exp, A custom exp).
+Notation "⟪ pred_P ⟫ Γ ⊨u M : A" := (valid_exp_under_ctx_unsorted pred_P Γ A M) (in custom judg at level 80, pred_P constr, Γ custom exp, M custom exp, A custom exp).
+Notation "⟪ pred_P ⟫ Γ ⊨ A ≈ A'" := (rel_typ_under_ctx pred_P Γ A A') (in custom judg at level 80, pred_P constr, Γ custom exp, A custom exp, A' custom exp).
+Notation "⟪ pred_P ⟫ Γ ⊨ A" := (valid_typ_under_ctx pred_P Γ A) (in custom judg at level 80, pred_P constr, Γ custom exp, A custom exp).
+Notation "⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Δ" := (rel_sub_under_ctx pred_P Γ Δ σ σ') (in custom judg at level 80, pred_P constr, Γ custom exp, σ custom exp, σ' custom exp, Δ custom exp).
+Notation "⟪ pred_P ⟫ Γ ⊨s σ : Δ" := (valid_sub_under_ctx pred_P Γ Δ σ) (in custom judg at level 80, pred_P constr, Γ custom exp, σ custom exp, Δ custom exp).
