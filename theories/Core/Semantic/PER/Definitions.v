@@ -317,8 +317,8 @@ Section Per_sort_elem_ind_def.
 End Per_sort_elem_ind_def.
 
 (** Subtyping PER *)
-Reserved Notation "'per' ⟪ pred_P ⟫ 'Subs' a <: b 'at' s" (in custom judg at level 90, pred_P constr, a custom domain, b custom domain, s constr).
-Reserved Notation "'per' ⟪ pred_P ⟫ 'Sub' a <: b" (in custom judg at level 90, pred_P constr, a custom domain, b custom domain).
+Reserved Notation "⟪ pred_P ⟫ 'Subs' a <: b 'at' s" (in custom judg at level 80, pred_P constr, a custom domain, b custom domain, s constr).
+Reserved Notation "⟪ pred_P ⟫ 'Sub' a <: b" (in custom judg at level 80, pred_P constr, a custom domain, b custom domain).
 
 (* Not sure if we want this or just the unsorted version (like for syntactic judgments) *)
 Inductive per_subtyp_sorted `(pred_P : PredicativeSig P) : P -> domain P -> domain P -> Prop :=
@@ -453,7 +453,7 @@ Hint Unfold valid_ctx : mcpts.
 
 
 (** Context Subtyping PER *)
-Reserved Notation "'per' ⟪ pred_P ⟫ 'SubE' Γ <: Δ" (in custom judg at level 90, pred_P constr, Γ custom exp, Δ custom exp).
+Reserved Notation "⟪ pred_P ⟫ 'SubE' Γ <: Δ" (in custom judg at level 80, pred_P constr, Γ custom exp, Δ custom exp).
 
 Inductive per_ctx_subtyp `(pred_P : PredicativeSig P) : ctx P -> ctx P -> Prop :=
 | per_ctx_subtyp_nil :

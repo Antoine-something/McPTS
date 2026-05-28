@@ -1605,7 +1605,7 @@ Qed.
 #[export]
 Hint Resolve per_subtyp_refl2 : mcpts.
 
-  
+    
 Lemma per_subtyp_trans_helper {P} {pred_P : PredicativeSig P} : forall {a1 a2 s},
     {{ per ⟪ pred_P ⟫ Subs a1 <: a2 at s }} ->
     forall a3 s',
@@ -1617,9 +1617,49 @@ Proof.
     assert (st_subtyp s1 s3) by (transitivity s2; eauto).
     econstructor; mauto 2.
   - econstructor; mauto 2.
-  - admit.
+  - dependent destruction Hsub.
+    handle_per_sort_elem_irrel.
+    assert (per_sort_elem pred_P s elem_rel'0 d{{{ Π r a'0 ρ'0 B'0 }}} d{{{ Π r a'0 ρ'0 B'0 }}}).
+    {
+      invert_per_sort_elem H7.
+      
+      per_sort_elem_econstructor; mauto 2.
+      - pose proof (ord_ru_pi_sub pred_P r sub1) as [ord_dom ord_im].
+        destruct_conjs.
+        destruct ord_dom; subst; mauto 2.
+      - intros.
+        destruct_rel_mod_eval.
+        pose proof (ord_ru_pi_sub pred_P r sub1) as [ord_dom ord_im].
+        destruct_conjs.
+        econstructor; mauto 2.
+        destruct ord_im; subst; mauto 2.
+    }
+    eapply per_subtyp_from_sorted with (s := s).
+    econstructor; mauto 2.
+    + transitivity a'; eauto.
+    + intros.      
+      invert_per_sort_elem H3.
+      assert (per_sort_elem pred_P s1 in_rel a' a').
+      {
+        pose proof (ord_ru_pi_sub pred_P r sub) as [ord_dom ord_im].
+        destruct_conjs.
+        destruct ord_dom; subst; mauto 2.
+      }
+      handle_per_sort_elem_irrel.
+      destruct_rel_mod_eval.
+      assert (per_sort_elem pred_P s2 (out_rel c c' H11) a0 a'1).
+      {
+        pose proof (ord_ru_pi_sub pred_P r sub0) as [ord_dom ord_im].
+        destruct_conjs.
+        destruct ord_im; subst; mauto 2.
+      }
+      assert (per_subtyp_sorted pred_P s2 a'1 a0) by mauto 3.
+      assert (per_subtyp_sorted pred_P s2 b a'1) by mauto 3.
+      assert (per_subtyp_sorted pred_P s2 a0 b') by mauto 3.
+      transitivity a'1; eauto.
+      transitivity a0; eauto.
   - econstructor; mauto 3.
-Admitted.
+Qed.
 
 Lemma per_subtyp_trans {P} {pred_P : PredicativeSig P} : forall a1 a2,
     {{ per ⟪ pred_P ⟫ Sub a1 <: a2 }} ->
