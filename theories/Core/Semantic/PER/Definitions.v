@@ -339,7 +339,7 @@ Inductive per_subtyp_sorted `(pred_P : PredicativeSig P) : P -> domain P -> doma
             {{ Dom c ≈ c' ∈ in_rel }} ->
             {{ ⟦ B ⟧ (ρ ↦ c) ↘ b }} ->
             {{ ⟦ B' ⟧ (ρ' ↦ c') ↘ b' }} ->
-            {{ ⟪ pred_P ⟫ Subs b <: b' at s2 }}) ->
+            {{ ⟪ pred_P ⟫ Subs b <: b' }}) ->
         {{ DF Π r a ρ B ≈ Π r a ρ B ∈ per_sort_elem pred_P s ↘ elem_rel }} ->
         {{ DF Π r a' ρ' B' ≈ Π r a' ρ' B' ∈ per_sort_elem pred_P s ↘ elem_rel' }} ->
         {{ ⟪ pred_P ⟫ Subs Π r a ρ B <: Π r a' ρ' B' at s }})

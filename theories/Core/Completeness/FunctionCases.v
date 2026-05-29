@@ -82,7 +82,7 @@ Proof.
     eapply H6.
 Qed.
 
-Lemma rel_exp_of_pi {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ env_rel M M' s1 s2 s3 A B} {r : Ru P s1 s2 s3},
+Lemma rel_exp_of_pi {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ env_rel M M' s1 s2 s3 A B} {r : Ru_pi P s1 s2 s3},
     {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }} ->
 	(forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_rel }}),
       exists in_rel out_rel,
@@ -146,7 +146,7 @@ Proof with intuition.
   intuition.
 Qed.
 
-Lemma rel_exp_unsorted_of_pi {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ env_rel M M' s1 s2 s3 A B} {r : Ru P s1 s2 s3},
+Lemma rel_exp_unsorted_of_pi {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ env_rel M M' s1 s2 s3 A B} {r : Ru_pi P s1 s2 s3},
     {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }} ->
 	(forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_rel }}),
       exists in_rel out_rel,
@@ -165,7 +165,7 @@ Ltac eexists_rel_exp_unsorted_of_pi :=
   unshelve eapply (rel_exp_unsorted_of_pi _); shelve_unifiable; [eassumption |].
 
 
-Lemma rel_exp_unsorted_pi_cong {P} {pred_P : PredicativeSig P} : forall {s1 s2 s3 Γ A A' B B'} {r : Ru P s1 s2 s3},
+Lemma rel_exp_unsorted_pi_cong {P} {pred_P : PredicativeSig P} : forall {s1 s2 s3 Γ A A' B B'} {r : Ru_pi P s1 s2 s3},
     {{ ⟪ pred_P ⟫ Γ ⊨u A : Sort@s1 }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u A ≈ A' : Sort@s1 }} ->
     {{ ⟪ pred_P ⟫ Γ, A@s1 ⊨u B ≈ B' : Sort@s2 }} ->
@@ -208,7 +208,7 @@ Hint Resolve rel_exp_unsorted_pi_cong : mcpts.
 
 
 
-Lemma rel_exp_unsorted_pi_sub {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru P s1 s2 s3} {Γ σ Δ A B},
+Lemma rel_exp_unsorted_pi_sub {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru_pi P s1 s2 s3} {Γ σ Δ A B},
     {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }} ->
     {{ ⟪ pred_P ⟫ Δ ⊨u A : Sort@s1 }} ->
     {{ ⟪ pred_P ⟫ Δ, A@s1 ⊨u B : Sort@s2 }} ->
@@ -236,6 +236,7 @@ Proof with mautosolve.
   assert (per_typ_elem pred_P (elem_relA ρσ ρ'σ' H7) a0 a) by mauto.
   handle_per_typ_elem_irrel.
   per_sort_elem_econstructor; eauto.
+  - econstructor.
   - eapply rel_exp_pi_core; eauto; try reflexivity.
     intros.
     assert (Hequiv : {{ Dom ρσ ↦ c ≈ ρ'σ' ↦ c' ∈ (cons_per_ctx_env env_relΔ elem_relA) }}) by (econstructor; mauto; econstructor; mauto).
@@ -252,7 +253,7 @@ Qed.
 Hint Resolve rel_exp_unsorted_pi_sub : mcpts.
 
 
-Lemma rel_exp_unsorted_fn_cong {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru P s1 s2 s3} {Γ A A' B M M'},
+Lemma rel_exp_unsorted_fn_cong {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru_pi P s1 s2 s3} {Γ A A' B M M'},
     {{ ⟪ pred_P ⟫ Γ ⊨u A ≈ A' : Sort@s1 }} ->
     {{ ⟪ pred_P ⟫ Γ, A@s1 ⊨u M ≈ M' : B }} ->
     {{ ⟪ pred_P ⟫ Γ, A@s1 ⊨u B : Sort@s2 }} ->
@@ -348,7 +349,7 @@ Qed.
 Hint Resolve rel_exp_unsorted_fn_cong : mcpts.
 
 
-Lemma rel_exp_unsorted_fn_sub {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru P s1 s2 s3} {Γ σ Δ A M B},
+Lemma rel_exp_unsorted_fn_sub {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru_pi P s1 s2 s3} {Γ σ Δ A M B},
     {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }} ->
     {{ ⟪ pred_P ⟫ Δ ⊨u A : Sort@s1 }} ->
     {{ ⟪ pred_P ⟫ Δ, A@s1 ⊨u M : B }} ->
@@ -376,7 +377,7 @@ Proof with mautosolve.
   eexists.
   split; econstructor; mauto 4.
   - econstructor; mauto.
-    per_sort_elem_econstructor; [| | apply Equivalence_Reflexive]; eauto.
+    per_sort_elem_econstructor; [econstructor | | | apply Equivalence_Reflexive]; eauto.
     intros.
     eapply rel_exp_pi_core; eauto; try reflexivity.
     clear dependent c.
@@ -437,7 +438,22 @@ Qed.
 #[export]
 Hint Resolve rel_exp_unsorted_fn_sub : mcpts.
 
-Lemma rel_exp_unsorted_of_pi_inversion {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M M' A B s1 s2 s3} {r : Ru P s1 s2 s3},
+Lemma pred_preserves_st {P : PtsSig} {pred_P : PredicativeSig P} : forall s s1 s2,
+    st_subtyp s1 s2 ->
+    pred_rel pred_P s s1 ->
+    pred_rel pred_P s s2.
+Proof.
+  intros.
+  assert (Transitive (pred_rel pred_P)) by (eapply (ord_rel pred_P)).
+  specialize (ord_st_subtyp pred_P H) as ?.
+  destruct H2; mauto.
+  subst; mauto.
+Qed.
+
+#[local]
+ Hint Resolve pred_preserves_st : mcpts.
+
+Lemma rel_exp_unsorted_of_pi_inversion {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M M' A B s1 s2 s3} {r : Ru_pi P s1 s2 s3},
     {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : Π r A B }} ->
     exists env_rel,
       {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }} /\
@@ -449,7 +465,7 @@ Lemma rel_exp_unsorted_of_pi_inversion {P : PtsSig} {pred_P : PredicativeSig P} 
               (fun f f' : domain P => forall (c c' : domain P) (equiv_c_c' : in_rel c c'), rel_mod_app f c f' c' (out_rel c c' equiv_c_c')).
 Proof.
   intros * [env_relΓ].
-  assert ((pred_rel pred_P s1 s3 \/ s1 = s3) /\ (pred_rel pred_P s2 s3 \/ s2 = s3)) by (eapply ord_ru; mauto).
+  assert ((pred_rel pred_P s1 s3 \/ s1 = s3) /\ (pred_rel pred_P s2 s3 \/ s2 = s3)) by (eapply ord_ru_pi; mauto).
   destruct_conjs.
   exists env_relΓ.
   split; mauto.
@@ -488,28 +504,31 @@ Proof.
     + destruct equiv_a_a'.
       destruct H0.
       * eapply H12; mauto.
-      * rewrite -> H0.
-        eapply H11; mauto.
+      * specialize (ord_st_subtyp pred_P sub) as ?.
+        destruct H13.
+        ** eapply H12; subst; mauto.
+        ** subst.
+           eapply H11; reflexivity.
   - intros.
     assert (rel_mod_eval
       (fun (R : relation (domain P)) (b b' : domain P) =>
-       (s2 = s3 -> per_sort_elem pred_P s3 R b b') /\
-       (pred_rel pred_P s2 s3 -> per_sort_elem pred_P s2 R b b')) B d{{{
-      ρ ↦ c }}} B d{{{ ρ' ↦ c' }}} (out_rel c c' equiv_c_c')) by mauto.
+       (s2 = s -> per_sort_elem pred_P s R b b') /\
+       (pred_rel pred_P s2 s -> per_sort_elem pred_P s2 R b b')) B d{{{
+            ρ ↦ c }}} B d{{{ ρ' ↦ c' }}} (out_rel c c' equiv_c_c')) by mauto.
     unfold rel_typ.
     inversion_clear H11.
     destruct_conjs.
     econstructor; mauto.
     destruct H1.
     + eapply H14; mauto.
-    + rewrite -> H1.
-      eapply H11; mauto.
+    + specialize (ord_st_subtyp pred_P sub) as ?.
+      destruct H17; subst; mauto.
   - handle_per_sort_elem_irrel.
     econstructor; mauto.
 Qed.
 
 
-Lemma rel_exp_unsorted_app_cong {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru P s1 s2 s3} {Γ M M' A B N N'},
+Lemma rel_exp_unsorted_app_cong {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru_pi P s1 s2 s3} {Γ M M' A B N N'},
     {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : Π r A B }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u N ≈ N' : A }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u M N ≈ M' N' : B[Id,,N] }}.
@@ -540,7 +559,7 @@ Qed.
 Hint Resolve rel_exp_unsorted_app_cong : mcpts.
 
 
-Lemma rel_exp_unsorted_app_sub {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru P s1 s2 s3} {Γ σ Δ M A B N},
+Lemma rel_exp_unsorted_app_sub {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru_pi P s1 s2 s3} {Γ σ Δ M A B N},
     {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }} ->
     {{ ⟪ pred_P ⟫ Δ ⊨u M : Π r A B }} ->
     {{ ⟪ pred_P ⟫ Δ ⊨u N : A }} ->
@@ -570,7 +589,7 @@ Qed.
 Hint Resolve rel_exp_unsorted_app_sub : mcpts.
 
 
-Lemma rel_exp_unsorted_pi_beta {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru P s1 s2 s3} {Γ A M B N},
+Lemma rel_exp_unsorted_pi_beta {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru_pi P s1 s2 s3} {Γ A M B N},
     {{ ⟪ pred_P ⟫ Γ, A@s1 ⊨u M : B }} ->
     {{ ⟪ pred_P ⟫ Γ, A@s1 ⊨u B : Sort@s2 }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u N : A }} ->
@@ -611,7 +630,7 @@ Qed.
 Hint Resolve rel_exp_unsorted_pi_beta : mcpts.
 
 
-Lemma rel_exp_unsorted_pi_eta {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru P s1 s2 s3} {Γ M A B},
+Lemma rel_exp_unsorted_pi_eta {P : PtsSig} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru_pi P s1 s2 s3} {Γ M A B},
   {{ ⟪ pred_P ⟫ Γ ⊨u M : Π r A B }} ->
   {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ λ r A (M[Wk] #0) : Π r A B }}.
 Proof with mautosolve.

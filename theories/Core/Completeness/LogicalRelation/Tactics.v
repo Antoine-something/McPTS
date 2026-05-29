@@ -25,8 +25,7 @@ Ltac eexists_rel_sub :=
 
 Ltac eexists_subtyp :=
   eexists;
-  split; [eassumption |];
-  eexists.
+  split; [eassumption |].
 
 Ltac invert_rel_typ_body :=
   simplify_evals;
