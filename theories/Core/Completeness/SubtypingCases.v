@@ -109,7 +109,7 @@ Proof.
   invert_per_ctx_envs.
   match goal with
   | _: _ <~> cons_per_ctx_env env_relΓ ?x |- _ =>
-      rename x into head_relA'
+      rename x into head_relA
   end.
   handle_per_ctx_env_irrel.
   eexists_subtyp.
@@ -118,13 +118,10 @@ Proof.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
   destruct_by_head @per_sort.
   handle_per_sort_elem_irrel.
-  (* destruct H0. *)
-  (* destruct_by_head (@rel_exp P). *)
-  (* destruct_conjs. *)
   
-  assert (forall c c', head_relA' ρ ρ' equiv_ρ_ρ' c c' -> cons_per_ctx_env env_relΓ head_relA' d{{{ ρ ↦ c }}} d{{{ ρ' ↦ c' }}}) as HΓA'
+  assert (forall c c', head_relA ρ ρ' equiv_ρ_ρ' c c' -> cons_per_ctx_env env_relΓ head_relA d{{{ ρ ↦ c }}} d{{{ ρ' ↦ c' }}}) as HΓA
       by (intros; econstructor; mauto).
-  assert (forall c c', head_rel ρ ρ' equiv_ρ_ρ' c c' -> cons_per_ctx_env env_relΓ head_rel d{{{ ρ ↦ c }}} d{{{ ρ' ↦ c' }}}) as HΓA'0
+  assert (forall c c', head_rel ρ ρ' equiv_ρ_ρ' c c' -> cons_per_ctx_env env_relΓ head_rel d{{{ ρ ↦ c }}} d{{{ ρ' ↦ c' }}}) as HΓA'
       by (intros; econstructor; mauto). 
 
   (** The proofs for the next two assertions are basically the same *)
@@ -136,7 +133,7 @@ Proof.
     -  etransitivity; [| symmetry]; mauto.
     - eapply rel_exp_pi_core; [| reflexivity].
       intros.
-      assert {{ Dom ρ ↦ c ≈ ρ' ↦ c' ∈ cons_per_ctx_env env_relΓ head_relA' }} as equiv_ρc_ρ'c' by (apply HΓA'; intuition).
+      assert {{ Dom ρ ↦ c ≈ ρ' ↦ c' ∈ cons_per_ctx_env env_relΓ head_relA }} as equiv_ρc_ρ'c' by (apply HΓA; intuition).
       (on_all_hyp: fun H => destruct (H _ _ equiv_ρc_ρ'c')).
       destruct_conjs.
       destruct_by_head @rel_typ_unsorted.
@@ -150,8 +147,8 @@ Proof.
     - etransitivity; [| symmetry]; mauto.
     - eapply rel_exp_pi_core; [| reflexivity].
       intros.
-      assert {{ Dom ρ ↦ c ≈ ρ' ↦ c' ∈ cons_per_ctx_env env_relΓ head_relA' }} as equiv_ρc_ρ'c' by (apply HΓA'; intuition).
-      assert {{ Dom ρ ↦ c ≈ ρ' ↦ c' ∈ cons_per_ctx_env env_relΓ head_rel }} as equiv_ρc_ρ'c'0 by (apply HΓA'0; intuition).
+      assert {{ Dom ρ ↦ c ≈ ρ' ↦ c' ∈ cons_per_ctx_env env_relΓ head_relA }} as equiv_ρc_ρ'c' by (apply HΓA; intuition).
+      assert {{ Dom ρ ↦ c ≈ ρ' ↦ c' ∈ cons_per_ctx_env env_relΓ head_rel }} as equiv_ρc_ρ'c'0 by (apply HΓA'; intuition).
       simpl in *.
       (on_all_hyp: fun H => destruct (H _ _ equiv_ρc_ρ'c')).
       (on_all_hyp: fun H => destruct (H _ _ equiv_ρc_ρ'c'0)).
@@ -165,19 +162,20 @@ Proof.
     per_sort_elem_econstructor; [econstructor | mauto 2 | | solve_refl].
     - eapply rel_exp_pi_core; [| reflexivity].
       intros.
-      assert {{ Dom ρ ↦ c ≈ ρ' ↦ c' ∈ cons_per_ctx_env env_relΓ head_relA' }} as equiv_ρc_ρ'c' by (apply HΓA'; intuition).
+      assert {{ Dom ρ ↦ c ≈ ρ' ↦ c' ∈ cons_per_ctx_env env_relΓ head_relA }} as equiv_ρc_ρ'c' by (apply HΓA; intuition).
       simpl in *.
       (on_all_hyp: fun H => destruct (H _ _ equiv_ρc_ρ'c')).
       econstructor; mauto.
   }
+  
   exvar (relation (domain P))
     ltac:(fun R => assert ({{ DF Π r a3 ρ B' ≈ Π r a2 ρ' B' ∈ per_sort_elem pred_P s3 ↘ R }})).
   {
     per_sort_elem_econstructor; [econstructor | mauto 2 | | solve_refl].
     - eapply rel_exp_pi_core; [| reflexivity].
       intros.
-      assert {{ Dom ρ ↦ c ≈ ρ' ↦ c' ∈ cons_per_ctx_env env_relΓ head_relA' }} as equiv_ρc_ρ'c' by (apply HΓA'; intuition).
-      assert {{ Dom ρ ↦ c ≈ ρ' ↦ c' ∈ cons_per_ctx_env env_relΓ head_rel }} as equiv_ρc_ρ'c'0 by (apply HΓA'0; intuition).
+      assert {{ Dom ρ ↦ c ≈ ρ' ↦ c' ∈ cons_per_ctx_env env_relΓ head_relA }} as equiv_ρc_ρ'c' by (apply HΓA; intuition).
+      assert {{ Dom ρ ↦ c ≈ ρ' ↦ c' ∈ cons_per_ctx_env env_relΓ head_rel }} as equiv_ρc_ρ'c'0 by (apply HΓA'; intuition).
       simpl in *.
       (on_all_hyp: fun H => destruct (H _ _ equiv_ρc_ρ'c')).
       (on_all_hyp: fun H => destruct (H _ _ equiv_ρc_ρ'c'0)).
@@ -191,14 +189,13 @@ Proof.
   only 3-4: try (saturate_refl; mautosolve 2).
   - eauto using per_sort_elem_cumu.
   - intros.
-    assert (cons_per_ctx_env env_relΓ head_relA' d{{{ ρ ↦ c }}} d{{{ ρ' ↦ c' }}}) as equiv_ρc_ρ'c' by (apply HΓA'; intuition).
-    assert (cons_per_ctx_env env_relΓ head_rel d{{{ ρ ↦ c }}} d{{{ ρ' ↦ c' }}}) as equiv_ρc_ρ'c'0 by (apply HΓA'0; intuition).
+    assert (cons_per_ctx_env env_relΓ head_relA d{{{ ρ ↦ c }}} d{{{ ρ' ↦ c' }}}) as equiv_ρc_ρ'c' by (apply HΓA; intuition).
+    assert (cons_per_ctx_env env_relΓ head_rel d{{{ ρ ↦ c }}} d{{{ ρ' ↦ c' }}}) as equiv_ρc_ρ'c'0 by (apply HΓA'; intuition).
     simpl in *.
     (on_all_hyp: fun H => destruct (H _ _ equiv_ρc_ρ'c')).
     (on_all_hyp: fun H => destruct (H _ _ equiv_ρc_ρ'c'0)).
     destruct_conjs.
-    destruct_by_head @rel_mod_eval.
-    destruct H42.
-    handle_per_sort_elem_irrel.
-    mauto using per_subtyp_sorted_cumu.
+    destruct_by_head @rel_exp.
+    destruct_by_head @per_sort.
+    simplify_evals.
 Admitted.
