@@ -466,7 +466,7 @@ Inductive per_ctx_subtyp `(pred_P : PredicativeSig P) : ctx P -> ctx P -> Prop :
            (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ tail_rel }}),
             {{ ⟦ A ⟧ ρ ↘ a }} ->
             {{ ⟦ A' ⟧ ρ' ↘ a' }} ->
-            {{ ⟪ pred_P ⟫ Subs a <: a' at s }}) ->
+            {{ ⟪ pred_P ⟫ Sub a <: a' }}) ->
         {{ EF Γ, A@s ≈ Γ, A@s ∈ per_ctx_env pred_P ↘ env_rel }} ->
         {{ EF Γ', A'@s ≈ Γ', A'@s ∈ per_ctx_env pred_P ↘ env_rel' }} ->
         {{ ⟪ pred_P ⟫ SubE Γ, A@s <: Γ', A'@s }} }

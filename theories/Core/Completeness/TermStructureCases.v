@@ -458,3 +458,29 @@ Qed.
 
 #[export]
 Hint Resolve presup_rel_exp : mcpts.
+
+Lemma rel_exp_eq_subtyp{P : PtsSig} {pred_P : PredicativeSig P} : forall Γ M M' A A',
+    {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : A }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨ A ⊆ A' }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : A' }}.
+Proof.
+  intros * HM [env_relΓ [? ?]].
+  invert_rel_exp_unsorted HM.
+  econstructor; split; try eassumption.
+  intros.
+  (on_all_hyp: destruct_rel_by_assumption env_relΓ).
+  destruct_by_head (@rel_typ_unsorted P).
+  destruct_by_head (@rel_exp P).
+  simplify_evals.
+  eexists.
+  split; econstructor; eauto using per_sort_elem_cumu.
+  handle_per_sort_elem_irrel.
+  eapply per_elem_subtyping_gen; [| | | try eassumption].
+  - eauto using per_subtyp_sorted_cumu.
+  - eauto using per_sort_elem_cumu.
+  - symmetry.
+    eauto using per_sort_elem_cumu.
+Qed.
+
+#[export]
+Hint Resolve rel_exp_eq_subtyp : mcpts.

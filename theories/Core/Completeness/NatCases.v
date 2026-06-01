@@ -625,7 +625,7 @@ Proof.
     repeat split; only 1-2: mauto.
 
     eapply per_bot_then_per_elem; [eassumption |].
-    eapply (@eval_natrec_neut P pred_P Γ env_relΓ MZ MZ' MS MS' A A'); eauto.
+    eapply (@eval_natrec_neut P pred_P Γ env_relΓ MZ MZ' MS MS' A A'); try (exact r); eauto.
     + assert {{ EF Γ, ℕ@s' ≈ Γ, ℕ@s' ∈ per_ctx_env pred_P ↘ env_relΓℕ }} by (per_ctx_env_econstructor; eauto).
       eexists_rel_exp_of_sort.
       apply_relation_equivalence.
