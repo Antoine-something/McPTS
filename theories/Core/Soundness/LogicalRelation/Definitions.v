@@ -179,7 +179,7 @@ Section Gluing.
           {{ Dom b ≈ b ∈ per_bot }} ->
           typ_rel <∙> neut_glu_typ_pred s b ->
           el_rel <∙> neut_glu_exp_pred s b ->
-          {{ DG ⇑ Sort@s b ∈ glu_sort_elem_core ↘ typ_rel ↘ el_rel }} }
+          {{ DG ⇑ a b ∈ glu_sort_elem_core ↘ typ_rel ↘ el_rel }} }
   .
 
 
@@ -224,12 +224,12 @@ Section Gluing.
           motive typ_rel el_rel d{{{ ℕ }}})
 
       (case_neut :
-        forall {b}
+        forall {a b}
           typ_rel el_rel,
           {{ Dom b ≈ b ∈ per_bot }} ->
           typ_rel <∙> neut_glu_typ_pred s b ->
           el_rel <∙> neut_glu_exp_pred s b ->
-          motive typ_rel el_rel d{{{ ⇑ Sort@s b }}} )
+          motive typ_rel el_rel d{{{ ⇑ a b }}} )
   .
 
 
@@ -334,13 +334,13 @@ Section GluingInduction.
           motive s typ_rel exp_rel d{{{ ℕ }}})
 
       (case_neut :
-        forall s b
+        forall s a b
           (typ_rel : glu_typ_pred P)
           (exp_rel : glu_exp_pred P),
           {{ Dom b ≈ b ∈ per_bot }} ->
           typ_rel <∙> neut_glu_typ_pred s b ->
           exp_rel <∙> neut_glu_exp_pred s b ->
-          motive s typ_rel exp_rel d{{{ ⇑ Sort@s b }}})
+          motive s typ_rel exp_rel d{{{ ⇑ a b }}})
   .
 
   #[local]
