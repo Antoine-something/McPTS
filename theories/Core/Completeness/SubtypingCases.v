@@ -101,6 +101,35 @@ Proof.
   repeat split; econstructor; mauto; try econstructor; mauto; try reflexivity.
 Qed.
 
+Lemma per_subtyp_implies_per_subtyp_sorted {P} {pred_P : PredicativeSig P} : forall b b',
+    {{ ⟪ pred_P ⟫ Sub b <: b' }} ->
+    forall s s1 s2,
+      {{ Dom b ≈ b ∈ per_sort pred_P s1 }} ->
+      {{ Dom b' ≈ b' ∈ per_sort pred_P s2 }} ->
+      st_subtyp s1 s ->
+      st_subtyp s2 s ->
+      {{ ⟪ pred_P ⟫ Subs b <: b' at s }}.
+Proof.
+  intros * H.
+  destruct H.
+  - intros.
+    destruct_by_head @per_sort.
+    econstructor; mauto.
+  - induction H.
+    + intros.
+      destruct_by_head @per_sort.
+      handle_per_sort_elem_irrel.
+      econstructor; mauto.
+    + mauto.
+    + intros.
+      destruct_by_head @per_sort.
+      handle_per_sort_elem_irrel.
+      assert (per_sort_elem pred_P s0 elem_rel d{{{ Π r a ρ B }}} d{{{ Π r a ρ B }}}) by mauto.
+      invert_per_sort_elem H8.
+      econstructor; mauto.
+    + mauto.
+Qed.
+
 Lemma subtyp_pi {P} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru_pi P s1 s2 s3} Γ A A' B B',
   {{ ⟪ pred_P ⟫ Γ ⊨u A ≈ A' : Sort@s1 }} ->
   {{ ⟪ pred_P ⟫ Γ , A@s1 ⊨u B : Sort@s2 }} ->
@@ -199,7 +228,12 @@ Proof.
     simpl in *.
     (on_all_hyp: fun H => destruct (H _ _ equiv_ρc_ρ'c')).
     (on_all_hyp: fun H => destruct (H _ _ equiv_ρc_ρ'c'0)).
-Admitted.
+    destruct_conjs.
+    destruct_by_head @rel_exp.    
+    simplify_evals.
+    saturate_refl.
+    eapply per_subtyp_implies_per_subtyp_sorted; mauto.
+Qed.
 
 #[export]
   Hint Resolve subtyp_refl subtyp_refl_unsorted subtyp_refl_unsorted' subtyp_trans subtyp_sort subtyp_pi : mcpts.
