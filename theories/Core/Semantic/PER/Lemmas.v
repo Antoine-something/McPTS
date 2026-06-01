@@ -1780,7 +1780,7 @@ Proof.
 Qed.
 
 #[export]
-Hint Resolve per_ctx_subtyp_trans : mctt.
+Hint Resolve per_ctx_subtyp_trans : mcpts.
 
 #[export]
 Instance per_ctx_subtyp_trans_ins {P : PtsSig} {pred_P : PredicativeSig P} : Transitive (@per_ctx_subtyp P pred_P).

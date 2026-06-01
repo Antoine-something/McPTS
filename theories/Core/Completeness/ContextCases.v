@@ -121,3 +121,6 @@ Proof.
   simplify_evals.
   eassumption.
 Qed.
+
+#[export]
+Hint Resolve rel_ctx_sub_empty rel_ctx_sub_extend : mcpts.

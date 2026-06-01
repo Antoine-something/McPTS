@@ -483,4 +483,4 @@ Proof.
 Qed.
 
 #[export]
-Hint Resolve rel_exp_eq_subtyp : mctt.
+Hint Resolve rel_exp_eq_subtyp : mcpts.

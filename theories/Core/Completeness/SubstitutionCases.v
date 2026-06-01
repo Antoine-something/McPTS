@@ -345,4 +345,4 @@ Proof.
 Qed.
 
 #[export]
-Hint Resolve rel_sub_eq_subtyp : mctt.
+Hint Resolve rel_sub_eq_subtyp : mcpts.

@@ -5,17 +5,6 @@ From McPTS.Core Require Import Base.
 From McPTS.Core.Completeness Require Import LogicalRelation SortCases TermStructureCases FunctionCases.
 Import Domain_Notations.
 
-Lemma t {P : PtsSig} {pred_P : PredicativeSig P} : forall s s' r m m', 
-    st_subtyp s s' ->
-    per_sort_elem pred_P s r m m' ->
-    per_sort_elem pred_P s' r m m'.
-Proof.
-  intros.
-  saturate_refl.
-  specialize (ord_st_subtyp pred_P H) as ?.
-  destruct H3; mauto.
-Qed.
-  
 
 Lemma subtyp_refl {P : PtsSig} {pred_P : PredicativeSig P}  : forall Γ M M' s,
     {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ M' : Sort@s }} ->
@@ -38,7 +27,23 @@ Proof.
     etransitivity; try eassumption; symmetry; eassumption.
 Qed.
 
-Lemma subtyp_refl_unsorted {P : PtsSig} {pred_P : PredicativeSig P}  : forall Γ M M' s,
+Lemma subtyp_refl_unsorted {P : PtsSig} {pred_P : PredicativeSig P}  : forall Γ M M',
+    {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ M' }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨ M ⊆ M' }}.
+Proof.
+  intros * [env_relΓ].
+  destruct_conjs.
+  eexists_subtyp.
+  intros.
+  saturate_refl.
+  (on_all_hyp: destruct_rel_by_assumption env_relΓ).
+  destruct_by_head (@rel_typ_unsorted P).
+  handle_per_typ_elem_irrel.
+  do 2 eexists.
+  repeat split; econstructor; mauto 3; etransitivity; try eassumption; symmetry; try eassumption.
+Qed.
+
+Lemma subtyp_refl_unsorted' {P : PtsSig} {pred_P : PredicativeSig P}  : forall Γ M M' s,
     {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : Sort@s }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨ M ⊆ M' }}.
 Proof.
@@ -154,7 +159,7 @@ Proof.
       (on_all_hyp: fun H => destruct (H _ _ equiv_ρc_ρ'c'0)).
       econstructor; mauto.
   }
-
+  
   exvar (relation (domain P))
     ltac:(fun R => assert ({{ DF Π r a3 ρ B ≈ Π r a2 ρ' B ∈ per_sort_elem pred_P s3 ↘ R }})).
   {
@@ -181,7 +186,7 @@ Proof.
       (on_all_hyp: fun H => destruct (H _ _ equiv_ρc_ρ'c'0)).
       econstructor; mauto.
   }
-  
+
   do 2 eexists.
   repeat split; econstructor; mauto 2.
   do 2 econstructor;
@@ -194,8 +199,7 @@ Proof.
     simpl in *.
     (on_all_hyp: fun H => destruct (H _ _ equiv_ρc_ρ'c')).
     (on_all_hyp: fun H => destruct (H _ _ equiv_ρc_ρ'c'0)).
-    destruct_conjs.
-    destruct_by_head @rel_exp.
-    destruct_by_head @per_sort.
-    simplify_evals.
 Admitted.
+
+#[export]
+  Hint Resolve subtyp_refl subtyp_refl_unsorted subtyp_refl_unsorted' subtyp_trans subtyp_sort subtyp_pi : mcpts.
