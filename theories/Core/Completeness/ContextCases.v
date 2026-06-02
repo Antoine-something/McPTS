@@ -98,3 +98,29 @@ Qed.
 
 #[export]
 Hint Resolve rel_ctx_extend rel_ctx_extend_het rel_ctx_extend' : mcpts.
+
+Lemma rel_ctx_sub_empty {P : PtsSig} {pred_P : PredicativeSig P} :
+  {{⟪ pred_P ⟫ SubE ⋅ <: ⋅ }}.
+Proof. mauto. Qed.
+
+Lemma rel_ctx_sub_extend {P : PtsSig} {pred_P : PredicativeSig P} : forall (Γ : ctx P) Δ s A A',
+  {{ ⟪ pred_P ⟫ SubE Γ <: Δ }} ->
+  {{ ⟪ pred_P ⟫ Γ ⊨u A : Sort@s }} ->
+  {{ ⟪ pred_P ⟫ Δ ⊨u A' : Sort@s }} ->
+  {{ ⟪ pred_P ⟫ Γ ⊨ A ⊆ A' }} ->
+  {{ ⟪ pred_P ⟫ SubE Γ , A@s <: Δ , A'@s }}.
+Proof.
+  intros * ? []%rel_ctx_extend' []%rel_ctx_extend' [env_relΓ].
+  pose env_relΓ.
+  destruct_conjs.
+  
+  econstructor; try eassumption.
+  intros.
+  (on_all_hyp: destruct_rel_by_assumption env_relΓ).
+  destruct_by_head (@rel_exp P).
+  simplify_evals.
+  eassumption.
+Qed.
+
+#[export]
+Hint Resolve rel_ctx_sub_empty rel_ctx_sub_extend : mcpts.

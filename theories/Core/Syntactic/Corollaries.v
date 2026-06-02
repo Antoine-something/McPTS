@@ -165,7 +165,7 @@ Proof.
   intros; mauto 2 using wf_subtyp_subst_eq.
 Qed.
 #[export]
-Hint Resolve wf_subtyp_subst_eq wf_subtyp_subst : mctt.
+Hint Resolve wf_subtyp_subst_eq wf_subtyp_subst : mcpts.
 
 
 Lemma exp_typ_sub_lhs {P : PtsSig} : forall {Γ σ Δ s1 s2},

@@ -124,10 +124,9 @@ Proof with mautosolve.
   intros * H.
   dependent induction H.
   - do 2 eexists; mauto 3.
-    econstructor...
   - specialize (IHwf_exp A0 ltac:(reflexivity) ltac:(reflexivity)).
     destruct_conjs.
-    do 2 eexists; mauto 3. 
+    eexists; mauto 3. 
 Qed.
 
 #[export]
