@@ -54,7 +54,7 @@ theories/Core/Soundness/LogicalRelation/Definitions.v
 theories/Core/Soundness/LogicalRelation/CoreTactics.v
 theories/Core/Soundness/LogicalRelation/CoreLemmas.v
 theories/Core/Soundness/LogicalRelation/Core.v
-# theories/Core/Soundness/Realizability.v
+theories/Core/Soundness/Realizability.v
 # theories/Core/Soundness/LogicalRelation/Lemmas.v
 # theories/Core/Soundness/LogicalRelation.v
 # theories/Core/Soundness/ContextCases.v
