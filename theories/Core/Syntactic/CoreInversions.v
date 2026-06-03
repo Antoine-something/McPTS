@@ -65,7 +65,6 @@ Qed.
 #[export]
 Hint Resolve wf_typ_pi_inversion' : mcpts.
 
-
 Corollary wf_fn_inversion {P : PtsSig} : forall {Γ : ctx P} {A M C s1 s2 s3} {r : Ru_pi P s1 s2 s3},
     {{ Γ ⊢ λ r A M : C }} ->
     exists B, {{ Γ, A@s1 ⊢ M : B }} /\ {{ Γ ⊢ Π r A B ⊆ C }}.
