@@ -412,9 +412,9 @@ Remove Hints wf_subtyp_refl : mcpts.
 Corollary wf_subtyp_pi' {P} : forall {Γ : ctx P} {A A' B B' s1 s2 s3} {r : Ru_pi P s1 s2 s3},
     {{ Γ ⊢ A ≈ A' : Sort@s1 }} ->
     {{ Γ, A@s1 ⊢ B : Sort@s2 }} ->
-        {{ Γ, A'@s1 ⊢ B' : Sort@s2 }} ->
-        {{ Γ, A'@s1 ⊢ B ⊆ B' }} ->
-        {{ Γ ⊢ Π r A B ⊆ Π r A' B' }}.
+    {{ Γ, A'@s1 ⊢ B' : Sort@s2 }} ->
+    {{ Γ, A'@s1 ⊢ B ⊆ B' }} ->
+    {{ Γ ⊢ Π r A B ⊆ Π r A' B' }}.
 Proof.
   impl_opt_constructor.
 Qed.
