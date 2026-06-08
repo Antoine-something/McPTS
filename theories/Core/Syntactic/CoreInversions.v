@@ -283,3 +283,15 @@ Qed.
 
 #[export]
 Hint Resolve wf_sub_extend_inversion : mcpts.
+
+Lemma wf_typ_inversion {P} : forall {Γ : ctx P} {A},
+    {{ Γ ⊢ A }} ->
+    (exists s, {{ Γ ⊢ A ≈ Sort@s }} \/ {{ Γ ⊢ A : Sort@s }}).
+Proof.
+  induction 1; mauto.
+  destruct IHwf_typ as [s []].
+  - eexists; left.
+    transitivity {{{ Sort@s[σ] }}}; mauto 3.
+  - eexists; right; mauto 3.
+Qed.
+

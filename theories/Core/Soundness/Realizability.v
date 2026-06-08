@@ -566,7 +566,7 @@ Theorem realize_glu_typ_elem_gen {P} {pred_P : PredicativeSig P} : forall a so t
           {{ Dom m ≈ m ∈ R }} ->
           {{ Γ ⊢ M : A ® m ∈ glu_elem_top_unsorted pred_P so a }}).
 Proof.
-  destruct 1; subst.
+  induction 1; subst.
   - repeat split; intros.
     + simpl_glu_rel; econstructor; mauto 3.
     + inversion_clear H2.
@@ -581,8 +581,9 @@ Proof.
       * simpl.
         split; [subst; mauto 2|].
         intros.
-        subst.
-        eapply H7; mauto 3.
+        assert {{ Δ ⊢ A[σ] ≈ Sort@s[σ] }} by mauto 3.
+        assert {{ Δ ⊢ A[σ] ≈ Sort@s }} by mauto 4.
+        enough {{ Δ ⊢ M[σ] ≈ A' : A[σ] }}; mauto 2.
     + simpl_glu_rel.
       assert {{ Γ ⊢ M ® glu_typ_top pred_P s m }} by mauto 3.
       destruct H7.
@@ -590,10 +591,16 @@ Proof.
       econstructor; mauto 2.
       * inversion_clear H1.
         simpl_glu_rel.
-        reflexivity.
+        mauto 3.
+      * inversion_clear H1.
+        simpl_glu_rel; mauto 2.
       * intros.
-        inversion_clear H10.
-        eapply H9; mauto 2.
+        assert {{ Δ ⊢ A[σ] ≈ Sort@s[σ] }} by mauto 3.
+        assert {{ Δ ⊢ A[σ] ≈ Sort@s }} by mauto 4.        
+        inversion_clear H1.
+        inversion_clear H11.
+        mauto 4.
+
 
   - assert (glu_sort_elem pred_P s typ_rel exp_rel a) by eassumption.
     eapply realize_glu_sort_elem_gen in H0.

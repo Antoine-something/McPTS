@@ -412,12 +412,12 @@ End GluingInduction.
 
 (** Gluing relation that includes top sorts *)
 Definition top_sort_glu_typ_pred {P : PtsSig} (pred_P : PredicativeSig P) (s : P) : glu_typ_pred P :=
-  fun Γ A => (A = {{{ Sort@s }}}).
+  fun Γ A => {{ Γ ⊢ A ≈ Sort@s }}.
 Arguments top_sort_glu_typ_pred {P} pred_P s Γ A/.
 Transparent top_sort_glu_typ_pred.
 
 Definition top_sort_glu_exp_pred {P} (pred_P : PredicativeSig P) (s : P) : glu_exp_pred P :=
-  fun Γ A M m => (A = {{{ Sort@s }}}) /\
+  fun Γ A M m => {{ Γ ⊢ A ≈ Sort@s }} /\
                 (exists typ_rel exp_rel, {{ DG m ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} /\
                                       {{ Γ ⊢ M ® typ_rel }}).
 Arguments top_sort_glu_exp_pred {P} pred_P s Γ A M m/.
@@ -494,7 +494,7 @@ Inductive glu_elem_bot_unsorted {P} (pred_P : PredicativeSig P) : SortOption P -
     {{ DG a ∈ glu_typ_elem pred_P None ↘ typ_rel ↘ exp_rel }} ->
     {{ Γ ⊢ A ® typ_rel }} ->
     {{ Dom m ≈ m ∈ per_bot }} ->
-    (forall Δ σ M', {{ Δ ⊢w σ : Γ }} -> {{ Rne m in length Δ ↘ M' }} -> {{ Δ ⊢ M[σ] ≈ M' : A }}) ->
+    (forall Δ σ M', {{ Δ ⊢w σ : Γ }} -> {{ Rne m in length Δ ↘ M' }} -> {{ Δ ⊢ M[σ] ≈ M' : A[σ] }}) ->
     {{ Γ ⊢ M : A ® m ∈ glu_elem_bot_unsorted pred_P None a }}
 | glu_elem_bot_unsorted_sorted : forall s a Γ A M m typ_rel exp_rel,
     {{ Γ ⊢ M : A }} ->
@@ -513,7 +513,7 @@ Inductive glu_elem_top_unsorted {P} (pred_P : PredicativeSig P) : SortOption P -
     {{ DG a ∈ glu_typ_elem pred_P None ↘ typ_rel ↘ exp_rel }} ->
     {{ Γ ⊢ A ® typ_rel }} ->
     {{ Dom ⇓ a m ≈ ⇓ a m ∈ per_top }} ->
-    (forall Δ σ W, {{ Δ ⊢w σ : Γ }} -> {{ Rnf ⇓ a m in length Δ ↘ W }} -> {{ Δ ⊢ M[σ] ≈ W : A }}) ->
+    (forall Δ σ W, {{ Δ ⊢w σ : Γ }} -> {{ Rnf ⇓ a m in length Δ ↘ W }} -> {{ Δ ⊢ M[σ] ≈ W : A[σ] }}) ->
     {{ Γ ⊢ M : A ® m ∈ glu_elem_top_unsorted pred_P None a }}
 | glu_elem_top_unsorted_sorted : forall s a Γ A M m typ_rel exp_rel,
     {{ Γ ⊢ M : A }} ->
@@ -529,7 +529,7 @@ Inductive glu_typ_top_unsorted {P} (pred_P : PredicativeSig P) : SortOption P ->
 | glu_typ_top_unsorted_top_sort :
   forall s a Γ A,
     (* (forall s', Ax_typ P s s' -> False) -> *)
-    (A = {{{ Sort@s }}}) ->
+    {{ Γ ⊢ A ≈ Sort@s }} ->
     (a = d{{{ Sort@s }}}) ->
     {{ Γ ⊢ A ® glu_typ_top_unsorted pred_P None a }}
 | glu_typ_top_unsorted_sorted :
@@ -646,11 +646,11 @@ Inductive glu_rel_exp_with_sub_unsorted {P} (pred_P : PredicativeSig P) : SortOp
 | glu_rel_exp_with_sub_unsorted_top_sort :
   `{ forall typ_rel exp_rel,
         (* (forall s', Ax_typ P s s' -> False) -> *)
-        (A = {{{ Sort@s }}}) ->
+        {{ ⟦ A ⟧ ρ ↘ a }} ->
         (a = d{{{ Sort@s }}}) ->
         {{ ⟦ M ⟧ ρ ↘ m }} ->
         {{ DG a ∈ glu_typ_elem pred_P None ↘ typ_rel ↘ exp_rel }} ->
-        {{ Δ ⊢ M[σ] : Sort@s ® m ∈ exp_rel }} ->
+        {{ Δ ⊢ M[σ] : A[σ] ® m ∈ exp_rel }} ->
         glu_rel_exp_with_sub_unsorted pred_P None Δ M A σ ρ }
 | glu_rel_exp_with_sub_unsorted_sorted :
   `{ forall typ_rel exp_rel,
@@ -688,9 +688,10 @@ Definition glu_rel_typ {P} (pred_P : PredicativeSig P) s Γ A : Prop :=
 Inductive glu_rel_typ_with_sub_unsorted {P} (pred_P : PredicativeSig P) : SortOption P -> ctx P -> typ P -> sub P -> env P -> Prop :=
 | glu_rel_typ_with_sub_unsorted_top_sort :
   `{ forall typ_rel exp_rel,
-        (A = {{{ Sort@s }}}) ->
+        {{ ⟦ A ⟧ ρ ↘ a }} ->
         (a = d{{{ Sort@s }}}) ->
         {{ DG a ∈ glu_typ_elem pred_P None ↘ typ_rel ↘ exp_rel }} ->
+        {{ Δ ⊢ A[σ] ® typ_rel }} ->
         glu_rel_typ_with_sub_unsorted pred_P None Δ A σ ρ }
 | glu_rel_typ_with_sub_unsorted_sorted :
   `{ forall typ_rel exp_rel,
