@@ -1,4 +1,4 @@
-\From McPTS Require Import PtsSignature LibTactics.
+From McPTS Require Import PtsSignature LibTactics.
 From McPTS.Core Require Import Base.
 From McPTS.Core.Completeness Require Import FundamentalTheorem.
 From McPTS.Core.Semantic Require Import Realizability.

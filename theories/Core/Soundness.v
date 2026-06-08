@@ -1,5 +1,6 @@
 From McPTS Require Import PtsSignature LibTactics.
 From McPTS.Core Require Import Base.
+From McPTS.Core.Syntactic Require Import CoreInversions.
 From McPTS.Core Require Import Completeness.
 From McPTS.Core.Completeness Require Import FundamentalTheorem.
 From McPTS.Core.Semantic Require Import Realizability.
@@ -68,7 +69,7 @@ Proof.
   intros.
   assert {{ ⊢ Γ }} by mauto 3.
               
-  eapply test in H as [s []].
+  eapply wf_typ_inversion in H as [s []].
   - assert {{ ⟪ pred_P ⟫ ⊨ Γ }} as [env_relΓ] by (eapply completeness_fundamental_ctx; mauto 2).
     unshelve (epose proof completeness_typ_unsorted H as [W []]); try eassumption.
     inversion H3; subst.

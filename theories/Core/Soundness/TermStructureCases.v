@@ -308,7 +308,7 @@ Lemma glu_rel_exp_sub_sort_unsorted {P} (pred_P : PredicativeSig P) : forall {Γ
 Proof.
   intros * Hσ HM.
   assert {{ Γ ⊢s σ : Δ }} by mauto 3.
-  assert {{ Δ ⊢ M : A }} by info_mauto 3.
+  assert {{ Δ ⊢ M : A }} by mauto 3.
   (* assert {{ ⟪ pred_P ⟫ Δ ⊩u A : Sort@s @ ^None }} by mauto 3. *)
   destruct Hσ as [SbΓ [SbΔ]].
   destruct_conjs.
@@ -598,7 +598,7 @@ Proof.
   epose proof glu_sort_elem_cumu pred_P H38 H41 as [? []].
   epose proof glu_sort_elem_typ_cumu pred_P H38 H41 H16 H42.
   handle_functional_glu_sort_elem P.
-  split; mauto 4.None
+  split; mauto 4.
 Qed.
 
 Lemma glu_rel_exp_conv_unsorted4 {P} (pred_P : PredicativeSig P) : forall {Γ M A A' s},

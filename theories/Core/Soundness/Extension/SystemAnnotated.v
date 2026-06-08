@@ -106,8 +106,7 @@ with wf_typ_ann {P} : ctx P -> typ P -> SortOption P -> Prop :=
      {{ Δ ⊫ A @ so}} ->
      {{ Γ ⊫ A[σ] @ so }} )
 where "Γ ⊫ A @ s" := (wf_typ_ann Γ A s) (in custom judg) : type_scope
-with wf_sub_ann {P} : ctx P -> ctx P| wfa_exp_sub_typ :
-  `(  -> sub P -> Prop :=
+with wf_sub_ann {P} : ctx P -> ctx P -> sub P -> Prop :=
 | wfa_sub_id :
   `( {{ ⊫ Γ }} ->
      {{ Γ ⊫s Id : Γ }} )
