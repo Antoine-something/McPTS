@@ -1787,3 +1787,19 @@ Instance per_ctx_subtyp_trans_ins {P : PtsSig} {pred_P : PredicativeSig P} : Tra
 Proof.
   eauto using per_ctx_subtyp_trans.
 Qed.
+
+Lemma per_subtyp_sort_inv_left {P} (pred_P : PredicativeSig P) : forall {s a},
+    {{ ⟪ pred_P ⟫ Sub Sort@s <: a }} ->
+    exists s', a = d{{{ Sort@s' }}} /\ st_subtyp s s'.
+Proof.
+  intros.
+  do 2 (dependent destruction H; mauto).
+Qed.
+
+Lemma per_subtyp_sort_inv_right {P} (pred_P : PredicativeSig P) : forall {s a},
+    {{ ⟪ pred_P ⟫ Sub a <: Sort@s }} ->
+    exists s', a = d{{{ Sort@s' }}} /\ st_subtyp s' s.
+Proof.
+  intros.
+  do 2 (dependent destruction H; mauto).
+Qed.

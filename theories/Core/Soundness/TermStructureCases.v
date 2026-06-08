@@ -422,21 +422,6 @@ Qed.
 #[export]
 Hint Resolve glu_rel_typ_sub_unsorted : mcpts.
 
-Lemma per_subtyp_sort_inv_left {P} (pred_P : PredicativeSig P) : forall {s a},
-    {{ ⟪ pred_P ⟫ Sub Sort@s <: a }} ->
-    exists s', a = d{{{ Sort@s' }}} /\ st_subtyp s s'.
-Proof.
-  intros.
-  do 2 (dependent destruction H; mauto).
-Qed.
-
-Lemma per_subtyp_sort_inv_right {P} (pred_P : PredicativeSig P) : forall {s a},
-    {{ ⟪ pred_P ⟫ Sub a <: Sort@s }} ->
-    exists s', a = d{{{ Sort@s' }}} /\ st_subtyp s' s.
-Proof.
-  intros.
-  do 2 (dependent destruction H; mauto).
-Qed.
   
 Lemma glu_rel_exp_conv_unsorted1 {P} (pred_P : PredicativeSig P) : forall {Γ M A A' s s'},
     {{ ⟪ pred_P ⟫ Γ ⊩u M : A @ ^(Some s) }} ->
@@ -613,7 +598,7 @@ Proof.
   epose proof glu_sort_elem_cumu pred_P H38 H41 as [? []].
   epose proof glu_sort_elem_typ_cumu pred_P H38 H41 H16 H42.
   handle_functional_glu_sort_elem P.
-  split; mauto 4.
+  split; mauto 4.None
 Qed.
 
 Lemma glu_rel_exp_conv_unsorted4 {P} (pred_P : PredicativeSig P) : forall {Γ M A A' s},
