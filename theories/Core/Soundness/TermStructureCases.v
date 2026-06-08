@@ -429,13 +429,12 @@ Lemma glu_rel_exp_conv_unsorted1 {P} (pred_P : PredicativeSig P) : forall {Γ M 
     {{ Γ ⊢ A ⊆ A' }} ->
     {{ ⟪ pred_P ⟫ Γ ⊩u M : A' @ ^(Some s') }}.
 Proof.
-  intros * [Sb [?]] ? ?.
-  assert {{ ⟪ pred_P ⟫ Γ ⊩ A' @ ^ s' }} as [SbA' [?]] by mauto 2.
+  intros * [Sb [?]] [SbA' [? ?]] ?.
   assert {{ ⟪ pred_P ⟫ Γ ⊨ A ⊆ A' }} as [env_relΓ [? ?]] by (eapply completeness_fundamental; mauto 2).
   handle_functional_glu_ctx_env P.
   assert (exists ρ ρ', initial_env Γ ρ /\ initial_env Γ ρ' /\ {{ Dom ρ ≈ ρ' ∈ env_relΓ }}) as [ρ [ρ']] by (eauto using per_ctx_then_per_env_initial_env).
   destruct_conjs.
-  destruct_rel_by_assumption env_relΓ H6.
+  destruct_rel_by_assumption env_relΓ H5.
 
   destruct_by_head (@rel_typ_unsorted P).
   destruct_by_head (@rel_exp).
@@ -461,12 +460,11 @@ Proof.
 
   assert (per_typ_elem pred_P (per_sort pred_P s) d{{{ Sort@s }}} d{{{ Sort@s }}}) by (eapply per_typ_sort; reflexivity).
 
-  assert (SbA' Δ σ ρ0) by (rewrite <- H8 in H17; mauto 2).
-  assert (glu_rel_typ_with_sub pred_P s' Δ A' σ ρ0) as glu_relA' by mauto 3.
-  destruct glu_relA'.
+  assert (SbA' Δ σ ρ0) by (rewrite <- H7 in H16; mauto 2).
+  assert (glu_rel_typ_with_sub_unsorted pred_P (Some s') Δ A' σ ρ0) as glu_relA' by mauto 3.
+  inversion glu_relA'; subst.
   simplify_evals.
-
-  econstructor; mauto.
+  econstructor; mauto.  
   eapply glu_sort_elem_per_subtyp_trm_conv; mauto 3.
 Qed.
 
