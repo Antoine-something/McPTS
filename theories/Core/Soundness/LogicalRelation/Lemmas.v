@@ -589,10 +589,23 @@ Proof.
     assert (OP d{{{ ⇑! a' (length Γ) }}} equiv_len'_len' {{{ Γ, IT@s1 }}} {{{ OT[Wk,,#0] }}}) by mauto 2.
     assert {{ Γ, IT'@s1 ⊢w Wk : Γ }} by mauto 3.
     assert (OP' d{{{ ⇑! a' (length Γ) }}} equiv_len'_len' {{{ Γ, IT'@s1 }}} {{{ OT'[Wk,,#0] }}}) by mauto 2.
-
     
     
     eapply wf_subtyp_pi; mauto 3.
+    
+    assert (OP d{{{ ⇑! a (length Γ) }}} equiv_len_len {{{ Γ, IT'@s1 }}} OT).
+    {
+      assert {{ ⊢ Γ, IT@s1 ≈ Γ, IT'@s1 }} by mauto 4.
+      assert (OP d{{{ ⇑! a (length Γ) }}} equiv_len_len {{{ Γ, IT'@s1 }}} {{{ OT[Wk,,#0] }}}).
+      {
+        eapply glu_sort_elem_typ_resp_ctx_eq; mauto 3.
+        eapply H62; mauto 2.        
+      }
+
+      enough {{ Γ, IT'@s1 ⊢ OT[Wk,,#0] ≈ OT : Sort@s2 }} by (eapply glu_sort_elem_typ_resp_exp_eq; mauto 2).
+      
+    }
+    assert (OP' d{{{ ⇑! a (length Γ) }}} equiv_len_len {{{ Γ, IT'@s1 }}} OT') by admit.
     eapply H1; mauto 3.
     
     assert (IP {{{ Γ, IT@s1 }}} {{{ IT[Wk] }}}) by mauto 4.
