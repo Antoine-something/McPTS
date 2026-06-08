@@ -103,7 +103,8 @@ Proof.
   assert {{ Δ ⊢ A : Sort@s }} by mauto 3.
   assert {{ Γ ⊢ M : A[σ] }} by mauto 3.
   assert {{ Δ ⊢ Sort@s : Sort@s' }} by (eapply glu_rel_exp_typ_well_sorted; mauto 2).
-  assert (Ax P s s') by (eapply glu_rel_exp_sort_implies_ax; mauto 2).
+  assert (exists s'', Ax_typ P s s'' /\ st_subtyp s'' s') as Hst by (eapply glu_rel_exp_sort_implies_ax; mauto 2).
+  destruct Hst as [s'' [? ?]].
   destruct Hσ as [SbΓ [SbΔ]].
   destruct_conjs.
   invert_glu_rel_exp HA.
@@ -128,18 +129,19 @@ Proof.
     assert {{ Δ0 ⊢s (σ,,M)∘σ0 ≈ (σ∘σ0),,M[σ0] : Δ, A@s }} by mauto 3.
     assert {{ Δ0 ⊢s Wk∘((σ,,M)∘σ0) : Δ }} by mauto 4.
     assert {{ Δ0 ⊢s Wk∘((σ,,M)∘σ0) ≈ Wk∘((σ∘σ0),,M[σ0]) : Δ }} by mauto 4.
-    assert {{ Δ0 ⊢ M[σ0] : A[σ][σ0] }} by mauto 3.
+    assert {{ Δ0 ⊢ M[σ0] : A[σ][σ0] }} by mauto 4.
     assert {{ Δ0 ⊢ M[σ0] : A[σ∘σ0] }} by mauto 4.
     assert {{ Δ0 ⊢s Wk∘((σ∘σ0),,M[σ0]) ≈ σ∘σ0 : Δ }} by mauto 3.
     assert {{ Δ0 ⊢s Wk∘((σ,,M)∘σ0) ≈ σ∘σ0 : Δ }} by mauto 3.
     econstructor; mauto 4.
     + assert {{ Δ, A@s ⊢s Wk : Δ }} by mauto 4.
+      assert {{ Δ, A@s ⊢ A[Wk] }} by mauto 3.
       assert {{ Δ0 ⊢ A[Wk][(σ,,M)∘σ0] ≈ A[Wk∘((σ,,M)∘σ0)] : Sort@s }} as -> by (symmetry; mauto 3).
       assert {{ Δ0 ⊢ A[Wk∘((σ,,M)∘σ0)] ≈ A[σ∘σ0] : Sort@s }} as -> by mauto 3.
       assert {{ Δ0 ⊢ A[σ∘σ0] ≈ A[σ][σ0] : Sort@s }} by mauto 3.
-      rewrite -> H26.
+      rewrite -> H29.
       assert {{ Δ, A@s ⊢ #0 : A[Wk] }} by mauto 3.
-      assert {{ Δ0 ⊢ #0[(σ,,M)∘σ0] ≈ #0[(σ∘σ0),,M[σ0]] : A[Wk][(σ,,M)∘σ0] }} by mauto 4.
+      assert {{ Δ0 ⊢ #0[(σ,,M)∘σ0] ≈ #0[(σ∘σ0),,M[σ0]] : A[Wk][(σ,,M)∘σ0] }} by mauto 3.
       assert {{ Δ0 ⊢ #0[(σ,,M)∘σ0] ≈ #0[(σ∘σ0),,M[σ0]] : A[σ][σ0] }} as -> by mauto 4.
       assert {{ Δ0 ⊢ #0[(σ∘σ0),,M[σ0]] ≈ M[σ0] : A[σ∘σ0] }} by mauto.
       assert {{ Δ0 ⊢ #0[(σ∘σ0),,M[σ0]] ≈ M[σ0] : A[σ][σ0] }} as -> by (eapply wf_exp_eq_conv; mauto 4).
@@ -176,7 +178,8 @@ Proof.
     destruct_glu_rel_sub_with_sub.
     destruct_glu_rel_exp_with_sub_unsorted.
     autoinjections.
-    assert (glu_rel_exp_with_sub_unsorted pred_P None Δ0 A {{{ Sort@s0 }}} {{{ σ∘σ0 }}} ρ') by mauto 3.
+    inversion H12; subst.
+    assert (glu_rel_exp_with_sub_unsorted pred_P None Δ0 A {{{ Sort@s0 }}} {{{ σ∘σ0 }}} ρ') by mauto 4.
     simpl_glu_rel.
     dir_inversion_clear_by_head (@glu_rel_exp_with_sub_unsorted P); autoinjections.
     dir_inversion_clear_by_head (@glu_typ_elem P).
@@ -208,24 +211,21 @@ Proof.
       mauto 2.
     + apply_predicate_equivalence.
       simpl.
-      rewrite -> H17.
+      rewrite -> H19.
       eassumption.
 Qed.
 
 #[export]
-Hint Resolve glu_rel_sub_extend_unsorted : mcpts.
+  Hint Resolve glu_rel_sub_extend_unsorted : mcpts.
 
 Lemma glu_rel_sub_conv {P} (pred_P : PredicativeSig P) : forall {Γ σ Δ Δ'},
     {{ ⟪ pred_P ⟫ Γ ⊩s σ : Δ }} ->
     {{ ⟪ pred_P ⟫ ⊩ Δ' }} ->
-    {{ ⊢ Δ ≈ Δ' }} ->
+    {{ ⊢ Δ ⊆ Δ' }} ->
     {{ ⟪ pred_P ⟫ Γ ⊩s σ : Δ' }}.
 Proof.
   intros * [SbΓ [SbΔ [? []]]] [SbΔ'] HΔΔ'.
-  assert (SbΔ <∙> SbΔ').
-  {
-    split; eapply glu_ctx_env_resp_per_ctx_helper; mauto 3.
-  }
+  assert (SbΔ -∙> SbΔ') by (eapply glu_ctx_env_resp_per_ctx_helper; mauto 3).
   do 2 eexists; repeat split; mauto 3.
   intros.
   destruct_glu_rel_sub_with_sub.

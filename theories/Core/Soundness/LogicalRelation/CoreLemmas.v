@@ -269,6 +269,17 @@ Proof.
     simpl_glu_rel; mauto 4.
 Qed.
 
+Lemma glu_sort_elem_typ_escape {P} (pred_P : PredicativeSig P) : forall s typ_rel exp_rel a,
+    {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
+    forall Γ A,
+      {{ Γ ⊢ A ® typ_rel }} ->
+      {{ Γ ⊢ A }}.
+Proof.
+  simpl.
+  induction 1 using glu_sort_elem_ind; intros;
+    simpl_glu_rel; mauto 4.
+Qed.
+
 Lemma glu_sort_elem_per_sort {P} (pred_P : PredicativeSig P) : forall s typ_rel exp_rel a,
     {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
     {{ Dom a ≈ a ∈ per_sort pred_P s }}.

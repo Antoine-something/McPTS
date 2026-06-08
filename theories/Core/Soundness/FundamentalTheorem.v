@@ -67,7 +67,7 @@ Section soundness_fundamental.
     eapply soundness_fundamental_typ_ann; mauto 2.
   Qed.
 
-  Theorem soundness_fundamental_sub {P} (pred_P : PredicativeSig P) (full_P : FullSig P) :
+  Theorem soundness_fundamental_sub {P} (pred_P : PredicativeSig P):
     forall Γ σ Δ, {{ Γ ⊢s σ : Δ }} -> {{ ⟪ pred_P ⟫ Γ ⊩s σ : Δ }}.
   Proof.
     intros.
