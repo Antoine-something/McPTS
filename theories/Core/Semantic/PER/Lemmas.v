@@ -1788,6 +1788,52 @@ Proof.
   eauto using per_ctx_subtyp_trans.
 Qed.
 
+
+Lemma per_sort_elem_pi_lowering {P} (pred_P : PredicativeSig P) : forall {s1 s2 s3 s} {r : Ru_pi P s1 s2 s3} {elem_rel a ρ B a' ρ' B'},
+    {{ DF Π r a ρ B ≈ Π r a' ρ' B' ∈ per_sort_elem pred_P s ↘ elem_rel }} ->
+    {{ DF Π r a ρ B ≈ Π r a' ρ' B' ∈ per_sort_elem pred_P s3 ↘ elem_rel }}.
+Proof.
+  intros.
+  invert_per_sort_elem H.
+  per_sort_elem_econstructor; mauto 3.
+  - destruct_conjs.
+    pose proof ord_ru_pi_sub pred_P r sub as [[] ?]; subst; mauto 2.
+  - intros.
+    destruct_rel_mod_eval.
+    econstructor; mauto 3.
+    pose proof ord_ru_pi_sub pred_P r sub as [? []]; subst; mauto 2.
+Qed.
+
+
+Lemma per_subtyp_implies_per_subtyp_sorted {P} {pred_P : PredicativeSig P} : forall b b',
+    {{ ⟪ pred_P ⟫ Sub b <: b' }} ->
+    forall s s1 s2,
+      {{ Dom b ≈ b ∈ per_sort pred_P s1 }} ->
+      {{ Dom b' ≈ b' ∈ per_sort pred_P s2 }} ->
+      st_subtyp s1 s ->
+      st_subtyp s2 s ->
+      {{ ⟪ pred_P ⟫ Subs b <: b' at s }}.
+Proof.
+  intros * H.
+  destruct H.
+  - intros.
+    destruct_by_head @per_sort.
+    econstructor; mauto.
+  - induction H.
+    + intros.
+      destruct_by_head @per_sort.
+      handle_per_sort_elem_irrel.
+      econstructor; mauto.
+    + mauto.
+    + intros.
+      destruct_by_head @per_sort.
+      handle_per_sort_elem_irrel.
+      assert (per_sort_elem pred_P s0 elem_rel d{{{ Π r a ρ B }}} d{{{ Π r a ρ B }}}) by mauto.
+      invert_per_sort_elem H8.
+      econstructor; mauto.
+    + mauto.
+Qed.
+
 Lemma per_subtyp_sort_inv_left {P} (pred_P : PredicativeSig P) : forall {s a},
     {{ ⟪ pred_P ⟫ Sub Sort@s <: a }} ->
     exists s', a = d{{{ Sort@s' }}} /\ st_subtyp s s'.

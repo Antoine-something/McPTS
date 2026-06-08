@@ -101,6 +101,7 @@ Proof.
   repeat split; econstructor; mauto; try econstructor; mauto; try reflexivity.
 Qed.
 
+(* This should go in PER lemmas *)
 Lemma per_subtyp_implies_per_subtyp_sorted {P} {pred_P : PredicativeSig P} : forall b b',
     {{ ⟪ pred_P ⟫ Sub b <: b' }} ->
     forall s s1 s2,
