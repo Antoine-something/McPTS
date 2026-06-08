@@ -490,7 +490,7 @@ Proof.
       progressive_inversion.
       specialize (H3 (length Δ)) as [? []].
       firstorder.
-Admitted.
+Qed.
 
 
 Corollary realize_glu_typ_top {P} (pred_P : PredicativeSig P) : forall a s typ_rel exp_rel,
