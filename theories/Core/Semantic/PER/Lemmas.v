@@ -1849,3 +1849,84 @@ Proof.
   intros.
   do 2 (dependent destruction H; mauto).
 Qed.
+
+Lemma per_subtyp_nat_inv_left {P} (pred_P : PredicativeSig P) : forall {a},
+    {{ ⟪ pred_P ⟫ Sub ℕ <: a }} ->
+    (a = d{{{ ℕ }}}).
+Proof.
+  intros.
+  inversion_clear H.
+  inversion_clear H0.
+  reflexivity.
+Qed.
+
+Lemma per_subtyp_nat_inv_right {P} (pred_P : PredicativeSig P) : forall {a},
+    {{ ⟪ pred_P ⟫ Sub a <: ℕ }} ->
+    a = d{{{ ℕ }}}.
+Proof.
+  intros.
+  inversion_clear H.
+  inversion_clear H0.
+  reflexivity.
+Qed.
+
+Lemma per_subtyp_pi_inv_left {P} (pred_P : PredicativeSig P) : forall {s1 s2 s3 c a ρ B} {r : Ru_pi P s1 s2 s3},
+    {{ ⟪ pred_P ⟫ Sub Π r a ρ B <: c }} ->
+    exists a' ρ' B', c = d{{{ Π r a' ρ' B' }}}.
+Proof.
+  intros.
+  do 2 (dependent destruction H; mauto).
+Qed.
+
+Lemma per_subtyp_pi_inv_right {P} (pred_P : PredicativeSig P) : forall {s1 s2 s3 c a ρ B} {r : Ru_pi P s1 s2 s3},
+    {{ ⟪ pred_P ⟫ Sub c <: Π r a ρ B }} ->
+    exists a' ρ' B', c = d{{{ Π r a' ρ' B' }}}.
+Proof.
+  intros.
+  do 2 (dependent destruction H; mauto).
+Qed.
+
+Lemma per_bot_var_inv {P : PtsSig} : forall {n n'},
+    @per_bot P d{{{ !n }}} d{{{ !n' }}} ->
+    n = n'.
+Proof.
+  intros.
+  specialize (H (max n n' + 1)) as [L []].
+  inversion H; subst.
+  inversion H0; subst.
+  lia.
+Qed.
+
+Lemma per_subtyp_var_inv_left {P} (pred_P : PredicativeSig P) : forall {a x n l},
+    n < l ->
+    {{ ⟪ pred_P ⟫ Sub ⇑! x n <: a }} ->
+    exists x', a = d{{{ ⇑! x' n }}}.
+Proof.
+  intros * Hlt ?.
+  inversion_clear H.
+  inversion_clear H0.
+  pose proof H.
+  specialize (H l) as [M []].
+  inversion H; subst.
+  inversion H1; subst.
+  assert (n = x0) by (eapply per_bot_var_inv; mauto 2).
+  subst.
+  eexists; reflexivity.
+Qed.
+
+Lemma per_subtyp_var_inv_right {P} (pred_P : PredicativeSig P) : forall {a x n l},
+    n < l ->
+    {{ ⟪ pred_P ⟫ Sub a <: ⇑! x n }} ->
+    exists x', a = d{{{ ⇑! x' n }}}.
+Proof.
+  intros * Hlt ?.
+  inversion_clear H.
+  inversion_clear H0.
+  pose proof H.
+  specialize (H l) as [M []].
+  inversion H1; subst.
+  inversion H; subst.
+  assert (n = x0) by (eapply per_bot_var_inv; mauto 2).
+  subst.
+  eexists; reflexivity.
+Qed.
