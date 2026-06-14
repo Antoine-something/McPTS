@@ -485,6 +485,52 @@ Proof.
     econstructor; mauto 2.
 Qed.
 
+Ltac do_sort_elem_lower_for_assert sort_elem s :=
+  match goal with
+  | [ r : Ru_pi ?P s ?s2 ?s3,
+        sub : st_subtyp ?s3 ?s',
+          H1 : pred_rel ?pred_P s ?s' -> sort_elem ?pred_P s ?a ?b ?c,
+            H2 : s = ?s' -> sort_elem ?pred_P ?s' ?a ?b ?c |- _ ] =>
+      
+      assert (sort_elem pred_P s a b c) by (pose proof ord_ru_pi_sub pred_P r sub as [[] ?]; subst; mauto 2);
+      clear H1 H2
+  | [ r : Ru_pi ?P ?s1 s ?s3,
+        sub : st_subtyp ?s3 ?s',
+          H1 : pred_rel ?pred_P s ?s' -> sort_elem ?pred_P s ?a ?b ?c,
+            H2 : s = ?s' -> sort_elem ?pred_P ?s' ?a ?b ?c |- _ ] =>
+      
+      assert (sort_elem pred_P s a b c) by (pose proof ord_ru_pi_sub pred_P r sub as [? []]; subst; mauto 2);
+      clear H1 H2
+  end.
+
+Ltac handle_per_sort_elem_lower_for s :=
+  try match goal with
+  | P : PtsSig |- _ => repeat do_sort_elem_lower_for_assert (@per_sort_elem P) s
+  end.
+
+Ltac handle_glu_sort_elem_lower_for s :=
+  try match goal with
+  | P : PtsSig |- _ => repeat do_sort_elem_lower_for_assert (@glu_sort_elem P) s
+  end.
+
+Ltac handle_per_sort_elem_lower :=
+  match goal with
+  | [ r : Ru_pi ?P ?s1 ?s2 ?s3 |- _ ] =>
+      handle_per_sort_elem_lower_for s1;
+      handle_per_sort_elem_lower_for s2;
+      clear_dups
+  | _ => idtac
+  end.
+ 
+Ltac handle_glu_sort_elem_lower :=
+  match goal with
+  | [ r : Ru_pi ?P ?s1 ?s2 ?s3 |- _ ] =>
+      handle_glu_sort_elem_lower_for s1;
+      handle_glu_sort_elem_lower_for s2;
+      clear_dups
+  | _ => idtac
+  end.    
+
 Lemma glu_sort_elem_per_subtyp_typ_sorted_escape {P} (pred_P : PredicativeSig P) : forall {s a a' typ_rel typ_rel' exp_rel exp_rel' Γ A A'},
     {{ ⟪ pred_P ⟫ Subs a <: a' at s }} ->
     {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
@@ -493,6 +539,7 @@ Lemma glu_sort_elem_per_subtyp_typ_sorted_escape {P} (pred_P : PredicativeSig P)
     {{ Γ ⊢ A' ® typ_rel' }} ->
     {{ Γ ⊢ A ⊆ A' }}.
 Proof.
+  handle_per_sort_elem_irrel.
   intros * Hsubtyp Hglu Hglu' HA HA'.
   gen A' A Γ. gen exp_rel' exp_rel typ_rel' typ_rel.
   induction Hsubtyp (* using per_subtyp_ind *); intros; subst;
@@ -543,8 +590,8 @@ Proof.
 
     match_by_head (per_sort_elem pred_P) ltac:(fun H => directed invert_per_sort_elem H).
     destruct_conjs.
-    assert (per_sort_elem pred_P s1 in_rel1 a' a') by (pose proof ord_ru_pi_sub pred_P r sub as [[] ?]; subst; mauto 2).
-    assert (per_sort_elem pred_P s1 in_rel0 a a) by (pose proof ord_ru_pi_sub pred_P r sub as [[] ?]; subst; mauto 2).
+
+    handle_per_sort_elem_lower.
     handle_per_sort_elem_irrel.
     
     assert (in_rel d{{{ ⇑! a (length Γ) }}} d{{{ ⇑! a' (length Γ) }}}) as equiv_len_len' by intuition.
@@ -556,24 +603,9 @@ Proof.
     destruct_rel_mod_eval.    
     functional_eval_rewrite_clear.
     rename a0 into b'ρ'a', a1 into b'ρ'a, a3 into bρa', a4 into bρa.
-    repeat (
-        match goal with
-        | [ H1 : pred_rel pred_P s2 s -> per_sort_elem pred_P s2 ?rel ?a ?b,
-            H2 : s2 = s -> per_sort_elem pred_P s ?rel ?a ?b |- _ ] =>
-            assert (per_sort_elem pred_P s2 rel a b) by (pose proof ord_ru_pi_sub pred_P r sub1 as [? []]; subst; mauto 2);
-            clear H1 H2
-        end
-      ).
 
-    repeat (
-        match goal with
-        | [ H1 : pred_rel pred_P s2 s -> per_sort_elem pred_P s2 ?rel ?a ?b,
-            H2 : s2 = s -> per_sort_elem pred_P s ?rel ?a ?b |- _ ] =>
-            assert (per_sort_elem pred_P s2 rel a b) by (pose proof ord_ru_pi_sub pred_P r sub1 as [? []]; subst; mauto 2);
-            clear H1 H2
-        end
-      ).
-    handle_per_sort_elem_irrel.    
+    handle_per_sort_elem_lower.
+    handle_per_sort_elem_irrel.
     
     assert {{ ⟪ pred_P ⟫ Subs bρa <: b'ρ'a' at s2 }} by mauto 2.
     assert (glu_sort_elem pred_P s2 (OP _ equiv_len_len) (OEL _ equiv_len_len) bρa) by mauto 2.
@@ -591,7 +623,7 @@ Proof.
 
     assert {{ Γ, IT@s1 ⊢ #0 : IT[Wk] ® ⇑! a' (length Γ) ∈ IEL }} by (eapply realize_glu_elem_bot; [| eapply var_glu_elem_bot]; mauto 3).
     assert {{ Γ, IT'@s1 ⊢ #0 : IT'[Wk] ® ⇑! a' (length Γ) ∈ IEL }} by (eapply realize_glu_elem_bot; [| eapply var_glu_elem_bot]; mauto 3).
-    simpl in H52, H55.
+    simpl in H48, H51.
     
     assert {{ Γ, IT@s1 ⊢w Wk : Γ }} by mauto 3.
     assert (OP d{{{ ⇑! a' (length Γ) }}} equiv_len'_len' {{{ Γ, IT@s1 }}} {{{ OT[Wk,,#0] }}}) by mauto 2.
@@ -606,12 +638,12 @@ Proof.
     assert {{ Γ, IT'@s1 ⊢ OT[Wk,,#0] ≈ OT : Sort@s2 }} by (transitivity {{{ OT[Id] }}}; mauto 3).
     assert {{ Γ, IT'@s1 ⊢ OT'[Wk,,#0] ≈ OT' : Sort@s2 }} by (transitivity {{{ OT'[Id] }}}; mauto 3).
 
-    assert (OP d{{{ ⇑! a (length Γ) }}} equiv_len_len {{{ Γ, IT'@s1 }}} {{{ OT[Wk,,#0] }}}) by (eapply H62; eapply glu_sort_elem_typ_resp_ctx_eq; mauto 3).    
+    assert (OP d{{{ ⇑! a (length Γ) }}} equiv_len_len {{{ Γ, IT'@s1 }}} {{{ OT[Wk,,#0] }}}) by (eapply H58; eapply glu_sort_elem_typ_resp_ctx_eq; mauto 3).    
     assert (OP d{{{ ⇑! a (length Γ) }}} equiv_len_len {{{ Γ, IT'@s1 }}} OT) by (eapply glu_sort_elem_typ_resp_exp_eq; mauto 2).
 
     assert (OP' d{{{ ⇑! a (length Γ) }}} equiv_len_len {{{ Γ, IT'@s1 }}} OT').
     {
-      eapply H60.
+      eapply H56.
       eapply glu_sort_elem_typ_resp_exp_eq; mauto 2.
     }
     eapply H1; mauto 3.
@@ -680,58 +712,31 @@ Proof.
     invert_glu_sort_elem H10.
     invert_per_sort_elems.
     destruct_conjs.
+    handle_glu_sort_elem_lower.
+    handle_per_sort_elem_lower.
+    handle_per_sort_elem_irrel.
+    simpl_glu_rel.
+    econstructor; mauto 4.
+    intros.
 
-    repeat (
-        match goal with
-        | [ sub : st_subtyp ?s3 ?s',
-              H1 : pred_rel pred_P ?s ?s' -> glu_sort_elem pred_P ?s ?rel ?a ?b,
-                H2 : ?s = ?s' -> glu_sort_elem pred_P ?s' ?rel ?a ?b |- _ ] =>
-            assert (glu_sort_elem pred_P s rel a b) by (pose proof ord_ru_pi_sub pred_P r sub as [[] ?]; subst; mauto 2);
-            clear H1 H2
-        end
-      ).
-    repeat (
-        match goal with
-        | [ sub : st_subtyp ?s3 ?s',
-              H1 : pred_rel pred_P ?s ?s' -> per_sort_elem pred_P ?s ?rel ?a ?b,
-                H2 : ?s = ?s' -> per_sort_elem pred_P ?s' ?rel ?a ?b |- _ ] =>
-            assert (per_sort_elem pred_P s rel a b) by (pose proof ord_ru_pi_sub pred_P r sub as [[] ?]; subst; mauto 2);
-            clear H1 H2
-        end
-      ).
+    assert (in_rel0 n n') as equiv_n_n'0 by intuition.
+    assert (in_rel1 n n') as equiv_n_n'1 by intuition.
+    assert (in_rel2 n n') as equiv_n_n'2 by intuition.
+    assert (in_rel3 n n') as equiv_n_n'3 by intuition.
+    assert (in_rel4 n n') as equiv_n_n'4 by intuition.
+    rename equiv_n_n' into equiv_n_n'5.
 
-      handle_per_sort_elem_irrel.
-      simpl_glu_rel.
-      econstructor; mauto 4.
-      intros.
+    destruct_rel_mod_eval.
+    simplify_evals.
 
-      assert (in_rel0 n n') as equiv_n_n'0 by intuition.
-      assert (in_rel1 n n') as equiv_n_n'1 by intuition.
-      assert (in_rel2 n n') as equiv_n_n'2 by intuition.
-      assert (in_rel3 n n') as equiv_n_n'3 by intuition.
-      assert (in_rel4 n n') as equiv_n_n'4 by intuition.
-      rename equiv_n_n' into equiv_n_n'5.
-
-      destruct_rel_mod_eval.
-      simplify_evals.
-
-      rename a1 into bn.
-      rename a'1 into bn'.
-      rename a0 into b'n.
-      rename a'0 into b'n'.
-      
-      repeat (
-          match goal with
-          | [ sub : st_subtyp ?s3 ?s',
-                H1 : pred_rel pred_P ?s ?s' -> per_sort_elem pred_P ?s ?rel ?a ?b,
-                  H2 : ?s = ?s' -> per_sort_elem pred_P ?s' ?rel ?a ?b |- _ ] =>
-              assert (per_sort_elem pred_P s rel a b) by (pose proof ord_ru_pi_sub pred_P r sub as [? []]; subst; mauto 2);
-              clear H1 H2
-          end
-        ).
-
-      destruct_rel_mod_app.
-      econstructor; mauto.
+    rename a1 into bn.
+    rename a'1 into bn'.
+    rename a0 into b'n.
+    rename a'0 into b'n'.
+    
+    handle_per_sort_elem_lower.
+    destruct_rel_mod_app.
+    econstructor; mauto.
     + assert {{ ⟪ pred_P ⟫ Subs bn <: b'n' at s2 }} by mauto 2.
       saturate_refl_for @per_sort_elem.
       eapply per_elem_subtyping_sorted; mauto.
@@ -764,16 +769,7 @@ Proof.
       rename a1 into b.
       rename a0 into b'.
 
-      repeat (
-          match goal with
-          | [ sub : st_subtyp ?s3 ?s',
-                H1 : pred_rel pred_P ?s ?s' -> per_sort_elem pred_P ?s ?rel ?a ?b,
-                  H2 : ?s = ?s' -> per_sort_elem pred_P ?s' ?rel ?a ?b |- _ ] =>
-              assert (per_sort_elem pred_P s rel a b) by (pose proof ord_ru_pi_sub pred_P r sub as [? []]; subst; mauto 2);
-              clear H1 H2
-          end
-        ).
-
+      handle_per_sort_elem_lower.
       assert {{ ⟪ pred_P ⟫ Subs b <: b' at s2 }} by mauto 2.
       handle_per_sort_elem_irrel.
 
@@ -783,16 +779,8 @@ Proof.
       assert ((s2 = s' -> glu_sort_elem pred_P s' (OP0 _ equiv_n4) (OEL0 _ equiv_n4) b') /\
                 (pred_rel pred_P s2 s' -> glu_sort_elem pred_P s2 (OP0 _ equiv_n4) (OEL0 _ equiv_n4) b'))
         as [] by mauto 3.
-      repeat (
-          match goal with
-          | [ sub : st_subtyp ?s3 ?s',
-                H1 : pred_rel pred_P ?s ?s' -> glu_sort_elem pred_P ?s ?rel ?a ?b,
-                  H2 : ?s = ?s' -> glu_sort_elem pred_P ?s' ?rel ?a ?b |- _ ] =>
-              assert (glu_sort_elem pred_P s rel a b) by (pose proof ord_ru_pi_sub pred_P r sub as [? []]; subst; mauto 2);
-              clear H1 H2
-          end
-        ).
-      
+
+      handle_glu_sort_elem_lower.
       eapply H1; mauto 4.
       eapply glu_sort_elem_per_subtyp_typ_sorted_escape; mauto.
       eapply glu_sort_elem_trm_typ; mauto 4.
