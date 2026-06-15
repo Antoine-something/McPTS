@@ -71,8 +71,8 @@ theories/Core/Soundness.v
 # theories/Core/Completeness/Consequences/Rules.v
 # theories/Core/Semantic/Consequences.v
 
-# theories/Frontend/Elaborator.v
-# theories/Algorithmic/Definitions.v
+theories/Frontend/Elaborator.v
+theories/Algorithmic/Definitions.v
 
 
 # theories/Instantiations/STLC.v

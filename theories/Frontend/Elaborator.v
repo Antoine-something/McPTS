@@ -35,8 +35,8 @@ Module Cst.
   (** Sorts *)
   | st : P -> obj P
   (** Functions *)
-  | pi : forall s1 s2 s3 (r : Ru P s1 s2 s3), string -> obj P -> obj P -> obj P
-  | fn : forall s1 s2 s3 (r : Ru P s1 s2 s3), string -> obj P -> obj P -> obj P
+  | pi : forall s1 s2 s3 (r : Ru_pi P s1 s2 s3), string -> obj P -> obj P -> obj P
+  | fn : forall s1 s2 s3 (r : Ru_pi P s1 s2 s3), string -> obj P -> obj P -> obj P
   | app : obj P -> obj P -> obj P
   (** Variables *)
   | var : string -> obj P
@@ -107,12 +107,12 @@ Inductive user_exp (P : PtsSig) : exp P -> Prop :=
   `( user_exp P (a_st s) )
 (** Functions *)
 | user_exp_pi :
-  `( forall (r : Ru P s1 s2 s3),
+  `( forall (r : Ru_pi P s1 s2 s3),
         user_exp P A ->
         user_exp P B ->
         user_exp P (a_pi r A B) )
 | user_exp_fn :
-  `( forall (r : Ru P s1 s2 s3),
+  `( forall (r : Ru_pi P s1 s2 s3),
         user_exp P A ->
         user_exp P M ->
         user_exp P (a_fn r A M) )
@@ -194,8 +194,8 @@ Inductive closed_at {P} : exp P -> nat -> Prop :=
 (** Sorts *)
 | ca_sort : `( closed_at (a_st m) n )
 (** Functions *)
-| ca_pi : `( forall (r : Ru P s1 s2 s3), closed_at t n -> closed_at b (1+n) -> closed_at (a_pi r t b) n )
-| ca_lam : `( forall (r : Ru P s1 s2 s3),  closed_at t n -> closed_at b (1+n) -> closed_at (a_fn r t b) n )
+| ca_pi : `( forall (r : Ru_pi P s1 s2 s3), closed_at t n -> closed_at b (1+n) -> closed_at (a_pi r t b) n )
+| ca_lam : `( forall (r : Ru_pi P s1 s2 s3),  closed_at t n -> closed_at b (1+n) -> closed_at (a_fn r t b) n )
 | ca_app : `( closed_at a1 n -> closed_at a2 n -> closed_at (a_app a1 a2) n )
 (** Variables *)
 | ca_var : `( x < n -> closed_at (a_var x) n )
@@ -313,6 +313,6 @@ Qed.
 Example test_elab {P} : @elaborate P Cst.nat nil = Some a_nat.
 Proof. reflexivity. Qed.
 
-Example test_elab2 {P} : forall {s1 s2 s3} {r : Ru P s1 s2 s3},
+Example test_elab2 {P} : forall {s1 s2 s3} {r : Ru_pi P s1 s2 s3},
     @elaborate P (Cst.fn r "s" Cst.nat (Cst.fn r "x" Cst.nat (Cst.fn r "s" Cst.nat (Cst.var "q")))) nil = None.
 Proof. reflexivity. Qed.
