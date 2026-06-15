@@ -138,22 +138,168 @@ Qed.
 (*     assert (B = B' /\ s0 = s') as [] by (eapply functional_ctx_lookup; mauto 2); subst. *)
 (* Admitted. *)
 
+Lemma subtyp_sort_is_sort_helper {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {A B},
+    {{ Γ ⊢ A ⊆ B }} ->
+    forall s, {{ Γ ⊢ B ≈ Sort@s }} ->
+    exists s', {{ Γ ⊢ A ≈ Sort@s' }} /\ st_subtyp s' s.
+Proof.
+  intros * Hsub.
+  induction Hsub; intros.
+  - eexists; split; mauto 2.
+  - specialize (IHHsub2 s ltac:(eassumption)) as [s' []].
+    specialize (IHHsub1 s' ltac:(eassumption)) as [s'' []].
+    eexists; split; mauto 3.
+    etransitivity; eassumption.
+  - (* This is part of Completeness.Consequences.Types, not yet merged *)
+    assert (s2 = s) by mauto 2. 
+    subst.
+    exists s1; split; mauto 3.
+  - (* This also need the consequences *)
+    assert ({{{ Π r A' B' }}} = {{{ Sort@s }}}) by mauto 2.
+    inversion H5.
+Qed.
+
+Lemma subtyp_sort_is_sort {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {A s},
+    {{ Γ ⊢ A ⊆ Sort@s }} ->
+    exists s', {{ Γ ⊢ A ≈ Sort@s' }} /\ st_subtyp s' s.
+Proof.
+  intros.
+  gen_presup H.
+  eapply subtyp_sort_is_sort_helper; mauto 2.
+Qed.
+
+Lemma subtyp_sort_sort_implies_st_subtyp {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {s s'},
+    {{ Γ ⊢ Sort@s ⊆ Sort@s' }} ->
+    st_subtyp s s'.
+Proof.
+  intros.
+  epose proof subtyp_sort_is_sort pred_P H as [s''].
+  destruct_conjs.
+  assert (s = s'') by mauto 2; subst.
+  mauto 2.
+Qed.
 
 
-(* Lemma exp_eq_sort_wf_sort_wf {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {A s}, *)
-(*     {{ Γ ⊢ A : Sort@s }} -> *)
-(*     forall A' s', *)
-(*       {{ Γ ⊢ A ≈ A' : Sort@s' }} -> *)
-(*       {{ Γ ⊢ A' : Sort@s }}. *)
-(* Proof. *)
-(*   intros * HA. *)
-(*   dependent induction HA; intros; gen_presups; mauto 2. *)
-(*   - admit. *)
-(*   - assert {{ Γ ⊢ Sort@s ≈ Sort@s' }} by mauto 2. *)
-(*     assert (s = s') by mauto 2. *)
-(*     subst. *)
-(*     eassumption. *)
-(*   -  *)
+Lemma wf_exp_sort_sub_implies_wf_exp_sort {P} (pred_P : PredicativeSig P) : forall {Γ Δ : ctx P} {s s' σ},
+    {{ Γ ⊢s σ : Δ }} ->
+    {{ Γ ⊢ Sort@s[σ] : Sort@s' }} ->
+    {{ Γ ⊢ Sort@s : Sort@s' }}.
+Proof.
+  intros * ? []%(@soundness P pred_P).
+  destruct_conjs.
+  dependent destruction H0.
+  simplify_evals.
+  inversion H4; subst.
+  inversion H8; subst.
+  gen_presups.
+  mauto 2.
+Qed.
+
+Lemma wf_sort_sort_any_context {P}(pred_P : PredicativeSig P) : forall {Γ Δ : ctx P} {s s'},
+    {{ Γ ⊢ Sort@s : Sort@s' }} ->
+    {{ ⊢ Δ }} -> 
+    {{ Δ ⊢ Sort@s : Sort@s' }}.
+Proof.
+  intros.
+  destruct (wf_exp_sort_sort_implies_axiom H) as [s2 []].
+  assert (st_subtyp s2 s') by mauto 2 using subtyp_sort_sort_implies_st_subtyp.
+  mauto 4.
+Qed.              
+
+#[local]
+Ltac gen_l_IH pred_P l l' H :=
+  match type of H with
+  | {{ ^?Γ ⊢ ^?A ≈ ^?B }} =>
+      let IHAB := fresh "HAB" in
+      pose proof l _ pred_P _ _ _ H as IHAB
+  | {{ ^?Γ ⊢ ^?A ≈ ^?B : ^?C }} =>
+      let IHAB := fresh "HABC" in
+      pose proof l' _ pred_P _ _ _ _ H as IHAB
+  end.
+
+
+Lemma l {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {A B},
+    {{ Γ ⊢ A ≈ B }} ->
+    forall s,
+      ({{ Γ ⊢ A : Sort@s }} ->
+       {{ Γ ⊢ B : Sort@s }}) /\
+        ({{ Γ ⊢ B : Sort@s }} ->
+         {{ Γ ⊢ A : Sort@s }})
+with l' {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {A B C},
+    {{ Γ ⊢ A ≈ B : C }} ->
+    forall C',
+      ({{ Γ ⊢ A : C' }} ->
+       {{ Γ ⊢ B : C' }}) /\
+        ({{ Γ ⊢ B : C' }} ->
+         {{ Γ ⊢ A : C' }}).
+Proof.
+  all: inversion_clear 1;
+    (on_all_hyp: gen_l_IH pred_P l l');
+    clear l l';
+    intros;
+    try pose proof HAB s as [];
+    try pose proof HAB0 s as [];
+    mauto 4.
+
+  - split; mauto 4.
+  - 
+  
+  - intros.
+    split; intros.
+    + destruct (subtyp_sort_is_sort pred_P H2) as [s2 []]. 
+    
+  
+
+  
+  intros * H.
+  dependent induction H; intros; gen_presups; mauto 3.
+  - split; intros.
+    + rewrite <- x.
+      eassumption.
+    + rewrite x; eassumption.
+  - split; intros.
+    + rewrite <- x in H0.
+      mauto 2.
+    + rewrite <- x.
+      mauto 3.
+  - split; intros.
+    + rewrite <- x0 in H0.
+      rewrite <- x.
+      mauto 2 using wf_exp_sort_sub_implies_wf_exp_sort.
+    + rewrite <- x0.
+      rewrite <- x in H0.      
+      assert {{ Δ ⊢ Sort@s1 : Sort@s }} by mauto 2 using wf_sort_sort_any_context.
+      mauto 2.
+  - 
+
+      mauto.
+  intros * H.
+  dependent induction H; intros; gen_presups; mauto 3.
+  
+  
+  - specialize (IHwf_typ_eq s).
+    destruct_conjs.
+    split; mauto 3.
+  - 
+
+  
+Lemma exp_eq_sort_wf_sort_wf {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {M A},
+    {{ Γ ⊢ M : A }} ->
+    forall M' A',
+      {{ Γ ⊢ M ≈ M' : A' }} ->
+      {{ Γ ⊢ M' : A }}.
+Proof.
+  intros * HA.
+  dependent induction HA; intros; gen_presups; mauto .
+  - admit.
+  - admit.
+  - admit.
+  - admit.
+  - assert {{ Γ ⊢ Sort@s0 ≈ Sort@s' }} by mauto 3.
+    assert (s = s') by mauto 2.
+    subst.
+    eassumption.
+  -
 
 
     
@@ -258,7 +404,7 @@ Qed.
 Hint Resolve nf_of_pi : mcpts.
 
 Theorem canonical_form_of_pi {P} (pred_P : PredicativeSig P) : forall {M A B s1 s2 s3} {r : Ru_pi P s1 s2 s3},
-    {{ ⋅ ⊢ M : Π r A B }} ->
+    {{ ⋅ ⊢ M :Lemma t {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {s B}, *) Π r A B }} ->
     exists W1 W2, nbe {{{ ⋅ }}} M {{{ Π r A B }}} n{{{ λ r W1 W2 }}}.
 Proof. mauto 3. Qed.
 
@@ -312,94 +458,124 @@ Proof with mautosolve 4.
 Qed.
 
 #[export]
-Hint Resolve canonical_form_of_typ : mcpts.
+  Hint Resolve canonical_form_of_typ : mcpts.
+    
 
-(* Lemma typ_eq_spec {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {A B}, *)
-(*     {{ Γ ⊢ A ≈ B }} -> *)
-(*     (exists s, {{ Γ ⊢ A ≈ B : Sort@s }}) \/ *)
-(*       (exists s, A = {{{ Sort@s }}} /\ B = {{{ Sort@s }}}). *)
-(* Proof with (congruence + firstorder (mautosolve 4)). *)
-(*   intros. *)
-(*   induction H. *)
-(*   - inversion H; subst. *)
-(*     + right; repeat eexists; reflexivity. *)
-(*     + left; eexists; mauto 2. *)
-(*   - left; eauto. *)
-(*   - destruct IHwf_typ_eq as [[s'] | [s']]. *)
-(*     + gen_presups. *)
-(*       assert {{ Γ ⊢ A ≈ B : Sort@s }} by admit. (* (eapply adjust_exp_eq_level; mauto 2). using adjust_exp_eq_level. *) *)
-(*       left. *)
-(*       eexists; etransitivity; eauto. *)
-(*     + destruct_conjs. *)
-(*       subst. *)
-(*       left; eauto. *)
-(* Admitted. *)
+Lemma t {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {s B},
+    {{ Γ ⊢ B : Sort@s }} ->
+    forall s',
+      {{ Γ ⊢ B : Sort@s' }} ->
+   Lemma t {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {s B}, *)   (exists s'', {{ Γ ⊢ B : Sort@s'' }} /\ st_subtyp s'' s /\ st_subtyp s'' s').
+Proof.
+  intros * H.
+  dependent induction H.
+  - intros.
+    destruct (wf_exp_sort_sort_implies_axiom H1) as [s2 []].
+    assert (st_subtyp s2 s') by mauto using subtyp_sort_sort_implies_st_subtyp.
+    assert {{ Γ ⊢ Sort@s1 : Sort@s2 }} by mauto 2.
+    exists s2.
+    
+    repeat eexists; mauto 3.
+  
+         
+
+Lemma typ_eq_spec {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {A B},
+    {{ Γ ⊢ A ≈ B }} ->
+    (exists s, {{ Γ ⊢ A ≈ B : Sort@s }}) \/
+      (exists s, {{ Γ ⊢ A ≈ Sort@s }} /\ {{ Γ ⊢ B ≈ Sort@s }}).
+Proof with (congruence + firstorder (mautosolve 4)).
+  intros.
+  induction H; mauto 3.  
+  - destruct (wf_typ_inversion H) as [s' []].
+    + right; repeat eexists; mauto 3.
+    + left; eexists; mauto 2.
+  - destruct IHwf_typ_eq as [[s']|[s']]; destruct_conjs; mauto 4.
+  - destruct IHwf_typ_eq1 as [[s]|[s]];
+      destruct IHwf_typ_eq2 as [[s']|[s']]; admit.
+  - destruct (wf_typ_inversion H) as [s' []].
+    + right; repeat eexists; mauto 3.
+    + left; eexists; mauto 2.
+  - right; repeat eexists; mauto 4.
+  - destruct IHwf_typ_eq as [[s'] | [s']].
+    + gen_presups.
+      left; eexists; mauto 4.
+    + destruct_conjs; gen_presups.
+      right; repeat eexists; mauto 4.
+  - destruct (wf_typ_inversion H1) as [s' []].
+    + gen_presups.
+      assert {{ Γ ⊢s σ∘τ : Γ'' }} by mauto 3.
+      assert {{ Γ ⊢ Sort@s'[σ][τ] ≈ Sort@s' }} by mauto 3.
+      right; repeat eexists; mauto 4.
+    + gen_presups.
+      left; eexists; mauto 4.
+Abort.
 
 (* #[export] *)
 (* Hint Resolve typ_eq_spec : mcpts. *)
 
-(* Lemma subtyp_spec : forall {Γ A B}, *)
-(*     {{ Γ ⊢ A ⊆ B }} -> *)
-(*     (exists k, {{ Γ ⊢ A ≈ B : Sort@k }}) \/ *)
-(*       (exists i j, (exists k, {{ Γ ⊢ A ≈ Sort@i : Sort@k }}) /\ (exists k, {{ Γ ⊢ Sort@j ≈ B : Sort@k }}) /\ i <= j) \/ *)
-(*       (exists A1 A2 B1 B2, (exists k, {{ Γ ⊢ A ≈ Π A1 A2 : Sort@k }}) /\ (exists k, {{ Γ ⊢ Π B1 B2 ≈ B : Sort@k }}) /\ (exists k, {{ Γ ⊢ A1 ≈ B1 : Sort@k }}) /\ {{ Γ, B1 ⊢ A2 ⊆ B2 }}) \/ *)
-(*       (exists A1 A2 B1 B2, (exists k, {{ Γ ⊢ A ≈ Σ A1 A2 : Sort@k }}) /\ (exists k, {{ Γ ⊢ Σ B1 B2 ≈ B : Sort@k }}) /\ (exists k, {{ Γ ⊢ A1 ≈ B1 : Sort@k }}) /\ {{ Γ, B1 ⊢ A2 ⊆ B2 }}). *)
-(* Proof with (congruence + firstorder (mautosolve 4 + lia)). *)
-(*   induction 1; mauto 3. *)
-(*   - destruct_all; firstorder (mauto 3); *)
-(*       try (right; right; left; do 4 eexists; firstorder mautosolve 3); *)
-(*       try (right; right; right; do 4 eexists; firstorder mautosolve 3). *)
-(*     + match goal with *)
-(*       | _: {{ Γ ⊢ M' ≈ Sort@?i : Sort@_ }}, *)
-(*           _: {{ Γ ⊢ Sort@?j ≈ M' : Sort@_ }} |- _ => *)
-(*           assert {{ Γ ⊢ Sort@j ≈ Sort@i : Sort@_ }} by mauto 3; *)
-(*           assert (j = i) as -> by mauto 3 *)
-(*       end... *)
-(*     + assert {{ Γ ⊢ Π ^_ ^_ ≈ Sort@_ : Sort@_ }} by mauto 3. *)
-(*       assert ({{{ Π ^_ ^_ }}} = {{{ Sort@_ }}}) by mauto 3... *)
-(*     + assert {{ Γ ⊢ Σ ^_ ^_ ≈ Sort@_ : Sort@_ }} by mauto 3. *)
-(*       assert ({{{ Σ ^_ ^_ }}} = {{{ Sort@_ }}}) by mauto 3... *)
-(*     + assert {{ Γ ⊢ Π ^_ ^_ ≈ Sort@_ : Sort@_ }} by mauto 3. *)
-(*       assert ({{{ Π ^_ ^_ }}} = {{{ Sort@_ }}}) by mauto 3... *)
-(*     + match goal with *)
-(*       | _: {{ Γ ⊢ M' ≈ Π ^?A1 ^?A2 : Sort@_ }}, *)
-(*           _: {{ Γ ⊢ Π ^?B1 ^?B2 ≈ M' : Sort@_ }} |- _ => *)
-(*           assert {{ Γ ⊢ Π A1 A2 ≈ Π B1 B2 : Sort@_ }} by mauto 3; *)
-(*           assert ({{ Γ ⊢ A1 ≈ B1 : Sort@_ }} /\ {{ Γ, A1 ⊢ A2 ≈ B2 : Sort@_ }}) as [] by mauto 3 using exp_eq_pi_inversion *)
-(*       end. *)
-(*       assert {{ ⊢ Γ ≈ Γ }} by mauto 3. *)
-(*       right; right; left. *)
-(*       do 4 eexists; repeat split; mauto 3. *)
-(*       * eexists; eapply exp_eq_trans_typ_max... *)
-(*       * etransitivity; [| eassumption]. *)
-(*         etransitivity; eapply ctxeq_subtyp... *)
-(*     + assert {{ Γ ⊢ Π ^_ ^_ ≈ Σ ^_ ^_ : Sort@_ }} as Hcontra by mauto 3. *)
-(*       eapply is_typ_constr_and_exp_eq_sigma_implies_eq_sigma in Hcontra; mauto 3. *)
-(*       destruct_all... *)
-(*     + assert {{ Γ ⊢ Σ ^_ ^_ ≈ Sort@_ : Sort@_ }} by mauto 3. *)
-(*       assert ({{{ Σ ^_ ^_ }}} = {{{ Sort@_ }}}) by mauto 3... *)
-(*     + assert {{ Γ ⊢ Π ^_ ^_ ≈ Σ ^_ ^_ : Sort@_ }} as Hcontra by mauto 3. *)
-(*       eapply is_typ_constr_and_exp_eq_sigma_implies_eq_sigma in Hcontra; mauto 3. *)
-(*       destruct_all... *)
-(*     + match goal with *)
-(*       | _: {{ Γ ⊢ M' ≈ Σ ^?A1 ^?A2 : Sort@_ }}, *)
-(*           _: {{ Γ ⊢ Σ ^?B1 ^?B2 ≈ M' : Sort@_ }} |- _ => *)
-(*           assert {{ Γ ⊢ Σ A1 A2 ≈ Σ B1 B2 : Sort@_ }} by mauto 3; *)
-(*           assert ({{ Γ ⊢ A1 ≈ B1 : Sort@_ }} /\ {{ Γ, A1 ⊢ A2 ≈ B2 : Sort@_ }}) as [] by mauto 3 using exp_eq_sigma_inversion *)
-(*       end. *)
-(*       assert {{ ⊢ Γ ≈ Γ }} by mauto 3. *)
-(*       right; right; right. *)
-(*       do 4 eexists; repeat split; mauto 3. *)
-(*       * eexists; eapply exp_eq_trans_typ_max... *)
-(*       * etransitivity; [| eassumption]. *)
-(*         etransitivity; eapply ctxeq_subtyp... *)
-(*   - right; left. *)
-(*     do 2 eexists... *)
-(*   - right; right; left. *)
-(*     do 4 eexists... *)
-(*   - right; right; right. *)
-(*     do 4 eexists... *)
-(* Qed. *)
+Lemma subtyp_spec {P} (pred_P : PredicativeSig P) : forall {Γ A B},
+    {{ Γ ⊢ A ⊆ B }} ->
+    {{ Γ ⊢ A ≈ B }} \/
+      (exists s1 s2, {{ Γ ⊢ A ≈ Sort@s1 }} /\ {{ Γ ⊢ Sort@s2 ≈ B }} /\ st_subtyp s1 s2) \/
+      (exists A1 A2 B1 B2 s1 s2 s3 (r : Ru_pi P s1 s2 s3),
+          (exists s, {{ Γ ⊢ A ≈ Π r A1 A2 : Sort@s }} /\ st_subtyp s3 s)
+          /\ (exists s, {{ Γ ⊢ Π r B1 B2 ≈ B : Sort@s }} /\ st_subtyp s3 s)
+          /\ {{ Γ ⊢ A1 ≈ B1 : Sort@s1 }} /\ {{ Γ, B1@s1 ⊢ A2 ⊆ B2 }}). 
+Proof with (congruence + firstorder (mautosolve 4 + lia)).
+  induction 1; mauto 3.
+  - destruct_all; (mauto 3);
+      try (right; left; repeat eexists; mautosolve 4).
+    (* + match goal with *)
+    (*   | _: {{ Γ ⊢ M' ≈ Sort@?i : Sort@_ }}, *)
+    (*       _: {{ Γ ⊢ Sort@?j ≈ M' : Sort@_ }} |- _ => *)
+    (*       assert {{ Γ ⊢ Sort@j ≈ Sort@i : Sort@_ }} by mauto 3; *)
+    (*       assert (j = i) as -> by mauto 3 *)
+    (*   end... *)
+    (* + assert {{ Γ ⊢ Π ^_ ^_ ≈ Sort@_ : Sort@_ }} by mauto 3. *)
+    (*   assert ({{{ Π ^_ ^_ }}} = {{{ Sort@_ }}}) by mauto 3... *)
+    (* + assert {{ Γ ⊢ Σ ^_ ^_ ≈ Sort@_ : Sort@_ }} by mauto 3. *)
+    (*   assert ({{{ Σ ^_ ^_ }}} = {{{ Sort@_ }}}) by mauto 3... *)
+    (* + assert {{ Γ ⊢ Π ^_ ^_ ≈ Sort@_ : Sort@_ }} by mauto 3. *)
+    (*   assert ({{{ Π ^_ ^_ }}} = {{{ Sort@_ }}}) by mauto 3... *)
+    + match goal with
+      | _: {{ Γ ⊢ M' ≈ Π r ^?A1 ^?A2 : Sort@?s }},
+          _: {{ Γ ⊢ Π r ^?B1 ^?B2 ≈ M' : Sort@_ }} |- _ =>
+          assert {{ Γ ⊢ Π r A1 A2 ≈ Π r B1 B2 : Sort@s }} by mauto 3;
+          assert ({{ Γ ⊢ A1 ≈ B1 : Sort@_ }} /\ {{ Γ, A1@s1 ⊢ A2 ≈ B2 : Sort@_ }}) as [] by mauto 3 using exp_eq_pi_inversion
+      end.
+      assert {{ ⊢ Γ ≈ Γ }} by mauto 3.
+      right; right; left.
+      do 4 eexists; repeat split; mauto 3.
+      * eexists; eapply exp_eq_trans_typ_max...
+      * etransitivity; [| eassumption].
+        etransitivity; eapply ctxeq_subtyp...
+    + assert {{ Γ ⊢ Π ^_ ^_ ≈ Σ ^_ ^_ : Sort@_ }} as Hcontra by mauto 3.
+      eapply is_typ_constr_and_exp_eq_sigma_implies_eq_sigma in Hcontra; mauto 3.
+      destruct_all...
+    + assert {{ Γ ⊢ Σ ^_ ^_ ≈ Sort@_ : Sort@_ }} by mauto 3.
+      assert ({{{ Σ ^_ ^_ }}} = {{{ Sort@_ }}}) by mauto 3...
+    + assert {{ Γ ⊢ Π ^_ ^_ ≈ Σ ^_ ^_ : Sort@_ }} as Hcontra by mauto 3.
+      eapply is_typ_constr_and_exp_eq_sigma_implies_eq_sigma in Hcontra; mauto 3.
+      destruct_all...
+    + match goal with
+      | _: {{ Γ ⊢ M' ≈ Σ ^?A1 ^?A2 : Sort@_ }},
+          _: {{ Γ ⊢ Σ ^?B1 ^?B2 ≈ M' : Sort@_ }} |- _ =>
+          assert {{ Γ ⊢ Σ A1 A2 ≈ Σ B1 B2 : Sort@_ }} by mauto 3;
+          assert ({{ Γ ⊢ A1 ≈ B1 : Sort@_ }} /\ {{ Γ, A1 ⊢ A2 ≈ B2 : Sort@_ }}) as [] by mauto 3 using exp_eq_sigma_inversion
+      end.
+      assert {{ ⊢ Γ ≈ Γ }} by mauto 3.
+      right; right; right.
+      do 4 eexists; repeat split; mauto 3.
+      * eexists; eapply exp_eq_trans_typ_max...
+      * etransitivity; [| eassumption].
+        etransitivity; eapply ctxeq_subtyp...
+  - right; left.
+    do 2 eexists...
+  - right; right; left.
+    do 4 eexists...
+  - right; right; right.
+    do 4 eexists...
+Qed.
 
 (* #[export] *)
 (* Hint Resolve subtyp_spec : mcpts. *)
