@@ -72,7 +72,9 @@ theories/Core/Completeness/Consequences/Rules.v
 # theories/Core/Semantic/Consequences.v
 
 theories/Frontend/Elaborator.v
-theories/Algorithmic/Definitions.v
+# theories/Algorithmic/Definitions.v
+theories/Algorithmic/Subtyping/Definitions.v
+theories/Algorithmic/Typing/Definitions.v
 
 
 # theories/Instantiations/STLC.v

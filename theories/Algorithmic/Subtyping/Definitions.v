@@ -13,38 +13,34 @@ Definition not_sort_pi {P} (A : nf P) : Prop :=
   | _ => True
   end.
 
-Record ConvertibleSig (P : PtsSig) : Prop :=
-  mkConvertibleSig {
-      Convert : ctx P -> typ P -> typ P -> Prop;
-      CorrectConv : forall Γ A B, Convert Γ A B <-> {{ Γ ⊢ A ≈ B }};
-      DecidableConv : forall Γ A B, (Convert Γ A B) \/ ~(Convert Γ A B);
-    }.
+(* Record ConvertibleSig (P : PtsSig) : Prop := *)
+(*   mkConvertibleSig { *)
+(*       Convert : ctx P -> typ P -> typ P -> Prop; *)
+(*       CorrectConv : forall Γ A B, Convert Γ A B <-> {{ Γ ⊢ A ≈ B }}; *)
+(*       DecidableConv : forall Γ A B, (Convert Γ A B) \/ ~(Convert Γ A B); *)
+(*     }. *)
 
-Inductive alg_subtyping {P} (conv_P : ConvertibleSig P) : ctx P -> nf P -> typ P -> Prop :=
-| alg_subtyp_refl : forall A B,
-    not_sort_pi A ->
-    Convert conv_P Γ A B ->
-    {{ Γ ⊢a A ⊆ B }}.
+(* Inductive alg_subtyping {P} (conv_P : ConvertibleSig P) : ctx P -> nf P -> typ P -> Prop := *)
+(* | alg_subtyp_refl : forall A B, *)
+(*     not_sort_pi A -> *)
+(*     Convert conv_P Γ A B -> *)
+(*     {{ Γ ⊢a A ⊆ B }}. *)
 
-Inductive alg_subtyping_nf : nf P -> nf P -> Prop :=
+Inductive alg_subtyping_nf {P} : nf P -> nf P -> Prop :=
 | asnf_refl : forall A A',
-    not_univ_pi_sigma A ->
+    not_sort_pi A ->
     A = A' ->
     {{ ⊢anf A ⊆ A' }}
-| asnf_univ : forall i j,
-    i <= j ->
-    {{ ⊢anf Type@i ⊆ Type@j }}
-| asnf_pi : forall A B A' B',
+| asnf_sort : forall s s',
+    st_subtyp s s' ->
+    {{ ⊢anf Sort@s ⊆ Sort@s' }}
+| asnf_pi : forall A B A' B' s1 s2 s3 (r : Ru_pi P s1 s2 s3 ),
     A = A' ->
     {{ ⊢anf B ⊆ B' }} ->
-    {{ ⊢anf Π A B ⊆ Π A' B' }}
-| asnf_sigma : forall A B A' B',
-    A = A' ->
-    {{ ⊢anf B ⊆ B' }} ->
-    {{ ⊢anf Σ A B ⊆ Σ A' B' }}
+    {{ ⊢anf Π r A B ⊆ Π r A' B' }}
 where "⊢anf A ⊆ A'" := (alg_subtyping_nf A A') (in custom judg) : type_scope.
 
-Inductive alg_subtyping : ctx -> typ -> typ -> Prop :=
+Inductive alg_subtyping {P} : ctx P -> typ P -> typ P -> Prop :=
 | alg_subtyp_run : forall Γ A B A' B',
     nbe_ty Γ A A' ->
     nbe_ty Γ B B' ->
