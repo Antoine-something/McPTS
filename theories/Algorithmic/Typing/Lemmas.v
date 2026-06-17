@@ -1,8 +1,9 @@
 From McPTS Require Import PtsSignature LibTactics.
-From McPTS.Algorithmic Require Import Definitions.
+From McPTS.Algorithmic.Typing Require Import Definitions.
+From McPTS.Algorithmic Require Import Subtyping.
 From McPTS.Core Require Import Base.
-(* From McPTS.Core.Completeness Require Import Consequences.Rules. *)
-(* From McPTS.Core.Semantic Require Import Consequences. *)
+From McPTS.Core.Completeness Require Import Consequences.Rules.
+From McPTS.Core.Semantic Require Import Consequences.
 From McPTS.Frontend Require Import Elaborator.
 Import Domain_Notations.
 
@@ -13,11 +14,9 @@ Record FunctionalSig (P : PtsSig) : Prop :=
       Func_ru_nat : forall s s', Ru_nat P s -> Ru_nat P s' -> s = s';
     }.
 
-
-
-Lemma functional_alg_type_infer {P} (conv_P : ConvertibleSig P) (func_P : FunctionalSig P) : forall {Γ : ctx P} {A A' M},
-    {{ ⟪ conv_P ⟫ Γ ⊢a M ⟹ A }} ->
-    {{ ⟪ conv_P ⟫ Γ ⊢a M ⟹ A' }} ->
+Lemma functional_alg_type_infer {P} (pred_P : PredicativeSig P) (func_P : FunctionalSig P) : forall {Γ : ctx P} {A A' M},
+    {{ ⟪ pred_P ⟫ Γ ⊢a M ⟹ A }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊢a M ⟹ A' }} ->
     A = A'.
 Proof.
   intros * HM1 HM2. gen A'.
@@ -30,11 +29,13 @@ Proof.
     try reflexivity;
     intuition.
 
-  - assert (A = A') as <- by (eapply functional_ctx_lookup; eassumption).
-    reflexivity.  
-  - assert ({{{ Π r A B }}} = {{{ Π r0 A0 B0 }}}) by mauto 2.
-    inversion_clear H1.
+  - assert (A = A0) as <- by (eapply functional_ctx_lookup; eassumption).
+    functional_nbe_rewrite_clear.
     reflexivity.
+  - 
+    assert (n{{{ Π r A B }}} = n{{{ Π r0 A0 B0 }}}) by mauto 2.
+    dependent destruction H3.
+    mauto 3.
   - eapply Func_ru_nat; mauto 2.
 Qed.
 
@@ -44,40 +45,51 @@ Hint Resolve functional_alg_type_infer : mcpts.
 Ltac functional_alg_type_infer_rewrite_clear1 :=
   let tactic_error o1 o2 := fail 3 "functional_alg_type_infer equality between" o1 "and" o2 "cannot be solved by mauto" in
   match goal with
-  | H1 : {{ ⟪ ?conv_P ⟫ ^?Γ ⊢a ^?M ⟹ ^?A1 }}, H2 : {{ ⟪ ?conv_P ⟫ ^?Γ ⊢a ^?M ⟹ ^?A2 }} |- _ =>
+  | H1 : {{ ⟪ ?pred_P ⟫ ^?Γ ⊢a ^?M ⟹ ^?A1 }}, H2 : {{ ⟪ ?pred_P ⟫ ^?Γ ⊢a ^?M ⟹ ^?A2 }} |- _ =>
       clean replace A2 with A1 by first [solve [mauto 2 using functional_alg_type_infer] | tactic_error A2 A1]; clear H2
   end.
 Ltac functional_alg_type_infer_rewrite_clear := repeat functional_alg_type_infer_rewrite_clear1.
 
     
-Lemma alg_type_sound {P} (conv_P : ConvertibleSig P) :
-  (forall {Γ : ctx P} {A M}, {{ ⟪ conv_P ⟫ Γ ⊢a M ⟸ A }} -> {{ ⊢ Γ }} -> {{ Γ ⊢ A }} -> {{ Γ ⊢ M : A }}) /\
-    (forall {Γ : ctx P} {A M}, {{ ⟪ conv_P ⟫ Γ ⊢a M ⟹ A }} -> {{ ⊢ Γ }} -> {{ Γ ⊢ M : A }}).
+Lemma alg_type_sound {P} (pred_P : PredicativeSig P) :
+  (forall {Γ : ctx P} {A M}, {{ ⟪ pred_P ⟫ Γ ⊢a M ⟸ A }} -> {{ ⊢ Γ }} -> {{ Γ ⊢ A }} -> {{ Γ ⊢ M : A }}) /\
+    (forall {Γ : ctx P} {A M}, {{ ⟪ pred_P ⟫ Γ ⊢a M ⟹ A }} -> {{ ⊢ Γ }} -> {{ Γ ⊢ M : A }}).
 Proof.
   apply alg_type_mut_ind; intros; try mautosolve 4.
 
   - assert {{ Γ ⊢ M : A }} by mauto 2.
-    assert {{ Γ ⊢ A ⊆ B }} by (eapply CorrectConv; mauto 2).
+    gen_presups.
+    assert {{ Γ ⊢ A ⊆ B }} by  (eapply alg_subtyping_sound; mauto 2).
+    mauto 2.    
+  - assert {{ Γ ⊢ A }} by mauto 3.
+    assert {{ ⊢ Γ, A@s }} by mauto 3.
+    inversion H1; subst.
+    assert {{ Γ ⊢ A ≈ B }} as <- by (mauto 2 using soundness_ty').
     mauto 2.
-    
   - assert {{ Γ ⊢ A : Sort@s1 }} by mauto 3.
     assert {{ ⊢ Γ, A@s1 }} by mauto 3.
     assert {{ Γ, A@s1 ⊢ B : Sort@s2 }} by mauto 3.
-    mauto 3.
-
+    mauto 2.
   - assert {{ Γ ⊢ A : Sort@s1 }} by mauto 3.
-    assert {{ ⊢ Γ, A@s1 }} by mauto 3.
+    assert {{ Γ ⊢ A }} by mauto 2.
+    assert {{ ⊢ Γ, A@s1 }} by mauto 2.
+    assert {{ Γ ⊢ A ≈ C : Sort@s1 }}.
+    assert {{ Γ, A@s1 ⊢ M : D }} by mauto 2.
+    assert {{ Γ, A@s1 ⊢ B }} by (gen_presups; mauto 3).
+    assert {{ Γ, A@s1 ⊢ B ≈ D  }} by (mauto 2 using soundness_ty').
     assert {{ Γ, A@s1 ⊢ B : Sort@s2 }} by mauto 3.
-    assert {{ Γ, A@s1 ⊢ M : B }} by mauto 3.
-    mauto 3.
+    assert {{ Γ ⊢ Π r A B ≈ Π r C D }}.
+    eapply wf_typ_eq_pi.
 
-  - assert {{ Γ ⊢ M : Π r A B }} by mauto 2.
+    by mauto 3.
+    mauto 3.
+  - assert {{ Γ ⊢ M : Π r A B }} by mauto 3.
     gen_presup H2.
     eapply wf_typ_pi_inversion in HAwf as [].
     assert {{ Γ ⊢ N : A }} by mauto 3.
-    mauto 2.
-    
+    mauto 2.    
   - assert {{ Γ ⊢ ℕ : Sort@s }} by mauto 2.
+    assert {{ Γ ⊢ ℕ }} by mauto 2.
     assert {{ ⊢ Γ, ℕ@s }} by mauto 2.
     assert {{ Γ, ℕ@s ⊢ A : Sort@s' }} by mauto 3.
     assert {{ ⊢ Γ, ℕ@s, A@s' }} by mauto 3.
@@ -87,140 +99,152 @@ Proof.
     assert {{ Γ, ℕ@s, A@s' ⊢s Wk∘Wk : Γ }} by (econstructor; mauto 3).
     assert {{ Γ, ℕ@s, A@s' ⊢s Wk∘Wk,,succ #1 : Γ, ℕ@s }} by mauto 4.
     assert {{ Γ, ℕ@s, A@s' ⊢ A[Wk∘Wk,,succ #1] : Sort@s' }} by mauto 4.
-    simpl.
+    assert {{ Γ ⊢ A[Id,,N] : Sort@s' }} by mauto 3.
+    assert {{ Γ ⊢ A[Id,,N] ≈ B }} as <- by (mauto 3 using soundness_ty').
     econstructor; mauto 3.
 Qed.
 
 
-Lemma alg_type_check_sound {P} (conv_P : ConvertibleSig P) : forall {Γ : ctx P} {A M},
-    {{ ⟪ conv_P ⟫ Γ ⊢a M ⟸ A }} ->
+Lemma alg_type_check_sound {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {A M},
+    {{ ⟪ pred_P ⟫ Γ ⊢a M ⟸ A }} ->
     {{ ⊢ Γ }} ->
     {{ Γ ⊢ A }} ->
     {{ Γ ⊢ M : A }}.
 Proof.
-  pose proof (alg_type_sound conv_P); intuition.
+  pose proof (alg_type_sound pred_P); intuition.
 Qed.
 
-Lemma alg_type_infer_sound {P} (conv_P : ConvertibleSig P) : forall {Γ : ctx P} {A M},
-    {{ ⟪ conv_P ⟫ Γ ⊢a M ⟹ A }} -> {{ ⊢ Γ }} -> {{ Γ ⊢ M : A }}.
+Lemma alg_type_infer_sound {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {A M},
+    {{ ⟪ pred_P ⟫ Γ ⊢a M ⟹ A }} -> {{ ⊢ Γ }} -> {{ Γ ⊢ M : A }}.
 Proof.
   pose proof @alg_type_sound; intuition.
 Qed.
 
 
-(* Lemma alg_type_infer_normal {P} (conv_P : ConvertibleSig P) : forall {Γ : ctx P} {A A' M}, *)
-(*     {{ ⊢ Γ }} -> *)
-(*     {{ Γ ⊢a M ⟹ A }} -> *)
-(*     nbe_ty Γ A A' -> *)
-(*     A = A'. *)
-(* Proof with (f_equiv; mautosolve 4). *)
-(*   intros. *)
-(*   eapply idempotent_nbe_ty; mauto 2. *)
+Lemma alg_type_infer_normal {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {A A' M},
+    {{ ⊢ Γ }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊢a M ⟹ A }} ->
+    nbe_ty Γ A A' ->
+    A = A'.
+Proof with (f_equiv; mautosolve 4).
+  intros * ? Hinfer Hnbe. gen A'.
+  assert {{ Γ ⊢ M : A }} by mauto 3 using alg_type_infer_sound.
+  induction Hinfer; intros;
+    try (dir_inversion_clear_by_head nbe_ty;
+         dir_inversion_by_head eval_exp; subst;
+         dir_inversion_by_head read_typ; subst;
+         reflexivity).
+  - assert {{ Γ ⊢ A : Sort@s }} by mauto 2.
+    epose proof idempotent_nbe_ty pred_P H3 H2 Hnbe.
+    exact H4.
+    epose proof presup_ctx_lookup_typ HΓ H1.
+  intros.
+  eapply idempotent_nbe_ty_unsorted; mauto 2.
   
   
-(*   intros * ? Hinfer Hnbe. gen A'. *)
-(*   assert {{ Γ ⊢ M : A }} by mauto 3 using alg_type_infer_sound. *)
-(*   induction Hinfer; intros; *)
-(*     try (dir_inversion_clear_by_head nbe_ty; *)
-(*          dir_inversion_by_head eval_exp; subst; *)
-(*          dir_inversion_by_head read_typ; subst; *)
-(*          reflexivity). *)
-(*   - assert {{ Γ ⊢ ℕ : Type@0 }} by mauto 3. *)
-(*     assert {{ Γ ⊢ M : ℕ }} by mauto 3 using alg_type_check_sound. *)
-(*     assert {{ ⊢ Γ, ℕ }} by mauto 3. *)
-(*     assert {{ Γ, ℕ ⊢ A : ^n{{{ Type@i }}} }} by mauto 3 using alg_type_infer_sound... *)
-(*   - assert {{ Γ ⊢ A : ^n{{{ Type@i }}} }} by mauto 3 using alg_type_infer_sound. *)
-(*     assert {{ Γ ⊢ A ≈ C : Type@i }} by mauto 3 using soundness_ty'. *)
-(*     assert {{ Γ, A ⊢ M : B }} by mauto 3 using alg_type_infer_sound. *)
-(*     assert (exists j, {{ Γ, A ⊢ B : Type@j }}) as [j] by (gen_presups; eauto 2). *)
-(*     assert {{ ⊢ Γ, A ≈ Γ, ^(C : exp) }} by mauto 3. *)
-(*     dir_inversion_clear_by_head nbe_ty. *)
-(*     simplify_evals. *)
-(*     dir_inversion_by_head read_typ; subst. *)
-(*     functional_initial_env_rewrite_clear. *)
-(*     assert (initial_env {{{ Γ, ^(C : exp) }}} d{{{ ρ ↦ ⇑! a (length Γ) }}}) by mauto 3. *)
-(*     assert (nbe_ty Γ A C) by mauto 3. *)
-(*     assert (nbe_ty Γ C A0) by mauto 3. *)
-(*     replace A0 with C by mauto 2. *)
-(*     assert (nbe_ty {{{ Γ, ^(C : exp) }}} B B') by mauto 3. *)
-(*     assert (nbe_ty {{{ Γ, A }}} B B') by mauto 4 using ctxeq_nbe_ty_eq'... *)
-(*   - assert {{ Γ ⊢ M : ^n{{{ Π A B }}} }} by mauto 3 using alg_type_infer_sound. *)
-(*     assert (exists i, {{ Γ ⊢ Π A B : Type@i }}) as [i] by (gen_presups; eauto 2). *)
-(*     assert ({{ Γ ⊢ A : Type@i }} /\ {{ Γ, ^(A : exp) ⊢ B : Type@i }}) as [] by mauto 3. *)
-(*     assert {{ Γ ⊢ N : A }} by mauto 3 using alg_type_check_sound. *)
-(*     assert {{ Γ ⊢ B[Id,,N] : Type@i }} by mauto 3... *)
-(*   - assert {{ Γ ⊢ A : Type@i }} by (eapply alg_type_sound in Hinfer1; mauto 3). *)
-(*     assert {{ Γ , A ⊢ B : Type@j }} by (eapply alg_type_sound in Hinfer2; mauto 3). *)
-(*     assert (exists j, {{ Γ ⊢ Σ A' C : Type@j }}) as [k] by (gen_presups; eauto 2). *)
-(*     apply wf_sigma_inversion' in H7; fold nf_to_exp in *. destruct_all. *)
-(*     dir_inversion_clear_by_head nbe_ty. *)
-(*     simplify_evals. *)
-(*     dir_inversion_by_head read_typ; subst. *)
-(*     assert (nbe_ty Γ A A' ) by mauto 3. *)
-(*     assert (nbe_ty Γ A' A0 ) by mauto 3. *)
-(*     replace A0 with A' in * by mauto 3. *)
-(*     assert {{ Γ ⊢ A ≈ A' : Type@i }} by mauto 3 using soundness_ty'. *)
-(*     functional_initial_env_rewrite_clear. *)
-(*     simplify_evals. *)
-(*     assert (nbe_ty {{{ Γ, A }}} B C) by unshelve mauto 3. *)
-(*     assert (nbe_ty {{{ Γ,  ^(A' : exp)}}} C B') by mauto 4. *)
-(*     assert {{ ⊢ Γ, A ≈ Γ, ^(A' : exp) }} by mauto 3. *)
-(*     assert (nbe_ty {{{ Γ, ^(A : exp) }}} C B') by mauto 3 using ctxeq_nbe_ty_eq'. *)
-(*     replace B' with C in * by mauto 3... *)
-(*   - assert {{ Γ ⊢ M : ^n{{{ Σ A B }}} }} by mauto 3 using alg_type_infer_sound. *)
-(*     gen_presups. *)
-(*     assert (nbe_ty Γ {{{Σ A B }}} n{{{Σ A B}}}). { *)
-(*       assert {{ Γ ⊢ ^ n{{{ Σ A B }}} ≈ ^ n{{{ Σ A B }}} : Type@i }} by (eapply exp_eq_refl; mauto 3). *)
-(*       apply completeness_ty in H as IH. destruct_all. *)
-(*       eapply IHHinfer in H2; subst; auto. *)
-(*     } *)
-(*     dir_inversion_clear_by_head nbe. *)
-(*     dir_inversion_clear_by_head nbe_ty. *)
-(*     simplify_evals. *)
-(*     dir_inversion_by_head read_typ; subst. *)
-(*     functional_initial_env_rewrite_clear. *)
-(*     simplify_evals. *)
-(*     functional_read_rewrite_clear. reflexivity. *)
-(*   - assert {{ Γ ⊢ M : ^n{{{ Σ A B }}} }} by mauto 3 using alg_type_infer_sound. *)
-(*     gen_presups. *)
-(*     apply wf_sigma_inversion' in HA; fold nf_to_exp in *. *)
-(*     destruct_all. *)
-(*     assert {{ Γ ⊢ fst M : A }} by mauto 3. *)
-(*     assert {{ Γ ⊢ B[Id,,fst M] : Type@i }} by mauto 3. *)
-(*     mauto 3. *)
-(*   - assert {{ Γ ⊢ A : ^n{{{ Type@i }}} }} by mauto 3 using alg_type_infer_sound. *)
-(*     assert {{ Γ ⊢ M : A }} by mauto 3 using alg_type_check_sound. *)
-(*     dir_inversion_clear_by_head nbe. *)
-(*     dir_inversion_clear_by_head nbe_ty. *)
-(*     simplify_evals. *)
-(*     dir_inversion_by_head read_typ; subst. *)
-(*     functional_initial_env_rewrite_clear. *)
-(*     functional_read_rewrite_clear. *)
-(*     assert (nbe_ty Γ A C) by mauto 3. *)
-(*     assert (nbe_ty Γ C A0) by mauto 3. *)
-(*     replace A0 with C in * by mauto 3. *)
-(*     assert (nbe Γ M A N) by mauto 3. *)
-(*     assert {{ Γ ⊢ A ≈ C : Type@i }} by mauto 2 using soundness_ty'. *)
-(*     assert (nbe Γ N C M1) by mauto 2. *)
-(*     replace M1 with N in * by mauto 2. *)
-(*     reflexivity. *)
-(*   - assert {{ Γ ⊢ A : ^n{{{ Type@i }}} }} by mauto 3 using alg_type_infer_sound. *)
-(*     assert {{ Γ ⊢ M1 : A }} by mauto 3 using alg_type_check_sound. *)
-(*     assert {{ Γ ⊢ M2 : A }} by mauto 3 using alg_type_check_sound. *)
-(*     assert {{ Γ ⊢ N : Eq A M1 M2 }} by mauto 3 using alg_type_check_sound. *)
-(*     assert {{ Γ, A ⊢s Wk : Γ }} by mauto 3. *)
-(*     assert {{ Γ, A ⊢ A[Wk] : Type@i }} by mauto 3. *)
-(*     assert {{ ⊢ Γ, A, A[Wk] }} by mauto 3. *)
-(*     assert {{ Γ, A, A[Wk] ⊢ Eq A[Wk∘Wk] #1 #0 : Type@i }} by mauto 3. *)
-(*     assert {{ Γ, A, A[Wk], Eq A[Wk∘Wk] #1 #0 ⊢ B : ^n{{{ Type@j }}} }} by mauto 3 using alg_type_infer_sound. *)
-(*     assert {{ Γ ⊢s Id,,M1,,M2,,N : Γ, A, A[Wk], Eq A[Wk∘Wk] #1 #0 }} by mauto 2. *)
-(*     assert {{ Γ ⊢ B[Id,,M1,,M2,,N] : Type@j }} by mauto 2. *)
-(*     mauto 3. *)
-(*   - assert (exists i, {{ Γ ⊢ A : Type@i }}) as [i] by mauto 2... *)
-(* Qed. *)
+  intros * ? Hinfer Hnbe. gen A'.
+  assert {{ Γ ⊢ M : A }} by mauto 3 using alg_type_infer_sound.
+  induction Hinfer; intros;
+    try (dir_inversion_clear_by_head nbe_ty;
+         dir_inversion_by_head eval_exp; subst;
+         dir_inversion_by_head read_typ; subst;
+         reflexivity).
+  - assert {{ Γ ⊢ ℕ : Type@0 }} by mauto 3.
+    assert {{ Γ ⊢ M : ℕ }} by mauto 3 using alg_type_check_sound.
+    assert {{ ⊢ Γ, ℕ }} by mauto 3.
+    assert {{ Γ, ℕ ⊢ A : ^n{{{ Type@i }}} }} by mauto 3 using alg_type_infer_sound...
+  - assert {{ Γ ⊢ A : ^n{{{ Type@i }}} }} by mauto 3 using alg_type_infer_sound.
+    assert {{ Γ ⊢ A ≈ C : Type@i }} by mauto 3 using soundness_ty'.
+    assert {{ Γ, A ⊢ M : B }} by mauto 3 using alg_type_infer_sound.
+    assert (exists j, {{ Γ, A ⊢ B : Type@j }}) as [j] by (gen_presups; eauto 2).
+    assert {{ ⊢ Γ, A ≈ Γ, ^(C : exp) }} by mauto 3.
+    dir_inversion_clear_by_head nbe_ty.
+    simplify_evals.
+    dir_inversion_by_head read_typ; subst.
+    functional_initial_env_rewrite_clear.
+    assert (initial_env {{{ Γ, ^(C : exp) }}} d{{{ ρ ↦ ⇑! a (length Γ) }}}) by mauto 3.
+    assert (nbe_ty Γ A C) by mauto 3.
+    assert (nbe_ty Γ C A0) by mauto 3.
+    replace A0 with C by mauto 2.
+    assert (nbe_ty {{{ Γ, ^(C : exp) }}} B B') by mauto 3.
+    assert (nbe_ty {{{ Γ, A }}} B B') by mauto 4 using ctxeq_nbe_ty_eq'...
+  - assert {{ Γ ⊢ M : ^n{{{ Π A B }}} }} by mauto 3 using alg_type_infer_sound.
+    assert (exists i, {{ Γ ⊢ Π A B : Type@i }}) as [i] by (gen_presups; eauto 2).
+    assert ({{ Γ ⊢ A : Type@i }} /\ {{ Γ, ^(A : exp) ⊢ B : Type@i }}) as [] by mauto 3.
+    assert {{ Γ ⊢ N : A }} by mauto 3 using alg_type_check_sound.
+    assert {{ Γ ⊢ B[Id,,N] : Type@i }} by mauto 3...
+  - assert {{ Γ ⊢ A : Type@i }} by (eapply alg_type_sound in Hinfer1; mauto 3).
+    assert {{ Γ , A ⊢ B : Type@j }} by (eapply alg_type_sound in Hinfer2; mauto 3).
+    assert (exists j, {{ Γ ⊢ Σ A' C : Type@j }}) as [k] by (gen_presups; eauto 2).
+    apply wf_sigma_inversion' in H7; fold nf_to_exp in *. destruct_all.
+    dir_inversion_clear_by_head nbe_ty.
+    simplify_evals.
+    dir_inversion_by_head read_typ; subst.
+    assert (nbe_ty Γ A A' ) by mauto 3.
+    assert (nbe_ty Γ A' A0 ) by mauto 3.
+    replace A0 with A' in * by mauto 3.
+    assert {{ Γ ⊢ A ≈ A' : Type@i }} by mauto 3 using soundness_ty'.
+    functional_initial_env_rewrite_clear.
+    simplify_evals.
+    assert (nbe_ty {{{ Γ, A }}} B C) by unshelve mauto 3.
+    assert (nbe_ty {{{ Γ,  ^(A' : exp)}}} C B') by mauto 4.
+    assert {{ ⊢ Γ, A ≈ Γ, ^(A' : exp) }} by mauto 3.
+    assert (nbe_ty {{{ Γ, ^(A : exp) }}} C B') by mauto 3 using ctxeq_nbe_ty_eq'.
+    replace B' with C in * by mauto 3...
+  - assert {{ Γ ⊢ M : ^n{{{ Σ A B }}} }} by mauto 3 using alg_type_infer_sound.
+    gen_presups.
+    assert (nbe_ty Γ {{{Σ A B }}} n{{{Σ A B}}}). {
+      assert {{ Γ ⊢ ^ n{{{ Σ A B }}} ≈ ^ n{{{ Σ A B }}} : Type@i }} by (eapply exp_eq_refl; mauto 3).
+      apply completeness_ty in H as IH. destruct_all.
+      eapply IHHinfer in H2; subst; auto.
+    }
+    dir_inversion_clear_by_head nbe.
+    dir_inversion_clear_by_head nbe_ty.
+    simplify_evals.
+    dir_inversion_by_head read_typ; subst.
+    functional_initial_env_rewrite_clear.
+    simplify_evals.
+    functional_read_rewrite_clear. reflexivity.
+  - assert {{ Γ ⊢ M : ^n{{{ Σ A B }}} }} by mauto 3 using alg_type_infer_sound.
+    gen_presups.
+    apply wf_sigma_inversion' in HA; fold nf_to_exp in *.
+    destruct_all.
+    assert {{ Γ ⊢ fst M : A }} by mauto 3.
+    assert {{ Γ ⊢ B[Id,,fst M] : Type@i }} by mauto 3.
+    mauto 3.
+  - assert {{ Γ ⊢ A : ^n{{{ Type@i }}} }} by mauto 3 using alg_type_infer_sound.
+    assert {{ Γ ⊢ M : A }} by mauto 3 using alg_type_check_sound.
+    dir_inversion_clear_by_head nbe.
+    dir_inversion_clear_by_head nbe_ty.
+    simplify_evals.
+    dir_inversion_by_head read_typ; subst.
+    functional_initial_env_rewrite_clear.
+    functional_read_rewrite_clear.
+    assert (nbe_ty Γ A C) by mauto 3.
+    assert (nbe_ty Γ C A0) by mauto 3.
+    replace A0 with C in * by mauto 3.
+    assert (nbe Γ M A N) by mauto 3.
+    assert {{ Γ ⊢ A ≈ C : Type@i }} by mauto 2 using soundness_ty'.
+    assert (nbe Γ N C M1) by mauto 2.
+    replace M1 with N in * by mauto 2.
+    reflexivity.
+  - assert {{ Γ ⊢ A : ^n{{{ Type@i }}} }} by mauto 3 using alg_type_infer_sound.
+    assert {{ Γ ⊢ M1 : A }} by mauto 3 using alg_type_check_sound.
+    assert {{ Γ ⊢ M2 : A }} by mauto 3 using alg_type_check_sound.
+    assert {{ Γ ⊢ N : Eq A M1 M2 }} by mauto 3 using alg_type_check_sound.
+    assert {{ Γ, A ⊢s Wk : Γ }} by mauto 3.
+    assert {{ Γ, A ⊢ A[Wk] : Type@i }} by mauto 3.
+    assert {{ ⊢ Γ, A, A[Wk] }} by mauto 3.
+    assert {{ Γ, A, A[Wk] ⊢ Eq A[Wk∘Wk] #1 #0 : Type@i }} by mauto 3.
+    assert {{ Γ, A, A[Wk], Eq A[Wk∘Wk] #1 #0 ⊢ B : ^n{{{ Type@j }}} }} by mauto 3 using alg_type_infer_sound.
+    assert {{ Γ ⊢s Id,,M1,,M2,,N : Γ, A, A[Wk], Eq A[Wk∘Wk] #1 #0 }} by mauto 2.
+    assert {{ Γ ⊢ B[Id,,M1,,M2,,N] : Type@j }} by mauto 2.
+    mauto 3.
+  - assert (exists i, {{ Γ ⊢ A : Type@i }}) as [i] by mauto 2...
+Qed.
 
-(* #[export] *)
-(* Hint Resolve alg_type_infer_normal : mcpts. *)
+#[export]
+Hint Resolve alg_type_infer_normal : mcpts.
 
 
 Lemma subtyp_sort_is_sort_helper {P} : forall {Γ : ctx P} {A B},
@@ -254,10 +278,10 @@ Proof.
 Qed.
 
   
-Lemma alg_type_check_typ_implies_alg_type_infer_typ {P} (conv_P : ConvertibleSig P) : forall {Γ A s},
+Lemma alg_type_check_typ_implies_alg_type_infer_typ {P} (pred_P : PredicativeSig P) : forall {Γ A s},
     {{ ⊢ Γ }} ->
-    {{ ⟪ conv_P ⟫ Γ ⊢a A ⟸ Sort@s }} ->
-    exists A' s', {{ ⟪ conv_P ⟫ Γ ⊢a A ⟹ A' }} /\ {{ Γ ⊢ A' ≈ Sort@s' }} /\ st_subtyp s' s.
+    {{ ⟪ pred_P ⟫ Γ ⊢a A ⟸ Sort@s }} ->
+    exists A' s', {{ ⟪ pred_P ⟫ Γ ⊢a A ⟹ A' }} /\ {{ Γ ⊢ A' ≈ Sort@s' }} /\ st_subtyp s' s.
 Proof.
   intros * ? Hcheck.
   inversion Hcheck as [? A' ? ? Hinfer Hsub]; subst.
@@ -269,11 +293,11 @@ Qed.
 #[export]
 Hint Resolve alg_type_check_typ_implies_alg_type_infer_typ : mcpts.
 
-Lemma alg_type_check_pi_implies_alg_type_infer_pi {P} (conv_P : ConvertibleSig P) : forall {Γ M A B s1 s2 s3 s} {r : Ru_pi P s1 s2 s3},
+Lemma alg_type_check_pi_implies_alg_type_infer_pi {P} (pred_P : PredicativeSig P) : forall {Γ M A B s1 s2 s3 s} {r : Ru_pi P s1 s2 s3},
     {{ ⊢ Γ }} ->
     {{ Γ ⊢ Π r A B : Sort@s }} ->
-    {{ ⟪ conv_P ⟫ Γ ⊢a M ⟸ Π r A B }} ->
-    exists A' A0 B0, {{ ⟪ conv_P ⟫ Γ ⊢a M ⟹ A' }} /\ {{ Γ ⊢ A' ≈ Π r A0 B0 }} /\ {{ Γ ⊢ A0 ≈ A : Sort@s1 }} /\ (Convert conv_P {{{ Γ, A@s1 }}} B0 B).
+    {{ ⟪ pred_P ⟫ Γ ⊢a M ⟸ Π r A B }} ->
+    exists A' A0 B0, {{ ⟪ pred_P ⟫ Γ ⊢a M ⟹ A' }} /\ {{ Γ ⊢ A' ≈ Π r A0 B0 }} /\ {{ Γ ⊢ A0 ≈ A : Sort@s1 }} /\ (Convert pred_P {{{ Γ, A@s1 }}} B0 B).
 Proof.
   intros * ? ? Hcheck.
   assert ({{ Γ ⊢ A : Sort@s1 }} /\ {{ Γ, A@s1 ⊢ B : Sort@s2 }} /\ {{ Γ ⊢ Sort@s3 ⊆ Sort@s }}) as [? []] by mauto 3.
@@ -291,25 +315,25 @@ Admitted.
 #[export]
 Hint Resolve alg_type_check_pi_implies_alg_type_infer_pi : mcpts.
 
-Lemma alg_type_check_subtyp {P} (conv_P : ConvertibleSig P) : forall {Γ A A' M},
-    {{ ⟪ conv_P ⟫ Γ ⊢a M ⟸ A }} ->
+Lemma alg_type_check_subtyp {P} (pred_P : PredicativeSig P) : forall {Γ A A' M},
+    {{ ⟪ pred_P ⟫ Γ ⊢a M ⟸ A }} ->
     {{ Γ ⊢ A ⊆ A' }} ->
-    {{ ⟪ conv_P ⟫ Γ ⊢a M ⟸ A' }}.
+    {{ ⟪ pred_P ⟫ Γ ⊢a M ⟸ A' }}.
 Proof.
   intros * [] **.
   assert {{ Γ0 ⊢ A0 ⊆ B }} by (eapply CorrectConv; mauto 2).
   assert {{ Γ0 ⊢ A0 ⊆ A' }} by mauto 2.
-  assert (Convert conv_P Γ0 A0 A') by (eapply CorrectConv; mauto 2).
+  assert (Convert pred_P Γ0 A0 A') by (eapply CorrectConv; mauto 2).
   mauto 2.
 Qed.
 
 #[export]
 Hint Resolve alg_type_check_subtyp : mcpts.
 
-Corollary alg_type_check_conv {P} (conv_P : ConvertibleSig P) : forall {Γ A A' M},
-    {{ ⟪ conv_P ⟫ Γ ⊢a M ⟸ A }} ->
+Corollary alg_type_check_conv {P} (pred_P : PredicativeSig P) : forall {Γ A A' M},
+    {{ ⟪ pred_P ⟫ Γ ⊢a M ⟸ A }} ->
     {{ Γ ⊢ A ≈ A' }} ->
-    {{ ⟪ conv_P ⟫ Γ ⊢a M ⟸ A' }}.
+    {{ ⟪ pred_P ⟫ Γ ⊢a M ⟸ A' }}.
 Proof.
   mauto 3.
 Qed.
@@ -317,33 +341,33 @@ Qed.
 #[export]
 Hint Resolve alg_type_check_conv : mcpts.
 
-Lemma alg_type_check_complete {P} (conv_P : ConvertibleSig P) : forall {Γ A M},
+Lemma alg_type_check_complete {P} (pred_P : PredicativeSig P) : forall {Γ A M},
     user_exp P M ->
     {{ Γ ⊢ M : A }} ->
-    {{ ⟪ conv_P ⟫ Γ ⊢a M ⟸ A }}.
+    {{ ⟪ pred_P ⟫ Γ ⊢a M ⟸ A }}.
 Proof.
   intros * Hue.
   induction 1; gen_presups; inversion Hue; subst; clear Hue; mauto 4 using alg_type_check_subtyp.
   - econstructor; mauto 3.
     eapply CorrectConv; mauto 2.
 
-  - assert (Convert conv_P Γ {{{ Sort@s3 }}} {{{ Sort@s3 }}}) by (eapply CorrectConv; mauto 3).
+  - assert (Convert pred_P Γ {{{ Sort@s3 }}} {{{ Sort@s3 }}}) by (eapply CorrectConv; mauto 3).
     econstructor; mauto 3.
     econstructor; mauto 3.
 
-  - assert {{ ⟪ conv_P ⟫ Γ ⊢a A ⟸ Sort@s1 }} by mauto 2.
-    assert {{ ⟪ conv_P ⟫ Γ, A@s1 ⊢a M ⟸ B }} by mauto 2.
+  - assert {{ ⟪ pred_P ⟫ Γ ⊢a A ⟸ Sort@s1 }} by mauto 2.
+    assert {{ ⟪ pred_P ⟫ Γ, A@s1 ⊢a M ⟸ B }} by mauto 2.
     inversion_clear H3.
     assert {{ Γ, A@s1 ⊢ A0 ⊆ B }} by (eapply CorrectConv; mauto 3).
     assert {{ Γ ⊢ Π r A A0 ⊆ Π r A B }} by admit.
-    assert (Convert conv_P Γ {{{ Π r A A0 }}} {{{ Π r A B }}}) by (eapply CorrectConv; mauto 3).
+    assert (Convert pred_P Γ {{{ Π r A A0 }}} {{{ Π r A B }}}) by (eapply CorrectConv; mauto 3).
     econstructor; mauto 3.
     econstructor; mauto 3.
     admit.
 
 
-  - assert {{ ⟪ conv_P ⟫ Γ ⊢a M ⟸ Π r A B }} by mauto 2.
-    assert {{ ⟪ conv_P ⟫ Γ ⊢a N ⟸ A }} by mauto 2.
+  - assert {{ ⟪ pred_P ⟫ Γ ⊢a M ⟸ Π r A B }} by mauto 2.
+    assert {{ ⟪ pred_P ⟫ Γ ⊢a N ⟸ A }} by mauto 2.
     econstructor; mauto 3.
     
     

@@ -6,7 +6,7 @@ From McPTS.Core.Syntactic Require Export SystemOpt.
 Import Syntax_Notations.
 
 
-Reserved Notation "⟪ pred_P ⟫ Γ '⊢a' M ⟹ A" (in custom judg at level 80, pred_P constr, Γ custom exp, M custom exp, A custom exp).
+Reserved Notation "⟪ pred_P ⟫ Γ '⊢a' M ⟹ A" (in custom judg at level 80, pred_P constr, Γ custom exp, M custom exp, A custom nf).
 Reserved Notation "⟪ pred_P ⟫ Γ '⊢a' M ⟸ A" (in custom judg at level 80, pred_P constr, Γ custom exp, M custom exp, A custom exp).
 
 Generalizable All Variables.
@@ -29,7 +29,7 @@ Inductive alg_type_check {P} (pred_P : PredicativeSig P) : ctx P -> typ P -> exp
               
 where "⟪ pred_P ⟫ Γ '⊢a' M ⟸ A" := (alg_type_check pred_P Γ A M) (in custom judg) : type_scope
 
-with alg_type_infer {P} (pred_P : PredicativeSig P) : ctx P -> typ P -> exp P -> Prop :=
+with alg_type_infer {P} (pred_P : PredicativeSig P) : ctx P -> nf P -> exp P -> Prop :=
 (** Variables *)
 | ati_var : `( {{ #x : A @ s ∈ Γ }} ->
                nbe_ty Γ A B ->
@@ -41,20 +41,23 @@ with alg_type_infer {P} (pred_P : PredicativeSig P) : ctx P -> typ P -> exp P ->
              
 (** Functions *)
 | atc_pi : `( forall {r : Ru_pi P s1 s2 s3},
-                 {{ ⟪ pred_P ⟫  Γ ⊢a A ⟸ Sort@s1 }} ->
-                 {{ ⟪ pred_P ⟫  Γ, A@s1 ⊢a B ⟸ Sort@s2 }} ->
+                 {{ ⟪ pred_P ⟫  Γ ⊢a A ⟹ Sort@s1 }} ->
+                 {{ ⟪ pred_P ⟫  Γ, A@s1 ⊢a B ⟹ Sort@s2 }} ->
                  {{ ⟪ pred_P ⟫  Γ ⊢a Π r A B ⟹ Sort@s3 }} )
 
 | ati_lam : `( forall {r : Ru_pi P s1 s2 s3},
-                  {{ ⟪ pred_P ⟫ Γ ⊢a A ⟸ Sort@s1 }} ->
-                  {{ ⟪ pred_P ⟫ Γ, A@s1 ⊢a B ⟸ Sort@s2 }} ->
-                  {{ ⟪ pred_P ⟫ Γ, A@s1 ⊢a M ⟹ B }} ->
-                  {{ ⟪ pred_P ⟫ Γ ⊢a λ r A M ⟹ Π r A B }} )
+                  {{ ⟪ pred_P ⟫ Γ ⊢a A ⟹ Sort@s1 }} ->
+                  {{ ⟪ pred_P ⟫ Γ, A@s1 ⊢a B ⟹ Sort@s2 }} ->
+                  nbe_ty {{{ Γ, A@s1 }}} B D ->
+                  {{ ⟪ pred_P ⟫ Γ, A@s1 ⊢a M ⟹ D }} ->
+                  nbe_ty Γ A C ->
+                  {{ ⟪ pred_P ⟫ Γ ⊢a λ r A M ⟹ Π r C D }} )
              
 | ati_app : `( forall {r : Ru_pi P s1 s2 s3},
                   {{ ⟪ pred_P ⟫ Γ ⊢a M ⟹ Π r A B }} ->
                   {{ ⟪ pred_P ⟫ Γ ⊢a N ⟸ A }} ->
-                  {{ ⟪ pred_P ⟫ Γ ⊢a M N ⟹ B[Id,,N] }} )
+                  nbe_ty Γ {{{ B[Id,,N] }}} C ->
+                  {{ ⟪ pred_P ⟫ Γ ⊢a M N ⟹ C }} )
                   
 (** Naturals *)
 | ati_nat : `( Ru_nat P s ->
@@ -62,14 +65,14 @@ with alg_type_infer {P} (pred_P : PredicativeSig P) : ctx P -> typ P -> exp P ->
 | ati_zero : `( Ru_nat P s ->
                 {{ ⟪ pred_P ⟫ Γ ⊢a zero ⟹ ℕ }} )
 | ati_succ : `( Ru_nat P s ->
-                {{ ⟪ pred_P ⟫ Γ ⊢a M ⟹ ℕ }} ->
+                {{ ⟪ pred_P ⟫ Γ ⊢a M ⟸ ℕ }} ->
                 {{ ⟪ pred_P ⟫ Γ ⊢a succ M ⟹ ℕ }} )
 | ati_rec : `( Ru_nat P s ->
-               {{ ⟪ pred_P ⟫ Γ, ℕ@s ⊢a A ⟸ Sort@s' }} ->
+               {{ ⟪ pred_P ⟫ Γ, ℕ@s ⊢a A ⟹ Sort@s' }} ->
                {{ ⟪ pred_P ⟫ Γ ⊢a MZ ⟸ A[Id,,zero] }} ->
                {{ ⟪ pred_P ⟫ Γ, ℕ@s, A@s' ⊢a MS ⟸ A[Wk∘Wk,,succ #1] }} ->
                {{ ⟪ pred_P ⟫ Γ ⊢a N ⟸ ℕ }} ->
-               nbe_ty Γ {{{ A[Id,,N] }}} B
+               nbe_ty Γ {{{ A[Id,,N] }}} B ->
                {{ ⟪ pred_P ⟫ Γ ⊢a rec N return A | zero -> MZ | succ -> MS end ⟹ B }} )
 where "⟪ pred_P ⟫ Γ '⊢a' M ⟹ A" := (alg_type_infer pred_P Γ A M) (in custom judg) : type_scope.
 

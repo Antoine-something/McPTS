@@ -67,6 +67,24 @@ Qed.
 #[export]
 Hint Resolve idempotent_nbe_ty : mcpts.
 
+Lemma idempotent_nbe_ty_unsorted {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {A B C},
+    {{ Γ ⊢ A  }} ->
+    nbe_ty Γ A B ->
+    nbe_ty Γ B C ->
+    B = C.
+Proof.
+  intros.
+  inversion H0; subst.
+  assert (nbe_ty Γ A B) by mauto 3.
+  assert {{ Γ ⊢ A ≈ B }} as [? []]%(@completeness_typ_unsorted P pred_P) by mauto 2 using soundness_ty'.
+
+  functional_nbe_rewrite_clear.
+  reflexivity.
+Qed.
+
+#[export]
+Hint Resolve idempotent_nbe_ty_unsorted : mcpts.
+
 Lemma adjust_exp_eq_level {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {A A' s s'},
     {{ Γ ⊢ A ≈ A' : Sort@s }} ->
     {{ Γ ⊢ A : Sort@s' }} ->
