@@ -41,16 +41,16 @@ with alg_type_infer {P} (pred_P : PredicativeSig P) : ctx P -> nf P -> exp P -> 
              
 (** Functions *)
 | atc_pi : `( forall {r : Ru_pi P s1 s2 s3},
-                 {{ ⟪ pred_P ⟫  Γ ⊢a A ⟹ Sort@s1 }} ->
-                 {{ ⟪ pred_P ⟫  Γ, A@s1 ⊢a B ⟹ Sort@s2 }} ->
+                 {{ ⟪ pred_P ⟫  Γ ⊢a A ⟸ Sort@s1 }} ->
+                 {{ ⟪ pred_P ⟫  Γ, A@s1 ⊢a B ⟸ Sort@s2 }} ->
                  {{ ⟪ pred_P ⟫  Γ ⊢a Π r A B ⟹ Sort@s3 }} )
 
 | ati_lam : `( forall {r : Ru_pi P s1 s2 s3},
-                  {{ ⟪ pred_P ⟫ Γ ⊢a A ⟹ Sort@s1 }} ->
-                  {{ ⟪ pred_P ⟫ Γ, A@s1 ⊢a B ⟹ Sort@s2 }} ->
-                  nbe_ty {{{ Γ, A@s1 }}} B D ->
+                  {{ ⟪ pred_P ⟫ Γ ⊢a A ⟸ Sort@s1 }} ->
+                  {{ ⟪ pred_P ⟫ Γ, A@s1 ⊢a B ⟸ Sort@s2 }} ->
                   {{ ⟪ pred_P ⟫ Γ, A@s1 ⊢a M ⟹ D }} ->
-                  nbe_ty Γ A C ->
+                  nbe {{{ Γ, A@s1 }}} B {{{ Sort@s2 }}} D ->
+                  nbe Γ A {{{ Sort@s1 }}} C ->
                   {{ ⟪ pred_P ⟫ Γ ⊢a λ r A M ⟹ Π r C D }} )
              
 | ati_app : `( forall {r : Ru_pi P s1 s2 s3},
