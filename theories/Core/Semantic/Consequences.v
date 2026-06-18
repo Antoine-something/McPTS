@@ -477,6 +477,70 @@ Qed.
 
 #[export]
   Hint Resolve canonical_form_of_typ : mcpts.
+
+Theorem subtyp_sort_implies_eq_typ_left {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {s A},
+    {{ Γ ⊢ A ⊆ Sort@s }} ->
+    exists s', {{ Γ ⊢ A ≈ Sort@s' }}.
+Proof.
+  intros.
+  assert {{ ⟪ pred_P ⟫ Γ ⊨ A ⊆ Sort@s }} as [env_relΓ] by mauto using completeness_fundamental_typ_subtyp.
+  destruct_conjs.
+  assert (exists p p', initial_env Γ p /\ initial_env Γ p' /\ {{ Dom p ≈ p' ∈ env_relΓ }}) as [ρ [ρ' ?]] by mauto using per_ctx_then_per_env_initial_env.
+  destruct_conjs.
+  functional_initial_env_rewrite_clear.
+  (on_all_hyp: destruct_rel_by_assumption env_relΓ).
+  destruct_by_head (@rel_typ_unsorted).
+  destruct_by_head (@rel_exp).
+  invert_rel_typ_body.
+  destruct (per_subtyp_sort_inv_right pred_P H12) as [s' []].
+  inversion H5; subst.
+  
+  assert (per_typ_elem pred_P (per_sort pred_P s) d{{{ Sort@s }}} d{{{ Sort@s }}}) by (econstructor; reflexivity).
+  handle_per_typ_elem_irrel.
+  assert (is_typ_constr {{{ Sort@s }}}) as Histyp' by mauto 1.
+
+  gen_presups.
+  destruct (soundness_ty pred_P HA) as [W []].
+  dir_inversion_clear_by_head @nbe_ty.
+  functional_initial_env_rewrite_clear.
+  invert_rel_typ_body.
+  dir_inversion_by_head @read_typ; subst.
+  eexists; eassumption.
+Qed.
+
+Theorem subtyp_sort_implies_eq_typ_right {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {s A},
+    {{ Γ ⊢ Sort@s ⊆ A }} ->
+    exists s', {{ Γ ⊢ A ≈ Sort@s' }}.
+Proof.
+  intros.
+  assert {{ ⟪ pred_P ⟫ Γ ⊨ Sort@s ⊆ A }} as [env_relΓ] by mauto using completeness_fundamental_typ_subtyp.
+  destruct_conjs.
+  assert (exists p p', initial_env Γ p /\ initial_env Γ p' /\ {{ Dom p ≈ p' ∈ env_relΓ }}) as [ρ [ρ' ?]] by mauto using per_ctx_then_per_env_initial_env.
+  destruct_conjs.
+  functional_initial_env_rewrite_clear.
+  (on_all_hyp: destruct_rel_by_assumption env_relΓ).
+  destruct_by_head (@rel_typ_unsorted).
+  destruct_by_head (@rel_exp).
+  invert_rel_typ_body.
+  destruct (per_subtyp_sort_inv_left pred_P H12) as [s' []].
+  inversion H3; subst.
+  
+  assert (per_typ_elem pred_P (per_sort pred_P s) d{{{ Sort@s }}} d{{{ Sort@s }}}) by (econstructor; reflexivity).
+  handle_per_typ_elem_irrel.
+  assert (is_typ_constr {{{ Sort@s }}}) as Histyp' by mauto 1.
+
+  gen_presups.
+  destruct (soundness_ty pred_P HB) as [W []].
+  dir_inversion_clear_by_head @nbe_ty.
+  functional_initial_env_rewrite_clear.
+  invert_rel_typ_body.
+  dir_inversion_by_head @read_typ; subst.
+  eexists; eassumption.
+Qed.
+
+#[export]
+Hint Resolve subtyp_sort_implies_eq_typ_left subtyp_sort_implies_eq_typ_right : mcpts.
+
     
 
 (* Lemma t {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {s B}, *)
@@ -808,3 +872,58 @@ Proof with (congruence + mautosolve 3).
   }
   eapply consistency_ne_helper...  
 Qed.
+
+Theorem pi_subtyp_typ_implies_eq_pi {P} (pred_P : PredicativeSig P) : forall Γ A B C s1 s2 s3 (r : Ru_pi P s1 s2 s3),
+    {{ Γ ⊢ Π r B C ⊆ A }} ->
+    exists B' C',  {{ Γ ⊢ A ≈  Π r B' C' }}.
+Proof.
+  intros.
+  gen_presups.
+  assert {{ ⟪ pred_P ⟫ Γ ⊨ Π r B C ⊆ A }} as [env_relΓ] by mauto using completeness_fundamental_typ_subtyp.
+  destruct_conjs.
+  assert (exists p p', initial_env Γ p /\ initial_env Γ p' /\ {{ Dom p ≈ p' ∈ env_relΓ }}) as [ρ [ρ' ?]] by mauto using per_ctx_then_per_env_initial_env.
+  destruct_conjs.
+  functional_initial_env_rewrite_clear.
+  (on_all_hyp: destruct_rel_by_assumption env_relΓ).
+  destruct_by_head @rel_typ_unsorted.
+  destruct_by_head @rel_exp.
+  invert_rel_typ_body.
+
+  destruct (per_subtyp_pi_inv_left pred_P H12) as [a' [ρ' [B']]].
+  subst.
+  epose proof soundness_ty pred_P HB as [W []].
+  dir_inversion_clear_by_head @nbe_ty.
+  functional_initial_env_rewrite_clear.
+  invert_rel_typ_body.
+  match_by_head @read_typ ltac:(fun H => progressive_invert H).
+  eexists; mauto 3.
+Qed.
+
+Theorem typ_subtyp_pi_implies_eq_pi {P} (pred_P : PredicativeSig P) : forall Γ A B C s1 s2 s3 (r : Ru_pi P s1 s2 s3),
+    {{ Γ ⊢ A ⊆ Π r B C }} ->
+    exists B' C',  {{ Γ ⊢ A ≈  Π r B' C' }}.
+Proof.
+  intros.
+  gen_presups.
+  assert {{ ⟪ pred_P ⟫ Γ ⊨ A ⊆ Π r B C }} as [env_relΓ] by mauto using completeness_fundamental_typ_subtyp.
+  destruct_conjs.
+  assert (exists p p', initial_env Γ p /\ initial_env Γ p' /\ {{ Dom p ≈ p' ∈ env_relΓ }}) as [ρ [ρ' ?]] by mauto using per_ctx_then_per_env_initial_env.
+  destruct_conjs.
+  functional_initial_env_rewrite_clear.
+  (on_all_hyp: destruct_rel_by_assumption env_relΓ).
+  destruct_by_head @rel_typ_unsorted.
+  destruct_by_head @rel_exp.
+  invert_rel_typ_body.
+
+  destruct (per_subtyp_pi_inv_right pred_P H12) as [a' [ρ' [B']]].
+  subst.
+  epose proof soundness_ty pred_P HA as [W []].
+  dir_inversion_clear_by_head @nbe_ty.
+  functional_initial_env_rewrite_clear.
+  invert_rel_typ_body.
+  match_by_head @read_typ ltac:(fun H => progressive_invert H).
+  eexists; mauto 3.
+Qed.
+
+#[export]
+Hint Resolve pi_subtyp_typ_implies_eq_pi typ_subtyp_pi_implies_eq_pi : mcpts.
