@@ -7,24 +7,13 @@ Import Syntax_Notations.
 Reserved Notation "Γ ⊢a A ⊆ A'" (in custom judg at level 80, Γ custom exp, A custom exp, A' custom exp).
 Reserved Notation "⊢anf A ⊆ A'" (in custom judg at level 80, A custom nf, A' custom nf).
 
+Reserved Notation "⊢a Γ ⊆ Γ'" (in custom judg at level 80, Γ custom exp, Γ' custom exp).
+
 Definition not_sort_pi {P} (A : nf P) : Prop :=
   match A with
   | nf_st _ | nf_pi _ _ _  => False
   | _ => True
   end.
-
-(* Record ConvertibleSig (P : PtsSig) : Prop := *)
-(*   mkConvertibleSig { *)
-(*       Convert : ctx P -> typ P -> typ P -> Prop; *)
-(*       CorrectConv : forall Γ A B, Convert Γ A B <-> {{ Γ ⊢ A ≈ B }}; *)
-(*       DecidableConv : forall Γ A B, (Convert Γ A B) \/ ~(Convert Γ A B); *)
-(*     }. *)
-
-(* Inductive alg_subtyping {P} (conv_P : ConvertibleSig P) : ctx P -> nf P -> typ P -> Prop := *)
-(* | alg_subtyp_refl : forall A B, *)
-(*     not_sort_pi A -> *)
-(*     Convert conv_P Γ A B -> *)
-(*     {{ Γ ⊢a A ⊆ B }}. *)
 
 Inductive alg_subtyping_nf {P} : nf P -> nf P -> Prop :=
 | asnf_refl : forall A A',
@@ -48,5 +37,13 @@ Inductive alg_subtyping {P} : ctx P -> typ P -> typ P -> Prop :=
     {{ Γ ⊢a A ⊆ B }}
 where "Γ ⊢a A ⊆ B" := (alg_subtyping Γ A B) (in custom judg) : type_scope.
 
+Inductive alg_subtyping_ctx {P} : ctx P -> ctx P -> Prop :=
+| asc_nil : {{ ⊢a ⋅ ⊆ ⋅ }}
+| asc_cons : forall Γ Γ' A A' s,
+    {{ ⊢a Γ ⊆ Γ' }} ->
+    {{ Γ ⊢a A ⊆ A' }} ->
+    {{ ⊢a Γ, A@s ⊆ Γ', A'@s }}
+where "⊢a Γ ⊆ Γ'" := (alg_subtyping_ctx Γ Γ') (in custom judg) : type_scope.
+
 #[export]
-Hint Constructors alg_subtyping_nf alg_subtyping: mcpts.
+Hint Constructors alg_subtyping_nf alg_subtyping alg_subtyping_ctx : mcpts.

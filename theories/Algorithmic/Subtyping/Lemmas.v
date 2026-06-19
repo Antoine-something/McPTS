@@ -150,3 +150,30 @@ Proof.
   transitivity B'; [eassumption |].
   mauto.
 Qed.
+
+Lemma alg_subtyping_ctx_sound {P} (pred_P : PredicativeSig P) : forall (Γ Γ' : ctx P),
+    {{ ⊢a Γ ⊆ Γ' }} ->
+    {{ ⊢ Γ }} ->
+    {{ ⊢ Γ' }} ->
+    {{ ⊢ Γ ⊆ Γ' }}.
+Proof.
+  intros.
+  induction H; mauto 2.
+  inversion_clear H0.
+  inversion_clear H1.
+  assert {{ ⊢ Γ ⊆ Γ' }} by mauto 2.
+  assert {{ Γ ⊢ A }} by mauto 3.
+  assert {{ Γ' ⊢ A' }} by mauto 3.
+  assert {{ Γ ⊢ A' }} by mauto 2.
+  assert {{ Γ ⊢ A ⊆ A' }} by mauto 2 using alg_subtyping_sound.
+  econstructor; mauto 2.
+Qed.
+
+Lemma alg_subtyping_ctx_complete {P} (pred_P : PredicativeSig P) : forall (Γ Γ' : ctx P),
+    {{ ⊢ Γ ⊆ Γ' }} ->
+    {{ ⊢a Γ ⊆ Γ' }}.
+Proof.
+  induction 1; mauto 2.
+  assert {{ Γ ⊢a A ⊆ A' }} by mauto 2 using alg_subtyping_complete.
+  econstructor; mauto 2.
+Qed.

@@ -15,27 +15,59 @@ Record FunctionalSig (P : PtsSig) : Prop :=
     }.
 
 Lemma functional_alg_type_infer {P} (pred_P : PredicativeSig P) (func_P : FunctionalSig P) : forall {Γ : ctx P} {A A' M},
-    {{ ⟪ pred_P ⟫ Γ ⊢a M ⟹ A }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊢a M ⟹ A' }} ->
-    A = A'.
+    {{ Γ ⊢a M ⟹ A }} ->
+    {{ Γ ⊢a M ⟹ A' }} ->
+    A = A'
+with functional_alg_type_infer_sub {P} (pred_P : PredicativeSig P) (func_P : FunctionalSig P) : forall {Γ : ctx P} {Δ Δ' σ},
+    {{ Γ ⊢as σ ⟹ Δ }} ->
+    {{ Γ ⊢as σ ⟹ Δ' }} ->
+    Δ = Δ'.
 Proof.
-  intros * HM1 HM2. gen A'.
-  induction HM1;
-    intros;
-    dependent destruction HM2;
-    subst;
-    functional_nbe_rewrite_clear;
-    f_equiv;
-    try reflexivity;
-    intuition.
+  - intros * HM1 HM2. gen A'.
+    induction HM1;
+      intros;
+      dependent destruction HM2;
+      subst;
+      functional_nbe_rewrite_clear;
+      f_equiv;
+      try reflexivity;
+      intuition.
 
-  - assert (A = A0) as <- by (eapply functional_ctx_lookup; eassumption).
+    + assert (A = A0) as <- by (eapply functional_ctx_lookup; eassumption).
     functional_nbe_rewrite_clear.
     reflexivity.
-  - assert (n{{{ Π r A B }}} = n{{{ Π r0 A0 B0 }}}) by mauto 2.
+    + assert (n{{{ Π r A B }}} = n{{{ Π r0 A0 B0 }}}) by mauto 2.
     dependent destruction H3.
     mauto 3.
-  - eapply Func_ru_nat; mauto 2.
+    + eapply Func_ru_nat; mauto 2.
+    + assert (Δ = Δ0) by mauto 2.
+      subst.
+      assert (A = A0) by mauto 2.
+      subst.
+      functional_nbe_rewrite_clear.
+      reflexivity.
+
+  - intros * Hσ1 Hσ2.
+    gen Δ'.
+    induction Hσ1;
+      intros;
+      dependent destruction Hσ2;
+      subst;
+      functional_nbe_rewrite_clear;
+      f_equiv;
+      try reflexivity;
+      intuition.
+    + assert (Γ2 = Γ4) by mauto 2.
+      subst.
+      mauto 2.
+    + assert (Δ = Δ0) by mauto 2.
+      subst.
+      
+      assert (A = A0) by mauto 2.
+      subst.
+      assert (n{{{ Sort@s }}} = n{{{ Sort@s0 }}}) by mauto 2.
+      inversion H3.
+      reflexivity.      
 Qed.
 
 #[local]
@@ -44,14 +76,18 @@ Qed.
 Ltac functional_alg_type_infer_rewrite_clear1 :=
   let tactic_error o1 o2 := fail 3 "functional_alg_type_infer equality between" o1 "and" o2 "cannot be solved by mauto" in
   match goal with
-  | H1 : {{ ⟪ ?pred_P ⟫ ^?Γ ⊢a ^?M ⟹ ^?A1 }}, H2 : {{ ⟪ ?pred_P ⟫ ^?Γ ⊢a ^?M ⟹ ^?A2 }} |- _ =>
+  | H1 : {{ ^?Γ ⊢a ^?M ⟹ ^?A1 }}, H2 : {{ ^?Γ ⊢a ^?M ⟹ ^?A2 }} |- _ =>
       clean replace A2 with A1 by first [solve [mauto 2 using functional_alg_type_infer] | tactic_error A2 A1]; clear H2
+  | H1 : {{ ^?Γ ⊢as ^?σ ⟹ ^?Δ1 }}, H2 : {{ ^?Γ ⊢a ^?σ ⟹ ^?Δ2 }} |- _ =>
+      clean replace Δ2 with Δ1 by first [solve [mauto 2 using functional_alg_type_infer_sub] | tactic_error Δ2 Δ1]; clear H2
   end.
 Ltac functional_alg_type_infer_rewrite_clear := repeat functional_alg_type_infer_rewrite_clear1.      
 
 Lemma alg_type_sound {P} (pred_P : PredicativeSig P) :
-  (forall {Γ : ctx P} {A M}, {{ ⟪ pred_P ⟫ Γ ⊢a M ⟸ A }} -> {{ ⊢ Γ }} -> {{ Γ ⊢ A }} -> {{ Γ ⊢ M : A }}) /\
-    (forall {Γ : ctx P} {A M}, {{ ⟪ pred_P ⟫ Γ ⊢a M ⟹ A }} -> {{ ⊢ Γ }} -> {{ Γ ⊢ M : A }}).
+  (forall {Γ : ctx P} {A M}, {{ Γ ⊢a M ⟸ A }} -> {{ ⊢ Γ }} -> {{ Γ ⊢ A }} -> {{ Γ ⊢ M : A }}) /\
+    (forall {Γ : ctx P} {A M}, {{ Γ ⊢a M ⟹ A }} -> {{ ⊢ Γ }} -> {{ Γ ⊢ M : A }}) /\
+    (forall {Γ : ctx P} {Δ σ}, {{ Γ ⊢as σ ⟸ Δ }} -> {{ ⊢ Γ }} -> {{ ⊢ Δ }} -> {{ Γ ⊢s σ : Δ }}) /\
+    (forall {Γ : ctx P} {Δ σ}, {{ Γ ⊢as σ ⟹ Δ }} -> {{ ⊢ Γ }} -> {{ Γ ⊢s σ : Δ}}).
 Proof.
   apply alg_type_mut_ind; intros; try mautosolve 4.
 
@@ -91,7 +127,7 @@ Proof.
     assert {{ Γ ⊢ N : A }} by mauto 3.
     gen_presups.
     assert {{ Γ ⊢ B[Id,,N] }} by mauto 4.
-    assert {{ Γ ⊢ B[Id,,N] ≈ C }} by (mauto 2 using soundness_ty').
+    assert {{ Γ ⊢ B[Id,,N] ≈ C }} by (mauto 3 using soundness_ty').
     mauto 3.
   - assert {{ Γ ⊢ ℕ : Sort@s }} by mauto 2.
     assert {{ Γ ⊢ M : ℕ }} by mauto 3.
@@ -109,6 +145,23 @@ Proof.
     assert {{ Γ, ℕ@s, A@s' ⊢ A[Wk∘Wk,,succ #1] : Sort@s' }} by mauto 4.
     assert {{ Γ ⊢ A[Id,,N] : Sort@s' }} by mauto 3.
     assert {{ Γ ⊢ A[Id,,N] ≈ B }} as <- by (mauto 3 using soundness_ty').
+    econstructor; mauto 3.
+  - assert {{ Γ ⊢s σ : Δ }} by mauto 2.
+    assert {{ ⊢ Δ }} by mauto 2.
+    assert {{ Δ ⊢ M : A }} by mauto 2.
+    gen_presup H4.    
+    assert {{ Γ ⊢ A[σ] }} by mauto 3.
+    assert {{ Γ ⊢ A[σ] ≈ W }} as <- by (mauto 3 using soundness_ty').
+    mauto 2.
+    
+  - assert {{ Γ ⊢s σ : Δ }} by mauto 2.
+    assert {{ ⊢ Δ ⊆ Δ' }} by (mauto 3 using alg_subtyping_ctx_sound).
+    mauto 2.
+  - assert {{ Γ1 ⊢s σ2 : Γ2 }} by mauto 2.
+    gen_presup H2.
+    mauto 3.
+  - assert {{ Γ ⊢s σ : Δ }} by mauto 2.
+    assert {{ Γ ⊢ A : Sort@s }} by mauto 2.
     econstructor; mauto 3.
 Qed.
 
