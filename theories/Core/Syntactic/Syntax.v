@@ -10,7 +10,7 @@ Module Cst.
   | st : P -> obj P
   (** Functions *)
   | pi : forall s1 s2 s3 (r : Ru_pi P s1 s2 s3), string -> obj P -> obj P -> obj P
-  | fn : forall s1 s2 s3 (r : Ru_pi P s1 s2 s3), string -> obj P -> obj P -> obj P
+  | fn : forall s1 s2 s3 (r : Ru_pi P s1 s2 s3), string -> obj P -> obj P -> obj P -> obj P
   | app : obj P -> obj P -> obj P
   (** Variables *)
   | var : string -> obj P
@@ -22,7 +22,7 @@ Module Cst.
 
   Arguments st {_}.
   Arguments pi {_ _ _ _}.
-  Arguments fn {_ _ _ _}.
+  Arguments fn {_ _ _ _ _}.
   Arguments app {_}.
   Arguments var {_}.
   Arguments nat {_}.
@@ -38,7 +38,7 @@ Inductive exp (P : PtsSig) : Set :=
 | a_st : P -> exp P
 (** Functions *)
 | a_pi : forall (s1 s2 s3 : P), Ru_pi P s1 s2 s3 -> exp P -> exp P -> exp P
-| a_fn : forall (s1 s2 s3 : P), Ru_pi P s1 s2 s3 -> exp P -> exp P -> exp P
+| a_fn : forall (s1 s2 s3 : P), Ru_pi P s1 s2 s3 -> exp P -> exp P -> exp P -> exp P
 | a_app : exp P -> exp P -> exp P
 (** Variable *)
 | a_var : nat -> exp P
@@ -111,7 +111,7 @@ Combined Scheme syntax_mut_ind from
 Inductive nf (P : PtsSig) : Set :=
 | nf_st : P -> nf P
 | nf_pi : forall (s1 s2 s3 : P), Ru_pi P s1 s2 s3 -> nf P -> nf P -> nf P
-| nf_fn : forall (s1 s2 s3 : P), Ru_pi P s1 s2 s3 -> nf P -> nf P -> nf P
+| nf_fn : forall (s1 s2 s3 : P), Ru_pi P s1 s2 s3 -> nf P -> nf P -> nf P -> nf P
 | nf_nat : nf P
 | nf_zero : nf P
 | nf_succ : nf P -> nf P
@@ -138,7 +138,7 @@ Fixpoint nf_to_exp {P : PtsSig} (M : nf P) : exp P :=
   match M with
   | nf_st s => a_st s
   | nf_pi r A B => a_pi r (nf_to_exp A) (nf_to_exp B)
-  | nf_fn r A M => a_fn r (nf_to_exp A) (nf_to_exp M)
+  | nf_fn r A B M => a_fn r (nf_to_exp A) (nf_to_exp B) (nf_to_exp M)
   | nf_nat => a_nat
   | nf_zero => a_zero
   | nf_succ M => a_succ (nf_to_exp M)
@@ -185,7 +185,7 @@ Module Syntax_Notations.
   Notation "'rec' e 'return' A | 'zero' -> ez | 'succ' -> es 'end'" := (a_natrec A ez es e) (in custom exp at level 0, A custom exp at level 60, ez custom exp at level 60, es custom exp at level 60, e custom exp at level 60) : mcpts_scope.
   Notation "'Π' r A B" := (a_pi r A B) (in custom exp at level 1, r constr at level 0, A custom exp at level 0, B custom exp at level 60) : mcpts_scope.
   Notation "'Π' r A B" := (a_pi r A B) (in custom exp at level 1, r constr at level 0, A custom exp at level 0, B custom exp at level 60) : mcpts_scope.
-  Notation "'λ' r A e" := (a_fn r A e) (in custom exp at level 1, r constr at level 0, A custom exp at level 0, e custom exp at level 60) : mcpts_scope.
+  Notation "'λ' r A B e" := (a_fn r A B e) (in custom exp at level 1, r constr at level 0, A custom exp at level 0, B custom exp at level 0, e custom exp at level 60) : mcpts_scope.
   Notation "f x .. y" := (a_app .. (a_app f x) .. y) (in custom exp at level 40, f custom exp, x custom exp at next level, y custom exp at next level) : mcpts_scope.
   Notation "'#' n" := (a_var n) (in custom exp at level 0, n constr at level 0, format "'#' n") : mcpts_scope.
 
@@ -209,7 +209,7 @@ Module Syntax_Notations.
   Notation "'succ' M" := (nf_succ M) (in custom nf at level 2, M custom nf at level 1) : mcpts_scope.
   Notation "'rec' M 'return' A | 'zero' -> MZ | 'succ' -> MS 'end'" := (ne_natrec A MZ MS M) (in custom nf at level 0, A custom nf at level 60, MZ custom nf at level 60, MS custom nf at level 60, M custom nf at level 60) : mcpts_scope.
   Notation "'Π' r A B" := (nf_pi r A B) (in custom nf at level 2, r constr at level 0, A custom nf at level 1, B custom nf at level 60) : mcpts_scope.
-  Notation "'λ' r A e" := (nf_fn r A e) (in custom nf at level 2, r constr at level 0, A custom nf at level 1, e custom nf at level 60) : mcpts_scope.
+  Notation "'λ' r A B e" := (nf_fn r A B e) (in custom nf at level 2, r constr at level 0, A custom nf at level 1, B custom nf at level 1, e custom nf at level 60) : mcpts_scope.
   Notation "f x .. y" := (ne_app .. (ne_app f x) .. y) (in custom nf at level 40, f custom nf, x custom nf at next level, y custom nf at next level) : mcpts_scope.
   Notation "'#' n" := (ne_var n) (in custom nf at level 0, n constr at level 0, format "'#' n") : mcpts_scope.
   Notation "'⇑' M" := (nf_neut M) (in custom nf at level 0, M custom nf at level 99, format "'⇑'  M") : mcpts_scope.

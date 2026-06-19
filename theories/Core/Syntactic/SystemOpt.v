@@ -155,7 +155,7 @@ Corollary wf_fn' {P : PtsSig} : forall {Γ : ctx P} {A M B s1 s2 s3} {r : Ru_pi 
     {{ Γ ⊢ A : Sort@s1 }} ->
     {{ Γ, A@s1 ⊢ M : B }} ->
     {{ Γ, A@s1 ⊢ B : Sort@s2 }} ->
-    {{ Γ ⊢ λ r A M : Π r A B }}.
+    {{ Γ ⊢ λ r A B M : Π r A B }}.
 Proof.
   impl_opt_constructor.
 Qed.
@@ -223,18 +223,16 @@ Hint Resolve wf_exp_eq_pi_cong' : mcpts.
 #[export]
 Remove Hints wf_exp_eq_pi_cong : mcpts.
 
-Corollary wf_exp_eq_fn_cong' {P : PtsSig} : forall {Γ : ctx P} {A A' s1 s2 s3 B M M'} {r : Ru_pi P s1 s2 s3},
+Corollary wf_exp_eq_fn_cong' {P : PtsSig} : forall {Γ : ctx P} {A A' s1 s2 s3 B B' M M'} {r : Ru_pi P s1 s2 s3},
     {{ Γ ⊢ A ≈ A' : Sort@s1 }} ->
     {{ Γ, A@s1 ⊢ M ≈ M' : B }} ->
-    {{ Γ, A@s1 ⊢ B : Sort@s2 }} ->
-    {{ Γ ⊢ λ r A M ≈ λ r A' M' : Π r A B }}.
+    {{ Γ, A@s1 ⊢ B ≈ B' : Sort@s2 }} ->
+    {{ Γ ⊢ λ r A B M ≈ λ r A' B' M' : Π r A B }}.
 Proof.
   intros.
-  econstructor; mauto 2.
   assert ({{ ⊢ Γ }} /\ {{ Γ ⊢ A : Sort@s1 }} /\ {{ Γ ⊢ A' : Sort@s1 }} /\ {{ Γ ⊢ Sort@s1 }}) by (eapply presup_exp_eq; mauto 2).
   destruct_conjs.
-  gen_presups.
-  mauto 2.
+  econstructor; gen_presups; mauto 2.
 Qed.
 
 #[export]
@@ -247,7 +245,7 @@ Corollary wf_exp_eq_fn_sub' {P : PtsSig} : forall {Γ : ctx P} {σ Δ A M B s1 s
     {{ Δ ⊢ A : Sort@s1 }} ->
     {{ Δ, A@s1 ⊢ M : B }} ->
     {{ Δ, A@s1 ⊢ B : Sort@s2 }} ->
-    {{ Γ ⊢ (λ r A M)[σ] ≈ λ r A[σ] M[q σ] : (Π r A B)[σ] }}.
+    {{ Γ ⊢ (λ r A B M)[σ] ≈ λ r A[σ] B[q σ] M[q σ] : (Π r A B)[σ] }}.
 Proof.
   impl_opt_constructor.
 Qed.
@@ -297,7 +295,7 @@ Corollary wf_exp_eq_pi_beta' {P : PtsSig} : forall {Γ : ctx P} {A B M N s1 s2 s
     {{ Γ, A@s1 ⊢ M : B }} ->
     {{ Γ, A@s1 ⊢ B : Sort@s2 }} ->
     {{ Γ ⊢ N : A }} ->
-    {{ Γ ⊢ (λ r A M) N ≈ M[Id,,N] : B[Id,,N] }}.
+    {{ Γ ⊢ (λ r A B M) N ≈ M[Id,,N] : B[Id,,N] }}.
 Proof.
   impl_opt_constructor.
 Qed.
@@ -309,7 +307,7 @@ Remove Hints wf_exp_eq_pi_beta : mcpts.
 
 Corollary wf_exp_eq_pi_eta' {P : PtsSig} : forall {Γ : ctx P} {A B M s1 s2 s3} {r : Ru_pi P s1 s2 s3},
     {{ Γ ⊢ M : Π r A B }} ->
-    {{ Γ ⊢ M ≈ λ r A (M[Wk] #0) : Π r A B }}.
+    {{ Γ ⊢ M ≈ λ r A B (M[Wk] #0) : Π r A B }}.
 Proof.
   intros.
   gen_presups.

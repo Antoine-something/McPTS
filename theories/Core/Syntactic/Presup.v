@@ -3,24 +3,26 @@ From McPTS.Core Require Import Base.
 From McPTS.Core.Syntactic Require Export CtxEq.
 Import Syntax_Notations.
 
-Lemma presup_exp_eq_fn_cong_right {P : PtsSig} : forall {Γ : ctx P} {s1 A A' s2 B M' s3} (r : Ru_pi P s1 s2 s3),
+Lemma presup_exp_eq_fn_cong_right {P : PtsSig} : forall {Γ : ctx P} {s1 A A' s2 B B' M' s3} (r : Ru_pi P s1 s2 s3),
     {{ ⊢ Γ }} ->
     {{ Γ ⊢ A : Sort@s1 }} ->
     {{ Γ ⊢ A' : Sort@s1 }} ->
     {{ Γ ⊢ A ≈ A' : Sort@s1 }} ->
     {{ ⊢ Γ, A@s1 }} ->
     {{ Γ, A@s1 ⊢ B : Sort@s2 }} ->
-    {{ Γ, A@s1 ⊢ M' : B }} ->
-    {{ Γ ⊢ λ r A' M' : Π r A B }}.
+    {{ Γ, A@s1 ⊢ B' : Sort@s2 }} ->
+    {{ Γ, A@s1 ⊢ B ≈ B' : Sort@s2 }} ->
+    {{ Γ, A@s1 ⊢ M' : B' }} ->
+    {{ Γ ⊢ λ r A' B' M' : Π r A B }}.
 Proof.
   intros.
-  assert {{ Γ ⊢ Π r A B ≈ Π r A' B : Sort@s3 }} by mauto 3.
+  assert {{ Γ ⊢ Π r A B ≈ Π r A' B' : Sort@s3 }} by mauto 3.
   assert {{ ⊢ Γ, A@s1 ≈ Γ, A'@s1 }} by mauto 3.
-  assert {{ Γ, A'@s1 ⊢ B : Sort@s2 }} by mauto 2.
-  assert {{ Γ, A'@s1 ⊢ M' : B }} by mauto 2.
+  assert {{ Γ, A'@s1 ⊢ B' : Sort@s2 }} by mauto 3.
+  assert {{ Γ, A'@s1 ⊢ M' : B' }} by mauto 2.
   assert {{ Γ ⊢ Π r A B : Sort@s3 }} by mauto 2.
-  assert {{ Γ ⊢ Π r A' B : Sort@s3 }} by mauto 2.
-  enough {{ Γ ⊢ λ r A' M' : Π r A' B }}; mautosolve 3.
+  assert {{ Γ ⊢ Π r A' B' : Sort@s3 }} by mauto 4.
+  enough {{ Γ ⊢ λ r A' B' M' : Π r A' B' }}; mautosolve 3.
 Qed.
 #[local]
 Hint Resolve presup_exp_eq_fn_cong_right : mcpts.
@@ -33,7 +35,7 @@ Lemma presup_exp_eq_fn_sub_right {P : PtsSig} : forall {Γ : ctx P} {σ Δ s1 A 
     {{ ⊢ Δ, A@s1 }} ->
     {{ Δ, A@s1 ⊢ B : Sort@s2 }} ->
     {{ Δ, A@s1 ⊢ M : B }} ->
-    {{ Γ ⊢ λ r A[σ] M[q σ] : (Π r A B)[σ] }}.
+    {{ Γ ⊢ λ r A[σ] B[q σ] M[q σ] : (Π r A B)[σ] }}.
 Proof.
   intros.
   assert {{ Γ ⊢ A[σ] : Sort@s1 }} by mauto 2.
@@ -41,7 +43,7 @@ Proof.
   assert {{ Γ ⊢ Π r A[σ] B[q σ] : Sort@s3 }} by mauto 2.
   assert {{ Γ ⊢ Π r A[σ] B[q σ] ≈ Π r A[σ] B[q σ] : Sort@s3 }} by mauto 2.
   assert {{ Γ, A[σ]@s1 ⊢ M[q σ] : B[q σ] }} by mauto 4.
-  assert {{ Γ ⊢ λ r A[σ] M[q σ] : Π r A[σ] B[q σ] }} by mauto 3.
+  assert {{ Γ ⊢ λ r A[σ] B[q σ] M[q σ] : Π r A[σ] B[q σ] }} by mauto 3.
   eapply wf_conv; mauto 3.
 Qed.
 
@@ -147,7 +149,7 @@ Lemma presup_exp_eq_pi_eta_right {P : PtsSig} : forall {Γ : ctx P} {s1 A B M s2
     {{ ⊢ Γ, A@s1 }} ->
     {{ Γ, A@s1 ⊢ B : Sort@s2 }} ->
     {{ Γ ⊢ M : Π r A B }} ->
-    {{ Γ ⊢ λ r A (M[Wk] #0) : Π r A B }}.
+    {{ Γ ⊢ λ r A B (M[Wk] #0) : Π r A B }}.
 Proof.
   intros.
   assert {{ Γ, A@s1 ⊢s Wk : Γ }} by mauto 2.

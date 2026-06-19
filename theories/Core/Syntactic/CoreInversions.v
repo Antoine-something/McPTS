@@ -65,17 +65,17 @@ Qed.
 #[export]
 Hint Resolve wf_typ_pi_inversion' : mcpts.
 
-Corollary wf_fn_inversion {P : PtsSig} : forall {Γ : ctx P} {A M C s1 s2 s3} {r : Ru_pi P s1 s2 s3},
-    {{ Γ ⊢ λ r A M : C }} ->
-    exists B, {{ Γ, A@s1 ⊢ M : B }} /\ {{ Γ ⊢ Π r A B ⊆ C }}.
+Corollary wf_fn_inversion {P : PtsSig} : forall {Γ : ctx P} {A B M C s1 s2 s3} {r : Ru_pi P s1 s2 s3},
+    {{ Γ ⊢ λ r A B M : C }} ->
+    {{ Γ, A@s1 ⊢ M : B }} /\ {{ Γ ⊢ Π r A B ⊆ C }}.
 Proof with solve [mauto].
   intros * H.
   dependent induction H;
     gen_core_presups.
-  - eexists; split; mauto.
-  - specialize (IHwf_exp A M A0 s1 s2 s3 r ltac:(reflexivity) ltac:(reflexivity)) as [B []].
+  - split; mauto.
+  - specialize (IHwf_exp A B M A0 s1 s2 s3 r ltac:(reflexivity) ltac:(reflexivity)).
     destruct_conjs.
-    eexists; split; mauto 2.
+    split; mauto 2.
 Qed.
 
 #[export]

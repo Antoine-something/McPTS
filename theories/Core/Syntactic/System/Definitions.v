@@ -60,7 +60,7 @@ with wf_exp {P : PtsSig} : ctx P -> typ P -> exp P -> Prop :=
         {{ Γ ⊢ A : Sort@s1 }} ->
         {{ Γ, A@s1 ⊢ B : Sort@s2 }} ->
         {{ Γ, A@s1 ⊢ M : B }} ->
-        {{ Γ ⊢ λ r A M : Π r A B }} )
+        {{ Γ ⊢ λ r A B M : Π r A B }} )
 | wf_app :
   `( forall (r : Ru_pi P s1 s2 s3),
         {{ Γ ⊢ A : Sort@s1 }} ->
@@ -174,15 +174,16 @@ with wf_exp_eq {P : PtsSig} : ctx P -> typ P -> exp P -> exp P -> Prop :=
         {{ Γ ⊢ A : Sort@s1 }} ->
         {{ Γ ⊢ A ≈ A' : Sort@s1 }} ->
         {{ Γ, A@s1 ⊢ B : Sort@s2 }} ->
+        {{ Γ, A@s1 ⊢ B ≈ B' : Sort@s2 }} ->
         {{ Γ, A@s1 ⊢ M ≈ M' : B }} ->
-        {{ Γ ⊢ λ r A M ≈ λ r A' M' : Π r A B }} )
+        {{ Γ ⊢ λ r A B M ≈ λ r A' B' M' : Π r A B }} )
 | wf_exp_eq_fn_sub :
   `( forall (r : Ru_pi P s1 s2 s3),
         {{ Γ ⊢s σ : Δ }} ->
         {{ Δ ⊢ A : Sort@s1 }} ->
         {{ Δ, A@s1 ⊢ B : Sort@s2 }} ->
         {{ Δ, A@s1 ⊢ M : B }} ->
-        {{ Γ ⊢ (λ r A M)[σ] ≈ λ r A[σ] M[q σ] : (Π r A B)[σ] }} )
+        {{ Γ ⊢ (λ r A B M)[σ] ≈ λ r A[σ] B[q σ] M[q σ] : (Π r A B)[σ] }} )
 | wf_exp_eq_app_cong :
   `( forall (r : Ru_pi P s1 s2 s3),
         {{ Γ ⊢ A : Sort@s1 }} ->
@@ -204,13 +205,13 @@ with wf_exp_eq {P : PtsSig} : ctx P -> typ P -> exp P -> exp P -> Prop :=
         {{ Γ, A@s1 ⊢ B : Sort@s2 }} ->
         {{ Γ, A@s1 ⊢ M : B }} ->
         {{ Γ ⊢ N : A }} ->
-        {{ Γ ⊢ (λ r A M) N ≈ M[Id,,N] : B[Id,,N] }} )
+        {{ Γ ⊢ (λ r A B M) N ≈ M[Id,,N] : B[Id,,N] }} )
 | wf_exp_eq_pi_eta :
   `( forall (r : Ru_pi P s1 s2 s3),
         {{ Γ ⊢ A : Sort@s1 }} ->
         {{ Γ, A@s1 ⊢ B : Sort@s2 }} ->
         {{ Γ ⊢ M : Π r A B }} ->
-        {{ Γ ⊢ M ≈ λ r A (M[Wk] #0) : Π r A B }} )
+        {{ Γ ⊢ M ≈ λ r A B (M[Wk] #0) : Π r A B }} )
 
 (** Naturals **)
 | wf_exp_eq_nat_sub :
