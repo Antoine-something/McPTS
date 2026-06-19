@@ -27,11 +27,12 @@ Section functional_read.
     apply read_mut_ind; intros.
     1,3-9,10,12,13: progressive_inversion...
 
-    - progressive_invert H1.
+    - progressive_invert H2.
       assert (A = A0) by mauto.
       assert (b = b0) by (eapply functional_eval_exp; mauto).
       assert (m' = m'0) by (eapply functional_eval_app; mauto).
       subst.
+      assert (B' = B'0) by mauto.
       assert (M = M0) by mauto.
       subst.
       reflexivity.

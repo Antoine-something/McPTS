@@ -67,6 +67,7 @@ Proof with (solve [try (try (eexists; split); econstructor); mauto]).
     end.
     assert {{ Dom ⇓ b fa ≈ ⇓ b' f'a' ∈ per_top }} by eauto.
     specialize (H2 s) as [? []].
+    specialize (H10 (S s)) as [? []].
     specialize (H16 (S s)) as [? []]...
   - intro s.
     (on_all_hyp: fun H => destruct (H s) as [? []])...

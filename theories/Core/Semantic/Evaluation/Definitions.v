@@ -34,7 +34,7 @@ Inductive eval_exp {P : PtsSig} : exp P -> env P -> domain P -> Prop :=
         {{ ⟦ Π r A B ⟧ ρ ↘ Π r a ρ B }} )
 | eval_exp_fn :
   `( forall r : Ru_pi P s1 s2 s3,
-      {{ ⟦ λ r A M ⟧ ρ ↘ λ r ρ M }} )
+      {{ ⟦ λ r A B M ⟧ ρ ↘ λ r ρ M }} )
 | eval_exp_app :
   `( {{ ⟦ M ⟧ ρ ↘ m }} ->
      {{ ⟦ N ⟧ ρ ↘ n }} ->

@@ -21,9 +21,10 @@ Inductive read_nf {P : PtsSig} : nat -> domain_nf P -> nf P -> Prop :=
         (** Normal form of eta-expanded body *)
         {{ $| m & ⇑! a i |↘ m' }} ->
         {{ ⟦ B ⟧ ρ ↦ ⇑! a i ↘ b }} ->
+        {{ Rtyp b in S i ↘ B' }} ->
         {{ Rnf ⇓ b m' in S i ↘ M }} ->
         (** Normal form of the whole function *)
-        {{ Rnf ⇓ (Π r a ρ B) m in i ↘ λ r A M }} )
+        {{ Rnf ⇓ (Π r a ρ B) m in i ↘ λ r A B' M }} )
 | read_nf_zero :
   `( {{ Rnf ⇓ ℕ zero in i ↘ zero }} )
 | read_nf_succ :
