@@ -927,3 +927,23 @@ Qed.
 
 #[export]
 Hint Resolve pi_subtyp_typ_implies_eq_pi typ_subtyp_pi_implies_eq_pi : mcpts.
+
+
+
+
+
+
+
+
+(* Several of the following lemmas can be better located *)
+Lemma nf_eq_implies_exp_eq {P} : forall (W W' : nf P),
+    W = W' -> (nf_to_exp W) = (nf_to_exp W')
+with ne_eq_implies_exp_eq {P} : forall (E E' : ne P),
+    E = E' -> (ne_to_exp E) = (ne_to_exp E').
+Proof.
+  - intros W; induction W; intros W' H; inversion H; try reflexivity.
+  - intros E; induction E; intros E' H; inversion H; try reflexivity.
+Qed.
+
+
+
