@@ -99,15 +99,20 @@ Proof.
   - assert {{ Γ ⊢ ℕ : Sort@s }} by mauto 2.
     assert {{ Γ ⊢ ℕ }} by mauto 2.
     assert {{ ⊢ Γ, ℕ@s }} by mauto 2.
+    assert {{ Γ ⊢ Sort@s' ⊆ Sort@s'' }} by mauto 3.    
     assert {{ Γ, ℕ@s ⊢ A : Sort@s' }} by mauto 3.
-    assert {{ ⊢ Γ, ℕ@s, A@s' }} by mauto 3.
+    assert {{ Γ, ℕ@s ⊢ A : Sort@s'' }} by mauto 3.
+    assert {{ ⊢ Γ, ℕ@s, A@s'' }} by mauto 3.
     assert {{ Γ ⊢ N : ℕ }} by mauto 2.
     assert {{ Γ ⊢s Id,,zero : Γ, ℕ@s }} by mauto 3.
     assert {{ Γ ⊢ A[Id,,zero] : Sort@s' }} by mauto 3.
-    assert {{ Γ, ℕ@s, A@s' ⊢s Wk∘Wk : Γ }} by (econstructor; mauto 3).
-    assert {{ Γ, ℕ@s, A@s' ⊢s Wk∘Wk,,succ #1 : Γ, ℕ@s }} by mauto 4.
-    assert {{ Γ, ℕ@s, A@s' ⊢ A[Wk∘Wk,,succ #1] : Sort@s' }} by mauto 4.
+    assert {{ Γ ⊢ A[Id,,zero] : Sort@s'' }} by mauto 3.
+    assert {{ Γ, ℕ@s, A@s'' ⊢s Wk∘Wk : Γ }} by (econstructor; mauto 3).
+    assert {{ Γ, ℕ@s, A@s'' ⊢s Wk∘Wk,,succ #1 : Γ, ℕ@s }} by mauto 4.
+    assert {{ Γ, ℕ@s, A@s'' ⊢ A[Wk∘Wk,,succ #1] : Sort@s' }} by mauto 4.
+    assert {{ Γ, ℕ@s, A@s'' ⊢ A[Wk∘Wk,,succ #1] : Sort@s'' }} by mauto 4.
     assert {{ Γ ⊢ A[Id,,N] : Sort@s' }} by mauto 3.
+    assert {{ Γ ⊢ A[Id,,N] : Sort@s'' }} by mauto 3.
     assert {{ Γ ⊢ A[Id,,N] ≈ B }} as <- by (mauto 3 using soundness_ty').
     econstructor; mauto 3.
 Qed.
@@ -186,7 +191,7 @@ Hint Resolve alg_type_infer_normal : mcpts.
 Lemma alg_type_check_typ_implies_alg_type_infer_typ {P} (pred_P : PredicativeSig P) : forall {Γ A s},
     {{ ⊢ Γ }} ->
     {{ ⟪ pred_P ⟫ Γ ⊢a A ⟸ Sort@s }} ->
-    exists A' s', {{ ⟪ pred_P ⟫ Γ ⊢a A ⟹ A' }} /\ {{ Γ ⊢ A' ≈ Sort@s' }} /\ st_subtyp s' s.
+    exists s', {{ ⟪ pred_P ⟫ Γ ⊢a A ⟹ Sort@s' }} /\ st_subtyp s' s.
 Proof.
   intros * ? Hcheck.
   inversion Hcheck as [? A' ? ? Hinfer Hsub]; subst.
@@ -195,8 +200,33 @@ Proof.
   gen_presups.
   assert {{ Γ ⊢ A' ⊆ Sort@s }} by mauto 2 using alg_subtyping_sound.
   pose proof (subtyp_sort_is_sort pred_P H) as [s' []].
+  
+  assert (A' = n{{{ Sort@s' }}}).
+  {
+    pose proof (@completeness_typ_unsorted P pred_P _ _ _ H2) as [W []].
+    inversion H5; subst.
+    simplify_evals.
+    inversion H8; subst.
+    mauto 2.
+  }
+  subst.  
   repeat eexists; mauto 3.
 Qed.
+
+(* Lemma alg_type_check_typ_implies_alg_type_infer_typ {P} (pred_P : PredicativeSig P) : forall {Γ A s}, *)
+(*     {{ ⊢ Γ }} -> *)
+(*     {{ ⟪ pred_P ⟫ Γ ⊢a A ⟸ Sort@s }} -> *)
+(*     exists A' s', {{ ⟪ pred_P ⟫ Γ ⊢a A ⟹ A' }} /\ {{ Γ ⊢ A' ≈ Sort@s' }} /\ st_subtyp s' s. *)
+(* Proof. *)
+(*   intros * ? Hcheck. *)
+(*   inversion Hcheck as [? A' ? ? Hinfer Hsub]; subst. *)
+(*   assert {{ Γ ⊢ A : Sort@s }} by mauto using alg_type_check_sound. *)
+(*   assert {{ Γ ⊢ A : A' }} by mauto 2 using alg_type_infer_sound. *)
+(*   gen_presups. *)
+(*   assert {{ Γ ⊢ A' ⊆ Sort@s }} by mauto 2 using alg_subtyping_sound. *)
+(*   pose proof (subtyp_sort_is_sort pred_P H) as [s' []]. *)
+(*   repeat eexists; mauto 3. *)
+(* Qed. *)
 
 #[export]
 Hint Resolve alg_type_check_typ_implies_alg_type_infer_typ : mcpts.
@@ -205,7 +235,7 @@ Lemma alg_type_check_pi_implies_alg_type_infer_pi {P} (pred_P : PredicativeSig P
     {{ ⊢ Γ }} ->
     {{ Γ ⊢ Π r A B : Sort@s }} ->
     {{ ⟪ pred_P ⟫ Γ ⊢a M ⟸ Π r A B }} ->
-    exists A' A0 B0, {{ ⟪ pred_P ⟫ Γ ⊢a M ⟹ A' }} /\ {{ Γ ⊢ A' ≈ Π r A0 B0 }} /\ {{ Γ ⊢ A0 ≈ A : Sort@s1 }} /\  {{ Γ, A@s1 ⊢a B0 ⊆ B }}.
+    exists A0 B0, {{ ⟪ pred_P ⟫ Γ ⊢a M ⟹ Π r A0 B0 }} /\ {{ Γ ⊢ A0 ≈ A : Sort@s1 }} /\  {{ Γ, A@s1 ⊢ B0 ⊆ B }}.
 Proof.
   intros * ? ? Hcheck.
   assert ({{ Γ ⊢ A : Sort@s1 }} /\ {{ Γ, A@s1 ⊢ B : Sort@s2 }} /\ {{ Γ ⊢ Sort@s3 ⊆ Sort@s }}) as [? []] by mauto 3.
@@ -219,9 +249,41 @@ Proof.
   assert {{ Γ ⊢ Π r A0 B0 ⊆ Π r A B }} by mauto 4.
   assert ({{ Γ ⊢ A0 ≈ A : Sort@s1 }} /\ {{ Γ, A@s1 ⊢ B0 ⊆ B }}) as [] by mauto 2 using subtyp_pi_inversion.
   assert {{ Γ, A@s1 ⊢a B0 ⊆ B }} by mauto 2 using alg_subtyping_complete.
-  do 3 eexists.
-  repeat split; mauto 3.
+
+  pose proof (@completeness_typ_unsorted P pred_P _ _ _ H5) as [W []].
+  assert (A' = W) by mauto 2.
+  subst.
+  inversion H11; subst.
+  simplify_evals.
+  dependent destruction H14.
+  subst.
+
+  assert ({{ Γ ⊢ A1 ≈ A : Sort@s1}} /\ {{ Γ, A@s1 ⊢ B' ⊆ B }}) as [] by mauto 2 using subtyp_pi_inversion.
+  do 2 eexists; repeat split; mauto 2 using alg_subtyping_complete.
 Qed.
+
+
+(* Lemma alg_type_check_pi_implies_alg_type_infer_pi {P} (pred_P : PredicativeSig P) : forall {Γ M A B s1 s2 s3 s} {r : Ru_pi P s1 s2 s3}, *)
+(*     {{ ⊢ Γ }} -> *)
+(*     {{ Γ ⊢ Π r A B : Sort@s }} -> *)
+(*     {{ ⟪ pred_P ⟫ Γ ⊢a M ⟸ Π r A B }} -> *)
+(*     exists A' A0 B0, {{ ⟪ pred_P ⟫ Γ ⊢a M ⟹ A' }} /\ {{ Γ ⊢ A' ≈ Π r A0 B0 }} /\ {{ Γ ⊢ A0 ≈ A : Sort@s1 }} /\  {{ Γ, A@s1 ⊢a B0 ⊆ B }}. *)
+(* Proof. *)
+(*   intros * ? ? Hcheck. *)
+(*   assert ({{ Γ ⊢ A : Sort@s1 }} /\ {{ Γ, A@s1 ⊢ B : Sort@s2 }} /\ {{ Γ ⊢ Sort@s3 ⊆ Sort@s }}) as [? []] by mauto 3. *)
+(*   inversion Hcheck as [? A' ? ? Hinfer Hsub]; subst. *)
+(*   assert {{ Γ ⊢ M : A' }} by mauto 3 using alg_type_infer_sound. *)
+(*   gen_presups. *)
+(*   assert {{ Γ ⊢ A' ⊆ Π r A B }} by mauto 3 using alg_subtyping_sound. *)
+
+(*   (* This should follow by consequences of normalization *) *)
+(*   assert (exists A0 B0,  {{ Γ ⊢ A' ≈  Π r A0 B0 }}) as [A0 [B0]]by mauto 3. *)
+(*   assert {{ Γ ⊢ Π r A0 B0 ⊆ Π r A B }} by mauto 4. *)
+(*   assert ({{ Γ ⊢ A0 ≈ A : Sort@s1 }} /\ {{ Γ, A@s1 ⊢ B0 ⊆ B }}) as [] by mauto 2 using subtyp_pi_inversion. *)
+(*   assert {{ Γ, A@s1 ⊢a B0 ⊆ B }} by mauto 2 using alg_subtyping_complete. *)
+(*   do 3 eexists. *)
+(*   repeat split; mauto 3. *)
+(* Qed. *)
 
 #[export]
 Hint Resolve alg_type_check_pi_implies_alg_type_infer_pi : mcpts.
@@ -265,8 +327,23 @@ Proof.
   - admit.
   - assert {{ ⟪ pred_P ⟫ Γ ⊢a M ⟸ Π r A B }} by mauto 2.
     assert {{ ⟪ pred_P ⟫ Γ ⊢a N ⟸ A }} by mauto 2.
-    (* econstructor; mauto 3. *)
-    admit.
+
+    assert (exists A0 B0, {{ ⟪ pred_P ⟫ Γ ⊢a M ⟹ Π r A0 B0 }} /\ {{ Γ ⊢ A0 ≈ A : Sort@s1 }} /\  {{ Γ, A@s1 ⊢ B0 ⊆ B }}) as [A0 [B0 [? []]]] by mauto 3.
+    assert {{ ⟪ pred_P ⟫ Γ ⊢a N ⟸ A0 }} by mauto 4.
+    assert {{ Γ, A@s1 ⊢a B0 ⊆ B }} by mauto 3 using alg_subtyping_complete.
+
+    gen_presup H9.
+    assert {{ Γ ⊢s Id,,N : Γ, A@s1 }} by mauto 3.
+    assert {{ Γ ⊢ B0[Id,,N] }} by mauto 3.
+    assert {{ Γ ⊢ B0[Id,,N] ≈ B0[Id,,N] }} by mauto 2.
+    pose proof (@completeness_typ_unsorted _ pred_P _ _ _ H14) as [W []].
+    assert {{ ⟪ pred_P ⟫ Γ ⊢a M N ⟹ W }} by mauto 3.
+    econstructor; mauto 2.
+
+    assert {{ Γ ⊢ B0[Id,,N] ⊆ B[Id,,N] }} by mauto 3.
+    assert {{ Γ ⊢ B0[Id,,N] ≈ W }} by mauto 3 using soundness_ty'.
+    eapply alg_subtyping_complete; mauto 3.
+    transitivity {{{ B0[Id,,N] }}}; mauto 3.
     
   - assert (exists W, nbe_ty Γ A W /\ {{ Γ ⊢ A ≈ W }}) as [W []] by (eapply soundness_ty; mauto 3).
     econstructor; mauto 4 using alg_subtyping_complete.
@@ -279,12 +356,18 @@ Proof.
     assert {{ ⟪ pred_P ⟫ Γ ⊢a MZ ⟸ A[Id,,zero] }} by mauto 2.
     assert {{ ⟪ pred_P ⟫ Γ, ℕ@s, A@s' ⊢a MS ⟸ A[Wk∘Wk,,succ #1] }} by mauto 2.
     assert {{ ⟪ pred_P ⟫ Γ ⊢a M ⟸ ℕ }} by mauto 2.
-
-    assert (exists A' s'0, {{ ⟪ pred_P ⟫ Γ, ℕ@s ⊢a A ⟹ A' }} /\ {{ Γ, ℕ@s ⊢ A' ≈ Sort@s'0 }} /\ st_subtyp s'0 s') as [A' [s'0 [? []]]] by mauto 2.
+    
+    assert (exists s'0, {{ ⟪ pred_P ⟫ Γ, ℕ@s ⊢a A ⟹ Sort@s'0 }} /\ st_subtyp s'0 s') as [s'0 []] by mauto 2.
     assert {{ Γ ⊢ Sort@s'[Id,,M] ≈ Sort@s' }} by mauto 4.
     assert {{ Γ ⊢ A[Id,,M] : Sort@s' }} by mauto 4.
-    assert {{ Γ ⊢ A[Id,,M] ≈ A[Id,,M] : Sort@s' }} as [? [? _]]%(@completeness P pred_P) by mauto 3.
-    admit.
+    assert {{ Γ ⊢ A[Id,,M] ≈ A[Id,,M] : Sort@s' }} as [W [? _]]%(@completeness P pred_P) by mauto 3.
+    
+    assert {{ Γ ⊢ A[Id,,M] ≈ W }} by mauto 4 using soundness_ty'.
+    assert {{ Γ ⊢ W ⊆ A[Id,,M] }} by mauto 3.
+    assert {{ Γ ⊢a W ⊆ A[Id,,M] }} by mauto 3 using alg_subtyping_complete.
+    
+    assert {{ ⟪ pred_P ⟫ Γ ⊢a rec M return A | zero -> MZ | succ -> MS end ⟹ W }} by mauto 3.
+    econstructor; mauto 3 using completeness_ty.
 Admitted.
 
 #[export]
@@ -310,10 +393,10 @@ Corollary alg_type_infer_typ_complete {P} (pred_P : PredicativeSig P) : forall {
     exists s', {{ ⟪ pred_P ⟫ Γ ⊢a A ⟹ Sort@s' }} /\ (st_subtyp s' s).
 Proof.
   mauto 4 using alg_type_check_complete.
-Abort.
+Qed.
 
-(* #[export] *)
-(* Hint Resolve alg_type_infer_typ_complete : mcpts. *)
+#[export]
+Hint Resolve alg_type_infer_typ_complete : mcpts.
 
 Corollary alg_type_infer_pi_complete  {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {s A},
     user_exp P A ->
@@ -321,7 +404,7 @@ Corollary alg_type_infer_pi_complete  {P} (pred_P : PredicativeSig P) : forall {
     exists s', {{ ⟪ pred_P ⟫ Γ ⊢a A ⟹ Sort@s' }} /\ (st_subtyp s' s).
 Proof.
   mauto 4 using alg_type_check_complete.
-Abort.
+Qed.
 
-(* #[export] *)
-(* Hint Resolve alg_type_infer_pi_complete : mcpts. *)
+#[export]
+Hint Resolve alg_type_infer_pi_complete : mcpts.
