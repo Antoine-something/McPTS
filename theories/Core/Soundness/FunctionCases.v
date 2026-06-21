@@ -294,7 +294,7 @@ Lemma glu_rel_exp_fn_helper {P} (pred_P : PredicativeSig P) : forall {Γ M A B s
     {{ ⟪ pred_P ⟫ Γ ⊩ A : Sort@s1 @ s1' }} ->
     {{ ⟪ pred_P ⟫ Γ, A@s1 ⊩ B : Sort@s2 @ s2' }} ->
     {{ ⟪ pred_P ⟫ Γ, A@s1 ⊩ M : B @ s2 }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩ λ r A M : Π r A B @ s3 }}.
+    {{ ⟪ pred_P ⟫ Γ ⊩ λ r A B M : Π r A B @ s3 }}.
 Proof.
   intros * HA HB HM.
   assert {{ ⟪ pred_P ⟫ ⊩ Γ }} as [SbΓ] by mauto 3.
@@ -357,7 +357,7 @@ Proof.
   }     
   apply_relation_equivalence.    
   assert {{ Δ, A[σ]@s1 ⊢ B[q σ] : Sort@s2 }} by mauto 3.
-  assert {{ Δ ⊢ (λ r A M)[σ] : (Π r A B)[σ] }} by (eapply wf_exp_sub_typ; mauto 3).
+  assert {{ Δ ⊢ (λ r A B M)[σ] : (Π r A B)[σ] }} by (eapply wf_exp_sub_typ; mauto 3).
   econstructor; mauto 2; intros.
   - assert {{ Dom ρ ↦ n ≈ ρ ↦ n' ∈ env_relΓA }}as HrelΓA by (apply_relation_equivalence; mauto 2).
     clear H26 H27.
@@ -398,20 +398,20 @@ Proof.
       mauto 2.
     }
 
-    assert {{ Δ0 ⊢ (λ r A M)[σ][σ0] N ≈ M[(σ∘σ0),,N] : B[σ∘σ0,,N] }} as ->.
+    assert {{ Δ0 ⊢ (λ r A B M)[σ][σ0] N ≈ M[(σ∘σ0),,N] : B[σ∘σ0,,N] }} as ->.
     {
       assert {{ Γ ⊢ Π r A B : Sort@s3 }} by mauto 3.
       assert {{ Δ0 ⊢s σ∘σ0 : Γ }} by mauto 3.
       assert  {{ Δ0, A[σ∘σ0]@s1 ⊢s q (σ∘σ0) : Γ, A@s1 }} by mauto 3. 
       assert {{ Δ0, A[σ∘σ0]@s1 ⊢ M[q (σ∘σ0)] : B[q (σ∘σ0)] }} by mauto 3.
-      assert {{ Δ0 ⊢ (λ r A M)[σ][σ0] ≈ (λ r A M)[σ∘σ0] : (Π r A B)[σ∘σ0] }} by (symmetry; mauto 4).
-      assert {{ Δ0 ⊢ (λ r A M)[σ][σ0] ≈ (λ r A[σ∘σ0] M[q (σ∘σ0)]) : (Π r A B)[σ∘σ0] }} by mauto 3.
-      assert {{ Δ0 ⊢ (λ r A M)[σ][σ0] ≈ (λ r A[σ∘σ0] M[q (σ∘σ0)]) : Π r A[σ∘σ0] B[q (σ∘σ0)] }} by mauto 4.
+      assert {{ Δ0 ⊢ (λ r A B M)[σ][σ0] ≈ (λ r A B M)[σ∘σ0] : (Π r A B)[σ∘σ0] }} by (symmetry; mauto 4).
+      assert {{ Δ0 ⊢ (λ r A B M)[σ][σ0] ≈ (λ r A[σ∘σ0] B[q (σ∘σ0)] M[q (σ∘σ0)]) : (Π r A B)[σ∘σ0] }} by mauto 3.
+      assert {{ Δ0 ⊢ (λ r A B M)[σ][σ0] ≈ (λ r A[σ∘σ0] B[q (σ∘σ0)] M[q (σ∘σ0)]) : Π r A[σ∘σ0] B[q (σ∘σ0)] }} by mauto 4.
       assert {{ Δ0 ⊢ N : A[σ∘σ0] }} by mauto 4.
-      assert {{ Δ0 ⊢ (λ r A M)[σ][σ0] N ≈ (λ r A[σ∘σ0] M[q (σ∘σ0)]) N : B[q (σ∘σ0)][Id,,N] }} by mauto 3.
-      assert {{ Δ0 ⊢ (λ r A M)[σ][σ0] N ≈ M[q (σ∘σ0)][Id,,N] : B[q (σ∘σ0)][Id,,N] }}.
+      assert {{ Δ0 ⊢ (λ r A B M)[σ][σ0] N ≈ (λ r A[σ∘σ0] B[q (σ∘σ0)] M[q (σ∘σ0)]) N : B[q (σ∘σ0)][Id,,N] }} by mauto 3.
+      assert {{ Δ0 ⊢ (λ r A B M)[σ][σ0] N ≈ M[q (σ∘σ0)][Id,,N] : B[q (σ∘σ0)][Id,,N] }}.
       {
-        transitivity {{{ (λ r A[σ∘σ0] M[q (σ∘σ0)]) N }}}; mauto 2.
+        transitivity {{{ (λ r A[σ∘σ0] B[q (σ∘σ0)] M[q (σ∘σ0)]) N }}}; mauto 2.
         eapply wf_exp_eq_pi_beta'; mauto 3.
       }
       transitivity {{{ M[q (σ∘σ0)][Id,,N] }}}; [mauto 4 |].
@@ -454,7 +454,7 @@ Lemma glu_rel_exp_fn_helper_unsorted {P} (pred_P : PredicativeSig P) : forall {�
     {{ ⟪ pred_P ⟫ Γ ⊩u A : Sort@s1 @ ^None }} ->
     {{ ⟪ pred_P ⟫ Γ, A@s1 ⊩u B : Sort@s2 @ ^None }} ->
     {{ ⟪ pred_P ⟫ Γ, A@s1 ⊩u M : B @ ^(Some s2) }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩u λ r A M : Π r A B @ ^(Some s3) }}.
+    {{ ⟪ pred_P ⟫ Γ ⊩u λ r A B M : Π r A B @ ^(Some s3) }}.
 Proof.
   intros * HA HB HM.
   assert {{ ⟪ pred_P ⟫ ⊩ Γ }} as [SbΓ] by mauto 3.
@@ -525,7 +525,7 @@ Proof.
 
   apply_relation_equivalence.
   assert {{ Δ, A[σ]@s1 ⊢ B[q σ] : Sort@s2 }} by mauto 3.
-  assert {{ Δ ⊢ (λ r A M)[σ] : (Π r A B)[σ] }} by (eapply wf_exp_sub_typ; mauto 3).
+  assert {{ Δ ⊢ (λ r A B M)[σ] : (Π r A B)[σ] }} by (eapply wf_exp_sub_typ; mauto 3).
   econstructor; mauto 4; intros.
   - assert {{ Dom ρ ↦ n ≈ ρ ↦ n' ∈ env_relΓA }} as HrelΓA by (apply_relation_equivalence; mauto 3).
     clear H24 H27.
@@ -569,20 +569,20 @@ Proof.
       mauto 2.
     }
 
-    assert {{ Δ0 ⊢ (λ r A M)[σ][σ0] N ≈ M[(σ∘σ0),,N] : B[σ∘σ0,,N] }} as ->.
+    assert {{ Δ0 ⊢ (λ r A B M)[σ][σ0] N ≈ M[(σ∘σ0),,N] : B[σ∘σ0,,N] }} as ->.
     {
       assert {{ Γ ⊢ Π r A B : Sort@s3 }} by mauto 3.
       assert {{ Δ0 ⊢s σ∘σ0 : Γ }} by mauto 3.
       assert  {{ Δ0, A[σ∘σ0]@s1 ⊢s q (σ∘σ0) : Γ, A@s1 }} by mauto 3. 
       assert {{ Δ0, A[σ∘σ0]@s1 ⊢ M[q (σ∘σ0)] : B[q (σ∘σ0)] }} by mauto 3.
-      assert {{ Δ0 ⊢ (λ r A M)[σ][σ0] ≈ (λ r A M)[σ∘σ0] : (Π r A B)[σ∘σ0] }} by (symmetry; mauto 4).
-      assert {{ Δ0 ⊢ (λ r A M)[σ][σ0] ≈ (λ r A[σ∘σ0] M[q (σ∘σ0)]) : (Π r A B)[σ∘σ0] }} by mauto 3.
-      assert {{ Δ0 ⊢ (λ r A M)[σ][σ0] ≈ (λ r A[σ∘σ0] M[q (σ∘σ0)]) : Π r A[σ∘σ0] B[q (σ∘σ0)] }} by mauto 4.
+      assert {{ Δ0 ⊢ (λ r A B M)[σ][σ0] ≈ (λ r A B M)[σ∘σ0] : (Π r A B)[σ∘σ0] }} by (symmetry; mauto 4).
+      assert {{ Δ0 ⊢ (λ r A B M)[σ][σ0] ≈ (λ r A[σ∘σ0] B[q (σ∘σ0)] M[q (σ∘σ0)]) : (Π r A B)[σ∘σ0] }} by mauto 3.
+      assert {{ Δ0 ⊢ (λ r A B M)[σ][σ0] ≈ (λ r A[σ∘σ0] B[q (σ∘σ0)] M[q (σ∘σ0)]) : Π r A[σ∘σ0] B[q (σ∘σ0)] }} by mauto 4.
       assert {{ Δ0 ⊢ N : A[σ∘σ0] }} by mauto 4.
-      assert {{ Δ0 ⊢ (λ r A M)[σ][σ0] N ≈ (λ r A[σ∘σ0] M[q (σ∘σ0)]) N : B[q (σ∘σ0)][Id,,N] }} by mauto 3.
-      assert {{ Δ0 ⊢ (λ r A M)[σ][σ0] N ≈ M[q (σ∘σ0)][Id,,N] : B[q (σ∘σ0)][Id,,N] }}.
+      assert {{ Δ0 ⊢ (λ r A B M)[σ][σ0] N ≈ (λ r A[σ∘σ0] B[q (σ∘σ0)] M[q (σ∘σ0)]) N : B[q (σ∘σ0)][Id,,N] }} by mauto 3.
+      assert {{ Δ0 ⊢ (λ r A B M)[σ][σ0] N ≈ M[q (σ∘σ0)][Id,,N] : B[q (σ∘σ0)][Id,,N] }}.
       {
-        transitivity {{{ (λ r A[σ∘σ0] M[q (σ∘σ0)]) N }}}; mauto 2.
+        transitivity {{{ (λ r A[σ∘σ0] B[q (σ∘σ0)] M[q (σ∘σ0)]) N }}}; mauto 2.
         eapply wf_exp_eq_pi_beta'; mauto 3.
       }
       transitivity {{{ M[q (σ∘σ0)][Id,,N] }}}; [mauto 4 |].
@@ -611,7 +611,7 @@ Qed.
 Lemma glu_rel_exp_fn_unsorted' {P} (pred_P : PredicativeSig P) : forall {Γ M A B s1 s2 s3} {r : Ru_pi P s1 s2 s3},
     {{ ⟪ pred_P ⟫ Γ ⊩u A : Sort@s1 @ ^None }} ->
     {{ ⟪ pred_P ⟫ Γ, A@s1 ⊩u M : B @ ^(Some s2) }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩u λ r A M : Π r A B @ ^(Some s3) }}.
+    {{ ⟪ pred_P ⟫ Γ ⊩u λ r A B M : Π r A B @ ^(Some s3) }}.
 Proof.
   intros * HA HM.
   assert {{ ⟪ pred_P ⟫ Γ, A@s1 ⊩u B : Sort@s2 @ ^None }} by mauto 3.
@@ -623,7 +623,7 @@ Qed.
 Lemma glu_rel_exp_fn_unsorted {P} (pred_P : PredicativeSig P) : forall {Γ M A B s1 s2 s3 so1} {r : Ru_pi P s1 s2 s3},
     {{ ⟪ pred_P ⟫ Γ ⊩u A : Sort@s1 @ so1 }} ->
     {{ ⟪ pred_P ⟫ Γ, A@s1 ⊩u M : B @ ^(Some s2) }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩u λ r A M : Π r A B @ ^(Some s3) }}.
+    {{ ⟪ pred_P ⟫ Γ ⊩u λ r A B M : Π r A B @ ^(Some s3) }}.
 Proof.
   intros.
   assert {{ ⟪ pred_P ⟫ Γ ⊩u A : Sort@s1 @ ^None }} by mauto 2.

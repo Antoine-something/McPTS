@@ -329,23 +329,23 @@ Proof.
       assert {{ Γ ⊢w Id : Γ }} by mauto 3.
       assert (IP Γ {{{ IT[Id] }}}) by mauto 3.
       assert {{ Γ ⊢ IT[Id] ≈ IT : Sort@s1 }} by mauto 3.
-      bulky_rewrite_in H26.
+      bulky_rewrite_in H27.
       
       destruct (H11 _ _ _ ltac:(eassumption) ltac:(eassumption)) as [].
       assert {{ Δ ⊢ IT[σ] ® IP }} by mauto 3.
-      specialize (H30 _ _ _ H20 H9).
+      specialize (H31 _ _ _ H20 H9).
+      autorewrite with mcpts in H31.
       assert {{ Δ ⊢ A[σ] ≈ (Π r IT OT)[σ] : Sort@s }} as -> by mauto 3.
       rewrite -> H10 in *.      
       assert {{ Γ, IT@s1 ⊢ OT : Sort@s2 }} by mauto 3.
+      
       assert {{ Δ ⊢ (Π r IT OT)[σ] ≈ Π r IT[σ] OT[q σ] : Sort@s }} by (econstructor; mauto 3).
       assert {{ Δ ⊢ M[σ] : (Π r IT OT)[σ] }} by mauto 4.
-      autorewrite with mcpts in H34.
-      rewrite -> H33.
+      autorewrite with mcpts in H35.
+      rewrite -> H34.
       rewrite @wf_exp_eq_pi_eta' with (M := {{{ M[σ] }}}); [| trivial].
       cbn [nf_to_exp].
-      eapply wf_exp_eq_fn_cong'; mauto 3.
 
-      
       pose proof (var_per_elem (length Δ) H0).
       assert (per_sort_elem pred_P s1 in_rel0 a a) by (destruct_conjs; pose proof ord_ru_pi_sub pred_P r sub_s3_s as [[] ?]; subst; mauto 2).
       handle_per_sort_elem_irrel.
@@ -354,10 +354,9 @@ Proof.
       simplify_evals.
       
       destruct (H2 _ ltac:(eassumption) _ ltac:(eassumption)) as [? []].
-      specialize (H12 _ _ _ _ ltac:(trivial) (var_glu_elem_bot _ _ _ _ _ _ _ H H31)).
+      specialize (H12 _ _ _ _ ltac:(trivial) (var_glu_elem_bot _ _ _ _ _ _ _ H H32)).
       assert {{ Δ, IT[σ]@s1 ⊢ IT[σ∘Wk] ≈ IT[σ][Wk] : Sort@s1 }} by (eapply exp_eq_sub_compose_typ_sort; mauto 4).
-      rewrite <- H42 in H12.
-
+      rewrite <- H43 in H12.
       
       specialize (H17 {{{ Δ, IT[σ]@s1 }}} {{{ σ∘Wk }}} _ _ ltac:(mauto) ltac:(eassumption) ltac:(eassumption)) as [? []].
       apply_equiv_left.
@@ -365,21 +364,28 @@ Proof.
       simplify_evals.
       deepexec H1 ltac:(fun H => pose proof H).
 
-      assert (per_sort_elem pred_P s2 (out_rel d{{{ ⇑! a (length Δ) }}} d{{{ ⇑! a (length Δ) }}} H35) b b) by (pose proof ord_ru_pi_sub pred_P r sub_s3_s as [? []]; subst; mauto 2).
-      specialize (H41 _ _ _ _ _ ltac:(eassumption) ltac:(eassumption) ltac:(eassumption) ltac:(eassumption)) as [].
-      specialize (H49 _ {{{Id}}} _ ltac:(mauto 3) ltac:(eassumption)).
-      do 2 (rewrite wf_exp_eq_sub_id in H49; mauto 3).
-      etransitivity; [|eassumption].
-      simpl.
-      assert {{ Δ, IT[σ]@s1 ⊢s σ∘Wk : Γ }} by mauto 4.
-      assert {{ Δ, IT[σ]@s1 ⊢ #0 : IT[σ∘Wk] }} by (rewrite <- @exp_eq_sub_compose_typ_sorted; mauto 3).
-      rewrite <- @sub_eq_q_sigma_id_extend; mauto 4.
-      rewrite <- @exp_eq_sub_compose_typ_sorted; mauto 2.
-      * eapply wf_exp_eq_app_cong'; [| mauto 3].
-        symmetry.
-        rewrite <- wf_exp_eq_pi_sub; mauto 4.
-        eapply wf_exp_eq_sub_compose_typ; mauto 3.
-      * mauto 3.
+      assert (per_sort_elem pred_P s2 (out_rel d{{{ ⇑! a (length Δ) }}} d{{{ ⇑! a (length Δ) }}} H36) b b) by (pose proof ord_ru_pi_sub pred_P r sub_s3_s as [? []]; subst; mauto 2).
+      specialize (H42 _ _ _ _ _ ltac:(eassumption) ltac:(eassumption) ltac:(eassumption) ltac:(eassumption)) as [].
+      specialize (H50 _ {{{Id}}} _ ltac:(mauto 3) ltac:(eassumption)).
+      do 2 (rewrite wf_exp_eq_sub_id in H50; mauto 3).
+      eapply wf_exp_eq_fn_cong'; mauto 3.
+      * etransitivity; [|eassumption].
+        simpl.
+        assert {{ Δ, IT[σ]@s1 ⊢s σ∘Wk : Γ }} by mauto 4.
+        assert {{ Δ, IT[σ]@s1 ⊢ #0 : IT[σ∘Wk] }} by (rewrite <- @exp_eq_sub_compose_typ_sorted; mauto 3).
+        rewrite <- @sub_eq_q_sigma_id_extend; mauto 4.
+        rewrite <- @exp_eq_sub_compose_typ_sorted; mauto 2.
+        ** eapply wf_exp_eq_app_cong'; [| mauto 3].
+           symmetry.
+           rewrite <- wf_exp_eq_pi_sub; mauto 4.
+           eapply wf_exp_eq_sub_compose_typ; mauto 3.
+        ** mauto 3.
+       
+      * handle_functional_glu_sort_elem P.
+        assert {{ Δ, IT[σ]@s1 ⊢w Id : Δ, IT[σ]@s1 }} by mauto 3.
+        assert {{ Δ, IT[σ]@s1 ⊢ OT[σ∘Wk,,#0] ® glu_typ_top pred_P s2 b }}  as [] by mauto 3.
+        assert ({{ Δ, IT[σ]@s1 ⊢ OT[σ∘Wk,,#0][Id] ≈ B' : Sort@s2 }}) by mauto 4.
+        mauto 4.
       (* * gen_presup H50; econstructor; mauto 3. *)
         
       
@@ -388,7 +394,6 @@ Proof.
       
       
       (* specialize (H29 _ _ _ H20 H9). *)
-
       (* assert (in_rel0 d{{{ ⇑! a (length Δ) }}} d{{{ ⇑! a (length Δ) }}}) by (eapply per_bot_then_per_elem; mauto 2). *)
       (* assert (in_rel d{{{ ⇑! a (length Δ) }}} d{{{ ⇑! a (length Δ) }}}) by intuition. *)
       (* destruct_rel_mod_eval. *)

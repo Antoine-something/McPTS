@@ -39,7 +39,7 @@ with wf_exp_ann {P} : ctx P -> typ P -> SortOption P -> exp P -> Prop :=
         {{ Γ ⊫ A : Sort@s1 @ so1 }} ->
         {{ Γ, A@s1 ⊫ B : Sort@s2 @ so2 }} ->
         {{ Γ, A@s1 ⊫ M : B @ ^(Some s2) }} ->
-        {{ Γ ⊫ λ r A M : Π r A B @ ^(Some s3) }} )
+        {{ Γ ⊫ λ r A B M : Π r A B @ ^(Some s3) }} )
 | wfa_app :
   `( forall (r : Ru_pi P s1 s2 s3),
         {{ Γ ⊫ A : Sort@s1 @ so1 }} ->
