@@ -409,13 +409,13 @@ Qed.
 
 Lemma nf_of_pi {P} (pred_P : PredicativeSig P) : forall {Γ M A B s1 s2 s3} {r : Ru_pi P s1 s2 s3},
     {{ Γ ⊢ M : Π r A B }} ->
-    exists W1 W2, nbe Γ M {{{ Π r A B }}} n{{{ λ r W1 W2 }}}.
+    exists W1 W2 W3, nbe Γ M {{{ Π r A B }}} n{{{ λ r W1 W2 W3 }}}.
 Proof.
   intros * [? []]%(@soundness P pred_P).
   dir_inversion_clear_by_head @nbe.
   invert_rel_typ_body.
   dir_inversion_clear_by_head @read_nf.
-  do 2 eexists; mauto 4.
+  do 3 eexists; mauto 4.
 Qed.
 
 #[export]
@@ -423,7 +423,7 @@ Hint Resolve nf_of_pi : mcpts.
 
 Theorem canonical_form_of_pi {P} (pred_P : PredicativeSig P) : forall {M A B s1 s2 s3} {r : Ru_pi P s1 s2 s3},
     {{ ⋅ ⊢ M : Π r A B }} ->
-    exists W1 W2, nbe {{{ ⋅ }}} M {{{ Π r A B }}} n{{{ λ r W1 W2 }}}.
+    exists W1 W2 W3, nbe {{{ ⋅ }}} M {{{ Π r A B }}} n{{{ λ r W1 W2 W3 }}}.
 Proof. mauto 3. Qed.
 
 #[export]
@@ -850,7 +850,7 @@ Theorem consistency {P} (pred_P : PredicativeSig P) : forall s1 s2 s3 s (r : Ru_
     ~ {{ ⋅ ⊢ M : Π r Sort@s #0 }}.
 Proof with (congruence + mautosolve 3).
   intros * HW.
-  assert (exists W1 W2, nbe {{{ ⋅ }}} M {{{ Π r Sort@s #0 }}} n{{{ λ r W1 W2 }}}) as [W1 [W2 Hnbe]] by mauto 3.
+  assert (exists W1 W2 W3, nbe {{{ ⋅ }}} M {{{ Π r Sort@s #0 }}} n{{{ λ r W1 W2 W3 }}}) as [W1 [W2 [W3 Hnbe]]] by mauto 3.
   assert (exists W, nbe {{{ ⋅ }}} M {{{ Π r Sort@s #0 }}} W /\ {{ ⋅ ⊢ M ≈ W : Π r Sort@s #0 }}) as [? []] by mauto 3 using soundness.
   gen_presups.
   functional_nbe_rewrite_clear.
@@ -861,11 +861,11 @@ Proof with (congruence + mautosolve 3).
   invert_rel_typ_body.
   match_by_head @read_nf ltac:(fun H => directed dependent destruction H).
   simpl in *.
-  assert (exists B, {{ ⋅, Sort@s @ s1 ⊢ M0 : B }} /\ {{ ⋅ ⊢ Π r Sort@s B ⊆ Π r Sort@s #0 }}) as [B []] by mauto 2.
+  assert (exists B, {{ ⋅, Sort@s @ s1 ⊢ M0 : B }} /\ {{ ⋅ ⊢ Π r Sort@s B ⊆ Π r Sort@s #0 }}) as [B []] by mauto 3.
 
   assert {{ ⋅, Sort@s@s1 ⊢ B ⊆ #0 }}.
   {
-    gen_presup H4.
+    gen_presup H5.
     assert {{ ⋅ ⊢ Π r Sort@s B : Sort@s3 }} by mauto 3.
     assert {{ ⋅ ⊢ Π r Sort@s #0 : Sort@s3 }} by mauto 3.
     eapply subtyp_pi_inversion; mauto 2.
