@@ -69,8 +69,9 @@ with alg_type_infer {P} (pred_P : PredicativeSig P) : ctx P -> nf P -> exp P -> 
                 {{ ⟪ pred_P ⟫ Γ ⊢a succ M ⟹ ℕ }} )
 | ati_rec : `( Ru_nat P s ->
                {{ ⟪ pred_P ⟫ Γ, ℕ@s ⊢a A ⟹ Sort@s' }} ->
+               st_subtyp s' s'' ->
                {{ ⟪ pred_P ⟫ Γ ⊢a MZ ⟸ A[Id,,zero] }} ->
-               {{ ⟪ pred_P ⟫ Γ, ℕ@s, A@s' ⊢a MS ⟸ A[Wk∘Wk,,succ #1] }} ->
+               {{ ⟪ pred_P ⟫ Γ, ℕ@s, A@s'' ⊢a MS ⟸ A[Wk∘Wk,,succ #1] }} ->
                {{ ⟪ pred_P ⟫ Γ ⊢a N ⟸ ℕ }} ->
                nbe_ty Γ {{{ A[Id,,N] }}} B ->
                {{ ⟪ pred_P ⟫ Γ ⊢a rec N return A | zero -> MZ | succ -> MS end ⟹ B }} )
