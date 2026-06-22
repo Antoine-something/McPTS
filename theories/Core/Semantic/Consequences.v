@@ -398,7 +398,7 @@ Proof.
   handle_per_sort_elem_irrel.
   assert (@per_bot P d{{{ !(length Γ) }}} d{{{ !(length Γ) }}}) by mauto 3.
   assert (in_rel0 d{{{ ⇑! a0 (length Γ) }}}  d{{{ ⇑! a0 (length Γ) }}}) by (eapply per_bot_then_per_elem; mauto 2).
-  assert {{ ⟪ pred_P ⟫ Subs a1 <: m at s2 }} by info_mauto 3.
+  assert {{ ⟪ pred_P ⟫ Subs a1 <: m at s2 }} by mauto 3.
 
   autorewrite with mcpts in H51.
   autorewrite with mcpts in H54.

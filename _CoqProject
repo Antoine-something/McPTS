@@ -71,12 +71,13 @@ theories/Core/Completeness/Consequences/Types.v
 theories/Core/Completeness/Consequences/Rules.v
 theories/Core/Semantic/Consequences.v
 
-# theories/Frontend/Elaborator.v
-# # theories/Algorithmic/Definitions.v
-# theories/Algorithmic/Subtyping/Definitions.v
-# theories/Algorithmic/Subtyping/Lemmas.v
-# theories/Algorithmic/Subtyping.v
-# theories/Algorithmic/Typing/Definitions.v
+theories/Frontend/Elaborator.v
+# theories/Algorithmic/Definitions.v
+theories/Algorithmic/Subtyping/Definitions.v
+theories/Algorithmic/Subtyping/Lemmas.v
+theories/Algorithmic/Subtyping.v
+theories/Algorithmic/Typing/Definitions.v
+theories/Algorithmic/Typing/Lemmas.v
 
 
 # # theories/Instantiations/STLC.v

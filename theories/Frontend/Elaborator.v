@@ -36,7 +36,7 @@ Module Cst.
   | st : P -> obj P
   (** Functions *)
   | pi : forall s1 s2 s3 (r : Ru_pi P s1 s2 s3), string -> obj P -> obj P -> obj P
-  | fn : forall s1 s2 s3 (r : Ru_pi P s1 s2 s3), string -> obj P -> obj P -> obj P
+  | fn : forall s1 s2 s3 (r : Ru_pi P s1 s2 s3), string -> obj P -> obj P -> obj P -> obj P
   | app : obj P -> obj P -> obj P
   (** Variables *)
   | var : string -> obj P
@@ -83,10 +83,10 @@ Fixpoint elaborate {P} (cst : Cst.obj P) (ctx : list string) : option (exp P) :=
       | Some a, Some t => Some (a_pi r t a)
       | _, _ => None
       end
-  | Cst.fn r s t c =>
-      match elaborate c (s :: ctx), elaborate t ctx with
-      | Some a, Some t => Some (a_fn r t a)
-      | _, _ => None
+  | Cst.fn r s t b c =>
+      match elaborate c (s :: ctx), elaborate b (s :: ctx), elaborate t ctx with
+      | Some a, Some b, Some t => Some (a_fn r t b a)
+      | _, _, _ => None
       end
   | Cst.app c1 c2 =>
       match elaborate c1 ctx, elaborate c2 ctx with
@@ -114,8 +114,9 @@ Inductive user_exp (P : PtsSig) : exp P -> Prop :=
 | user_exp_fn :
   `( forall (r : Ru_pi P s1 s2 s3),
         user_exp P A ->
+        user_exp P B ->
         user_exp P M ->
-        user_exp P (a_fn r A M) )
+        user_exp P (a_fn r A B M) )
 | user_exp_app :
   `( user_exp P M ->
      user_exp P N ->
@@ -167,7 +168,8 @@ Proof.
   functional induction (elaborate O vs) using elaborate_fun_ind;
     intros; inversion_clear Heq; mauto 4.
 
-  econstructor; mauto 3.
+  - econstructor; mauto 3.
+  - econstructor; mauto 3.
 Qed.
 
 (** This function finds all the variables in an object *)
@@ -177,7 +179,7 @@ Fixpoint cst_variables {P} (cst : Cst.obj P) : StrSet.t :=
  | Cst.st s => StrSet.empty
  (** Functions *)   
  | Cst.pi r s t c => StrSet.union (cst_variables t) (StrSet.remove s (cst_variables c))
- | Cst.fn r s t c => StrSet.union (cst_variables t) (StrSet.remove s (cst_variables c))
+ | Cst.fn r s t b c => StrSet.union (StrSet.union (cst_variables t) (StrSet.remove s (cst_variables b))) (StrSet.remove s (cst_variables c))
  | Cst.app c1 c2 => StrSet.union (cst_variables c1) (cst_variables c2)
  (** Variables *)
  | Cst.var s => StrSet.singleton s
@@ -195,7 +197,7 @@ Inductive closed_at {P} : exp P -> nat -> Prop :=
 | ca_sort : `( closed_at (a_st m) n )
 (** Functions *)
 | ca_pi : `( forall (r : Ru_pi P s1 s2 s3), closed_at t n -> closed_at b (1+n) -> closed_at (a_pi r t b) n )
-| ca_lam : `( forall (r : Ru_pi P s1 s2 s3),  closed_at t n -> closed_at b (1+n) -> closed_at (a_fn r t b) n )
+| ca_lam : `( forall (r : Ru_pi P s1 s2 s3),  closed_at t n -> closed_at b (1+n) -> closed_at c (1+n) -> closed_at (a_fn r t b c) n )
 | ca_app : `( closed_at a1 n -> closed_at a2 n -> closed_at (a_app a1 a2) n )
 (** Variables *)
 | ca_var : `( x < n -> closed_at (a_var x) n )
@@ -282,8 +284,10 @@ Proof.
   - (* fn *)
     assert (cst_variables cst1 [<=] StrSProp.of_list ctx) by fsetdec.
     assert (cst_variables cst2 [<=] StrSProp.of_list (s :: ctx)) by (simpl; fsetdec).
+    assert (cst_variables cst3 [<=] StrSProp.of_list (s :: ctx)) by (simpl; fsetdec).
     destruct (IHcst1 _ H0) as [ast [-> ?]];
-      destruct (IHcst2 _ H1) as [ast' [-> ?]]; mauto.
+      destruct (IHcst2 _ H1) as [ast' [-> ?]]; 
+      destruct (IHcst3 _ H2) as [ast'' [-> ?]]; mauto.
   - (* app *)
     assert (cst_variables cst1 [<=] StrSProp.of_list ctx) by fsetdec.
     assert (cst_variables cst2 [<=] StrSProp.of_list ctx) by fsetdec.
@@ -314,5 +318,5 @@ Example test_elab {P} : @elaborate P Cst.nat nil = Some a_nat.
 Proof. reflexivity. Qed.
 
 Example test_elab2 {P} : forall {s1 s2 s3} {r : Ru_pi P s1 s2 s3},
-    @elaborate P (Cst.fn r "s" Cst.nat (Cst.fn r "x" Cst.nat (Cst.fn r "s" Cst.nat (Cst.var "q")))) nil = None.
+    @elaborate P (Cst.fn r "s" Cst.nat Cst.nat (Cst.fn r "x" Cst.nat Cst.nat (Cst.fn r "s" Cst.nat Cst.nat (Cst.var "q")))) nil = None.
 Proof. reflexivity. Qed.

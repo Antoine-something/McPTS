@@ -81,9 +81,7 @@ Proof.
     assert {{ Γ, ^(nf_to_exp C)@s1 ⊢ B : Sort@s2 }} by mauto 3.
     assert {{ Γ ⊢ Π r A B ⊆ Π r C D }} by mauto 4.
 
-    assert {{ Γ, A@s1 ⊢ M : D }} by mauto 2.
-    assert {{ Γ, A@s1 ⊢ M : B }} by mauto 3.
-    assert {{ Γ ⊢ λ r A M : Π r A B }} by mauto 3.
+    assert {{ Γ ⊢ λ r A B M : Π r A B }} by mauto 3.
     mauto 3.
   - assert {{ Γ ⊢ M : Π r A B }} by mauto 3.
     gen_presup H2.
@@ -149,8 +147,8 @@ Proof with (f_equiv; mautosolve 4).
          reflexivity).
   - assert {{ Γ ⊢ A : Sort@s }} by mauto 2.
     eapply idempotent_nbe_ty; mauto 2.
-  - destruct (wf_fn_inversion H0) as [B' []].
-    gen_presup H5.
+  - destruct (wf_fn_inversion H0) as [].
+    gen_presup H6.
     assert {{ Γ ⊢ A : Sort@s1 }} by mauto 3.
     assert {{ Γ ⊢ A ≈ C : Sort@s1 }} by mauto 3 using soundness'.
     assert {{ Γ, A@s1 ⊢ B : Sort@s2 }} by (eapply alg_type_check_sound; mauto 2).
@@ -170,8 +168,8 @@ Proof with (f_equiv; mautosolve 4).
     assert (nbe_ty Γ A C) by mauto 3.
     assert (nbe_ty Γ C A0) by mauto 3.
     replace A0 with C by mauto 2.
-    assert (nbe_ty {{{ Γ, ^(nf_to_exp C)@s1 }}} D B'0) by mauto 3.
-    assert (nbe_ty {{{ Γ, A@s1 }}} D B'0)  by mauto 4 using ctxeq_nbe_ty_eq'...
+    assert (nbe_ty {{{ Γ, ^(nf_to_exp C)@s1 }}} D B') by mauto 3.
+    assert (nbe_ty {{{ Γ, A@s1 }}} D B')  by mauto 4 using ctxeq_nbe_ty_eq'...
   - assert {{ Γ ⊢ M : ^n{{{ Π r A B }}} }} by mauto 3 using alg_type_infer_sound.
     simpl in H3.
     gen_presups.    
@@ -324,7 +322,16 @@ Proof.
   - assert {{ Γ ⊢ Sort@s3 ⊆ Sort@s3 }} by mauto 2.
     assert {{ Γ ⊢a Sort@s3 ⊆ Sort@s3 }} by mauto 2 using alg_subtyping_complete.
     econstructor; mauto 4.
-  - admit.
+  - assert {{ ⟪ pred_P ⟫ Γ ⊢a A ⟸ Sort@s1 }} by mauto 2.
+    assert {{ ⟪ pred_P ⟫ Γ, A@s1 ⊢a B ⟸ Sort@s2 }} by mauto 2.
+    assert {{ ⟪ pred_P ⟫ Γ, A@s1 ⊢a M ⟸ B }} by mauto 2.
+    assert (exists B', {{ ⟪ pred_P ⟫ Γ, A@s1 ⊢a M ⟹ B' }} /\ {{ Γ, A@s1 ⊢a B' ⊆ B }}) as [B' []] by (inversion_clear_by_head @alg_type_check; firstorder).
+    assert (exists W : nf P, nbe Γ A {{{ Sort@s1 }}} W /\ {{ Γ ⊢ A ≈ W : Sort@s1 }}) as [W []] by mauto 2 using soundness.
+    assert (exists W : nf P, nbe {{{ Γ, A@s1 }}} B {{{ Sort@s2 }}} W /\ {{ Γ, A@s1 ⊢ B ≈ W : Sort@s2 }}) as [W' []] by mauto 2 using soundness.
+    gen_presups.
+    assert {{ Γ ⊢ ^n{{{Π r W W'}}} ⊆ Π r A B }} by (eapply wf_subtyp_pi; mauto 4).
+    assert {{ Γ ⊢a ^n{{{ Π r W W' }}} ⊆ Π r A B }} by mauto 2 using alg_subtyping_complete.
+    econstructor; mauto 4.
   - assert {{ ⟪ pred_P ⟫ Γ ⊢a M ⟸ Π r A B }} by mauto 2.
     assert {{ ⟪ pred_P ⟫ Γ ⊢a N ⟸ A }} by mauto 2.
 
