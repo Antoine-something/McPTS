@@ -1,4 +1,5 @@
 From Coq Require Import Orders Relation_Definitions RelationClasses.
+From Coq Require Import Program.Equality.
 
 From Equations Require Import Equations.
 
@@ -126,6 +127,26 @@ Section OrderProperties.
       exfalso. eapply pred_rel_Asymmetric; eassumption.
   Qed.
 End OrderProperties.
+
+Record DecidableSig (P : PtsSig) : Type :=
+  mkDecidableSig {
+      dec_st : forall (s s' : P), ( {s = s'} + {s <> s'} )%type;
+      dec_pi: forall (s1 s2 s3 : P) (r : Ru_pi P s1 s2 s3) (r' : Ru_pi P s1 s2 s3),
+        ( { r = r'} + {r <> r'} )%type
+    }.
+Arguments dec_st {_}.
+Arguments dec_pi {_}.
+
+Section DecidableProperties.
+  Context {P : PtsSig} (dec_P : DecidableSig P).
+
+  Definition strong_equality : forall (s1 s1' s2 s2' s3 s3' : P) (r : Ru_pi P s1 s2 s3) (r' : Ru_pi P s1' s2' s3'),
+      (s1 = s1') /\ (s2 = s2') /\ (s3 = s3') /\ (r ~= r').
+    
+    
+  Lemma strong_decidable_pi : forall (s1 s1' s2 s2' s3 s3' : P) (r : Ru_pi P s1 s2 s3) (r' : Ru_pi P s1' s2' s3').
+  
+
 
 (* Definition FullSig (P : PtsSig) : Type := forall s, exists s', Ax P s s'. *)
 

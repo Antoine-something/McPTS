@@ -1,7 +1,7 @@
-From Mctt Require Import LibTactics.
-From Mctt.Core Require Import Base.
-From Mctt.Algorithmic Require Export Subtyping.
-From Mctt.Extraction Require Import NbE PseudoMonadic.
+From McPTS Require Import PtsSignature LibTactics.
+From McPTS.Core Require Import Base.
+From McPTS.Algorithmic Require Export Subtyping.
+From McPTS.Extraction Require Import NbE PseudoMonadic.
 From Equations Require Import Equations.
 Import Domain_Notations.
 
@@ -22,22 +22,22 @@ Ltac subtyping_tac :=
   end.
 
 #[tactic="subtyping_tac",derive(equations=no,eliminator=no)]
-Equations subtyping_nf_impl A B : { {{ ⊢anf A ⊆ B }} } + {~ {{ ⊢anf A ⊆ B }} } :=
-| n{{{ Type@i }}}, n{{{ Type@j }}} =>
-    let*b _ := Compare_dec.le_lt_dec i j while _ in
+Equations subtyping_nf_impl {P : PtsSig} (dec_P : DecidableSig P) (A : nf P) B : { {{ ⊢anf A ⊆ B }} } + {~ {{ ⊢anf A ⊆ B }} } :=
+| dec_P, n{{{ Sort@s }}}, n{{{ Sort@s' }}} =>
+    let*b _ := dec_st dec_P s s' while _ in
     pureb _
-| n{{{ Π A B }}}, n{{{ Π A' B' }}} =>
-    let*b _ := nf_eq_dec A A' while _ in
-    let*b _ := subtyping_nf_impl B B' while _ in
-    pureb _
-| n{{{ Σ A B }}}, n{{{ Σ A' B' }}} =>
-    let*b _ := nf_eq_dec A A' while _ in
-    let*b _ := subtyping_nf_impl B B' while _ in
+| dec_P, (@nf_pi P s1 s2 s3 r A B), (@nf_pi P s1' s2' s3' r' A' B') =>
+    let*b _ := dec_st dec_P s1 s1' while _ in
+    let*b _ := dec_st dec_P s2 s2' while _ in
+    let*b _ := dec_st dec_P s3 s3' while _ in
+    let*b _ := dec_pi dec_P s1 s2 s3 r r' while _ in
+    let*b _ := nf_eq_dec dec_P A A' while _ in
+    let*b _ := subtyping_nf_impl dec_P B B' while _ in
     pureb _
 (** Pseudo-monadic syntax for the next catch-all branch
     generates some unsolved obligations, so we directly match on
     [nf_eq_dec A B] here. *)
-| A, B with nf_eq_dec A B => {
+| dec_P, A, B with nf_eq_dec dec_P A B => {
   | left _ => left _
   | right _ => right _
   }.

@@ -1,5 +1,5 @@
 From Coq Require Import List String.
-
+From Coq Require Import Program.Equality.
 From McPTS Require Import PtsSignature.
 From McPTS.Core Require Import Base.
 
@@ -154,6 +154,64 @@ with ne_to_exp {P : PtsSig} (M : ne P) : exp P :=
 
 Coercion nf_to_exp : nf >-> exp.
 Coercion ne_to_exp : ne >-> exp.
+  
+Fact nf_eq_dec {P : PtsSig} (dec_P : DecidableSig P) : forall (M M' : nf P),
+    ({M = M'} + {M <> M'})%type
+with ne_eq_dec {P : PtsSig} (dec_P : DecidableSig P): forall (M M' : ne P),
+    ({M = M'} + {M <> M'})%type.
+Proof.
+  - intros.
+    destruct M; destruct M';
+      try solve [right; intros H; inversion H];
+      try solve [left; reflexivity].
+    + destruct (dec_st dec_P s s0).
+      * subst.
+        left.
+        reflexivity.
+      * right.
+        injection.
+        eassumption.
+    + destruct (dec_st dec_P s1 s0); [| right; injection; intros; auto].
+      destruct (dec_st dec_P s2 s4); [| right; injection; intros; auto].
+      destruct (dec_st dec_P s3 s5); [| right; injection; intros; auto].
+      subst.
+      pose proof (dec_pi dec_P _ _ _ r r0).
+      destruct H; [| right; injection; intros; simpl_existTs; auto].
+      subst.
+      destruct (nf_eq_dec P dec_P M1 M'1); [| right; injection; auto].
+      destruct (nf_eq_dec P dec_P M2 M'2); [| right; injection; auto].
+      subst.
+      left.
+      reflexivity.
+    + destruct (dec_st dec_P s1 s0); [| right; injection; intros; auto].
+      destruct (dec_st dec_P s2 s4); [| right; injection; intros; auto].
+      destruct (dec_st dec_P s3 s5); [| right; injection; intros; auto].
+      subst.
+      pose proof (dec_pi dec_P _ _ _ r r0).
+      destruct H; [| right; injection; intros; simpl_existTs; auto].
+      subst.
+      destruct (nf_eq_dec P dec_P M1 M'1); [| right; injection; auto].
+      destruct (nf_eq_dec P dec_P M2 M'2); [| right; injection; auto].
+      destruct (nf_eq_dec P dec_P M3 M'3); [| right; injection; auto].
+      subst.
+      left.
+      reflexivity.
+    + destruct (nf_eq_dec P dec_P M M').
+      * subst.
+        left.
+        reflexivity.
+      * right.
+        injection.
+        eassumption.
+    + destruct (ne_eq_dec P dec_P n n0).
+      * subst.
+        left.
+        reflexivity.
+      * right.
+        injection.
+        eassumption.
+  - intros; decide equality; try apply PeanoNat.Nat.eq_dec.
+Defined.
 
 Definition q {P : PtsSig} (σ : sub P) := a_extend (a_compose σ a_weaken) (a_var 0).
 Arguments q {_} σ/.
