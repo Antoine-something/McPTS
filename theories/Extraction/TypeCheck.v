@@ -24,67 +24,54 @@ Section lookup.
     intros;
     repeat impl_obl_tac1;
     intuition (mauto 4).
-    
+
   #[tactic="impl_obl_tac",derive(equations=no,eliminator=no)]
-  Equations lookup {P} (Γ : ctx P) (HΓ : {{ ⊢ Γ }}) x : { A | {{ #x : A @ s ∈ Γ }} } + { forall A s, ~ {{ #x : A@s  ∈ Γ }} } :=
-  | {{{ Γ, A@s }}}, HΓ, s, x with x => {
-    | 0 => pureo (exist _ {{{ A[Wk] }}} _)
-    | S x' =>
-        let*o (exist _ B _) := lookup Γ _ x' while _ in
-        pureo (exist _ {{{ B[Wk] }}} _)
+  Equations lookup {P} (dec_P : DecidableSig P) (Γ : ctx P) (HΓ : {{ ⊢ Γ }}) x : { A & {s | {{ #x : A @ s ∈ Γ }} } } + { forall A s, ~ {{ #x : A @ s ∈ Γ }} } :=
+  | dec_P, {{{ Γ, A@s }}}, HΓ, x with x => {
+    | 0 => pureo (existT _ {{{ A[Wk] }}} (exist _ s _))
+    | S x' => 
+        let*o (existT _ B (exist _ s' _)) := lookup dec_P Γ _ x' while _ in
+        pureo (existT _ {{{ B[Wk] }}} (exist _ s' _))
     }
-  | {{{ ⋅ }}}, HG, s, x => inright _.
+  | dec_P, {{{ ⋅ }}}, HG, x => inright _.
 End lookup.
 
 Section type_check.
   #[derive(equations=no,eliminator=no)]
-  Equations get_level_of_type_nf (A : nf) : { i | A = n{{{ Sort@i }}} } + { forall i, A <> n{{{ Sort@i }}} } :=
-  | n{{{ Sort@i }}} => pureo (exist _ i _)
-  | _               => inright _
+  Equations get_level_of_sort_nf {P} (dec_P : DecidableSig P) (A : nf P) : { s | A = n{{{ Sort@s }}} } + { forall s, A <> n{{{ Sort@s }}} } :=
+  | dec_P, n{{{ Sort@s }}} => pureo (exist _ s _)
+  | _, _                   => inright _
   .
 
   (** Don't forget to use 9th bit of [Extraction Flag] (for example, [Set Extraction Flag 1007.]).
       Otherwise, this function would introduce redundant pair construction/pattern matching. *)
   #[derive(equations=no,eliminator=no)]
-  Equations get_subterms_of_pi_nf (A : nf) : { B & { C | A = n{{{ Π B C }}} } } + { forall B C, A <> n{{{ Π B C }}} } :=
-  | n{{{ Π B C }}} => pureo (existT _ B (exist _ C _))
-  | _              => inright _
+  Equations get_subterms_of_pi_nf {P} (dec_P : DecidableSig P) (A : nf P) : { s1 & { s2 & { s3 & { r & { B & { C | A = @nf_pi P s1 s2 s3 r B C } } } } } } + { forall s1 s2 s3 r B C, A <> @nf_pi P s1 s2 s3 r B C } :=
+  | dec_P, n{{{ Π r B C }}} => pureo (existT _ s1 (existT _ s2 (existT _ s3 (existT _ r (existT _ B (exist _ C _))))))
+  | _, _                    => inright _
   .
 
-  #[derive(equations=no,eliminator=no)]
-  Equations get_subterms_of_sigma_nf (A : nf) : { B & { C | A = n{{{ Σ B C }}} } } + { forall B C, A <> n{{{ Σ B C }}} } :=
-  | n{{{ Σ B C }}} => pureo (existT _ B (exist _ C _))
-  | _              => inright _
-  .
+  Extraction Inline get_level_of_sort_nf get_subterms_of_pi_nf.
 
-  Extraction Inline get_level_of_type_nf get_subterms_of_pi_nf.
-
-  Inductive type_check_order : exp -> Prop :=
+  Inductive type_check_order {P} : exp P -> Prop :=
   | tc_ti : forall {A}, type_infer_order A -> type_check_order A
-  with type_infer_order : exp -> Prop :=
-  | ti_typ : forall {i}, type_infer_order {{{ Sort@i }}}
+  with type_infer_order {P} : exp P -> Prop :=
+  | ti_typ : forall {s}, type_infer_order {{{ Sort@s }}}
   | ti_nat : type_infer_order {{{ ℕ }}}
   | ti_zero : type_infer_order {{{ zero }}}
   | ti_succ : forall {M}, type_check_order M -> type_infer_order {{{ succ M }}}
   | ti_natrec : forall {A MZ MS M}, type_check_order M -> type_infer_order A -> type_check_order MZ -> type_check_order MS -> type_infer_order {{{ rec M return A | zero -> MZ | succ -> MS end }}}
-  | ti_pi : forall {A B}, type_infer_order A -> type_infer_order B -> type_infer_order {{{ Π A B }}}
-  | ti_fn : forall {A M}, type_infer_order A -> type_infer_order M -> type_infer_order {{{ λ A M }}}
+  | ti_pi : forall {s1 s2 s3} {r : Ru_pi P s1 s2 s3} {A B}, type_infer_order A -> type_infer_order B -> type_infer_order {{{ Π r A B }}}
+  | ti_fn : forall {s1 s2 s3} {r : Ru_pi P s1 s2 s3} {A B M}, type_infer_order A -> type_infer_order M -> type_infer_order {{{ λ r A B M }}}
   | ti_app : forall {M N}, type_infer_order M -> type_check_order N -> type_infer_order {{{ M N }}}
-  | ti_sigma : forall {A B}, type_infer_order A -> type_infer_order B -> type_infer_order {{{ Σ A B }}}
-  | ti_pair : forall {A B M1 M2}, type_infer_order A -> type_infer_order B -> type_check_order M1 -> type_check_order M2 -> type_infer_order {{{ ⟨ M1 : A ; M2 : B ⟩ }}}
-  | ti_fst : forall {M}, type_infer_order M -> type_infer_order {{{ fst M }}}
-  | ti_snd : forall {M}, type_infer_order M -> type_infer_order {{{ snd M }}}
-  | ti_eq : forall {A M1 M2}, type_infer_order A -> type_check_order M1 -> type_check_order M2 -> type_infer_order {{{ Eq A M1 M2 }}}
-  | ti_refl : forall {A M}, type_infer_order A -> type_check_order M -> type_infer_order {{{ refl A M }}}
-  | ti_eqrec : forall {N A M1 M2 B BR}, type_check_order N -> type_infer_order A -> type_check_order M1 -> type_check_order M2 -> type_infer_order B -> type_check_order BR -> type_infer_order {{{ eqrec N as Eq A M1 M2 return B | refl -> BR end }}}
   | ti_vlookup : forall {x}, type_infer_order {{{ #x }}}
   .
 
   #[local]
   Hint Constructors type_check_order type_infer_order : mcpts.
 
-  Lemma user_exp_to_type_infer_order : forall M,
-      user_exp M ->
+  Lemma user_exp_to_type_infer_order {P} : forall M,
+      user_exp P M ->
       type_infer_order M.
   Proof.
     intros M HM.
@@ -93,33 +80,34 @@ Section type_check.
   Qed.
 
   #[local]
-  Ltac clear_defs :=
+  Ltac clear_defs P :=
     do 2 lazymatch goal with
-      | H: (forall (G : ctx) (A : typ),
-               (exists i : nat, {{ G ⊢ A : Sort@i }}) ->
-               forall M : typ,
+      | H: (forall (Γ : ctx P) (A : typ P),
+               (exists s : P, {{ Γ ⊢ A : Sort@s }}) ->
+               forall M : typ P,
                  type_check_order M ->
-                 ({ {{ G ⊢a M ⟸ A }} } + { ~ {{ G ⊢a M ⟸ A }} }))
+                 ({ {{ Γ ⊢a M ⟸ A }} } + { ~ {{ Γ ⊢a M ⟸ A }} }))
         |- _ =>
           clear H
       | H: (let H := fixproto in
-            forall (G : ctx) (A : typ),
-              (exists i : nat, {{ G ⊢ A : Sort @ i }}) -> forall M : typ, type_check_order M -> { {{ G ⊢a M ⟸ A }} } + { ~ {{ G ⊢a M ⟸ A }} })
+            forall (Γ : ctx P) (A : typ P),
+              (exists s : P, {{ Γ ⊢ A : Sort @ s }}) -> forall M : typ P, type_check_order M -> { {{ Γ ⊢a M ⟸ A }} } + { ~ {{ G ⊢a M ⟸ A }} })
         |- _ =>
           clear H
       | H: (let H := fixproto in
-            forall G : ctx,
-              {{ ⊢ G }} ->
-              forall M : typ,
+            forall Γ : ctx P,
+              {{ ⊢ Γ }} ->
+              forall M : typ P,
                 type_infer_order M ->
-                ({ B : nf | {{ G ⊢a M ⟹ B }} /\ (exists i : nat, {{ G ⊢a ^(nf_to_exp B) ⟹ Sort@i }}) } + { forall C : nf, ~ {{ G ⊢a M ⟹ C }} }))
+                (* This will pose problems, we probably need an algorithmic type well-formedness check *)
+                ({ B : nf P | {{ Γ ⊢a M ⟹ B }} /\ (exists s : P, {{ Γ ⊢a ^(nf_to_exp B) ⟹ Sort@s }}) } + { forall C : nf P, ~ {{ Γ ⊢a M ⟹ C }} }))
         |- _ =>
           clear H
-      | H: (forall G : ctx,
-               {{ ⊢ G }} ->
-               forall M : typ,
+      | H: (forall Γ : ctx P,
+               {{ ⊢ Γ }} ->
+               forall M : typ P,
                  type_infer_order M ->
-                 ({ B : nf | {{ G ⊢a M ⟹ B }} /\ (exists i : nat, {{ G ⊢a ^(nf_to_exp B) ⟹ Sort@i }}) } + { forall C : nf, ~ {{ G ⊢a M ⟹ C }} }))
+                 ({ B : nf P | {{ Γ ⊢a M ⟹ B }} /\ (exists s : P, {{ Γ ⊢a ^(nf_to_exp B) ⟹ Sort@s }}) } + { forall C : nf P, ~ {{ Γ ⊢a M ⟹ C }} }))
         |- _ =>
           clear H
     end.
