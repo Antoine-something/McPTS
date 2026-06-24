@@ -77,17 +77,17 @@ theories/Algorithmic/Subtyping/Lemmas.v
 theories/Algorithmic/Subtyping.v
 theories/Algorithmic/Typing/Definitions.v
 theories/Algorithmic/Typing/Lemmas.v
+theories/Algorithmic/Typing.v
 
 theories/Extraction/Evaluation.v
 theories/Extraction/Readback.v
 theories/Extraction/NbE.v
 theories/Extraction/PseudoMonadic.v
+theories/Extraction/Subtyping.v
 # ./Entrypoint.v
-# ./Extraction/NbE.v
-# ./Extraction/PseudoMonadic.v
-# ./Extraction/Subtyping.v
+
 # ./Extraction/TypeCheck.v
-# ./Frontend/Elaborator.v
+
 # ./Frontend/Parser.v
 
 

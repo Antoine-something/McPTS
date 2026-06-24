@@ -175,7 +175,7 @@ Proof.
       destruct (dec_st dec_P s2 s4); [| right; injection; intros; auto].
       destruct (dec_st dec_P s3 s5); [| right; injection; intros; auto].
       subst.
-      pose proof (dec_pi dec_P _ _ _ r r0).
+      pose proof (dec_ru_pi dec_P _ _ _ r r0).
       destruct H; [| right; injection; intros; simpl_existTs; auto].
       subst.
       destruct (nf_eq_dec P dec_P M1 M'1); [| right; injection; auto].
@@ -187,7 +187,7 @@ Proof.
       destruct (dec_st dec_P s2 s4); [| right; injection; intros; auto].
       destruct (dec_st dec_P s3 s5); [| right; injection; intros; auto].
       subst.
-      pose proof (dec_pi dec_P _ _ _ r r0).
+      pose proof (dec_ru_pi dec_P _ _ _ r r0).
       destruct H; [| right; injection; intros; simpl_existTs; auto].
       subst.
       destruct (nf_eq_dec P dec_P M1 M'1); [| right; injection; auto].
