@@ -1,5 +1,6 @@
 From Coq Require Import Orders Relation_Definitions RelationClasses.
 From Coq Require Import Program.Equality.
+From Coq Require Import Logic.JMeq.
 
 From Equations Require Import Equations.
 
@@ -140,12 +141,34 @@ Arguments dec_pi {_}.
 Section DecidableProperties.
   Context {P : PtsSig} (dec_P : DecidableSig P).
 
-  Definition strong_equality : forall (s1 s1' s2 s2' s3 s3' : P) (r : Ru_pi P s1 s2 s3) (r' : Ru_pi P s1' s2' s3'),
+  Definition strong_equality (s1 s1' s2 s2' s3 s3' : P) (r : Ru_pi P s1 s2 s3) (r' : Ru_pi P s1' s2' s3') :=
       (s1 = s1') /\ (s2 = s2') /\ (s3 = s3') /\ (r ~= r').
+
+  Definition strong_inequality (s1 s1' s2 s2' s3 s3' : P) (r : Ru_pi P s1 s2 s3) (r' : Ru_pi P s1' s2' s3') :=
+    ~(strong_equality s1 s1' s2 s2' s3 s3' r r').
     
-    
-  Lemma strong_decidable_pi : forall (s1 s1' s2 s2' s3 s3' : P) (r : Ru_pi P s1 s2 s3) (r' : Ru_pi P s1' s2' s3').
-  
+  Lemma strong_decidable_pi : forall (s1 s1' s2 s2' s3 s3' : P) (r : Ru_pi P s1 s2 s3) (r' : Ru_pi P s1' s2' s3'),
+      ({ strong_equality s1 s1' s2 s2' s3 s3' r r' } + {strong_inequality s1 s1' s2 s2' s3 s3' r r'})%type.
+    intros.
+    destruct (dec_st dec_P s1 s1'); [| right; unfold strong_inequality; unfold strong_equality; intuition].
+    destruct (dec_st dec_P s2 s2'); [| right; unfold strong_inequality; unfold strong_equality; intuition].
+    destruct (dec_st dec_P s3 s3'); [| right; unfold strong_inequality; unfold strong_equality; intuition].
+    subst.
+    destruct (dec_pi dec_P s1' s2' s3' r r').
+    - left.
+      unfold strong_equality.
+      repeat eexists.
+      subst.
+      reflexivity.
+    - right.
+      unfold strong_inequality.
+      unfold strong_equality.
+      intros H.
+      destruct H as [? [? []]].
+      assert (r = r') by (eapply JMeq_eq; eassumption).
+      eauto.
+  Qed.
+End DecidableProperties.      
 
 
 (* Definition FullSig (P : PtsSig) : Type := forall s, exists s', Ax P s s'. *)
