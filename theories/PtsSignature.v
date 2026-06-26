@@ -43,7 +43,6 @@ Record PredicativeSig (P : PtsSig) : Type :=
       ord_ax_typ : forall {s1 s2 : P}, Ax_typ P s1 s2 -> pred_rel s1 s2;
       ord_ax_sub : forall {s1 s2 : P}, Ax_sub P s1 s2 -> pred_rel s1 s2;
       ord_ru_pi : forall {s1 s2 s3 : P}, Ru_pi P s1 s2 s3 -> (pred_rel s1 s3 \/ s1 = s3) /\ (pred_rel s2 s3 \/ s2 = s3);
-
     }.
 Arguments pred_rel {_}.
 Arguments ord_rel {_}.
@@ -135,10 +134,12 @@ Record DecidableSig (P : PtsSig) : Type :=
       dec_ru_pi: forall (s1 s2 s3 : P) (r : Ru_pi P s1 s2 s3) (r' : Ru_pi P s1 s2 s3),
         ( { r = r'} + {r <> r'} )%type;
       dec_st_sub : forall (s s' : P), ({st_subtyp s s'} + {~ st_subtyp s s'})%type;
+      dec_ru_nat : {s : P & {r : Ru_nat P s | True}} + (forall s, Ru_nat P s -> False);
     }.
 Arguments dec_st {_}.
 Arguments dec_ru_pi {_}.
 Arguments dec_st_sub {_}.
+Arguments dec_ru_nat {_}.
 
 Section DecidableProperties.
   Context {P : PtsSig} (dec_P : DecidableSig P).

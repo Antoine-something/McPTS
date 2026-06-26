@@ -42,7 +42,7 @@ Section type_check.
   | dec_P, n{{{ Sort@s }}} => pureo (exist _ s _)
   | _, _                   => inright _
   .
-
+  
   (** Don't forget to use 9th bit of [Extraction Flag] (for example, [Set Extraction Flag 1007.]).
       Otherwise, this function would introduce redundant pair construction/pattern matching. *)
   #[derive(equations=no,eliminator=no)]
@@ -80,21 +80,23 @@ Section type_check.
   Qed.
 
   #[local]
-  Ltac clear_defs P :=
+  Ltac clear_defs :=
     do 2 lazymatch goal with
-      | H: (forall (Γ : ctx P) (A : typ P),
-               (exists s : P, {{ Γ ⊢ A : Sort@s }}) ->
-               forall M : typ P,
+      | H: (forall (Γ : ctx ?P) (A : typ ?P),
+               {{ Γ ⊢ A }} ->
+               forall M : typ ?P,
                  type_check_order M ->
                  ({ {{ Γ ⊢a M ⟸ A }} } + { ~ {{ Γ ⊢a M ⟸ A }} }))
         |- _ =>
           clear H
       | H: (let H := fixproto in
+            forall (P : PtsSig), (?dec_P : DecidableSig P) -> 
             forall (Γ : ctx P) (A : typ P),
-              (exists s : P, {{ Γ ⊢ A : Sort @ s }}) -> forall M : typ P, type_check_order M -> { {{ Γ ⊢a M ⟸ A }} } + { ~ {{ Γ ⊢a M ⟸ A }} })
+              {{ Γ ⊢ A  }} -> forall M : typ P, type_check_order M -> { {{ Γ ⊢a M ⟸ A }} } + { ~ {{ Γ ⊢a M ⟸ A }} })
         |- _ =>
           clear H
       | H: (let H := fixproto in
+            forall (P : PtsSig), (?dec_P : DecidableSig P) -> 
             forall Γ : ctx P,
               {{ ⊢ Γ }} ->
               forall M : typ P,
@@ -102,11 +104,11 @@ Section type_check.
                 ({ B : nf P | {{ Γ ⊢a M ⟹ B }} /\ {{ Γ ⊢aty ^(nf_to_exp B) }} } + { forall C : nf P, ~ {{ Γ ⊢a M ⟹ C }} }))
         |- _ =>
           clear H
-      | H: (forall Γ : ctx P,
+      | H: (forall Γ : ctx ?P,
                {{ ⊢ Γ }} ->
-               forall M : typ P,
+               forall M : typ ?P,
                  type_infer_order M ->
-                 ({ B : nf P | {{ Γ ⊢a M ⟹ B }} /\{{ Γ ⊢aty ^(nf_to_exp B) }} } + { forall C : nf P, ~ {{ Γ ⊢a M ⟹ C }} }))
+                 ({ B : nf ?P | {{ Γ ⊢a M ⟹ B }} /\{{ Γ ⊢aty ^(nf_to_exp B) }} } + { forall C : nf ?P, ~ {{ Γ ⊢a M ⟹ C }} }))
         |- _ =>
           clear H
     end.
@@ -114,8 +116,8 @@ Section type_check.
   #[local]
   Ltac clear_redundant_pat :=
     repeat match goal with
-      | H: { A | {{ ^?Γ ⊢a ^?M ⟹ A }} /\ (exists s, {{ ^?Γ ⊢a ^(nf_to_exp A) ⟹ Sort@s }}) }
-          , H1: {{ ^?Γ ⊢a ^?M ⟹ ^?B }} /\ (exists s, {{ ^?Γ ⊢a ^(nf_to_exp ?B) ⟹ Sort@s }}) |- _ => clear H
+      | H: { A | {{ ^?Γ ⊢a ^?M ⟹ A }} /\ {{ ^?Γ ⊢aty A }} }
+          , H1: {{ ^?Γ ⊢a ^?M ⟹ ^?B }} /\ {{ ^?Γ ⊢aty ^?B }} |- _ => clear H
       | H: { s | ?A = n{{{ Sort@s }}} }
           , H1: ?A = n{{{ Sort@?s }}} |- _ => clear H
       | H: { B & { C | ?A = n{{{ Π ?r B C }}} } }
@@ -132,7 +134,7 @@ Section type_check.
   Ltac impl_obl_tac := clean_obl; eauto 3.
 
   #[tactic="impl_obl_tac",derive(equations=no,eliminator=no)]
-  Equations type_check {P : PtsSig} (dec_P : DecidableSig P) (Γ : ctx P) A (HA : (exists i, {{ Γ ⊢ A : Sort@i }})) M (H : type_check_order M) : { {{ Γ ⊢a M ⟸ A }} } + { ~ {{ Γ ⊢a M ⟸ A }} } by struct H :=
+  Equations type_check {P : PtsSig} (dec_P : DecidableSig P) (Γ : ctx P) A (HA : {{ Γ ⊢ A }}) M (H : type_check_order M) : { {{ Γ ⊢a M ⟸ A }} } + { ~ {{ Γ ⊢a M ⟸ A }} } by struct H :=
   | dec_P, Γ, A, HA, M, H =>
       let*o->b (exist _ B _) := type_infer dec_P Γ _ M _ while _ in
       let*b _ := subtyping_impl dec_P Γ (B : nf P) A _ while _ in
@@ -143,18 +145,21 @@ Section type_check.
         (* pureo (exist _ n{{{ Sort@(S s) }}} _) *)
         _ 
     | {{{ ℕ }}} =>
-        pureo (exist _ n{{{ Sort@0 }}} _)
+    (* pureo (exist _ n{{{ Sort@0 }}} _) *)
+        _
     | {{{ zero }}} =>
         pureo (exist _ n{{{ ℕ }}} _)
     | {{{ succ M' }}} =>
-        let*b->o _ := type_check Γ {{{ ℕ }}} _ M' _ while _ in
+        let*b->o _ := type_check dec_P Γ {{{ ℕ }}} _ M' _ while _ in
         pureo (exist _ n{{{ ℕ }}} _)
     | {{{ rec M' return A' | zero -> MZ | succ -> MS end }}} =>
-        let*b->o _ := type_check Γ {{{ ℕ }}} _ M' _ while _ in
-        let*o (exist _ UA' _) := type_infer {{{ Γ, ℕ@s }}} _ A' _ while _ in
-        let*o (exist _ s' _) :=  get_level_of_sort_nf UA' while _ in
-        let*b->o _ := type_check Γ {{{ A'[Id,,zero] }}} _ MZ _ while _ in
-        let*b->o _ := type_check {{{ Γ, ℕ@s, A'@s' }}} {{{ A'[Wk∘Wk,,succ #1] }}} _ MS _ while _ in
+        let*o (exist _ US _) := type_infer dec_P Γ _ {{{ ℕ }}} _ while _ in
+        let*o (exist _ s _) := get_level_of_sort_nf dec_P US while _ in
+        let*b->o _ := type_check dec_P Γ {{{ ℕ }}} _ M' _ while _ in
+        let*o (exist _ UA' _) := type_infer dec_P {{{ Γ, ℕ@s }}} _ A' _ while _ in
+        let*o (exist _ s' _) :=  get_level_of_sort_nf dec_P UA' while _ in
+        let*b->o _ := type_check dec_P Γ {{{ A'[Id,,zero] }}} _ MZ _ while _ in
+        let*b->o _ := type_check dec_P {{{ Γ, ℕ@s, A'@s' }}} {{{ A'[Wk∘Wk,,succ #1] }}} _ MS _ while _ in
         let (A'', _) := nbe_ty_impl Γ {{{ A'[Id,,M'] }}} _ in
         pureo (exist _ A'' _)
     | {{{ Π r B C }}} =>
@@ -183,7 +188,7 @@ Section type_check.
         pureo (exist _ A' _)
     | _ => inright _
     }
-  .
+  .  
 
   #[local]
   Ltac invert_type_check_infer_order :=
