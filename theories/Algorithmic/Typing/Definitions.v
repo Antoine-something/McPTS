@@ -5,9 +5,9 @@ From McPTS.Core.Semantic Require Export NbE.
 From McPTS.Core.Syntactic Require Export SystemOpt.
 Import Syntax_Notations.
 
-
 Reserved Notation "Γ '⊢a' M ⟹ A" (in custom judg at level 80, Γ custom exp, M custom exp, A custom nf).
 Reserved Notation "Γ '⊢a' M ⟸ A" (in custom judg at level 80, Γ custom exp, M custom exp, A custom exp).
+Reserved Notation "Γ '⊢aty' A" (in custom judg at level 80, Γ custom exp, A custom nf).
 
 Generalizable All Variables.
 
@@ -77,9 +77,16 @@ with alg_type_infer {P} : ctx P -> nf P -> exp P -> Prop :=
                {{ Γ ⊢a rec N return A | zero -> MZ | succ -> MS end ⟹ B }} )
 where "Γ '⊢a' M ⟹ A" := (alg_type_infer Γ A M) (in custom judg) : type_scope.
 
-
 #[export]
 Hint Constructors alg_type_check alg_type_infer : mcpts.
+
+Inductive alg_wf_type {P} : ctx P -> typ P -> Prop :=
+| awt_sort : `( {{ Γ ⊢aty Sort@s }} )
+| awt_sorted : `( {{ Γ ⊢a A ⟹ Sort@s }} ->
+                  {{ Γ ⊢aty A }} )
+where "Γ '⊢aty' A" := (alg_wf_type Γ A) (in custom judg) : type_scope.
+
+
 
 Scheme alg_type_check_mut_ind := Induction for alg_type_check Sort Prop
 with alg_type_infer_mut_ind := Induction for alg_type_infer Sort Prop.

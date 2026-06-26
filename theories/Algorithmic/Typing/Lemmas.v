@@ -39,8 +39,8 @@ Proof.
 Qed.
 
 #[local]
-  Hint Resolve functional_alg_type_infer : mcpts.         
-
+  Hint Resolve functional_alg_type_infer : mcpts.
+  
 Ltac functional_alg_type_infer_rewrite_clear1 :=
   let tactic_error o1 o2 := fail 3 "functional_alg_type_infer equality between" o1 "and" o2 "cannot be solved by mauto" in
   match goal with
@@ -131,7 +131,15 @@ Proof.
   pose proof @alg_type_sound; intuition.
 Qed.
 
-
+Lemma alg_aty_sound {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {A},
+    {{ Γ ⊢aty A }} -> {{ ⊢ Γ }} -> {{ Γ ⊢ A }}.
+Proof.
+  intros.
+  induction H; mauto 3.
+  assert {{ Γ ⊢ A : ^ n{{{ Sort@s }}} }} by mauto 2 using alg_type_infer_sound.
+  mauto 3.
+Qed.
+  
 Lemma alg_type_infer_normal {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {A A' M},
     {{ ⊢ Γ }} ->
     {{ Γ ⊢a M ⟹ A }} ->
@@ -415,3 +423,19 @@ Qed.
 
 #[export]
 Hint Resolve alg_type_infer_pi_complete : mcpts.
+
+Lemma alg_aty_complete {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {A},
+    user_exp P A ->
+    {{ Γ ⊢ A }} ->
+    {{ Γ ⊢aty A }}.
+Proof.
+  induction 2; intros.
+  - econstructor.
+  - gen_presups.
+    destruct (alg_type_infer_typ_complete pred_P H H0) as [s' []].
+    econstructor; mauto 3.
+  - inversion H.
+Qed.
+
+#[export]
+Hint Resolve alg_aty_complete : mcpts.
