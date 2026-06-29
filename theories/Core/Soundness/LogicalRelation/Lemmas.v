@@ -12,11 +12,12 @@ Add Parametric Morphism {P} (pred_P : PredicativeSig P) s a Γ A M : (glu_elem_b
 Proof.
   intros m m' Hmm' *.
   split; intros []; econstructor; mauto 3;
-    try (etransitivity; mauto 4);
     intros;
     specialize (Hmm' (length Δ)) as [? []];
+    etransitivity;
     functional_read_rewrite_clear;
-    mauto.
+    assert {{ Δ ⊢ M[σ] ≈ M' : A[σ] }} by mauto 2;
+    mauto 3.
 Qed.
 
 Add Parametric Morphism {P} (pred_P : PredicativeSig P) s a Γ A M R (H : per_sort_elem pred_P s R a a) : (glu_elem_top pred_P s a Γ A M)
@@ -24,12 +25,13 @@ Add Parametric Morphism {P} (pred_P : PredicativeSig P) s a Γ A M R (H : per_so
 Proof.
   intros m m' Hmm' *.
   split; intros []; econstructor; mauto 3;
-    pose proof (per_elem_then_per_top H Hmm') as Hmm'';
-    try (etransitivity; mauto 4);
+    pose proof (per_elem_then_per_top H Hmm') as Hmm''; mauto 3;
     intros;
     specialize (Hmm'' (length Δ)) as [? []];
+    etransitivity;
     functional_read_rewrite_clear;
-    mauto.
+    assert {{ Δ ⊢ M[σ] ≈ W : A[σ] }} by mauto 2;
+    mauto 3.
 Qed.
 
 Lemma glu_sort_elem_typ_unique_upto_exp_eq {P} (pred_P : PredicativeSig P) : forall {s a typ_rel typ_rel' exp_rel exp_rel' Γ A A'},
@@ -57,7 +59,6 @@ Qed.
 #[export]
 Hint Resolve glu_sort_elem_typ_unique_upto_exp_eq : mcpts.
 
-
 Lemma glu_sort_elem_per_sort_elem_typ_escape {P} (pred_P : PredicativeSig P) : forall {s a a' elem_rel typ_rel typ_rel' exp_rel exp_rel' Γ A A'},
     {{ DF a ≈ a' ∈ per_sort_elem pred_P s ↘ elem_rel }} ->
     {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
@@ -75,7 +76,6 @@ Qed.
 #[export]
 Hint Resolve glu_sort_elem_per_sort_elem_typ_escape : mcpts.
 
-
 Lemma glu_sort_elem_per_sort_typ_escape {P} (pred_P : PredicativeSig P) : forall {s a a' typ_rel typ_rel' exp_rel exp_rel' Γ A A'},
     {{ Dom a ≈ a' ∈ per_sort pred_P s }} ->
     {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
@@ -90,8 +90,6 @@ Qed.
 
 #[export]
 Hint Resolve glu_sort_elem_per_sort_typ_escape : mcpts.
-
-
 
 Lemma glu_sort_elem_exp_unique_upto_exp_eq {P} (pred_P : PredicativeSig P) : forall {s a typ_rel typ_rel' exp_rel exp_rel' Γ A A' M M' m},
     {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
@@ -171,7 +169,6 @@ Proof.
   assert {{ DF a ≈ a ∈ per_sort_elem pred_P s2 ↘ R }} by mauto.
   mauto.
 Qed.
-
 
 Section glu_sort_elem_cumulativity.
   Lemma glu_sort_elem_pi_sub_irrel {P} (pred_P : PredicativeSig P) : forall {s1 s2 s3 s} {r : Ru_pi P s1 s2 s3} {sub_s3_s sub_s3_s' : st_subtyp s3 s} {in_rel elem_rel IP IEL OP OEL},
@@ -781,19 +778,19 @@ Proof.
         as [] by mauto 3.
 
       handle_glu_sort_elem_lower.
-      eapply H1; mauto 4.
-      eapply glu_sort_elem_per_subtyp_typ_sorted_escape; mauto.
-      eapply glu_sort_elem_trm_typ; mauto 4.
+      eapply H1; mauto 2.
+      * eapply glu_sort_elem_per_subtyp_typ_sorted_escape; mauto.
+        eapply glu_sort_elem_trm_typ; mauto 4.
 
-      eapply H25; mauto.
-      eapply H35.
-      rewrite <- H21.
-      eassumption.
+        eapply H25; mauto.
+        eapply H35.
+        rewrite <- H21.
+        eassumption.
 
-      eapply H25; mauto.
-      eapply H35.
-      rewrite <- H21.
-      eassumption.
+      * eapply H25; mauto.
+        eapply H35.
+        rewrite <- H21.
+        eassumption.
   - invert_glu_sort_elem H2.
     invert_glu_sort_elem H1.
     match_by_head (per_bot e e') ltac:(fun H => specialize (H (length Γ)) as [V []]).
@@ -828,10 +825,8 @@ Proof.
   intros * Hsubtyp Hsubtyp' Hglu Hglu' HA HA'.
   gen A' A Γ. gen exp_rel' exp_rel typ_rel' typ_rel.
   induction Hsubtyp' (* using per_subtyp_ind *); intros; subst.
-  -     
-
-    invert_glu_sort_elem  Hglu.
-    invert_glu_sort_elem  Hglu'.
+  - invert_glu_sort_elem Hglu.
+    invert_glu_sort_elem Hglu'.
     unfold sort_glu_exp_pred' in *.
     unfold glu_sort_typ_rec in *.
 
@@ -843,7 +838,7 @@ Proof.
     simpl_glu_rel.
     split; [|split]; mauto 3.
     do 2 eexists; split; mauto 4.
-  - eapply glu_sort_elem_per_subtyp_trm_sorted_conv; mauto. 
+  - eapply glu_sort_elem_per_subtyp_trm_sorted_conv; mauto.
 Qed.
 
 Lemma glu_sort_elem_per_subtyp_trm_if {P} (pred_P : PredicativeSig P) : forall {s a a' typ_rel typ_rel' exp_rel exp_rel' Γ A A' M m},
@@ -1022,7 +1017,7 @@ Proof.
   econstructor; mauto 4.
   assert {{ Γ, A@s ⊢s Wk : Γ }} by mauto 3.
   assert {{ Δ ⊢ A[Wk][σ] ≈ A[Wk][σ'] : Sort@s }} as <- by mauto 4.
-  assert {{ Δ ⊢ #0[σ] ≈ #0[σ'] : A[Wk][σ] }} as <- by mauto 5.
+  assert {{ Δ ⊢ #0[σ] ≈ #0[σ'] : A[Wk][σ] }} as <- by mauto.
   eassumption.
 Qed.
 
