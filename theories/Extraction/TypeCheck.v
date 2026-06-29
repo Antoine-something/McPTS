@@ -492,8 +492,91 @@ Section type_check.
   Qed.
 
   Next Obligation.
+    
+    inversion 1.
+    assert (pat0 = s) by (eapply Func_ru_nat; mauto 2).
+    assert (s0 = s) by (eapply Func_ru_nat; mauto 2).
+    subst.
+    
   Admitted.
 
+  Inductive ctx_st_subtyp {P} : ctx P -> ctx P -> Prop :=
+  | css_nil : ctx_st_subtyp {{{ ⋅ }}} {{{ ⋅ }}}
+  | css_cons : forall Γ Γ' s s' A,
+      ctx_st_subtyp Γ Γ' ->
+      st_subtyp s s' ->
+      {{ Γ ⊢ A : Sort@s }} ->
+      {{ Γ' ⊢ A : Sort@s }} ->
+      ctx_st_subtyp {{{ Γ, A@s }}} {{{ Γ', A@s' }}}
+  .
+
+  #[local]
+   Hint Constructors ctx_st_subtyp : mcpts.
+  
+  Lemma ctx_st_subtyp_implies_wf_ctx {P} : forall {Γ Γ' : ctx P},
+      ctx_st_subtyp Γ Γ' ->
+      {{ ⊢ Γ }} /\ {{ ⊢ Γ' }}.
+  Proof.
+    induction 1; split; destruct_conjs; mauto 2.
+    assert {{ Γ' ⊢ Sort@s ⊆ Sort@s' }} by mauto 2.
+    mauto 3.
+  Qed.
+
+
+  #[local]
+    Ltac gen_ctx_st_subtyp_presup H :=
+    match type of H with
+    | ctx_st_subtyp ?Γ ?Γ' =>
+        let HΓ := fresh "HΓ" in
+        let HΓ' := fresh "HΓ'" in
+        pose proof ctx_st_subtyp_implies_wf_ctx H as [HΓ HΓ']
+    | _ => idtac
+    end.
+
+  Ltac gen_ctx_st_subtyp_presups := match_by_head ctx_st_subtyp ltac:(fun H => gen_ctx_st_subtyp_presup H).    
+  
+  Lemma ctx_st_subtyp_exp {P} : forall {Γ : ctx P} {M A}, {{ Γ ⊢ M : A }} -> forall {Δ}, ctx_st_subtyp Δ Γ -> {{ Δ ⊢ M : A }}.
+  Proof.
+    induction 1; intros;
+      gen_ctx_st_subtyp_presups;
+      mauto 3.
+    - assert {{ Δ ⊢ A : Sort@s1 }} by mauto 2.
+      assert (ctx_st_subtyp {{{ Δ, A@s1 }}} {{{ Γ, A@s1 }}}) by mauto 2.
+      assert {{ Δ, A@s1 ⊢ B : Sort@s2 }} by mauto 2.
+      mauto 2.
+
+    - assert {{ Δ ⊢ A : Sort@s1 }} by mauto 2.
+      assert (ctx_st_subtyp {{{ Δ, A@s1 }}} {{{ Γ, A@s1 }}}) by mauto 2.
+      assert {{ Δ, A@s1 ⊢ B : Sort@s2 }} by mauto 2.
+      assert {{ Δ, A@s1 ⊢ M : B }} by mauto 2.
+      mauto 2.
+      
+    - admit.
+    - admit.
+
+    - 
+      assert {{ Δ ⊢ ℕ : Sort@s }} by mauto 2.
+      assert (ctx_st_subtyp {{{ Δ, ℕ@s }}} {{{ Γ, ℕ@s }}}) by mauto 3.
+      assert {{ Δ, ℕ@s ⊢ A : Sort@s' }} by mauto 2.
+      assert (ctx_st_subtyp {{{ Δ, ℕ@s, A@s' }}} {{{ Γ, ℕ@s, A@s' }}}) by mauto 3.
+
+      assert {{ Δ ⊢ MZ : A[Id,,zero] }} by mauto 2.
+      assert {{ Δ ⊢ M : ℕ }} by mauto 2.
+      assert {{ Δ, ℕ@s, A@s' ⊢ MS : A[Wk∘Wk,,succ #1] }} by mauto 2.
+      mauto 2.
+
+    - admit. (* need another lemma for well-formed substitution *)
+      
+    - admit. (* need another lemma for subtyping *)
+  Admitted.
+  
+  Lemma ctx_st_subtyp_irrelevance {P} : forall {Γ Γ' : ctx P},
+      ctx_st_subtyp Γ Γ' ->
+      forall M A, {{ Γ' ⊢ M : A }} -> {{ Γ ⊢ M : A }}.
+  Proof.
+    induction 1; intros; mauto 2.
+    
+  
   Next Obligation.
     mautosolve 3.
   Qed.
