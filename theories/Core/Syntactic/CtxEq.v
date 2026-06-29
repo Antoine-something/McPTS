@@ -57,7 +57,7 @@ Proof with mautosolve.
   assert {{ ⊢ Γ ≈ Δ0 }} by mauto 2.
   econstructor; mauto 3.
   etransitivity; mauto 2.
-  eapply ctxeq_exp_eq; mauto 2.
+  eapply ctxeq_typ_eq; mauto 2.
 Qed.
 
 #[export]
