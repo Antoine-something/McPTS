@@ -72,7 +72,7 @@ Arguments a_extend {_}.
 
 
 Notation typ := (fun P => exp P).
-Notation ctx := (fun (P : PtsSig) => list (typ P * P)%type).
+Notation ctx := (fun (P : PtsSig) => list (typ P)%type).
 
 Fixpoint nat_to_exp {P : PtsSig} (n : nat) : exp P :=
   match n with
@@ -254,7 +254,7 @@ Module Syntax_Notations.
   Notation "'q' σ" := (q σ) (in custom exp at level 30) : mcpts_scope.
 
   Notation "⋅" := nil (in custom exp at level 0) : mcpts_scope.
-  Notation "Γ , A @ K" := (cons (A, K) Γ) (in custom exp at level 50, left associativity, format "Γ ,  A @ K") : mcpts_scope.
+  Notation "Γ , A" := (cons A Γ) (in custom exp at level 50, left associativity, format "Γ ,  A") : mcpts_scope.
 
   Notation "n{{{ x }}}" := x (at level 0, x custom nf at level 99, format "'n{{{'  x  '}}}'") : mcpts_scope.
   Notation "( x )" := x (in custom nf at level 0, x custom nf at level 60) : mcpts_scope.

@@ -5,8 +5,8 @@ Import Syntax_Notations.
 
 (** ** Basic Context Properties *)
 
-Lemma ctx_lookup_lt {P : PtsSig} : forall {Γ : ctx P} {A s x},
-    {{ #x : A@s ∈ Γ }} ->
+Lemma ctx_lookup_lt {P : PtsSig} : forall {Γ : ctx P} {A x},
+    {{ #x : A ∈ Γ }} ->
     x < length Γ.
 Proof.
   induction 1; simpl; lia.
@@ -14,13 +14,13 @@ Qed.
 #[export]
 Hint Resolve ctx_lookup_lt : mcpts.
 
-Lemma functional_ctx_lookup {P : PtsSig} : forall {Γ : ctx P} {A s A' s' x},
-    {{ #x : A@s ∈ Γ }} ->
-    {{ #x : A'@s' ∈ Γ }} ->
-    A = A' /\ s = s'.
+Lemma functional_ctx_lookup {P : PtsSig} : forall {Γ : ctx P} {A A' x},
+    {{ #x : A ∈ Γ }} ->
+    {{ #x : A' ∈ Γ }} ->
+    A = A'.
 Proof with mautosolve.
   intros * Hx Hx'; gen A'.
-  dependent induction Hx; intros; inversion_clear Hx'; split;
+  dependent induction Hx; intros; inversion_clear Hx'; 
     f_equal;
     intuition.
 Qed.
