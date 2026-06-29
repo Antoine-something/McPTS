@@ -1197,14 +1197,14 @@ Proof with (destruct_rel_typ; handle_per_sort_elem_irrel; eexists; intuition).
    try reflexivity.
   specialize (IHHorig _ _ equiv_Γ_Γ'0).
   intros ρ ρ'.
-  split; intros Hcons; dependent destruction Hcons;
+    split; intros Hcons; dependent destruction Hcons;
     [ assert {{ Dom ρ ↯ ≈ ρ' ↯ ∈ tail_rel0 }} by intuition
     | assert {{ Dom ρ ↯ ≈ ρ' ↯ ∈ tail_rel }} by intuition ];
-    assert (rel_typ pred_P s A _ A' _ (head_rel _ _ ltac:(eassumption))) by mauto 3;
-    assert (rel_typ pred_P s A _ A'0 _ (head_rel0 _ _ ltac:(eassumption))) by mauto 3;
-    inversion_clear_by_head (@rel_typ P);
+    assert (rel_typ_unsorted pred_P A _ A' _ (head_rel _ _ ltac:(eassumption))) by mauto 3;
+    assert (rel_typ_unsorted pred_P A _ A'0 _ (head_rel0 _ _ ltac:(eassumption))) by mauto 3;
+    inversion_clear_by_head (@rel_typ_unsorted P);
     simplify_evals;
-    handle_per_sort_elem_irrel;
+    handle_per_typ_elem_irrel;
     econstructor; mauto 3;
     intuition.
 Qed.
@@ -1222,7 +1222,7 @@ Proof with solve [intuition].
   - assert (tail_rel ρ' ρ) by eauto.
     assert (tail_rel ρ ρ) by (etransitivity; eassumption).
     destruct_rel_mod_eval.
-    handle_per_sort_elem_irrel.
+    handle_per_typ_elem_irrel.
     econstructor; eauto.
     symmetry...
   - apply_relation_equivalence.
@@ -1230,7 +1230,7 @@ Proof with solve [intuition].
     assert (tail_rel d{{{ ρ' ↯ }}} d{{{ ρ ↯ }}}) by eauto.
     assert (tail_rel d{{{ ρ ↯ }}} d{{{ ρ ↯ }}}) by (etransitivity; eassumption).
     destruct_rel_mod_eval.
-    handle_per_sort_elem_irrel.
+    handle_per_typ_elem_irrel.
     eexists; [eassumption | eassumption |].
     eapply H13.
     eapply (per_typ_elem_sym); mauto.
@@ -1336,9 +1336,7 @@ Proof with solve [eauto using per_sort_trans].
       destruct_rel_typ.
       handle_per_sort_elem_irrel.
       econstructor; mauto; intuition.
-      (** This one cannot be replaced with `etransitivity` as we need different `i`s. *)
-      do 3 (etransitivity; mauto).
-      symmetry; mauto.
+      eapply per_sort_trans; [|eassumption]; eassumption.
   - destruct_by_head (@cons_per_ctx_env P).
     assert (tail_rel d{{{ ρ ↯ }}} d{{{ ρ' ↯ }}}) by eauto.
     destruct_rel_typ.
@@ -1392,7 +1390,7 @@ Lemma per_ctx_env_cons' {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ Γ
     (forall {ρ ρ'} (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ tail_rel }}),
         rel_typ pred_P s A ρ A' ρ' (head_rel equiv_ρ_ρ')) ->
     (env_rel <~> cons_per_ctx_env tail_rel (@head_rel)) ->
-    {{ EF Γ, A@s ≈ Γ', A'@s ∈ per_ctx_env pred_P ↘ env_rel }}.
+    {{ EF Γ, A ≈ Γ', A' ∈ per_ctx_env pred_P ↘ env_rel }}.
 Proof.
   intros.
   econstructor; eauto.
@@ -1405,12 +1403,12 @@ Hint Resolve per_ctx_env_cons' : mcpts.
 Ltac per_ctx_env_econstructor :=
   (repeat intro; hnf; eapply per_ctx_env_cons') + econstructor.
 
-Lemma per_ctx_env_cons_clean_inversion {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ Γ' env_relΓ A A' env_relΓA s},
+Lemma per_ctx_env_cons_clean_inversion {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ Γ' env_relΓ A A' env_relΓA},
     {{ EF Γ ≈ Γ' ∈ per_ctx_env pred_P ↘ env_relΓ }} ->
-    {{ EF Γ, A@s ≈ Γ', A'@s ∈ per_ctx_env pred_P ↘ env_relΓA }} ->
+    {{ EF Γ, A ≈ Γ', A' ∈ per_ctx_env pred_P ↘ env_relΓA }} ->
     exists (head_rel : forall {ρ ρ'} (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}), relation (domain P)),
       (forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}),
-          rel_typ pred_P s A ρ A' ρ' (head_rel equiv_ρ_ρ')) /\
+          rel_typ_unsorted pred_P A ρ A' ρ' (head_rel equiv_ρ_ρ')) /\
         (env_relΓA <~> cons_per_ctx_env env_relΓ (@head_rel)).
 Proof with intuition.
   intros * HΓ HΓA.
@@ -1420,12 +1418,12 @@ Proof with intuition.
   split; intros.
   - instantiate (1 := fun ρ ρ' (equiv_ρ_ρ' : env_relΓ ρ ρ') m m' =>
                         forall R,
-                          rel_typ pred_P s A ρ A' ρ' R ->
+                          rel_typ_unsorted pred_P A ρ A' ρ' R ->
                           {{ Dom m ≈ m' ∈ R }}).
     assert (tail_rel ρ ρ') by intuition.
     (on_all_hyp: destruct_rel_by_assumption tail_rel).
     econstructor; eauto.
-    apply -> per_sort_elem_morphism_iff; eauto.
+    apply -> per_typ_elem_morphism_iff; eauto.
     split; intros...
     destruct_by_head (@rel_typ P).
     handle_per_sort_elem_irrel...

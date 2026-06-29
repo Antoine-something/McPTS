@@ -435,9 +435,9 @@ Section Per_ctx_env_def.
           (equiv_Γ_Γ' : {{ EF Γ ≈ Γ' ∈ per_ctx_env ↘ tail_rel }}),
           PER tail_rel ->
           (forall {ρ ρ'} (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ tail_rel }}),
-              rel_typ pred_P s A ρ A' ρ' (head_rel equiv_ρ_ρ')) ->
+              rel_typ_unsorted pred_P A ρ A' ρ' (head_rel equiv_ρ_ρ')) ->
           (env_rel <~> cons_per_ctx_env tail_rel (@head_rel)) ->
-          {{ EF Γ, A@s ≈ Γ', A'@s ∈ per_ctx_env ↘ env_rel }} }
+          {{ EF Γ, A ≈ Γ', A' ∈ per_ctx_env ↘ env_rel }} }
   .
 End Per_ctx_env_def.
 
@@ -467,9 +467,9 @@ Inductive per_ctx_subtyp `(pred_P : PredicativeSig P) : ctx P -> ctx P -> Prop :
             {{ ⟦ A ⟧ ρ ↘ a }} ->
             {{ ⟦ A' ⟧ ρ' ↘ a' }} ->
             {{ ⟪ pred_P ⟫ Sub a <: a' }}) ->
-        {{ EF Γ, A@s ≈ Γ, A@s ∈ per_ctx_env pred_P ↘ env_rel }} ->
-        {{ EF Γ', A'@s ≈ Γ', A'@s ∈ per_ctx_env pred_P ↘ env_rel' }} ->
-        {{ ⟪ pred_P ⟫ SubE Γ, A@s <: Γ', A'@s }} }
+        {{ EF Γ, A ≈ Γ, A ∈ per_ctx_env pred_P ↘ env_rel }} ->
+        {{ EF Γ', A' ≈ Γ', A' ∈ per_ctx_env pred_P ↘ env_rel' }} ->
+        {{ ⟪ pred_P ⟫ SubE Γ, A <: Γ', A' }} }
 where "⟪ pred_P ⟫ 'SubE' Γ <: Δ" := (per_ctx_subtyp pred_P Γ Δ) (in custom judg) : type_scope.
 
 #[export]
