@@ -179,7 +179,7 @@ Proof.
     do 2 eexists; repeat split; only 1-2: econstructor; eauto.
     apply_relation_equivalence.
     econstructor; mauto.
-    eapply per_bot_then_per_elem; eauto.
+    eapply per_bot_then_per_typ_elem; eauto.
     erewrite per_ctx_respects_length; mauto.
     eexists; eauto.
 Qed.
