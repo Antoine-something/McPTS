@@ -8,27 +8,27 @@ Import Domain_Notations.
 
 Open Scope list_scope.
 
-Lemma wf_ctx_sub_ctx_lookup {P} : forall n (A : typ P) s Γ,
-    {{ #n : A@s ∈ Γ }} ->
+Lemma wf_ctx_sub_ctx_lookup {P} : forall n (A : typ P) Γ,
+    {{ #n : A ∈ Γ }} ->
     forall Δ,
       {{ ⊢ Δ ⊆ Γ }} ->
       exists Δ1 A0 Δ2 A',
-        Δ = Δ1 ++ (A0, s) :: Δ2 /\
+        Δ = Δ1 ++ A0 :: Δ2 /\
           n = length Δ1 /\
           A' = iter (S n) (fun A => {{{ A[Wk] }}}) A0 /\
-          {{ #n : A'@s ∈ Δ }} /\
+          {{ #n : A' ∈ Δ }} /\
           {{ Δ ⊢ A' ⊆ A }}.
 Proof.
   induction 1; intros; progressive_inversion.
   - exists nil.
     repeat eexists; mauto 4.    
   - edestruct IHctx_lookup as [Δ1 [? [? [? [? [? [? []]]]]]]]; mauto.
-    exists ((A0, s') :: Δ1). subst.
+    exists (A0 :: Δ1). subst.
     repeat eexists; mauto 4.
 Qed.
 
-Lemma var_arith {P} : forall (Γ1 Γ2 : ctx P) (A : typ P) s,
-    length (Γ1 ++ (A, s) :: Γ2) - length Γ2 - 1 = length Γ1.
+Lemma var_arith {P} : forall (Γ1 Γ2 : ctx P) (A : typ P),
+    length (Γ1 ++ A :: Γ2) - length Γ2 - 1 = length Γ1.
 Proof.
   intros.
   rewrite List.length_app.
@@ -38,34 +38,34 @@ Qed.
 
 Lemma var_weaken_gen {P} : forall (Δ : ctx P) (σ : sub P) (Γ : ctx P),
     {{ Δ ⊢w σ : Γ }} ->
-    forall Γ1 Γ2 A0 s0,
-      Γ = Γ1 ++ (A0, s0) :: Γ2 ->
+    forall Γ1 Γ2 A0,
+      Γ = Γ1 ++ A0 :: Γ2 ->
       {{ Δ ⊢ #(length Γ1)[σ] ≈ #(length Δ - length Γ2 - 1) : ^(iter (S (length Γ1)) (fun A => {{{ A[Wk] }}}) A0)[σ] }}.
 Proof.
   induction 1; intros; subst; gen_presups.
-  - pose proof (app_ctx_vlookup _ _ _ _ _ ltac:(eassumption) eq_refl) as Hvar.
+  - pose proof (app_ctx_vlookup _ _ _ _ ltac:(eassumption) eq_refl) as Hvar.
 
     (* gen_presup Hvar. *)
-    pose proof (app_ctx_lookup Γ1 A0 Γ2 (length Γ1) s0 ltac:(reflexivity)).
-    assert {{ ⊢ ^ (app Γ1 {{{ Γ2, A0@s0 }}}) }} by mauto.
+    pose proof (app_ctx_lookup Γ1 A0 Γ2 (length Γ1) ltac:(reflexivity)).
+    assert {{ ⊢ ^ (app Γ1 {{{ Γ2, A0 }}}) }} by mauto.
     pose proof (presup_ctx_lookup_typ H1 H0).
-    assert {{ ^(app Γ1 {{{ Γ2, A0@s0 }}}) ⊢ ^(iter (S (length Γ1)) (fun T : exp P => {{{ T[Wk] }}}) A0) }} by (eapply presup_exp_typ; mauto).
+    assert {{ ^(app Γ1 {{{ Γ2, A0 }}}) ⊢ ^(iter (S (length Γ1)) (fun T : exp P => {{{ T[Wk] }}}) A0) }} by (eapply presup_exp_typ; mauto).
     clear_dups.
     apply wf_sub_id_inversion in Hτ.
     pose proof (wf_ctx_sub_length _ _ Hτ).
     transitivity {{{ #(length Γ1)[^(@a_id P)] }}}; mauto 3.
-    replace (length Γ) with (length (Γ1 ++ {{{ Γ2, A0@s0 }}})) by lia.
+    replace (length Γ) with (length (Γ1 ++ {{{ Γ2, A0 }}})) by lia.
     rewrite var_arith.
     eapply wf_exp_eq_conv'; [eapply wf_exp_eq_sub_id; mauto 3 |].
     transitivity {{{ ^(iter (S (length Γ1)) (fun T : exp P => {{{ T[Wk] }}}) A0)[Id] }}}; mauto.
 
-  - pose proof (app_ctx_vlookup _ _ _ _ _ HΔ0 eq_refl) as Hvar.
-    pose proof (app_ctx_lookup Γ1 A0 Γ2 _ s0 eq_refl).
+  - pose proof (app_ctx_vlookup _ _ _ _ HΔ0 eq_refl) as Hvar.
+    pose proof (app_ctx_lookup Γ1 A0 Γ2 _ eq_refl).
 
     (* gen_presup Hvar. *)
     clear_dups.
-    assert {{ ⊢ Δ', A@s }} by mauto 3.
-    assert {{ Δ', A@s ⊢s Wk : ^(Γ1 ++ {{{ Γ2, A0@s0 }}}) }} by mauto 3.
+    assert {{ ⊢ Δ', A }} by mauto 3.
+    assert {{ Δ', A ⊢s Wk : ^(Γ1 ++ {{{ Γ2, A0 }}}) }} by mauto 3.
     transitivity {{{ #(length Γ1)[Wk∘τ] }}}; [mauto 5 |].
     assert {{ Γ ⊢ ^ (iter (S (length Γ1)) (fun A1 : exp P => {{{ A1[Wk] }}}) A0)[Wk∘τ] ≈ ^ (iter (S (length Γ1)) (fun A1 : exp P => {{{ A1[Wk] }}}) A0)[σ] }} by mauto 5.
     eapply wf_exp_eq_conv'; mauto 2.
@@ -82,10 +82,9 @@ Proof.
     repeat rewrite List.length_app in *.
 
     etransitivity.
-    + assert {{ ⊢ ^ (app Γ1' {{{ Γ2',x@s0 }}}) }} by mauto 3.
+    + assert {{ ⊢ ^ (app Γ1' {{{ Γ2',x }}}) }} by mauto 3.
       eapply wf_exp_eq_sub_cong_typ; [| eapply wf_exp_eq_conv |mauto 3].
-      * econstructor; mauto 2.
-        eapply wf_exp_sort_sub; mauto 2.
+      * mauto 3.
       * eapply wf_exp_eq_var_weaken; [mauto 3|]; eauto.
       * eapply wf_typ_sort_sub; mauto 3.
       * eapply wf_subtyp_sub; mauto 3.
@@ -94,10 +93,10 @@ Proof.
       clear_refl_eqs.
       replace (length Γ2) with (length Γ2') by (simpl in *; lia).
       eapply wf_exp_eq_conv.
-      * eapply IHweakening with (Γ1 := (A, s) :: _).
+      * eapply IHweakening with (Γ1 := A :: _).
         reflexivity.
       * eapply wf_typ_sort_sub; mauto 2.
-        assert {{ ^(app Γ1' {{{ Γ2', x@s0 }}}), A@s ⊢s Wk : ^(app Γ1' {{{ Γ2', x@s0 }}}) }} by mauto 3.
+        assert {{ ^(app Γ1' {{{ Γ2', x }}}), A ⊢s Wk : ^(app Γ1' {{{ Γ2', x }}}) }} by mauto 3.
         eapply wf_typ_sort_sub; mauto 2.
       * eapply wf_subtyp_sub; mauto 2.
         simpl.
@@ -107,15 +106,16 @@ Qed.
 Lemma var_glu_elem_bot {P} (pred_P : PredicativeSig P) : forall a s typ_rel exp_rel Γ A,
     {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
     {{ Γ ⊢ A ® typ_rel }} ->
-    {{ Γ, A@s ⊢ #0 : A[Wk] ® !(length Γ) ∈ glu_elem_bot pred_P s a }}.
+    {{ Γ, A ⊢ #0 : A[Wk] ® !(length Γ) ∈ glu_elem_bot pred_P s a }}.
 Proof.
   intros. saturate_glu_info.
-  econstructor; mauto 4.
-  - eapply glu_sort_elem_typ_monotone; eauto.
-    assert {{ ⊢ Γ, A@s }} by mauto 3.
+  econstructor; mauto 5.
+  - eapply glu_sort_elem_typ_monotone; mauto 3.
+    assert {{ ⊢ Γ, A }} by mauto 4.
     eapply weakening_wk; mauto 3.
-  - intros. progressive_inversion.
-    exact (var_weaken_gen _ _ _ H2 nil _ _ _ eq_refl).
+  - intros.
+    progressive_inversion.
+    exact (var_weaken_gen _ _ _ H2 nil _ _ eq_refl).
 Qed.
 
 #[local]
@@ -218,20 +218,20 @@ Proof.
       assert (per_sort_elem pred_P s2 (out_rel d{{{ ⇑! a (length Δ) }}} d{{{ ⇑! a (length Δ) }}} H29) b b) by (destruct_conjs; pose proof ord_ru_pi_sub pred_P r sub_s3_s as [? []]; subst; mauto 2).
       
       (* destruct (H2 _ ltac:(eassumption) _ ltac:(eassumption)) as [? []]. *)
-      assert (IEL {{{ Δ, IT[σ]@s1 }}} {{{ IT[σ][Wk] }}} {{{ #0 }}} d{{{ ⇑! a (length Δ) }}}) by mauto 3 using var_glu_elem_bot.
-      assert {{ Δ, IT[σ]@s1 ⊢ IT[σ][Wk] ≈ IT[σ∘Wk] : Sort@s1 }}.
+      assert (IEL {{{ Δ, IT[σ] }}} {{{ IT[σ][Wk] }}} {{{ #0 }}} d{{{ ⇑! a (length Δ) }}}) by mauto 3 using var_glu_elem_bot.
+      assert {{ Δ, IT[σ] ⊢ IT[σ][Wk] ≈ IT[σ∘Wk] : Sort@s1 }}.
       {
         symmetry.
         eapply exp_eq_sub_compose_typ_sort; mauto.
       }
-      assert (IEL {{{ Δ,IT[σ]@s1 }}} {{{ IT[σ∘Wk] }}} {{{ #0 }}} d{{{ ⇑! a (length Δ) }}}) by (eapply glu_sort_elem_trm_resp_typ_exp_eq; mauto 2).
-      assert {{ Δ, IT[σ]@s1 ⊢w σ∘Wk : Γ }} by mauto 4.
+      assert (IEL {{{ Δ,IT[σ] }}} {{{ IT[σ∘Wk] }}} {{{ #0 }}} d{{{ ⇑! a (length Δ) }}}) by (eapply glu_sort_elem_trm_resp_typ_exp_eq; mauto 2).
+      assert {{ Δ, IT[σ] ⊢w σ∘Wk : Γ }} by mauto 4.
 
       assert (in_rel d{{{ ⇑! a (length Δ) }}} d{{{ ⇑! a (length Δ) }}}) by intuition.
       specialize (H1 d{{{ ⇑! a (length Δ) }}} ltac:(eassumption) b ltac:(eassumption)).
       specialize (H2 d{{{ ⇑! a (length Δ) }}} ltac:(eassumption) b ltac:(eassumption)) as [? []].
       
-      specialize (H15 {{{ Δ, IT[σ]@s1 }}} {{{ σ∘Wk }}} _ _ ltac:(mauto) ltac:(eassumption) ltac:(intuition)).
+      specialize (H15 {{{ Δ, IT[σ] }}} {{{ σ∘Wk }}} _ _ ltac:(mauto) ltac:(eassumption) ltac:(intuition)).
 
       specialize (H2 _ _ _ H0 H15) as [].
       etransitivity; [| eapply H42]; mauto 3.
@@ -270,7 +270,7 @@ Proof.
       destruct (H15 _ _ _ _ _ ltac:(eassumption) ltac:(eassumption) ltac:(eassumption) H0).
       handle_functional_glu_sort_elem P.
 
-      assert {{ Δ0 ⊢ OT[σ∘σ0,,N[σ0]] ≈ OT[σ,,N][σ0] : Sort@s2 }} by (transitivity {{{ OT[(σ,,N)∘σ0] }}}; mauto 4).
+      assert {{ Δ0 ⊢ OT[σ∘σ0,,N[σ0]] ≈ OT[σ,,N][σ0] : Sort@s2 }} by (transitivity {{{ OT[(σ,,N)∘σ0] }}}; mauto 5).
       enough {{ Δ0 ⊢ (M[σ] N)[σ0] ≈ ^ n{{{ M0 N0 }}} : OT[σ∘σ0,,N[σ0]] }} by mauto.
 
       etransitivity.
@@ -291,13 +291,13 @@ Proof.
           assert {{ Δ0 ⊢ IT[σ][σ0][Id] ≈ IT[σ][σ0] : Sort@s1 }} by mauto 4.
           assert {{ Δ0 ⊢ N[σ0] : IT[σ][σ0] }} by mauto 4.
           assert {{ Δ0 ⊢ N[σ0] : IT[σ][σ0][Id] }} by mauto 3.
-          assert {{ Δ0 ⊢s Id,,N[σ0] : Δ0, IT[σ][σ0]@s1 }} by mauto 4.
+          assert {{ Δ0 ⊢s Id,,N[σ0] : Δ0, IT[σ][σ0] }} by mauto 5.
           assert {{ Δ0 ⊢s σ∘σ0 : Γ }} by mauto 2.
-          assert {{ Δ0, IT[σ∘σ0]@s1 ⊢s q (σ∘σ0) : Γ, IT@s1 }} by mauto 4.
+          assert {{ Δ0, IT[σ∘σ0] ⊢s q (σ∘σ0) : Γ, IT }} by mauto 4.
           assert {{ Δ0 ⊢ IT[σ∘σ0] ≈ IT[σ][σ0] : Sort@s1 }} by mauto 3.
           assert {{ ⊢ Δ0 }} by mauto 2.
-          assert {{ ⊢ Δ0, IT[σ][σ0]@s1 ≈ Δ0, IT[σ∘σ0]@s1 }} by mauto 4.
-          assert {{ Δ0 ⊢s Id,,N[σ0] : Δ0, IT[σ∘σ0]@s1 }} by mauto 4.
+          assert {{ ⊢ Δ0, IT[σ][σ0] ≈ Δ0, IT[σ∘σ0] }} by mauto 5.
+          assert {{ Δ0 ⊢s Id,,N[σ0] : Δ0, IT[σ∘σ0] }} by mauto 4.
           eapply exp_eq_sub_compose_typ_sort; mauto 2.
         }
 
@@ -337,7 +337,7 @@ Proof.
       autorewrite with mcpts in H31.
       assert {{ Δ ⊢ A[σ] ≈ (Π r IT OT)[σ] : Sort@s }} as -> by mauto 3.
       rewrite -> H10 in *.      
-      assert {{ Γ, IT@s1 ⊢ OT : Sort@s2 }} by mauto 3.
+      assert {{ Γ, IT ⊢ OT : Sort@s2 }} by mauto 3.
       
       assert {{ Δ ⊢ (Π r IT OT)[σ] ≈ Π r IT[σ] OT[q σ] : Sort@s }} by (econstructor; mauto 3).
       assert {{ Δ ⊢ M[σ] : (Π r IT OT)[σ] }} by mauto 4.
@@ -355,10 +355,10 @@ Proof.
       
       destruct (H2 _ ltac:(eassumption) _ ltac:(eassumption)) as [? []].
       specialize (H12 _ _ _ _ ltac:(trivial) (var_glu_elem_bot _ _ _ _ _ _ _ H H32)).
-      assert {{ Δ, IT[σ]@s1 ⊢ IT[σ∘Wk] ≈ IT[σ][Wk] : Sort@s1 }} by (eapply exp_eq_sub_compose_typ_sort; mauto 4).
+      assert {{ Δ, IT[σ] ⊢ IT[σ∘Wk] ≈ IT[σ][Wk] : Sort@s1 }} by (eapply exp_eq_sub_compose_typ_sort; mauto 4).
       rewrite <- H43 in H12.
       
-      specialize (H17 {{{ Δ, IT[σ]@s1 }}} {{{ σ∘Wk }}} _ _ ltac:(mauto) ltac:(eassumption) ltac:(eassumption)) as [? []].
+      specialize (H17 {{{ Δ, IT[σ] }}} {{{ σ∘Wk }}} _ _ ltac:(mauto) ltac:(eassumption) ltac:(eassumption)) as [? []].
       apply_equiv_left.
       destruct_rel_mod_app.
       simplify_evals.
@@ -371,20 +371,19 @@ Proof.
       eapply wf_exp_eq_fn_cong'; mauto 3.
       * etransitivity; [|eassumption].
         simpl.
-        assert {{ Δ, IT[σ]@s1 ⊢s σ∘Wk : Γ }} by mauto 4.
-        assert {{ Δ, IT[σ]@s1 ⊢ #0 : IT[σ∘Wk] }} by (rewrite <- @exp_eq_sub_compose_typ_sorted; mauto 3).
+        assert {{ Δ, IT[σ] ⊢s σ∘Wk : Γ }} by mauto 4.
+        assert {{ Δ, IT[σ] ⊢ #0 : IT[σ∘Wk] }} by (rewrite <- @exp_eq_sub_compose_typ_sorted; mauto 3).
         rewrite <- @sub_eq_q_sigma_id_extend; mauto 4.
-        rewrite <- @exp_eq_sub_compose_typ_sorted; mauto 2.
-        ** eapply wf_exp_eq_app_cong'; [| mauto 3].
-           symmetry.
-           rewrite <- wf_exp_eq_pi_sub; mauto 4.
-           eapply wf_exp_eq_sub_compose_typ; mauto 3.
-        ** mauto 3.
-       
+        rewrite <- @exp_eq_sub_compose_typ_sorted; mauto 4.
+        eapply wf_exp_eq_app_cong'; [| mauto 3].
+        symmetry.
+        rewrite <- wf_exp_eq_pi_sub; mauto 4.
+        eapply wf_exp_eq_sub_compose_typ; mauto 3.
+             
       * handle_functional_glu_sort_elem P.
-        assert {{ Δ, IT[σ]@s1 ⊢w Id : Δ, IT[σ]@s1 }} by mauto 3.
-        assert {{ Δ, IT[σ]@s1 ⊢ OT[σ∘Wk,,#0] ® glu_typ_top pred_P s2 b }}  as [] by mauto 3.
-        assert ({{ Δ, IT[σ]@s1 ⊢ OT[σ∘Wk,,#0][Id] ≈ B' : Sort@s2 }}) by mauto 4.
+        assert {{ Δ, IT[σ] ⊢w Id : Δ, IT[σ] }} by mauto 3.
+        assert {{ Δ, IT[σ] ⊢ OT[σ∘Wk,,#0] ® glu_typ_top pred_P s2 b }}  as [] by mauto 3.
+        assert ({{ Δ, IT[σ] ⊢ OT[σ∘Wk,,#0][Id] ≈ B' : Sort@s2 }}) by mauto 4.
         mauto 4.
       (* * gen_presup H50; econstructor; mauto 3. *)
         
@@ -541,7 +540,7 @@ Hint Resolve realize_glu_typ_top realize_glu_elem_top : mcpts.
 Corollary var0_glu_elem {P} (pred_P : PredicativeSig P) : forall {s a typ_rel exp_rel Γ A},
     {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
     {{ Γ ⊢ A ® typ_rel }} ->
-    {{ Γ, A@s ⊢ #0 : A[Wk] ® ⇑! a (length Γ) ∈ exp_rel }}.
+    {{ Γ, A ⊢ #0 : A[Wk] ® ⇑! a (length Γ) ∈ exp_rel }}.
 Proof.
   intros.
   eapply realize_glu_elem_bot; mauto 4.

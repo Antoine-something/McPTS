@@ -87,9 +87,9 @@ Proof.
   mauto.
 Qed.
 
-Lemma weakening_wk {P} : forall (Γ : ctx P) A s,
-    {{ ⊢ Γ, A@s }} ->
-    {{ Γ, A@s ⊢w Wk : Γ }}.
+Lemma weakening_wk {P} : forall (Γ : ctx P) A,
+    {{ ⊢ Γ, A }} ->
+    {{ Γ, A ⊢w Wk : Γ }}.
 Proof.
   intros.
   eapply wk_p; mauto 3.

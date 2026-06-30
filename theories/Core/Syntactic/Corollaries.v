@@ -643,3 +643,44 @@ Qed.
 
 #[export]
 Hint Resolve exp_eq_typ_q_sigma_then_weak_weak_extend_succ_var_1 : mcpts.
+
+Lemma ctx_eq_extend_wf_exp {P} : forall {Γ Δ : ctx P} {A B M},
+    {{ ⊢ Γ ≈ Δ }} ->
+    {{ Γ, A ⊢ M : B }} ->
+    {{ Δ, A ⊢ M : B }}.
+Proof.
+  intros; gen_presups; mauto 5.
+Qed.
+
+#[export]
+ Hint Resolve ctx_eq_extend_wf_exp : mcpts.
+
+Lemma sub_ctx_extend_wf_exp {P} : forall {Γ Δ : ctx P} {σ A B M},
+    {{ Γ ⊢s σ : Δ }} ->
+    {{ Δ, A ⊢ M : B }} ->
+    {{ Γ, A[σ] ⊢ M[q σ] : B[q σ] }}.
+Proof.
+  intros; gen_presups; mauto 5.
+Qed.
+
+#[export]
+ Hint Resolve sub_ctx_extend_wf_exp : mcpts.
+
+Lemma sub_ctx_extend_wf_exp_sort {P} : forall {Γ Δ : ctx P} {σ s A M},
+    {{ Γ ⊢s σ : Δ }} ->
+    {{ Δ, A ⊢ M : Sort@s }} ->
+    {{ Γ, A[σ] ⊢ M[q σ] : Sort@s }}.
+Proof.
+  intros; gen_presups; mauto 4.
+Qed.
+
+#[export]
+ Hint Resolve sub_ctx_extend_wf_exp_sort : mcpts.
+
+Lemma t {P} : forall {Γ Δ : ctx P} {s σ σ' A},
+    {{ Γ ⊢s σ ≈ σ' : Δ }} ->
+    {{ Γ ⊢ A[σ] : Sort@s }} ->
+    {{ Γ ⊢ A[σ] ≈ A[σ'] : Sort@s }}.
+Proof. 
+  intros.
+  
