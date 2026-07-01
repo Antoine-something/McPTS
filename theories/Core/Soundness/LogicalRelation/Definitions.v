@@ -607,7 +607,7 @@ Inductive glu_ctx_env {P} (pred_P : PredicativeSig P) : ctx_anns P -> glu_sub_pr
             {{ Δ ⊢s σ ® ρ ∈ TSb }} ->
             glu_rel_typ_with_sub_unsorted pred_P (Some s) Δ A σ ρ) ->
         Sb <∙> cons_glu_sub_pred pred_P (Some s) Γ A TSb ->
-        {{ EG Γ,A ∈ glu_ctx_env pred_P ((Some s) :: ans) ↘ Sb }} }
+        {{ EG Γ,A ∈ glu_ctx_env pred_P ((Some s) :: anns) ↘ Sb }} }
 | glu_ctx_env_cons_unsorted :
   `{ forall TSb Sb,
         glu_ctx_env pred_P anns TSb Γ ->
@@ -617,7 +617,7 @@ Inductive glu_ctx_env {P} (pred_P : PredicativeSig P) : ctx_anns P -> glu_sub_pr
             {{ Δ ⊢s σ ® ρ ∈ TSb }} ->
             glu_rel_typ_with_sub_unsorted pred_P None Δ A σ ρ) ->
         Sb <∙> cons_glu_sub_pred pred_P None Γ A TSb ->
-        {{ EG Γ,A ∈ glu_ctx_env pred_P (None :: ans) ↘ Sb }} }.
+        {{ EG Γ,A ∈ glu_ctx_env pred_P (None :: anns) ↘ Sb }} }.
 
 
 (** Logical relation for contexts *)

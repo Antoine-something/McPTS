@@ -373,6 +373,7 @@ with wf_subtyp {P : PtsSig} : ctx P -> typ P -> typ P -> Prop :=
   `( {{ Γ ⊢ A ⊆ B }} ->
      {{ Γ ⊢ B ⊆ C }} ->
      {{ Γ ⊢ A ⊆ C }} )
+(* This rule should use Ax_sub P s1 s2 instead, and we should prove the form with st_subtyp s1 s2 as a lemma early on *)
 | wf_subtyp_sort_sub :
   `( {{ ⊢ Γ }} ->
      st_subtyp s1 s2 ->
@@ -403,6 +404,7 @@ with wf_typ {P : PtsSig} : ctx P -> typ P -> Prop :=
 where "Γ ⊢ A" := (wf_typ Γ A) (in custom judg) : type_scope
 
 with wf_typ_eq {P : PtsSig} : ctx P -> typ P -> typ P -> Prop :=
+(* This rule should be admissible *)
 | wf_typ_eq_refl :
   `( {{ Γ ⊢ A }} ->
      {{ Γ ⊢ A ≈ A }} )
@@ -416,6 +418,7 @@ with wf_typ_eq {P : PtsSig} : ctx P -> typ P -> typ P -> Prop :=
   `( {{ Γ ⊢ A ≈ B }} ->
      {{ Γ ⊢ B ≈ C }} ->
      {{ Γ ⊢ A ≈ C }} )
+(* This rules should be admissible *)
 | wf_typ_eq_sub_id :
   `( {{ Γ ⊢ A }} ->
      {{ Γ ⊢ A[Id] ≈ A }} )
