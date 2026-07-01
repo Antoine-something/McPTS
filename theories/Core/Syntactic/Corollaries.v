@@ -676,11 +676,4 @@ Qed.
 
 #[export]
  Hint Resolve sub_ctx_extend_wf_exp_sort : mcpts.
-
-Lemma t {P} : forall {Γ Δ : ctx P} {s σ σ' A},
-    {{ Γ ⊢s σ ≈ σ' : Δ }} ->
-    {{ Γ ⊢ A[σ] : Sort@s }} ->
-    {{ Γ ⊢ A[σ] ≈ A[σ'] : Sort@s }}.
-Proof. 
-  intros.
   

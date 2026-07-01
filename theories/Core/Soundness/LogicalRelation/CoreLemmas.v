@@ -460,6 +460,32 @@ Proof.
 Qed.
 
 
+
+Lemma glu_typ_elem_trm_resp_exp_eq {P} (pred_P : PredicativeSig P) : forall so typ_rel exp_rel a,
+    {{ DG a ∈ glu_typ_elem pred_P so ↘ typ_rel ↘ exp_rel }} ->
+    forall Γ A M m M',
+      {{ Γ ⊢ M : A ® m ∈ exp_rel }} ->
+      {{ Γ ⊢ M ≈ M' : A }} ->
+      {{ Γ ⊢ M' : A ® m ∈ exp_rel }}.
+Proof.
+  simpl.
+  inversion_clear 1; intros; [| eapply glu_sort_elem_trm_resp_exp_eq; mauto 2];
+    simpl_glu_rel;
+    repeat split; mauto 3.
+  repeat eexists; mauto 2.
+  eapply glu_sort_elem_typ_resp_exp_eq; mauto 2.
+Qed.  
+    
+
+Add Parametric Morphism {P} (pred_P : PredicativeSig P) so typ_rel exp_rel a (H : glu_typ_elem pred_P so typ_rel exp_rel a) Γ T : (exp_rel Γ T)
+    with signature wf_exp_eq Γ T ==> eq ==> iff as glu_typ_elem_trm_morphism_iff3.
+Proof.
+  split; intros;
+    eapply glu_typ_elem_trm_resp_exp_eq;
+    mauto 2.
+Qed.
+
+
 Lemma glu_sort_elem_core_sort' {P} (pred_P : PredicativeSig P) : forall s'' s' s typ_rel exp_rel,
     Ax_typ P s'' s' ->
     st_subtyp s' s ->
@@ -737,6 +763,47 @@ Ltac handle_functional_glu_sort_elem P :=
   apply_functional_glu_sort_elem;
   apply_predicate_equivalence;
   clear_dups.
+
+
+Lemma functional_glu_typ_elem {P} (pred_P : PredicativeSig P) : forall so a typ_rel typ_rel' exp_rel exp_rel',
+    {{ DG a ∈ glu_typ_elem pred_P so ↘ typ_rel ↘ exp_rel }} ->
+    {{ DG a ∈ glu_typ_elem pred_P so ↘ typ_rel' ↘ exp_rel' }} ->
+    (typ_rel <∙> typ_rel') /\ (exp_rel <∙> exp_rel').
+Proof.
+  simpl.
+  intros * Ha Ha'.
+  inversion Ha; subst;
+    inversion_clear Ha'; [ | eapply functional_glu_sort_elem; mauto 2].
+  split; etransitivity; try eassumption;
+    symmetry; eassumption.
+Qed.
+
+Ltac apply_functional_glu_typ_elem1 :=
+  let tactic_error o1 o2 := fail 2 "functional_glu_sort_elem biconditional between" o1 "and" o2 "cannot be solved" in
+  match goal with
+  | H1 : {{ DG ^?a ∈ glu_typ_elem ?pred_P ?so ↘ ?typ_rel1 ↘ ?exp_rel1 }},
+      H2 : {{ DG ^?a ∈ glu_typ_elem ?pred_P ?so ↘ ?typ_rel2 ↘ ?exp_rel2 }} |- _ =>
+      match goal with
+      | H : typ_rel1 <∙> typ_rel2, H0 : exp_rel1 <∙> exp_rel2 |- _ => fail 1
+      | H : typ_rel1 <∙> typ_rel2, H0 : exp_rel2 <∙> exp_rel1 |- _ => fail 1
+      | H : typ_rel2 <∙> typ_rel1, H0 : exp_rel1 <∙> exp_rel2 |- _ => fail 1
+      | H : typ_rel2 <∙> typ_rel1, H0 : exp_rel2 <∙> exp_rel1 |- _ => fail 1
+      | _ => assert ((typ_rel1 <∙> typ_rel2) /\ (exp_rel1 <∙> exp_rel2)) as [] by (eapply functional_glu_typ_elem; [apply H1 | apply H2]) || tactic_error typ_rel1 typ_rel2
+      end
+  end.
+
+Ltac apply_functional_glu_typ_elem :=
+  repeat apply_functional_glu_typ_elem1.
+
+Ltac handle_functional_glu_typ_elem P :=
+  functional_eval_rewrite_clear;
+  fold (glu_typ_pred P) in *;
+  fold (glu_exp_pred P) in *;
+  apply_functional_glu_typ_elem;
+  apply_predicate_equivalence;
+  clear_dups.
+
+
 
 Lemma glu_sort_elem_pi_clean_inversion1 {P} (pred_P : PredicativeSig P) : forall {s1 s2 s3 s a ρ B in_rel typ_rel exp_rel} {r : Ru_pi P s1 s2 s3} (sub_s3_s : st_subtyp s3 s),
   {{ DF a ≈ a ∈ per_sort_elem pred_P s1 ↘ in_rel }} ->
