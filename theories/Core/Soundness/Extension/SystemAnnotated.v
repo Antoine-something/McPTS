@@ -7,127 +7,127 @@ From McPTS.Core.Soundness Require Import LogicalRelation.
 Import Syntax_Notations.
 
 
-Reserved Notation "⊫ Γ" (in custom judg at level 80, Γ custom exp).
-Reserved Notation "Γ ⊫ M : A @ s" (in custom judg at level 80, Γ custom exp, M custom exp, A custom exp, s custom exp).
-Reserved Notation "Γ ⊫ A @ s" (in custom judg at level 80, Γ custom exp, A custom exp, s custom exp).
-Reserved Notation "Γ ⊫s σ : Δ" (in custom judg at level 80, Γ custom exp, σ custom exp, Δ custom exp).
+Reserved Notation "⊫ Γ 'with' anns" (in custom judg at level 80, Γ custom exp, anns constr).
+Reserved Notation "Γ 'with' anns ⊫ M : A @ s" (in custom judg at level 80, Γ custom exp, anns constr, M custom exp, A custom exp, s custom exp).
+Reserved Notation "Γ 'with' anns ⊫ A @ s" (in custom judg at level 80, Γ custom exp, anns constr, A custom exp, s custom exp).
+Reserved Notation "Γ 'with' anns ⊫s σ : Δ 'with' anns'" (in custom judg at level 80, Γ custom exp, anns constr, σ custom exp, Δ custom exp, anns' constr).
 
 Generalizable All Variables.
 
-Inductive wf_ctx_ann {P} : ctx P -> Prop :=
-| wfa_ctx_empty : {{ ⊫ ⋅ }}
+Inductive wf_ctx_ann {P} : ctx_anns P -> ctx P -> Prop :=
+| wfa_ctx_empty : {{ ⊫ ⋅ with nil}}
 | wfa_ctx_enxtend :
-  `( {{ ⊫ Γ }} ->
-     {{ Γ ⊫ A : Sort@s @ s' }} ->
-     {{ ⊫ Γ, A@s }} )
-where "⊫ Γ" := (wf_ctx_ann Γ) (in custom judg) : type_scope
-with wf_exp_ann {P} : ctx P -> typ P -> SortOption P -> exp P -> Prop :=
+  `( {{ ⊫ Γ with anns }} ->
+     {{ Γ with anns ⊫ A @ so }} ->
+     {{ ⊫ Γ, A with so::anns }} )
+where "⊫ Γ 'with' anns" := (wf_ctx_ann anns Γ) (in custom judg) : type_scope
+with wf_exp_ann {P} : ctx_anns P -> ctx P -> typ P -> SortOption P -> exp P -> Prop :=
 (** Sorts *)
 | wfa_st :
   `( Ax_typ P s1 s2 ->
-     {{ ⊫ Γ }} ->
-     {{ Γ ⊫ Sort@s1 : Sort@s2 @ ^None }} )
+     {{ ⊫ Γ with anns }} ->
+     {{ Γ with anns ⊫ Sort@s1 : Sort@s2 @ ^None }} )
 
 (** Functions *)
 | wfa_pi :
   `( forall (r : Ru_pi P s1 s2 s3),
-        {{ Γ ⊫ A : Sort@s1 @ so1 }} ->
-        {{ Γ, A@s1 ⊫ B : Sort@s2 @ so2 }} ->
-        {{ Γ ⊫ Π r A B : Sort@s3 @ ^None }} )
+        {{ Γ with anns ⊫ A : Sort@s1 @ so1 }} ->
+        {{ Γ, A with (Some s1)::anns ⊫ B : Sort@s2 @ so2 }} ->
+        {{ Γ with anns ⊫ Π r A B : Sort@s3 @ ^None }} )
 | wfa_fn :
   `( forall (r : Ru_pi P s1 s2 s3),
-        {{ Γ ⊫ A : Sort@s1 @ so1 }} ->
-        {{ Γ, A@s1 ⊫ B : Sort@s2 @ so2 }} ->
-        {{ Γ, A@s1 ⊫ M : B @ ^(Some s2) }} ->
-        {{ Γ ⊫ λ r A B M : Π r A B @ ^(Some s3) }} )
+        {{ Γ with anns ⊫ A : Sort@s1 @ so1 }} ->
+        {{ Γ, A with (Some s1)::anns ⊫ B : Sort@s2 @ so2 }} ->
+        {{ Γ, A with (Some s1)::anns ⊫ M : B @ ^(Some s2) }} ->
+        {{ Γ with anns ⊫ λ r A B M : Π r A B @ ^(Some s3) }} )
 | wfa_app :
   `( forall (r : Ru_pi P s1 s2 s3),
-        {{ Γ ⊫ A : Sort@s1 @ so1 }} ->
-        {{ Γ, A@s1 ⊫ B : Sort@s2 @ so2 }} ->
-        {{ Γ ⊫ M : Π r A B @ ^(Some s3) }} ->
-        {{ Γ ⊫ N : A @ ^(Some s1) }} ->
-        {{ Γ ⊫ M N : B[Id,,N] @ ^(Some s2) }} )
+        {{ Γ with anns ⊫ A : Sort@s1 @ so1 }} ->
+        {{ Γ, A with (Some s1)::anns ⊫ B : Sort@s2 @ so2 }} ->
+        {{ Γ with anns ⊫ M : Π r A B @ ^(Some s3) }} ->
+        {{ Γ with anns ⊫ N : A @ ^(Some s1) }} ->
+        {{ Γ with anns ⊫ M N : B[Id,,N] @ ^(Some s2) }} )
 
 (** Variables *)
 | wfa_vlookup :
-  `( {{ ⊫ Γ }} ->
-     {{ #x : A@s ∈ Γ }} ->
-     {{ Γ ⊫ #x : A @ ^(Some s) }} )
+  `( {{ ⊫ Γ with anns }} ->
+     {{ #x : A@so ∈ Γ with anns }} ->
+     {{ Γ with anns ⊫ #x : A @ so }} )
 
 (** Naturals *)
 | wfa_nat :
   `( forall (r : Ru_nat P sn),
-        {{ ⊫ Γ }} ->
-        {{ Γ ⊫ ℕ : Sort@sn @ ^None }} )
+        {{ ⊫ Γ with anns}} ->
+        {{ Γ with anns ⊫ ℕ : Sort@sn @ ^None }} )
 | wfa_zero :
   `( forall (r : Ru_nat P sn),
-        {{ ⊫ Γ }} ->
-        {{ Γ ⊫ zero : ℕ @ ^(Some sn) }} )
+        {{ ⊫ Γ with anns }} ->
+        {{ Γ with anns ⊫ zero : ℕ @ ^(Some sn) }} )
 | wfa_succ :
   `( forall (r : Ru_nat P sn),
-        {{ Γ ⊫ M : ℕ @ ^(Some sn) }} ->
-        {{ Γ ⊫ succ M : ℕ @ ^(Some sn) }} )
+        {{ Γ with anns ⊫ M : ℕ @ ^(Some sn) }} ->
+        {{ Γ with anns ⊫ succ M : ℕ @ ^(Some sn) }} )
 | wfa_rec :
   `( forall (r : Ru_nat P sn),
-        {{ Γ, ℕ@sn ⊫ A : Sort@sa @ so1 }} ->
-        {{ Γ ⊫ MZ : A[Id,,zero] @ ^(Some sa) }} ->
-        {{ Γ, ℕ@sn, A@sa ⊫ MS : A[Wk∘Wk,,succ #1] @ ^(Some sa) }} ->
-        {{ Γ ⊫ M : ℕ @ ^(Some sn) }} ->
-        {{ Γ ⊫ rec M return A | zero -> MZ | succ -> MS end : A[Id,,M] @ ^(Some sa) }} )
+        {{ Γ, ℕ with (Some sn)::anns ⊫ A @ so }} ->
+        {{ Γ with anns ⊫ MZ : A[Id,,zero] @ so }} ->
+        {{ Γ, ℕ, A with so ::(Some sn)::anns ⊫ MS : A[Wk∘Wk,,succ #1] @ so  }} ->
+        {{ Γ with anns ⊫ M : ℕ @ ^(Some sn) }} ->
+        {{ Γ with anns ⊫ rec M return A | zero -> MZ | succ -> MS end : A[Id,,M] @ so }} )
 
 (** explicit substitutions *)
 | wfa_exp_sub:
-  `( {{ Γ ⊫s σ : Δ }} ->
-     {{ Δ ⊫ M : A @ so }} ->
-     {{ Δ ⊫ A @ so }} ->
-     {{ Γ ⊫ M[σ] : A[σ] @ so }} )
+  `( {{ Γ with anns ⊫s σ : Δ with anns' }} ->
+     {{ Δ with anns' ⊫ M : A @ so }} ->
+     {{ Δ with anns' ⊫ A @ so }} ->
+     {{ Γ with anns ⊫ M[σ] : A[σ] @ so }} )
 
 (** Conversions *)
 | wfa_exp_conv :
-  `( {{ Γ ⊫ M : A @ so }} ->
-     {{ Γ ⊫ A' @ so' }} ->
+  `( {{ Γ with anns ⊫ M : A @ so }} ->
+     {{ Γ with anns ⊫ A' @ so' }} ->
      {{ Γ ⊢ A ⊆ A' }} ->
-     {{ Γ ⊫ M : A' @ so' }} )
+     {{ Γ with anns ⊫ M : A' @ so' }} )
 | wfa_exp_conv_ann :
-  `( {{ Γ ⊫ M : A @ so }} ->
-     {{ Γ ⊫ A @ so' }} ->
-     {{ Γ ⊫ M : A @ so' }} )
-where "Γ ⊫ M : A @ s" := (wf_exp_ann Γ A s M) (in custom judg) : type_scope
+  `( {{ Γ with anns ⊫ M : A @ so }} ->
+     {{ Γ with anns ⊫ A @ so' }} ->
+     {{ Γ with anns ⊫ M : A @ so' }} )
+where "Γ 'with' anns ⊫ M : A @ s" := (wf_exp_ann anns Γ A s M) (in custom judg) : type_scope
 
-with wf_typ_ann {P} : ctx P -> typ P -> SortOption P -> Prop :=
+with wf_typ_ann {P} : ctx_anns P -> ctx P -> typ P -> SortOption P -> Prop :=
 | wfa_typ_st :
-  `( {{ ⊫ Γ }} ->
-     {{ Γ ⊫ Sort@s @ ^None }} )
+  `( {{ ⊫ Γ with anns }} ->
+     {{ Γ with anns ⊫ Sort@s @ ^None }} )
 | wfa_typ_exp :
-  `( {{ Γ ⊫ A : Sort@s @ so }} ->
-     {{ Γ ⊫ A @ ^(Some s) }} )
+  `( {{ Γ with anns ⊫ A : Sort@s @ so }} ->
+     {{ Γ with anns ⊫ A @ ^(Some s) }} )
 | wfa_typ_sub :
-  `( {{ Γ ⊫s σ : Δ }} ->
-     {{ Δ ⊫ A @ so}} ->
-     {{ Γ ⊫ A[σ] @ so }} )
-where "Γ ⊫ A @ s" := (wf_typ_ann Γ A s) (in custom judg) : type_scope
-with wf_sub_ann {P} : ctx P -> ctx P -> sub P -> Prop :=
+  `( {{ Γ with anns ⊫s σ : Δ with anns' }} ->
+     {{ Δ with anns' ⊫ A @ so}} ->
+     {{ Γ with anns ⊫ A[σ] @ so }} )
+where "Γ 'with' anns ⊫ A @ s" := (wf_typ_ann anns Γ A s) (in custom judg) : type_scope
+with wf_sub_ann {P} : ctx_anns P -> ctx_anns P -> ctx P -> ctx P -> sub P -> Prop :=
 | wfa_sub_id :
-  `( {{ ⊫ Γ }} ->
-     {{ Γ ⊫s Id : Γ }} )
+  `( {{ ⊫ Γ with anns }} ->
+     {{ Γ with anns ⊫s Id : Γ with anns }} )
 | wfa_sub_weaken :
-  `( {{ ⊫ Γ, A@s }} ->
-     {{ Γ, A@s ⊫s Wk : Γ }} )
+  `( {{ ⊫ Γ, A with (Some s)::anns }} ->
+     {{ Γ, A with (Some s)::anns ⊫s Wk : Γ with anns}} )
 | wfa_sub_compose :
-  `( {{ Γ1 ⊫s σ2 : Γ2 }} ->
-     {{ Γ2 ⊫s σ1 : Γ3 }} ->
-     {{ Γ1 ⊫s σ1∘σ2 : Γ3 }} )
+  `( {{ Γ1 with anns1 ⊫s σ2 : Γ2 with anns2 }} ->
+     {{ Γ2 with anns2 ⊫s σ1 : Γ3 with anns3 }} ->
+     {{ Γ1 with anns1 ⊫s σ1∘σ2 : Γ3 with anns3 }} )
 | wfa_sub_extend :
-  `( {{ Γ ⊫s σ : Δ }} ->
-     {{ Δ ⊫ A : Sort@s @ so }} ->
-     {{ Γ ⊫ M : A[σ] @ ^(Some s) }} ->
-     {{ Γ ⊫s σ,,M : Δ, A@s }} )
+  `( {{ Γ with anns ⊫s σ : Δ with anns' }} ->
+     {{ Δ with anns' ⊫ A : Sort@s @ so }} ->
+     {{ Γ with anns ⊫ M : A[σ] @ ^(Some s) }} ->
+     {{ Γ with anns ⊫s σ,,M : Δ, A with (Some s)::anns'  }} )
 | wfa_sub_conv :
-  `( {{ Γ ⊫s σ : Δ }} ->
-     {{ ⊫ Δ' }} ->
+  `( {{ Γ with anns ⊫s σ : Δ with anns' }} ->
+     {{ ⊫ Δ' with anns'' }} ->
      {{ ⊢ Δ ⊆ Δ' }} ->
-     {{ Γ ⊫s σ : Δ' }} )
-where "Γ ⊫s σ : Δ" := (wf_sub_ann Γ Δ σ) (in custom judg) : type_scope.
+     {{ Γ with anns ⊫s σ : Δ' with anns'' }} )
+where "Γ 'with' anns ⊫s σ : Δ 'with' anns'" := (wf_sub_ann anns anns' Γ Δ σ) (in custom judg) : type_scope.
 
 
 #[export]

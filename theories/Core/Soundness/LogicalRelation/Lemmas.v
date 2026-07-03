@@ -1284,37 +1284,70 @@ Proof.
 Qed.
 
 (* This should be moves to CoreLemmas.v *)
-Lemma glu_typ_elem_none_typ_resp_typ_eq {P} (pred_P : PredicativeSig P) : forall typ_rel exp_rel a,
-    {{ DG a ∈ glu_typ_elem pred_P None ↘ typ_rel ↘ exp_rel }} ->
-    forall Γ A A',
-      {{ Γ ⊢ A ® typ_rel }} ->
-      {{ Γ ⊢ A ≈ A' }} ->
-      {{ Γ ⊢ A' ® typ_rel }}.
+Lemma glu_typ_elem_per_subtyp_trm_if' {P} (pred_P : PredicativeSig P) : forall {so so' a a' typ_rel typ_rel' exp_rel exp_rel' Γ A A' M m},
+    {{ Γ ⊢ A ⊆ A' }} ->
+    {{ ⟪ pred_P ⟫ Sub a <: a' }} ->
+    {{ DG a ∈ glu_typ_elem pred_P so ↘ typ_rel ↘ exp_rel }} ->
+    {{ DG a' ∈ glu_typ_elem pred_P so' ↘ typ_rel' ↘ exp_rel' }} ->
+    {{ Γ ⊢ A' ® typ_rel' }} ->
+    {{ Γ ⊢ M : A ® m ∈ exp_rel }} ->
+    {{ Γ ⊢ M : A' ® m ∈ exp_rel' }}.
 Proof.
-  simpl.
-  inversion_clear 1.
   intros.
-  simpl_glu_rel.
-  transitivity A; mauto 3.
-Qed.
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) typ_rel exp_rel a (H : glu_typ_elem pred_P None typ_rel exp_rel a) Γ : (typ_rel Γ)
-    with signature wf_typ_eq Γ  ==> iff as glu_typ_elem_typ_morphism_iff1.
-Proof.
-  split; intros;
-    eapply glu_typ_elem_none_typ_resp_typ_eq;
-    mauto 2.
+  destruct so; destruct so'.
+  - eapply glu_typ_elem_per_subtyp_trm_if; mauto 4.
+  - inversion H1; subst.
+    inversion H2; subst.
+    epose proof per_subtyp_sort_inv_left pred_P H0 as [s' []]; subst.
+    apply_predicate_equivalence.
+    destruct H4.
+    destruct_conjs.
+    invert_glu_sort_elem H8.
+    apply_predicate_equivalence.
+    unfold top_sort_glu_typ_pred in *.
+    unfold top_sort_glu_exp_pred in *.
+    unfold sort_glu_exp_pred' in *.
+    unfold sort_glu_typ_pred in *.
+    unfold glu_sort_typ_rec in *.
+    simpl_glu_rel.
+    assert {{ Γ ⊢ M : Sort@s0 }} by (eapply glu_sort_elem_sort_lvl; mauto 2).
+    assert {{ Γ ⊢ Sort@s0 ⊆ Sort@s' }} by mauto 2.
+    assert {{ Γ ⊢ M : Sort@s' }} by mauto 2.
+    assert {{ Γ ⊢ M : A' }} by mauto 3.
+    epose proof glu_sort_elem_cumu pred_P H13 H11.
+    destruct_conjs.
+    repeat eexists; mauto 4.
+    eapply glu_sort_elem_typ_cumu; mauto 4.
+  - inversion H1; subst.
+    inversion H2; subst.
+    epose proof per_subtyp_sort_inv_right pred_P H0 as [s' []]; subst.
+    invert_glu_sort_elem H6; subst.
+    apply_predicate_equivalence.
+    unfold top_sort_glu_typ_pred in *.
+    unfold sort_glu_exp_pred' in *.
+    destruct_conjs.
+    unfold glu_sort_typ_rec in *.
+    destruct_conjs.
+    
+    simpl_glu_rel.
+    econstructor; mauto 4.
+    epose proof glu_sort_elem_cumu pred_P H9 H13.
+    destruct_conjs.
+    repeat eexists; mauto 4.
+    eapply glu_sort_elem_typ_cumu; mauto 4.
+  - inversion H1; subst.
+    inversion H2; subst.
+    eapply glu_sort_elem_per_subtyp_trm_conv; mauto 4.
 Qed.
 
-
-(* Things get a bit complicated here *)
-Lemma glu_ctx_env_resp_per_ctx_helper {P} (pred_P : PredicativeSig P) : forall {anns Γ Γ' Sb Sb'},
+Lemma glu_ctx_env_resp_per_ctx_helper {P} (pred_P : PredicativeSig P) : forall {anns anns' Γ Γ' Sb Sb'},
     {{ EG Γ ∈ glu_ctx_env pred_P anns ↘ Sb }} ->
-    {{ EG Γ' ∈ glu_ctx_env pred_P anns ↘ Sb' }} ->
+    {{ EG Γ' ∈ glu_ctx_env pred_P anns' ↘ Sb' }} ->
     {{ ⊢ Γ ⊆ Γ' }} ->
     (Sb -∙> Sb').
 Proof.
   intros * Hglu Hglu' HΓΓ'.
-  gen Sb' Γ'.
+  gen anns' Sb' Γ'.
   dependent induction Hglu; intros;
     epose proof completeness_fundamental_ctx_sub _ pred_P _ _ HΓΓ' as Hsub;
     dependent destruction Hsub;
@@ -1323,7 +1356,7 @@ Proof.
     handle_per_typ_elem_irrel;
     dependent destruction Hglu';
     apply_predicate_equivalence;
-    try firstorder.  
+    try firstorder.
 
   - invert_per_ctx_envs.
     handle_per_ctx_env_irrel.
@@ -1333,6 +1366,79 @@ Proof.
     rename tail_rel0 into tail_rel'.
     
     inversion HΓΓ' as [|? ? l ? l']; subst.
+
+    assert (TSb -∙> TSb') by intuition.
+    intros Δ σ ρ [].
+    saturate_refl_for (@per_ctx_env P).
+    assert {{ Dom ρ0 ↯ ≈ ρ0 ↯ ∈ tail_rel }} by (eapply glu_ctx_env_per_env; revgoals; eassumption).
+    assert {{ Dom ρ0 ↯ ≈ ρ0 ↯ ∈ tail_rel' }} by (eapply glu_ctx_env_per_env; [| | eapply H10]; eassumption).
+    assert {{ Δ0 ⊢s Wk∘σ0 ® ρ0 ↯ ∈ TSb' }} by intuition.
+    
+    assert (glu_rel_typ_with_sub_unsorted pred_P (Some s0) Δ0 A' {{{ Wk∘σ0 }}} d{{{ ρ0 ↯ }}}) by mautosolve 3.
+    inversion H22; subst.
+    assert {{ ⟪ pred_P ⟫ Sub a <: a0 }} by mauto 3.
+
+    destruct_rel_typ_unsorted.
+    handle_functional_glu_sort_elem P.
+    handle_functional_glu_typ_elem P.
+    simplify_evals.
+    rename a0 into a'.
+    rename exp_rel0 into exp_rel'.
+    rename typ_rel0 into typ_rel'.
+    assert (glu_typ_elem pred_P (Some s0) typ_rel' exp_rel' a') by (econstructor; mauto 2).
+    
+    econstructor; mauto 4.
+    inversion H15; subst.
+    inversion H16; subst.
+    handle_functional_glu_sort_elem P.
+    assert {{ Γ, A ⊢ A[Wk] ⊆ A'[Wk] }} by mauto 4.
+    eapply glu_sort_elem_per_subtyp_trm_conv; mauto 3.
+    assert {{ Δ0 ⊢s σ0 : Γ, A }} by mauto 3.
+    assert {{ Δ0 ⊢ A'[Wk][σ0] ≈ A'[Wk∘σ0] : Sort@s0 }} as -> by (eapply exp_eq_sub_compose_typ_sorted; mauto 3).
+    eassumption.
+  - invert_per_ctx_envs.
+    handle_per_ctx_env_irrel.
+    
+    rename Γ'0 into Γ'.
+    rename TSb0 into TSb'.
+    rename tail_rel0 into tail_rel'.
+    
+    inversion HΓΓ' as [|? ? l ? l']; subst.
+    assert (TSb -∙> TSb') by intuition.
+    intros Δ σ ρ [].
+    saturate_refl_for (@per_ctx_env P).
+    assert {{ Dom ρ0 ↯ ≈ ρ0 ↯ ∈ tail_rel }} by (eapply glu_ctx_env_per_env; revgoals; eassumption).
+    assert {{ Dom ρ0 ↯ ≈ ρ0 ↯ ∈ tail_rel' }} by (eapply glu_ctx_env_per_env; [| | eapply H10]; eassumption).
+    assert {{ Δ0 ⊢s Wk∘σ0 ® ρ0 ↯ ∈ TSb' }} by intuition.
+    
+    assert (glu_rel_typ_with_sub_unsorted pred_P None Δ0 A' {{{ Wk∘σ0 }}} d{{{ ρ0 ↯ }}}) by mautosolve 3.
+    inversion H22; subst.
+    inversion H15; subst.
+    assert {{ ⟪ pred_P ⟫ Sub a <: Sort@s0 }} by mauto 3.
+    
+    destruct_rel_typ_unsorted.
+    handle_functional_glu_sort_elem P.
+    handle_functional_glu_typ_elem P.
+    simplify_evals.
+    rename exp_rel0 into exp_rel'.
+    rename typ_rel0 into typ_rel'.
+    
+    econstructor; mauto 4.
+    assert {{ Δ0 ⊢s σ0 : Γ, A }} by mauto 3.
+    assert {{ Δ0 ⊢ A'[Wk][σ0] ≈ A'[Wk∘σ0] }} as -> by (eapply typ_eq_sub_compose_typ; mauto 3).
+    eapply glu_typ_elem_per_subtyp_trm_if'; mauto 4.
+    assert {{ Δ0 ⊢s σ0 : Γ, A }} by mauto 3.
+    assert {{ Δ0 ⊢ A[Wk][σ0] ≈ A[Wk∘σ0] : Sort@s }} as <- by (eapply exp_eq_sub_compose_typ_sorted; mauto 3).
+    eassumption.
+  - invert_per_ctx_envs.
+    handle_per_ctx_env_irrel.
+    
+    rename Γ'0 into Γ'.
+    rename TSb0 into TSb'.
+    rename tail_rel0 into tail_rel'.
+    
+    inversion HΓΓ' as [|? ? l ? l']; subst.
+
     assert (TSb -∙> TSb') by intuition.
     intros Δ σ ρ [].
     saturate_refl_for (@per_ctx_env P).
@@ -1352,14 +1458,20 @@ Proof.
     rename exp_rel0 into exp_rel'.
     rename typ_rel0 into typ_rel'.
     assert (glu_typ_elem pred_P (Some s) typ_rel' exp_rel' a') by (econstructor; mauto 2).
-    
+
     econstructor; mauto 4.
     inversion H15; subst.
-    eapply glu_sort_elem_per_subtyp_trm_if; mauto.
+    inversion H; subst.
+    handle_functional_glu_sort_elem P.
+
+    assert {{ Γ, A ⊢ A[Wk] ⊆ A'[Wk] }} by mauto 4.
+    eapply glu_typ_elem_per_subtyp_trm_if'; mauto 4.
     assert {{ Δ0 ⊢s σ0 : Γ, A }} by mauto 3.
     assert {{ Δ0 ⊢ A'[Wk][σ0] ≈ A'[Wk∘σ0] : Sort@s }} as -> by (eapply exp_eq_sub_compose_typ_sorted; mauto 3).
     eassumption.
-
+    apply_predicate_equivalence.
+    eassumption.
+    
   - invert_per_ctx_envs.
     handle_per_ctx_env_irrel.
     
@@ -1378,26 +1490,22 @@ Proof.
     assert (glu_rel_typ_with_sub_unsorted pred_P None Δ0 A' {{{ Wk∘σ0 }}} d{{{ ρ0 ↯ }}}) by mautosolve 3.
     inversion H22; subst.
     inversion H15; subst.
-    rename s into s', s0 into s.
-    assert {{ ⟪ pred_P ⟫ Sub Sort@s <: Sort@s' }} by mauto 3.
-    
+    assert {{ ⟪ pred_P ⟫ Sub Sort@s0 <: Sort@s }} by mauto 3.
     
     destruct_rel_typ_unsorted.
     handle_functional_glu_sort_elem P.
-    handle_functional_glu_typ_elem P.
     simplify_evals.
     rename exp_rel0 into exp_rel'.
     rename typ_rel0 into typ_rel'.
     
     econstructor; mauto 4.
-    inversion H25; subst.
-    
-    eapply glu_typ_elem_per_subtyp_trm_if; mauto.
-    + assert {{ Δ0 ⊢s σ0 : Γ, A }} by mauto 3.
-      assert {{ Δ0 ⊢ A'[Wk][σ0] ≈ A'[Wk∘σ0] }} as -> by (eapply typ_eq_sub_compose_typ; mauto 3).    
-      eassumption.
-    + apply_predicate_equivalence.
-      eassumption.
+    assert {{ Δ0 ⊢s σ0 : Γ, A }} by mauto 3.
+    assert {{ Δ0 ⊢ A'[Wk][σ0] ≈ A'[Wk∘σ0] }} as -> by (eapply typ_eq_sub_compose_typ; mauto 3).
+    eapply glu_typ_elem_per_subtyp_trm_if'; mauto 4.
+    assert {{ Δ0 ⊢s σ0 : Γ, A }} by mauto 3.
+    assert {{ Δ0 ⊢ A[Wk][σ0] ≈ A[Wk∘σ0]  }} as <- by mauto 4.
+    apply_predicate_equivalence.
+    eassumption.
 Qed.
 
 
@@ -1530,53 +1638,92 @@ Proof.
   induction 1; intros * HSb Hσ;
     apply_predicate_equivalence;
     simpl in *;
-    mauto 3.
-
-  destruct_by_head (@cons_glu_sub_pred P).
-  econstructor; mauto 3.
-  - assert {{ Δ' ⊢ #0[σ0][σ] : A[Wk][σ0][σ] ® m ∈ exp_rel }} by (eapply glu_sort_elem_exp_monotone; mauto 3).
-    assert {{ Γ, A@s ⊢ #0 : A[Wk] }} by mauto 3.
-    assert {{ Γ, A@s ⊢s Wk : Γ }} by mauto 3.
-    assert {{ Δ' ⊢ #0[σ0∘σ] ≈ #0[σ0][σ] : A[Wk][σ0∘σ] }} as -> by mauto 5.
-    assert {{ Δ' ⊢s σ : Δ }} by mauto 3.
-    assert {{ Δ' ⊢ A[Wk][σ0][σ] ≈ A[Wk][σ0∘σ] : Sort@s }} as <- by mauto 4.
-    eassumption.
-  - assert {{ Δ' ⊢s σ : Δ }} by mauto 3.
-    assert {{ Γ, A@s ⊢s Wk : Γ }} by mauto 3.
-    assert {{ Δ' ⊢s (Wk ∘ σ0) ∘ σ ≈ Wk ∘ (σ0 ∘ σ) : Γ }} as <- by mauto 3.
-    mauto 3.
+    mauto 3;
+    destruct_by_head (@cons_glu_sub_pred P).
+  
+  - econstructor; mauto 3.
+    + assert {{ Δ' ⊢ #0[σ0][σ] : A[Wk][σ0][σ] ® m ∈ exp_rel }} by (eapply glu_typ_elem_exp_monotone; mauto 3).
+      assert {{ Γ, A ⊢ #0 : A[Wk] }} by mauto 3.
+      assert {{ Γ, A ⊢s Wk : Γ }} by mauto 3.
+      assert {{ Δ' ⊢ #0[σ0∘σ] ≈ #0[σ0][σ] : A[Wk][σ0∘σ] }} as -> by mauto 5.
+      assert {{ Δ' ⊢s σ : Δ }} by mauto 3.
+      assert {{ Δ' ⊢ A[Wk][σ0][σ] ≈ A[Wk][σ0∘σ] : Sort@s }} as <- by mauto 4.
+      eassumption.
+    + assert {{ Δ' ⊢s σ : Δ }} by mauto 3.
+      assert {{ Γ, A ⊢s Wk : Γ }} by mauto 3.
+      assert {{ Δ' ⊢s (Wk ∘ σ0) ∘ σ ≈ Wk ∘ (σ0 ∘ σ) : Γ }} as <- by mauto 3.
+      mauto 3.
+  - econstructor; mauto 3.
+    + assert {{ Δ' ⊢ #0[σ0][σ] : A[Wk][σ0][σ] ® m ∈ exp_rel }} by (eapply glu_typ_elem_exp_monotone; mauto 3).
+      assert {{ Γ, A ⊢ #0 : A[Wk] }} by mauto 3.
+      assert {{ Γ, A ⊢s Wk : Γ }} by mauto 3.
+      assert {{ Δ' ⊢ #0[σ0∘σ] ≈ #0[σ0][σ] : A[Wk][σ0∘σ] }} as -> by mauto 5.
+      assert {{ Δ' ⊢s σ : Δ }} by mauto 3.
+      assert {{ Δ' ⊢ A[Wk][σ0][σ] ≈ A[Wk][σ0∘σ] }} as <- by mauto 4.
+      eassumption.
+    + assert {{ Δ' ⊢s σ : Δ }} by mauto 3.
+      assert {{ Γ, A ⊢s Wk : Γ }} by mauto 3.
+      assert {{ Δ' ⊢s (Wk ∘ σ0) ∘ σ ≈ Wk ∘ (σ0 ∘ σ) : Γ }} as <- by mauto 3.
+      mauto 3.
 Qed.
 
-Lemma cons_glu_sub_pred_helper {P} (pred_P : PredicativeSig P) : forall {Γ Sb Δ σ ρ A a s typ_rel exp_rel M c},
-    {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} ->
+Lemma cons_glu_sub_pred_helper_sorted {P} (pred_P : PredicativeSig P) : forall {anns Γ Sb Δ σ ρ A a s typ_rel exp_rel M c},
+    {{ EG Γ ∈ glu_ctx_env pred_P anns ↘ Sb }} ->
     {{ Δ ⊢s σ ® ρ ∈ Sb }} ->
     {{ Γ ⊢ A : Sort@s }} ->
     {{ ⟦ A ⟧ ρ ↘ a }} ->
-    {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
+    {{ DG a ∈ glu_typ_elem pred_P (Some s) ↘ typ_rel ↘ exp_rel }} ->
     {{ Δ ⊢ M : A[σ] ® c ∈ exp_rel }} ->
-    {{ Δ ⊢s σ,,M ® ρ ↦ c ∈ cons_glu_sub_pred pred_P s Γ A Sb }}.
+    {{ Δ ⊢s σ,,M ® ρ ↦ c ∈ cons_glu_sub_pred pred_P (Some s) Γ A Sb }}.
 Proof.
   intros.
+  inversion H3; subst.
   assert {{ Δ ⊢s σ : Γ }} by mauto 2.
   assert {{ Δ ⊢ M : A[σ] }} by mauto 2 using glu_sort_elem_trm_escape.
-  assert {{ Δ ⊢s σ,,M : Γ, A@s }} by mauto 2.
-  econstructor; mauto 3;
-    autorewrite with mcpts; mauto 3.
+  assert {{ Δ ⊢s σ,,M : Γ, A }} by mauto 3.
+  econstructor; mauto 4;
+    autorewrite with mcpts; mauto 4.
 
-  assert {{ Δ ⊢ #0[σ,,M] ≈ M : A[σ] }}; mauto 2.
+
+  assert {{ Δ ⊢ #0[σ,,M] ≈ M : A[σ] }}; mauto 3.
   assert {{ Δ ⊢ A[Wk][σ,,M] ≈ A[σ] : Sort@s }} by mauto 4.
-  enough (exp_rel Δ {{{ A[σ] }}} {{{ #0[σ,,M] }}} c) by (eapply glu_sort_elem_trm_resp_typ_exp_eq; mauto 3).
+  enough (exp_rel Δ {{{ A[σ] }}} {{{ #0[σ,,M] }}} c) by (eapply glu_sort_elem_trm_resp_typ_exp_eq; mauto ).
   enough (exp_rel Δ {{{ A[σ] }}} M c) by (eapply glu_sort_elem_trm_resp_exp_eq; mauto 4).
   mauto.
 Qed.
 
 #[export]
-Hint Resolve cons_glu_sub_pred_helper : mcpts.
+  Hint Resolve cons_glu_sub_pred_helper_sorted : mcpts.
 
+Lemma cons_glu_sub_pred_helper_unsorted {P} (pred_P : PredicativeSig P) : forall {anns Γ Sb Δ σ ρ A a typ_rel exp_rel M c},
+    {{ EG Γ ∈ glu_ctx_env pred_P anns ↘ Sb }} ->
+    {{ Δ ⊢s σ ® ρ ∈ Sb }} ->
+    {{ Γ ⊢ A }} ->
+    {{ ⟦ A ⟧ ρ ↘ a }} ->
+    {{ DG a ∈ glu_typ_elem pred_P None ↘ typ_rel ↘ exp_rel }} ->
+    {{ Δ ⊢ M : A[σ] ® c ∈ exp_rel }} ->
+    {{ Δ ⊢s σ,,M ® ρ ↦ c ∈ cons_glu_sub_pred pred_P None Γ A Sb }}.
+Proof.
+  intros.
+  assert {{ Δ ⊢s σ : Γ }} by mauto 2.
+  assert {{ Δ ⊢ M : A[σ] }} by mauto 2 using glu_typ_elem_trm_escape.
+  assert {{ Δ ⊢s σ,,M : Γ, A }} by mauto 3.
+  econstructor; mauto 4;
+    autorewrite with mcpts; mauto 4.
 
-Lemma initial_env_glu_rel_exp {P} (pred_P : PredicativeSig P) : forall {Γ ρ Sb},
+  assert {{ Δ ⊢ #0[σ,,M] ≈ M : A[σ] }}; mauto 3.
+  assert {{ Δ ⊢ A[Wk][σ,,M] ≈ A[σ] }} by mauto 4.
+  enough (exp_rel Δ {{{ A[σ] }}} {{{ #0[σ,,M] }}} c) by (eapply glu_typ_elem_none_trm_resp_typ_eq; mauto ).
+  enough (exp_rel Δ {{{ A[σ] }}} M c) by (eapply glu_typ_elem_trm_resp_exp_eq; mauto 4).
+  mauto.
+Qed.
+
+#[export]
+  Hint Resolve cons_glu_sub_pred_helper_unsorted : mcpts.
+
+Lemma initial_env_glu_rel_exp {P} (pred_P : PredicativeSig P) : forall {anns Γ ρ Sb},
     initial_env Γ ρ ->
-    {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} ->
+    {{ EG Γ ∈ glu_ctx_env pred_P anns ↘ Sb }} ->
     {{ Γ ⊢s Id ® ρ ∈ Sb }}.
 Proof.
   intros * Hinit HΓ.
@@ -1585,27 +1732,48 @@ Proof.
     dependent destruction Hinit;
     apply_predicate_equivalence;
     try solve [econstructor; mauto].
-
-  rename ρ0 into ρ.
-  assert (glu_rel_typ_with_sub pred_P s Γ A {{{ Id }}} ρ) as [] by mauto.
-
-  functional_eval_rewrite_clear.
-  econstructor; mauto.
-  - match goal with
-    | H: typ_rel Γ {{{ A[Id] }}} |- _ =>
-        bulky_rewrite_in H
-    end.
-    eapply realize_glu_elem_bot; mauto.
-    assert {{ ⊢ Γ }} by mauto 3.
-    assert {{ Γ, A@s ⊢s Wk : Γ }} by mauto 4.
-    assert {{ Γ, A@s ⊢ A[Wk] : Sort@s }} by mauto 4.
-    assert {{ Γ, A@s ⊢ A[Wk] ≈ A[Wk][Id] : Sort@s }} as <- by mauto 3.
-    assert {{ Γ, A@s ⊢ #0 ≈ #0[Id] : A[Wk] }} as <- by mauto.
-    eapply var_glu_elem_bot; mauto.
-  - assert {{ Γ, A@s ⊢s Wk : Γ }} by mauto 4.
-    assert {{ Γ, A@s ⊢s Wk∘Id : Γ }} by mauto 4.
-    assert {{ Γ, A@s ⊢s Id∘Wk ≈ Wk∘Id : Γ }} as <- by (transitivity (@a_weaken P); mauto 3).
-    eapply glu_ctx_env_sub_monotone; mauto 4.
+  - rename ρ0 into ρ.
+    assert (glu_rel_typ_with_sub_unsorted pred_P (Some s) Γ A {{{ Id }}} ρ) by mauto.
+    inversion H1; subst.
+    functional_eval_rewrite_clear.
+    
+    econstructor; mauto.
+    + econstructor; mauto.
+    + match goal with
+      | H: typ_rel Γ {{{ A[Id] }}} |- _ =>
+          bulky_rewrite_in H
+      end.
+      eapply realize_glu_elem_bot; mauto.
+      assert {{ ⊢ Γ }} by mauto 3.
+      assert {{ Γ, A ⊢s Wk : Γ }} by mauto 4.
+      assert {{ Γ, A ⊢ A[Wk] : Sort@s }} by mauto 4.
+      assert {{ Γ, A ⊢ A[Wk] ≈ A[Wk][Id] : Sort@s }} as <- by mauto 3.
+      assert {{ Γ, A ⊢ #0 ≈ #0[Id] : A[Wk] }} as <- by mauto.
+      eapply var_glu_elem_bot; mauto.
+    + gen_presup H.
+      assert {{ Γ, A ⊢s Wk : Γ }} by mauto 4.
+      assert {{ Γ, A ⊢s Wk∘Id : Γ }} by mauto 4.
+      assert {{ Γ, A ⊢s Id∘Wk ≈ Wk∘Id : Γ }} as <- by (transitivity (@a_weaken P); mauto 3).
+      eapply glu_ctx_env_sub_monotone; mauto 4.
+  - rename ρ0 into ρ.
+    assert (glu_rel_typ_with_sub_unsorted pred_P None Γ A {{{ Id }}} ρ) by mauto.    
+    inversion H1; subst.
+    functional_eval_rewrite_clear.
+    econstructor; mauto.
+    + eapply realize_glu_elem_bot_unsorted; mauto.
+      assert {{ ⊢ Γ }} by mauto 3.
+      assert {{ Γ, A ⊢s Wk : Γ }} by mauto 4.
+      assert {{ Γ, A ⊢ A[Wk] }} by mauto 4.
+      assert {{ Γ, A ⊢ A[Wk] ≈ A[Wk][Id] }} as <- by mauto 3.
+      assert {{ Γ, A ⊢ #0 ≈ #0[Id] : A[Wk] }} as <- by mauto.
+      eapply var_glu_elem_bot_unsorted; mauto.
+      assert {{ Γ ⊢ A[Id] ≈ A }} as <- by mauto 3.
+      eassumption.
+    + gen_presup H.
+      assert {{ Γ, A ⊢s Wk : Γ }} by mauto 4.
+      assert {{ Γ, A ⊢s Wk∘Id : Γ }} by mauto 4.
+      assert {{ Γ, A ⊢s Id∘Wk ≈ Wk∘Id : Γ }} as <- by (transitivity (@a_weaken P); mauto 3).
+      eapply glu_ctx_env_sub_monotone; mauto 4.
 Qed.
 
 
@@ -1655,9 +1823,9 @@ Ltac destruct_glu_rel_typ_with_sub :=
 
 (** *** Lemmas about [glu_rel_exp] *)
 
-Lemma glu_rel_exp_clean_inversion1 {P} (pred_P : PredicativeSig P) : forall {s Γ Sb M A},
-    {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩ M : A @ s}} ->
+Lemma glu_rel_exp_clean_inversion1 {P} (pred_P : PredicativeSig P) : forall {anns s Γ Sb M A},
+    {{ EG Γ ∈ glu_ctx_env pred_P anns ↘ Sb }} ->
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩ M : A @ s }} ->
     glu_rel_exp_resp_sub_env pred_P s Sb M A.
 Proof.
   intros * ? [].
@@ -1673,8 +1841,8 @@ Ltac invert_glu_rel_exp H :=
   unfold glu_rel_exp_resp_sub_env in H)
   + (inversion H as [? [? [? ?]]]; subst).
 
-Lemma glu_rel_exp_to_wf_exp {P} (pred_P : PredicativeSig P) : forall {s Γ A M},
-    {{ ⟪ pred_P ⟫ Γ ⊩ M : A @ s }} ->
+Lemma glu_rel_exp_to_wf_exp {P} (pred_P : PredicativeSig P) : forall {anns s Γ A M},
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩ M : A @ s }} ->
     {{ Γ ⊢ M : A }}.
 Proof.
   intros * [Sb].
@@ -1693,11 +1861,11 @@ Hint Resolve glu_rel_exp_to_wf_exp : mcpts.
 
 (** *** Lemmas about [glu_rel_sub] *)
 
-Lemma glu_rel_sub_clean_inversion1 {P} (pred_P : PredicativeSig P) : forall {Γ Sb τ Γ'},
-    {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩s τ : Γ' }} ->
+Lemma glu_rel_sub_clean_inversion1 {P} (pred_P : PredicativeSig P) : forall {anns anns' Γ Sb τ Γ'},
+    {{ EG Γ ∈ glu_ctx_env pred_P anns ↘ Sb }} ->
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩s τ : Γ' with anns'}} ->
     exists Sb' : glu_sub_pred P,
-      glu_ctx_env pred_P Sb' Γ' /\ (forall (Δ : ctx P) (σ : sub P) (ρ : env P), Sb Δ σ ρ -> glu_rel_sub_with_sub pred_P Δ τ Sb' σ ρ).
+      glu_ctx_env pred_P anns' Sb' Γ' /\ (forall (Δ : ctx P) (σ : sub P) (ρ : env P), Sb Δ σ ρ -> glu_rel_sub_with_sub pred_P Δ τ Sb' σ ρ).
 Proof.
   intros * ? [? []].
   destruct_conjs.
@@ -1708,11 +1876,11 @@ Proof.
   mauto 3.
 Qed.
 
-Lemma glu_rel_sub_clean_inversion2 {P} (pred_P : PredicativeSig P) : forall {Γ τ Γ' Sb'},
-    {{ EG Γ' ∈ glu_ctx_env pred_P ↘ Sb' }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩s τ : Γ' }} ->
+Lemma glu_rel_sub_clean_inversion2 {P} (pred_P : PredicativeSig P) : forall {anns anns' Γ τ Γ' Sb'},
+    {{ EG Γ' ∈ glu_ctx_env pred_P anns' ↘ Sb' }} ->
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩s τ : Γ' with anns' }} ->
     exists Sb : glu_sub_pred P,
-      glu_ctx_env pred_P Sb Γ /\ (forall (Δ : ctx P) (σ : sub P) (ρ : env P), Sb Δ σ ρ -> glu_rel_sub_with_sub pred_P Δ τ Sb' σ ρ).
+      glu_ctx_env pred_P anns Sb Γ /\ (forall (Δ : ctx P) (σ : sub P) (ρ : env P), Sb Δ σ ρ -> glu_rel_sub_with_sub pred_P Δ τ Sb' σ ρ).
 Proof.
   intros * ? [? [Sb'0]].
   destruct_conjs.
@@ -1725,10 +1893,10 @@ Proof.
   mauto 3.
 Qed.
 
-Lemma glu_rel_sub_clean_inversion3 {P} (pred_P : PredicativeSig P) : forall {Γ Sb τ Γ' Sb'},
-    {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} ->
-    {{ EG Γ' ∈ glu_ctx_env pred_P ↘ Sb' }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩s τ : Γ' }} ->
+Lemma glu_rel_sub_clean_inversion3 {P} (pred_P : PredicativeSig P) : forall {anns anns' Γ Sb τ Γ' Sb'},
+    {{ EG Γ ∈ glu_ctx_env pred_P anns ↘ Sb }} ->
+    {{ EG Γ' ∈ glu_ctx_env pred_P anns' ↘ Sb' }} ->
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩s τ : Γ' with anns' }} ->
     glu_rel_sub_resp_sub_env pred_P Sb Sb' τ.
 Proof.
   simpl. intros * ? ? Hglu.
@@ -1748,8 +1916,8 @@ Ltac invert_glu_rel_sub H :=
      destruct H as [? []])
   + (inversion H; subst).
 
-Lemma glu_rel_sub_wf_sub {P} (pred_P : PredicativeSig P) : forall {Γ σ Δ},
-    {{ ⟪ pred_P ⟫ Γ ⊩s σ : Δ }} ->
+Lemma glu_rel_sub_wf_sub {P} (pred_P : PredicativeSig P) : forall {anns anns' Γ σ Δ},
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩s σ : Δ with anns'}} ->
     {{ Γ ⊢s σ : Δ }}.
 Proof.
   intros * [SbΓ [SbΔ]].
@@ -1790,8 +1958,8 @@ Ltac apply_glu_rel_judge P :=
   clear_dups.
 
 
-Lemma glu_rel_exp_preserves_lvl {P} (pred_P : PredicativeSig P) : forall {Γ Sb M A s},
-    {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} ->
+Lemma glu_rel_exp_preserves_lvl {P} (pred_P : PredicativeSig P) : forall {anns Γ Sb M A s},
+    {{ EG Γ ∈ glu_ctx_env pred_P anns ↘ Sb }} ->
     (forall Δ σ ρ,
         {{ Δ ⊢s σ ® ρ ∈ Sb }} ->
         glu_rel_exp_with_sub pred_P s Δ M A σ ρ) ->
@@ -1817,9 +1985,9 @@ Hint Resolve glu_rel_exp_preserves_lvl : mcpts.
 
 Ltac saturate_syn_judge1 :=
   match goal with
-  | H : {{ ⟪ ?pred_P ⟫ ^?Γ ⊩ ^?M : ^?A @ ^?s }} |- _ =>
+  | H : {{ ⟪ ?pred_P ⟫ ^?Γ with ?anns ⊩ ^?M : ^?A @ ^?s }} |- _ =>
       assert {{ Γ ⊢ M : A }} by mauto; fail_if_dup
-  | H : {{ ⟪ ?pred_P ⟫ ^?Γ ⊩s ^?τ : ^?Γ' }} |- _ =>
+  | H : {{ ⟪ ?pred_P ⟫ ^?Γ with ?anns ⊩s ^?τ : ^?Γ' with ?anns' }} |- _ =>
       assert {{ Γ ⊢s τ : Γ' }} by mauto; fail_if_dup
   end.
 
@@ -1829,9 +1997,9 @@ Ltac saturate_syn_judge :=
 
 Ltac invert_sem_judge1 :=
   match goal with
-  | H : {{ ⟪ ?pred_P ⟫ ^?Γ ⊩ ^?M : ^?A @ ^?s }} |- _ =>
+  | H : {{ ⟪ ?pred_P ⟫ ^?Γ with ?anns ⊩ ^?M : ^?A @ ^?s }} |- _ =>
       invert_glu_rel_exp H
-  | H : {{ ⟪ ?pred_P ⟫ ^?Γ ⊩s ^?τ : ^?Γ' }} |- _ =>
+  | H : {{ ⟪ ?pred_P ⟫ ^?Γ with ?anns ⊩s ^?τ : ^?Γ' with ?anns'}} |- _ =>
       invert_glu_rel_sub H
   end.
 
@@ -1840,8 +2008,8 @@ Ltac invert_sem_judge :=
   repeat invert_sem_judge1.
 
 
-Lemma glu_rel_exp_typ_well_sorted {P} (pred_P : PredicativeSig P) : forall {Γ M A s},
-    {{ ⟪ pred_P ⟫ Γ ⊩ M : A @ s }} ->
+Lemma glu_rel_exp_typ_well_sorted {P} (pred_P : PredicativeSig P) : forall {anns Γ M A s},
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩ M : A @ s }} ->
     {{ Γ ⊢ A : Sort@s }}.
 Proof.
   intros.
@@ -1888,8 +2056,8 @@ Qed.
 (* Qed. *)
 
 
-Lemma glu_rel_exp_sort_implies_ax {P} (pred_P : PredicativeSig P) : forall {Γ A s s'},
-    {{ ⟪ pred_P ⟫ Γ ⊩ A: Sort@s @ s' }} ->
+Lemma glu_rel_exp_sort_implies_ax {P} (pred_P : PredicativeSig P) : forall {anns Γ A s s'},
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩ A: Sort@s @ s' }} ->
     exists s'', Ax_typ P s s'' /\ st_subtyp s'' s'.
 Proof.
   intros.
@@ -1907,9 +2075,9 @@ Qed.
 
 
 (** Lemmas for unsorted logical relations *)
-Lemma glu_rel_exp_implies_glu_rel_exp_unsorted {P} (pred_P : PredicativeSig P) : forall {Γ M A s},
-    {{ ⟪ pred_P ⟫ Γ ⊩ M : A @ s }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩u M : A @ ^(Some s) }}.
+Lemma glu_rel_exp_implies_glu_rel_exp_unsorted {P} (pred_P : PredicativeSig P) : forall {anns Γ M A s},
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩ M : A @ s }} ->
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩u M : A @ ^(Some s) }}.
 Proof.
   intros * [SbΓ []].
   eexists; split; [eassumption |].
@@ -1921,9 +2089,9 @@ Qed.
 #[export]
 Hint Resolve glu_rel_exp_implies_glu_rel_exp_unsorted : mcpts.
 
-Lemma glu_rel_exp_unsorted_implies_glu_rel_exp {P} (pred_P : PredicativeSig P) : forall {Γ M A s},
-    {{ ⟪ pred_P ⟫ Γ ⊩u M : A @ ^(Some s) }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩ M : A @ s }}.
+Lemma glu_rel_exp_unsorted_implies_glu_rel_exp {P} (pred_P : PredicativeSig P) : forall {anns Γ M A s},
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩u M : A @ ^(Some s) }} ->
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩ M : A @ s }}.
 Proof.
   intros * [SbΓ []].
   eexists; split; [eassumption |].
@@ -1937,9 +2105,9 @@ Qed.
 Hint Resolve glu_rel_exp_unsorted_implies_glu_rel_exp : mcpts.
 
 
-Lemma glu_rel_typ_implies_glu_rel_typ_unsorted {P} (pred_P : PredicativeSig P) : forall {Γ A s},
-    {{ ⟪ pred_P ⟫ Γ ⊩ A @ s }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩u A @ ^(Some s) }}.
+Lemma glu_rel_typ_implies_glu_rel_typ_unsorted {P} (pred_P : PredicativeSig P) : forall {anns Γ A s},
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩ A @ s }} ->
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩u A @ ^(Some s) }}.
 Proof.
   intros *[SbΓ []].
   eexists; split; [eassumption|].
@@ -1951,9 +2119,9 @@ Qed.
 #[export]
 Hint Resolve glu_rel_typ_implies_glu_rel_typ_unsorted : mcpts.
 
-Lemma glu_rel_typ_unsorted_implies_glu_rel_typ {P} (pred_P : PredicativeSig P) : forall {Γ A s},
-    {{ ⟪ pred_P ⟫ Γ ⊩u A @ ^(Some s) }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩ A @ s }}.
+Lemma glu_rel_typ_unsorted_implies_glu_rel_typ {P} (pred_P : PredicativeSig P) : forall {anns Γ A s},
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩u A @ ^(Some s) }} ->
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩ A @ s }}.
 Proof.
   intros *[SbΓ []].
   eexists; split; [eassumption|].
@@ -2044,9 +2212,9 @@ Proof.
 Qed.
 
 
-Lemma glu_rel_exp_unsorted_clean_inversion1 {P} (pred_P : PredicativeSig P) : forall {so Γ Sb M A},
-    {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩u M : A @ so }} ->
+Lemma glu_rel_exp_unsorted_clean_inversion1 {P} (pred_P : PredicativeSig P) : forall {anns so Γ Sb M A},
+    {{ EG Γ ∈ glu_ctx_env pred_P anns ↘ Sb }} ->
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩u M : A @ so }} ->
     glu_rel_exp_resp_sub_env_unsorted pred_P so Sb M A.
 Proof.
   intros * ? [].
@@ -2098,8 +2266,8 @@ Ltac destruct_glu_rel_typ_with_sub_unsorted :=
   unmark_all.
 
 
-Lemma glu_rel_exp_unsorted_to_wf_exp {P} (pred_P : PredicativeSig P) : forall {so Γ A M},
-    {{ ⟪ pred_P ⟫ Γ ⊩u M : A @ so }} ->
+Lemma glu_rel_exp_unsorted_to_wf_exp {P} (pred_P : PredicativeSig P) : forall {anns so Γ A M},
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩u M : A @ so }} ->
     {{ Γ ⊢ M : A }}.
 Proof.
   intros * [Sb].
@@ -2124,8 +2292,8 @@ Qed.
 #[export]
   Hint Resolve glu_rel_exp_unsorted_to_wf_exp : mcpts.
 
-Lemma glu_rel_typ_unsorted_to_wf_typ {P} (pred_P : PredicativeSig P) : forall {so Γ A},
-    {{ ⟪ pred_P ⟫ Γ ⊩u A @ so }} ->
+Lemma glu_rel_typ_unsorted_to_wf_typ {P} (pred_P : PredicativeSig P) : forall {anns so Γ A},
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩u A @ so }} ->
     {{ Γ ⊢ A }}.
 Proof.
   intros * [Sb].

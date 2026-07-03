@@ -673,3 +673,19 @@ Qed.
 
 #[export]
 Hint Resolve realize_glu_typ_top_unsorted realize_glu_elem_top_unsorted : mcpts.
+
+Lemma var_glu_elem_bot_unsorted {P} (pred_P : PredicativeSig P) : forall a typ_rel exp_rel Γ A,
+    {{ DG a ∈ glu_typ_elem pred_P None ↘ typ_rel ↘ exp_rel }} ->
+    {{ Γ ⊢ A ® typ_rel }} ->
+    {{ Γ, A ⊢ #0 : A[Wk] ® !(length Γ) ∈ glu_elem_bot_unsorted pred_P None a }}.
+Proof.
+  intros.
+  saturate_glu_info.
+  econstructor; mauto 4.
+  - eapply glu_typ_elem_typ_monotone; mauto 3.
+    assert {{ ⊢ Γ, A }} by mauto 4.
+    eapply weakening_wk; mauto 3.
+  - intros.
+    progressive_inversion.
+    exact (var_weaken_gen _ _ _ H2 nil _ _ eq_refl).
+Qed.

@@ -24,8 +24,8 @@ Import Domain_Notations.
 (* Qed. *)
 
 
-Lemma glu_rel_exp_of_typ_unsorted {P} (pred_P : PredicativeSig P) : forall {Γ Sb A s},
-    {{ EG Γ ∈ glu_ctx_env pred_P ↘ Sb }} ->
+Lemma glu_rel_exp_of_typ_unsorted {P} (pred_P : PredicativeSig P) : forall {anns Γ Sb A s},
+    {{ EG Γ ∈ glu_ctx_env pred_P anns ↘ Sb }} ->
     (forall Δ σ ρ,
         {{ Δ ⊢s σ ® ρ ∈ Sb }} ->
         {{ Δ ⊢ A[σ] : Sort@s }} /\
@@ -33,7 +33,7 @@ Lemma glu_rel_exp_of_typ_unsorted {P} (pred_P : PredicativeSig P) : forall {Γ S
             {{ ⟦ A ⟧ ρ ↘ a }} /\
               {{ Dom a ≈ a ∈ per_sort pred_P s }} /\
               forall typ_rel exp_rel, {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} -> {{ Δ ⊢ A[σ] ® typ_rel }}) ->
-      {{ ⟪ pred_P ⟫ Γ ⊩u A : Sort@s @ ^None }}.
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩u A : Sort@s @ ^None }}.
 Proof.
   intros * ? Hbody.
   eexists; split; mauto.
@@ -71,10 +71,10 @@ Qed.
 (* Hint Resolve glu_rel_exp_typ : mcpts. *)
 
 
-Lemma glu_rel_exp_typ_unsorted {P} (pred_P : PredicativeSig P) : forall {Γ s s'},
+Lemma glu_rel_exp_typ_unsorted {P} (pred_P : PredicativeSig P) : forall {anns Γ s s'},
     Ax_typ P s s' ->
-    {{ ⟪ pred_P ⟫ ⊩ Γ }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩u Sort@s : Sort@s' @ ^None }}.
+    {{ ⟪ pred_P ⟫ ⊩ Γ with anns }} ->
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩u Sort@s : Sort@s' @ ^None }}.
 Proof.
   intros * Hax [].
   eapply glu_rel_exp_of_typ_unsorted; mauto 3.
@@ -93,14 +93,14 @@ Qed.
 #[export]
 Hint Resolve glu_rel_exp_typ_unsorted : mcpts.
 
-Lemma glu_rel_exp_sub_typ {P} (pred_P : PredicativeSig P) : forall {s' Γ σ Δ s A},
-    {{ ⟪ pred_P ⟫ Γ ⊩s σ : Δ }} ->
-    {{ ⟪ pred_P ⟫ Δ ⊩ A : Sort@s @ s' }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩ A[σ] : Sort@s @ s' }}.
+Lemma glu_rel_exp_sub_typ {P} (pred_P : PredicativeSig P) : forall {s' anns Γ σ anns' Δ s A},
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩s σ : Δ with anns' }} ->
+    {{ ⟪ pred_P ⟫ Δ with anns' ⊩ A : Sort@s @ s' }} ->
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩ A[σ] : Sort@s @ s' }}.
 Proof.
   intros.
   assert {{ Γ ⊢s σ : Δ }} by mauto 3.
-  assert {{ ⟪ pred_P ⟫ Γ ⊩ A[σ] : Sort@s[σ] @ s' }} by mauto 4.
+  assert {{ ⟪ pred_P ⟫ Γ with anns ⊩ A[σ] : Sort@s[σ] @ s' }} by mauto 4.
 
   simpl in H2.
   destruct_conjs.
@@ -129,10 +129,10 @@ Qed.
 Hint Resolve glu_rel_exp_sub_typ : mcpts.
 
 
-Lemma glu_rel_exp_sub_typ_unsorted {P} (pred_P : PredicativeSig P) : forall {so Γ σ Δ s A},
-    {{ ⟪ pred_P ⟫ Γ ⊩s σ : Δ }} ->
-    {{ ⟪ pred_P ⟫ Δ ⊩u A : Sort@s @ so }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩u A[σ] : Sort@s @ so }}.
+Lemma glu_rel_exp_sub_typ_unsorted {P} (pred_P : PredicativeSig P) : forall {so anns Γ σ anns' Δ s A},
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩s σ : Δ with anns' }} ->
+    {{ ⟪ pred_P ⟫ Δ with anns' ⊩u A : Sort@s @ so }} ->
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩u A[σ] : Sort@s @ so }}.
 Proof.
   intros.
   destruct so.
@@ -156,18 +156,18 @@ Proof.
     assert {{ Δ0 ⊢ M[σ∘σ0] ≈ M[σ][σ0] : Sort@s0 }} as <- by mauto 4.
     eassumption.
 
-  - assert {{ ⟪ pred_P ⟫ Δ ⊩ A : Sort@s @ s0 }} by mauto 2.
-    assert {{ ⟪ pred_P ⟫ Γ ⊩ A[σ] : Sort@s @ s0 }} by mauto 2.
+  - assert {{ ⟪ pred_P ⟫ Δ with anns' ⊩ A : Sort@s @ s0 }} by mauto 2.
+    assert {{ ⟪ pred_P ⟫ Γ with anns ⊩ A[σ] : Sort@s @ s0 }} by mauto 2.
     mauto 2.
 Qed.
 
 #[export]
 Hint Resolve glu_rel_exp_sub_typ_unsorted : mcpts.
 
-Lemma glu_rel_typ_sort {P} (pred_P : PredicativeSig P) : forall {Γ s s'},
+Lemma glu_rel_typ_sort {P} (pred_P : PredicativeSig P) : forall {anns Γ s s'},
     Ax_typ P s s' ->
-    {{ ⟪ pred_P ⟫ ⊩ Γ }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩ Sort@s @ s' }}.
+    {{ ⟪ pred_P ⟫ ⊩ Γ with anns }} ->
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩ Sort@s @ s' }}.
 Proof.
   intros * Hax [SbΓ].
   eexists; split; mauto 2.
@@ -183,10 +183,10 @@ Qed.
 Hint Resolve glu_rel_typ_sort : mcpts.
 
 
-Lemma glu_rel_typ_unsorted_sort_ax {P} (pred_P : PredicativeSig P) : forall {Γ s s'},
+Lemma glu_rel_typ_unsorted_sort_ax {P} (pred_P : PredicativeSig P) : forall {anns Γ s s'},
     Ax_typ P s s' ->
-    {{ ⟪ pred_P ⟫ ⊩ Γ }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩u Sort@s @ ^(Some s') }}.
+    {{ ⟪ pred_P ⟫ ⊩ Γ with anns }} ->
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩u Sort@s @ ^(Some s') }}.
 Proof.
   intros.
   mauto 3.
@@ -195,9 +195,9 @@ Qed.
 #[export]
 Hint Resolve glu_rel_typ_unsorted_sort_ax : mcpts.
 
-Lemma glu_rel_typ_unsorted_sort_none {P} (pred_P : PredicativeSig P) : forall {Γ s},
-    {{ ⟪ pred_P ⟫ ⊩ Γ }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩u Sort@s @ ^None}}.
+Lemma glu_rel_typ_unsorted_sort_none {P} (pred_P : PredicativeSig P) : forall {anns Γ s},
+    {{ ⟪ pred_P ⟫ ⊩ Γ with anns }} ->
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩u Sort@s @ ^None}}.
 Proof.
   intros * [SbΓ].
   eexists; split; [eassumption |].
@@ -211,9 +211,9 @@ Qed.
 Hint Resolve glu_rel_typ_unsorted_sort_none : mcpts.
 
 
-Lemma glu_rel_typ_sorted {P} (pred_P : PredicativeSig P) : forall {Γ A s s'},
-    {{ ⟪ pred_P ⟫ Γ ⊩ A : Sort@s @ s' }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩ A @ s }}.
+Lemma glu_rel_typ_sorted {P} (pred_P : PredicativeSig P) : forall {anns Γ A s s'},
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩ A : Sort@s @ s' }} ->
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩ A @ s }}.
 Proof.
   intros * [SbΓ []].
   eexists; split; mauto 2.
@@ -232,9 +232,9 @@ Qed.
 Hint Resolve glu_rel_typ_sorted : mcpts.
 
 
-Lemma glu_rel_typ_unsorted_sorted {P} (pred_P : PredicativeSig P) : forall {Γ A s so},
-    {{ ⟪ pred_P ⟫ Γ ⊩u A : Sort@s @ so }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩u A @ ^(Some s) }}.
+Lemma glu_rel_typ_unsorted_sorted {P} (pred_P : PredicativeSig P) : forall {anns Γ A s so},
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩u A : Sort@s @ so }} ->
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩u A @ ^(Some s) }}.
 Proof.
   intros * [SbΓ []].
   eexists; split; mauto 2.
@@ -258,13 +258,13 @@ Qed.
 Hint Resolve glu_rel_typ_unsorted_sorted : mcpts.
 
 
-Lemma glu_exp_with_sub_unsorted_typ_none {P} (pred_P : PredicativeSig P) : forall {Γ A s so},
-    {{ ⟪ pred_P ⟫ Γ ⊩u A : Sort@s @ so }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊩u A : Sort@s @ ^None }}.
+Lemma glu_exp_with_sub_unsorted_typ_none {P} (pred_P : PredicativeSig P) : forall {anns Γ A s so},
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩u A : Sort@s @ so }} ->
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩u A : Sort@s @ ^None }}.
 Proof.
   intros.
-  assert {{ ⟪ pred_P ⟫ ⊩ Γ }} by mauto 2.
-  assert {{ ⟪ pred_P ⟫ Γ ⊩u Sort@s @ ^None }} by mauto 3.
+  assert {{ ⟪ pred_P ⟫ ⊩ Γ with anns }} by mauto 2.
+  assert {{ ⟪ pred_P ⟫ Γ with anns ⊩u Sort@s @ ^None }} by mauto 3.
   mauto 2.
 Qed.
 

@@ -29,7 +29,7 @@ Notation "Γ ⊢s σ ® ρ ∈ R" := ((R Γ σ ρ : Prop) : (Prop : (Type : Type
 
 Notation "'DG' a ∈ R ↘ P ↘ El" := (R P El a : ((Prop : Type) : (Type : Type))) (in custom judg at level 90, a custom domain, R constr, P constr, El constr).
 Notation "'EG' A ∈ R ↘ Sb " := (R Sb A : ((Prop : (Type : Type)) : (Type : Type))) (in custom judg at level 90, A custom exp,R constr, Sb constr).
-
+Reserved Notation "'#' x : A '@' so ∈ Γ 'with' anns" (in custom judg at level 80, x constr at level 0, so constr, anns constr, A custom exp, Γ custom exp at level 50).
 
 
 Definition neut_glu_typ_pred {P : PtsSig} s a : glu_typ_pred P :=
@@ -439,6 +439,12 @@ Arguments None {P}.
 Arguments Some {P} s.
 Notation ctx_anns := (fun (P : PtsSig) => list (SortOption P)%type).
 
+Inductive anns_lookup {P : PtsSig} : nat -> typ P -> SortOption P -> ctx_anns P -> ctx P -> Prop :=
+| here : `( {{ #0 : A[Wk] @ so ∈ Γ,A with (so::anns) }})
+| there : `( {{ #n : A @ so ∈ Γ with anns }} -> {{ #(S n) : A[Wk] @ so ∈ Γ, B with (so'::anns) }} )
+where "'#' x : A '@' so ∈ Γ 'with' anns" := (anns_lookup x A so anns Γ) (in custom judg).
+
+
 Inductive glu_typ_elem {P} (pred_P : PredicativeSig P) : SortOption P -> glu_typ_pred P -> glu_exp_pred P -> domain P -> Prop :=
 | glu_typ_elem_top_sort :
   `{ (* (forall s', Ax_typ P s s' -> False) -> *)
@@ -725,10 +731,10 @@ Definition glu_rel_typ_unsorted {P} (pred_P : PredicativeSig P) so anns Γ A : P
 
 
 
-Notation "⟪ pred_P ⟫ ⊩ Γ" := (glu_rel_ctx pred_P Γ) (in custom judg at level 80, pred_P constr, Γ custom exp).
+Notation "⟪ pred_P ⟫ ⊩ Γ 'with' anns" := (glu_rel_ctx pred_P anns Γ) (in custom judg at level 80, pred_P constr, anns constr, Γ custom exp).
 
-Notation "⟪ pred_P ⟫ Γ '@' anns ⊩s τ : Γ' '@' anns'" := (glu_rel_sub pred_P anns Γ τ anns' Γ') (in custom judg at level 80, pred_P constr, anns constr, Γ custom exp, τ custom exp, anns' constr, Γ' custom exp).
-Notation "⟪ pred_P ⟫ Γ '@' anns ⊩ M : A '@' s" := (glu_rel_exp pred_P s anns Γ M A) (in custom judg at level 80, pred_P constr, anns constr, Γ custom exp, M custom exp, A custom exp, s custom exp).
-Notation "⟪ pred_P ⟫ Γ '@' anns ⊩u M : A '@' so" := (glu_rel_exp_unsorted pred_P so anns Γ M A) (in custom judg at level 80, pred_P constr, Γ custom exp, M custom exp, A custom exp, so custom exp, anns constr).
-Notation "⟪ pred_P ⟫ Γ '@' anns ⊩ A '@' s" := (glu_rel_typ pred_P s anns Γ A) (in custom judg at level 80, pred_P constr, Γ custom exp, A custom exp, s custom exp, anns constr).
-Notation "⟪ pred_P ⟫ Γ '@' anns ⊩u A '@' so" := (glu_rel_typ_unsorted pred_P so anns Γ A) (in custom judg at level 80, pred_P constr, Γ custom exp, A custom exp, so custom exp, anns constr).
+Notation "⟪ pred_P ⟫ Γ 'with' anns ⊩s τ : Γ' 'with' anns'" := (glu_rel_sub pred_P anns Γ τ anns' Γ') (in custom judg at level 80, pred_P constr, anns constr, Γ custom exp, τ custom exp, anns' constr, Γ' custom exp).
+Notation "⟪ pred_P ⟫ Γ 'with' anns ⊩ M : A '@' s" := (glu_rel_exp pred_P s anns Γ M A) (in custom judg at level 80, pred_P constr, anns constr, Γ custom exp, M custom exp, A custom exp, s custom exp).
+Notation "⟪ pred_P ⟫ Γ 'with' anns ⊩u M : A '@' so" := (glu_rel_exp_unsorted pred_P so anns Γ M A) (in custom judg at level 80, pred_P constr, Γ custom exp, M custom exp, A custom exp, so custom exp, anns constr).
+Notation "⟪ pred_P ⟫ Γ 'with' anns ⊩ A '@' s" := (glu_rel_typ pred_P s anns Γ A) (in custom judg at level 80, pred_P constr, Γ custom exp, A custom exp, s custom exp, anns constr).
+Notation "⟪ pred_P ⟫ Γ 'with' anns ⊩u A '@' so" := (glu_rel_typ_unsorted pred_P so anns Γ A) (in custom judg at level 80, pred_P constr, Γ custom exp, A custom exp, so custom exp, anns constr).
