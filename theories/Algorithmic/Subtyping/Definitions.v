@@ -13,18 +13,6 @@ Definition not_sort_pi {P} (A : nf P) : Prop :=
   | _ => True
   end.
 
-(* Record ConvertibleSig (P : PtsSig) : Prop := *)
-(*   mkConvertibleSig { *)
-(*       Convert : ctx P -> typ P -> typ P -> Prop; *)
-(*       CorrectConv : forall Γ A B, Convert Γ A B <-> {{ Γ ⊢ A ≈ B }}; *)
-(*       DecidableConv : forall Γ A B, (Convert Γ A B) \/ ~(Convert Γ A B); *)
-(*     }. *)
-
-(* Inductive alg_subtyping {P} (conv_P : ConvertibleSig P) : ctx P -> nf P -> typ P -> Prop := *)
-(* | alg_subtyp_refl : forall A B, *)
-(*     not_sort_pi A -> *)
-(*     Convert conv_P Γ A B -> *)
-(*     {{ Γ ⊢a A ⊆ B }}. *)
 
 Inductive alg_subtyping_nf {P} : nf P -> nf P -> Prop :=
 | asnf_refl : forall A A',

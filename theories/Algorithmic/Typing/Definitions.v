@@ -11,16 +11,6 @@ Reserved Notation "Γ '⊢aty' A" (in custom judg at level 80, Γ custom exp, A 
 
 Generalizable All Variables.
 
-(* Record ConvertibleSig (P : PtsSig) : Type := *)
-(*   mkConvertibleSig { *)
-(*       Convert : ctx P -> typ P -> typ P -> Prop; *)
-(*       CorrectConv : forall Γ A B, Convert Γ A B <-> {{ Γ ⊢ A ⊆ B }}; *)
-(*       DecidableConv : forall Γ A B, (Convert Γ A B) \/ ~(Convert Γ A B); *)
-(*     }. *)
-(* Arguments Convert {_}. *)
-(* Arguments CorrectConv {_}. *)
-(* Arguments DecidableConv {_}. *)
-
 Inductive alg_type_check {P} : ctx P -> typ P -> exp P -> Prop :=             
 (** Conversion *)
 | atc_conv : `( {{ Γ ⊢a M ⟹ A }} ->
