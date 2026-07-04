@@ -69,7 +69,7 @@ theories/Core/Soundness.v
 
 theories/Core/Completeness/Consequences/Types.v
 theories/Core/Completeness/Consequences/Rules.v
-# theories/Core/Semantic/Consequences.v
+theories/Core/Semantic/Consequences.v
 
 # theories/Frontend/Elaborator.v
 # theories/Algorithmic/Subtyping/Definitions.v
