@@ -121,13 +121,13 @@ Qed.
 
 Lemma wf_var_inversion_helper {P} : forall {Γ : ctx P} {x A},
     {{ Γ ⊢ #x : A }} ->
-    exists B s, {{ #x : B@s ∈ Γ }} /\ {{ Γ ⊢ B ⊆ A }}.
+    exists B, {{ #x : B ∈ Γ }} /\ {{ Γ ⊢ B ⊆ A }}.
 Proof.
   intros * HA.
   dependent induction HA.
-  - do 2 eexists; split; mauto 3.
-  - specialize (IHHA x A0 ltac:(reflexivity) ltac:(reflexivity)) as [B [s' []]].
-    do 2 eexists; split; mauto 3.
+  - eexists; split; mauto 3.
+  - specialize (IHHA x A0 ltac:(reflexivity) ltac:(reflexivity)) as [B []].
+    eexists; split; mauto 3.
 Qed.
 
 (* Lemma wf_var_inversion {P} : forall {Γ : ctx P} {x A s}, *)
@@ -323,7 +323,7 @@ Qed.
     
 Lemma exp_eq_pi_inversion {P} (pred_P : PredicativeSig P) : forall {Γ A B A' B' s1 s2 s3} {r : Ru_pi P s1 s2 s3},
     {{ Γ ⊢ Π r A B ≈ Π r A' B' : Sort@s3 }} ->
-    {{ Γ ⊢ A ≈ A' : Sort@s1 }} /\ {{ Γ, A@s1 ⊢ B ≈ B' : Sort@s2 }}.
+    {{ Γ ⊢ A ≈ A' : Sort@s1 }} /\ {{ Γ, A ⊢ B ≈ B' : Sort@s2 }}.
 Proof.
   intros * H.
   gen_presups.
@@ -342,14 +342,14 @@ Proof.
   functional_read_rewrite_clear.
   autoinjections.
   assert {{ Γ ⊢ A' ≈ A : Sort@s1 }} by mauto 3.
-  assert {{ ⊢ Γ, A'@s1 ≈ Γ, A@s1 }} by mauto 3.
+  assert {{ ⊢ Γ, A' ≈ Γ, A }} by mauto 4.
   split; [mauto 3 |].
   etransitivity; [| symmetry]; mauto 2.
 Qed.
 
 Lemma subtyp_pi_inversion {P} (pred_P : PredicativeSig P) : forall {Γ A B A' B' s1 s2 s3} {r : Ru_pi P s1 s2 s3},
     {{ Γ ⊢ Π r A B ⊆ Π r A' B' }} ->
-    {{ Γ ⊢ A ≈ A' : Sort@s1 }} /\ {{ Γ, A'@s1 ⊢ B ⊆ B' }}.
+    {{ Γ ⊢ A ≈ A' : Sort@s1 }} /\ {{ Γ, A' ⊢ B ⊆ B' }}.
 Proof.
   intros * H.
   assert {{ ⟪ pred_P ⟫ Γ ⊨ Π r A B ⊆ Π r A' B' }} by mauto 3 using completeness_fundamental_typ_subtyp.
@@ -382,8 +382,9 @@ Proof.
   assert {{ Γ ⊢ A ≈ A' : Sort@s1 }} by mauto 3.
 
   gen_presups.
-  assert {{ ⊢ Γ, A@s1 ≈ Γ, A'@s1 }} by mauto 3.
-  assert {{ Γ, A'@s1 ⊢ B : Sort@s2 }} by mauto 2.
+  assert {{ ⊢ Γ, A ≈ Γ, A' }} by mauto 4.
+  assert {{ Γ, A' ⊢ B : Sort@s2 }} by mauto 2.
+
   
   destruct (soundness_fundamental_exp pred_P _ _ _ H42) as [so [Sb []]].
   destruct (soundness_fundamental_exp pred_P _ _ _ HM0) as [so' [Sb' []]].
