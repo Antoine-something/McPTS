@@ -444,6 +444,8 @@ Inductive anns_lookup {P : PtsSig} : nat -> typ P -> SortOption P -> ctx_anns P 
 | there : `( {{ #n : A @ so ∈ Γ with anns }} -> {{ #(S n) : A[Wk] @ so ∈ Γ, B with (so'::anns) }} )
 where "'#' x : A '@' so ∈ Γ 'with' anns" := (anns_lookup x A so anns Γ) (in custom judg).
 
+#[export]
+Hint Constructors anns_lookup : mcpts.
 
 Inductive glu_typ_elem {P} (pred_P : PredicativeSig P) : SortOption P -> glu_typ_pred P -> glu_exp_pred P -> domain P -> Prop :=
 | glu_typ_elem_top_sort :
