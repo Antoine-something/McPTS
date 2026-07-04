@@ -4,7 +4,7 @@ From McPTS Require Import LibTactics PtsSignature.
 From McPTS.Core Require Import Base.
 From McPTS.Core.Syntactic Require Import Syntax.
 From McPTS.Frontend Require Import Elaborator.
-From McPTS.CaseStudies.MiniML Require Import Signature.
+From McPTS.CaseStudies.LF Require Import Signature.
 
 
 Open Scope string_scope.
@@ -37,7 +37,8 @@ Notation "s [<=] t" := (StrSet.Subset s t) (at level 70, no associativity).
 Module Cst.
   Inductive obj : Set :=
   (** Sorts *)
-  | st : obj
+  | s_typ : obj
+  | s_knd : obj
   (** Functions, without rule annotations.  Co-domains can also be removed once we have implementations *)
   | pi : string -> obj -> obj -> obj
   | fn : string -> obj -> obj -> obj -> obj
@@ -52,19 +53,20 @@ Module Cst.
 End Cst.
 
 
-Fixpoint elaborate' (cst : Cst.obj) (ctx : list string) : option (exp MiniML_Sig) :=
+Fixpoint elaborate' (cst : Cst.obj) (ctx : list string) : option (exp LF_Sig) :=
   match cst with
   (* Sort *)
-  | Cst.st => Some (@a_st MiniML_Sig s_typ)
+  | Cst.s_typ => Some (@a_st LF_Sig s_typ)
+  | Cst.s_knd => Some (@a_st LF_Sig s_knd)
   (* Functions *)
   | Cst.pi s t c =>
       match elaborate' c (s :: ctx), elaborate' t ctx with
-      | Some a, Some t => Some (@a_pi MiniML_Sig _ _ _ f_simple t a)
+      | Some a, Some t => Some (@a_pi LF_Sig _ _ _ f_simple t a)
       | _, _ => None
       end
   | Cst.fn s t b c =>
       match elaborate' c (s :: ctx), elaborate' b (s :: ctx), elaborate' t ctx with
-      | Some a, Some b, Some t => Some (@a_fn MiniML_Sig _ _ _ f_simple t b a)
+      | Some a, Some b, Some t => Some (@a_fn LF_Sig _ _ _ f_simple t b a)
       | _, _, _ => None
       end
   | Cst.app c1 c2 =>
@@ -98,7 +100,7 @@ Functional Scheme elaborate_fun_ind' := Induction for elaborate' Sort Prop.
 
 Lemma elaborator_gives_user_exp : forall O vs M,
     elaborate' O vs = Some M ->
-    user_exp MiniML_Sig M.
+    user_exp LF_Sig M.
 Proof.
   intros * Heq. gen M.
   functional induction (elaborate' O vs) using elaborate_fun_ind';
@@ -211,7 +213,7 @@ Qed.
 (** If the set of free variables in a cst are contained in a context
     then elaboration succeeds with that context, and the result is a closed term *)
 Lemma well_scoped (cst : Cst.obj) : forall ctx,  cst_variables cst [<=] StrSProp.of_list ctx  ->
-exists a : exp MiniML_Sig, (elaborate' cst ctx = Some a) /\ (closed_at a (List.length ctx)).
+exists a : exp LF_Sig, (elaborate' cst ctx = Some a) /\ (closed_at a (List.length ctx)).
 Proof.
   induction cst; intros; simpl in *; mauto.
   - (* pi *)
@@ -261,5 +263,5 @@ Proof. reflexivity. Qed.
 
 (* This test shows that the rule annotation is elaborated *)
 Example test_elab3 :
-  elaborate' (Cst.fn "x" Cst.nat Cst.nat (Cst.var "x")) nil = Some (@a_fn MiniML_Sig s_typ s_typ s_typ f_simple a_nat a_nat (a_var 0)).
+  elaborate' (Cst.fn "x" Cst.nat Cst.nat (Cst.var "x")) nil = Some (@a_fn LF_Sig s_typ s_typ s_typ f_simple a_nat a_nat (a_var 0)).
 Proof. reflexivity. Qed.
