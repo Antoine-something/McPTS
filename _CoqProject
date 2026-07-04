@@ -11,7 +11,7 @@ theories/PtsSignature/Functionality.v
 theories/PtsSignature/Decidability.v
 theories/PtsSignature.v
 
-# theories/Core/Syntactic/Syntax.v
+theories/Core/Syntactic/Syntax.v
 # theories/Core/Syntactic/System/Definitions.v
 # theories/Core/Syntactic/System/Lemmas.v
 # theories/Core/Syntactic/System/Tactics.v
@@ -76,7 +76,7 @@ theories/PtsSignature.v
 # theories/Core/Completeness/Consequences/Rules.v
 # theories/Core/Semantic/Consequences.v
 
-# theories/Frontend/Elaborator.v
+theories/Frontend/Elaborator.v
 # theories/Algorithmic/Subtyping/Definitions.v
 # theories/Algorithmic/Subtyping/Lemmas.v
 # theories/Algorithmic/Subtyping.v
@@ -91,6 +91,9 @@ theories/PtsSignature.v
 # theories/Extraction/Subtyping.v
 # ./Entrypoint.v
 
+theories/CaseStudies/MiniML/Signature.v
+theories/CaseStudies/MiniML/Frontend.v
+theories/CaseStudies/MiniML/Parser.v
 
 # theories/Instantiations/STLC.v
 # theories/Instantiations/LF.v
