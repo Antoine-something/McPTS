@@ -1171,57 +1171,57 @@ Qed.
 Hint Resolve glu_ctx_env_per_ctx_env : mcpts.
 
 
-Lemma glu_sort_elem_resp_per_subtyp_sorted {P} (pred_P : PredicativeSig P) : forall a s typ_rel exp_rel,
-    {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
-    forall a',
-      {{ ⟪ pred_P ⟫ Subs a <: a' at s }} ->
-      exists typ_rel' exp_rel',
-        {{ DG a' ∈ glu_sort_elem pred_P s ↘ typ_rel' ↘ exp_rel' }}.
-Proof.
-  simpl.
-  induction 1 using glu_sort_elem_ind;
-    intros * Hsub; dependent destruction Hsub; subst.
-  - match_by_head (per_sort pred_P) ltac:(fun H => destruct H as []).
-    invert_per_sort_elem H4.
-    repeat eexists; glu_sort_elem_econstructor; mauto 2; reflexivity.
-  - (* Pi case will require a helper lemma *)
-    admit. 
-    (* assert (glu_sort_elem pred_P s1 IP IEL a') by (eapply glu_sort_elem_resp_per_sort; mauto 3). *)
-    (* handle_per_sort_elem_irrel. *)
-    (* assert (per_sort_elem pred_P s1 in_rel a' a') by (etransitivity; [symmetry|]; eassumption). *)
+(* Lemma glu_sort_elem_resp_per_subtyp_sorted {P} (pred_P : PredicativeSig P) : forall a s typ_rel exp_rel, *)
+(*     {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} -> *)
+(*     forall a', *)
+(*       {{ ⟪ pred_P ⟫ Subs a <: a' at s }} -> *)
+(*       exists typ_rel' exp_rel', *)
+(*         {{ DG a' ∈ glu_sort_elem pred_P s ↘ typ_rel' ↘ exp_rel' }}. *)
+(* Proof. *)
+(*   simpl. *)
+(*   induction 1 using glu_sort_elem_ind; *)
+(*     intros * Hsub; dependent destruction Hsub; subst. *)
+(*   - match_by_head (per_sort pred_P) ltac:(fun H => destruct H as []). *)
+(*     invert_per_sort_elem H4. *)
+(*     repeat eexists; glu_sort_elem_econstructor; mauto 2; reflexivity. *)
+(*   - (* Pi case will require a helper lemma *) *)
+(*     admit.  *)
+(*     (* assert (glu_sort_elem pred_P s1 IP IEL a') by (eapply glu_sort_elem_resp_per_sort; mauto 3). *) *)
+(*     (* handle_per_sort_elem_irrel. *) *)
+(*     (* assert (per_sort_elem pred_P s1 in_rel a' a') by (etransitivity; [symmetry|]; eassumption). *) *)
 
-    (* invert_per_sort_elems. *)
-    (* assert (per_sort_elem pred_P s1 in_rel0 a a). *)
-    (* { *)
-    (*   destruct_conjs; pose proof ord_ru_pi_sub pred_P r sub_s3_s as [[] ?]; subst; mauto 2. *)
-    (* } *)
-    (* assert (per_sort_elem pred_P s1 in_rel1 a' a'). *)
-    (* { *)
-    (*   destruct_conjs; pose proof ord_ru_pi_sub pred_P r sub_s3_s as [[] ?]; subst; mauto 2. *)
-    (* } *)
-    (* handle_per_sort_elem_irrel. *)
+(*     (* invert_per_sort_elems. *) *)
+(*     (* assert (per_sort_elem pred_P s1 in_rel0 a a). *) *)
+(*     (* { *) *)
+(*     (*   destruct_conjs; pose proof ord_ru_pi_sub pred_P r sub_s3_s as [[] ?]; subst; mauto 2. *) *)
+(*     (* } *) *)
+(*     (* assert (per_sort_elem pred_P s1 in_rel1 a' a'). *) *)
+(*     (* { *) *)
+(*     (*   destruct_conjs; pose proof ord_ru_pi_sub pred_P r sub_s3_s as [[] ?]; subst; mauto 2. *) *)
+(*     (* } *) *)
+(*     (* handle_per_sort_elem_irrel. *) *)
 
-    (* Pi case will need a helper lemma *)
+(*     (* Pi case will need a helper lemma *) *)
 
-    (* repeat eexists; glu_sort_elem_econstructor. *)
-    (* + split; intros; subst; eassumption. *)
-    (* + eassumption. *)
-    (* + intros c equiv_c_c1. *)
-    (*   assert (in_rel c c) as equiv_c_c by intuition. *)
-    (*   assert (in_rel0 c c) as equiv_c_c0 by intuition. *)
-    (*   destruct (H8 c c equiv_c_c0). *)
-    (*   destruct H9. *)
-    (*   intros. *)
-    (*   simplify_evals. *)
-    (*   rename b into b', a0 into b. *)
-    (*   assert {{ ⟪ pred_P ⟫ Subs b <: b' at s2 }} by mauto 2. *)
-    (*   assert (exists OP' OEL',  glu_sort_elem pred_P s2 OP' OEL' b') as [OP' [OEL']] by mauto 2. *)
+(*     (* repeat eexists; glu_sort_elem_econstructor. *) *)
+(*     (* + split; intros; subst; eassumption. *) *)
+(*     (* + eassumption. *) *)
+(*     (* + intros c equiv_c_c1. *) *)
+(*     (*   assert (in_rel c c) as equiv_c_c by intuition. *) *)
+(*     (*   assert (in_rel0 c c) as equiv_c_c0 by intuition. *) *)
+(*     (*   destruct (H8 c c equiv_c_c0). *) *)
+(*     (*   destruct H9. *) *)
+(*     (*   intros. *) *)
+(*     (*   simplify_evals. *) *)
+(*     (*   rename b into b', a0 into b. *) *)
+(*     (*   assert {{ ⟪ pred_P ⟫ Subs b <: b' at s2 }} by mauto 2. *) *)
+(*     (*   assert (exists OP' OEL',  glu_sort_elem pred_P s2 OP' OEL' b') as [OP' [OEL']] by mauto 2. *) *)
       
-    (*   split; intros; subst; mauto 2. *)
-  - repeat eexists; glu_sort_elem_econstructor; mauto 2.
-  - assert (per_bot e' e') by (etransitivity; [symmetry|]; eassumption).
-    repeat eexists; glu_sort_elem_econstructor; mauto 2; try reflexivity.
-Admitted.
+(*     (*   split; intros; subst; mauto 2. *) *)
+(*   - repeat eexists; glu_sort_elem_econstructor; mauto 2. *)
+(*   - assert (per_bot e' e') by (etransitivity; [symmetry|]; eassumption). *)
+(*     repeat eexists; glu_sort_elem_econstructor; mauto 2; try reflexivity. *)
+(* Abort. *)
 
 Lemma glu_sort_elem_resp_per_subtyp {P} (pred_P : PredicativeSig P) : forall a a' s typ_rel exp_rel,
     {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->

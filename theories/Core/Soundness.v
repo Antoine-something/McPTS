@@ -15,8 +15,9 @@ Theorem soundness {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {M A},
 Proof.
   intros * H.
   assert {{ ⊢ Γ }} by mauto 2.
+  (* assert (exists anns : list (SortOption P), {{ ⊫ Γ with anns }}) as [anns] by (apply wf_ctx_implies_wf_ctx_ann; eassumption). *)
   assert {{ ⟪ pred_P ⟫ ⊨ Γ }} as [env_relΓ] by (apply completeness_fundamental_ctx; eassumption).
-  destruct (soundness_fundamental_exp pred_P _ _ _ H) as [so [Sb []]].
+  destruct (soundness_fundamental_exp pred_P _ _ _ H) as [anns [so [Sb []]]].
   pose proof (per_ctx_then_per_env_initial_env ltac:(eassumption)) as [p].
   destruct_conjs.
   functional_initial_env_rewrite_clear.

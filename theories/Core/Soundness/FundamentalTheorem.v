@@ -13,65 +13,74 @@ Import Domain_Notations.
 
 Section soundness_fundamental.
   Theorem soundness_fundamental {P} (pred_P : PredicativeSig P) :
-    (forall Γ, {{ ⊫ Γ }} -> {{ ⟪ pred_P ⟫ ⊩ Γ }}) /\
-      (forall Γ A s M, {{ Γ ⊫ M : A @ s }} -> {{ ⟪ pred_P ⟫ Γ ⊩u M : A @ s }}) /\
-      (forall Γ A s, {{ Γ ⊫ A @ s }} -> {{ ⟪ pred_P ⟫ Γ ⊩u A @ s }}) /\
-      (forall Γ Δ σ, {{ Γ ⊫s σ : Δ }} -> {{ ⟪ pred_P ⟫ Γ ⊩s σ : Δ }}).
+    (forall anns Γ, {{ ⊫ Γ with anns }} -> {{ ⟪ pred_P ⟫ ⊩ Γ with anns }}) /\
+      (forall anns Γ A s M, {{ Γ with anns ⊫ M : A @ s }} -> {{ ⟪ pred_P ⟫ Γ with anns ⊩u M : A @ s }}) /\
+      (forall anns Γ A s, {{ Γ with anns ⊫ A @ s }} -> {{ ⟪ pred_P ⟫ Γ with anns ⊩u A @ s }}) /\
+      (forall anns anns' Γ Δ σ, {{ Γ with anns ⊫s σ : Δ with anns' }} -> {{ ⟪ pred_P ⟫ Γ with anns ⊩s σ : Δ with anns' }}).
   Proof.
     eapply syntactic_wf_ann_mut_ind; mauto.
+    - intros.
+      assert {{ ⊢ Γ }} by mauto 3 using wf_ctx_ann_implies_wf_ctx.
+      assert {{ #x : A ∈ Γ}} by (eapply ann_lookup_implies_lookup; mauto 2).
+      eapply glu_rel_exp_vlookup; mauto 3.
   Qed.
 
   #[local]
   Ltac solve_it pred_P := pose proof soundness_fundamental pred_P; firstorder.
 
   Corollary soundness_fundamental_ctx_ann {P} (pred_P : PredicativeSig P) :
-    forall Γ, {{ ⊫ Γ }} -> {{ ⟪ pred_P ⟫ ⊩ Γ }}.
+    forall anns Γ, {{ ⊫ Γ with anns }} -> {{ ⟪ pred_P ⟫ ⊩ Γ with anns }}.
   Proof. solve_it pred_P. Qed.
 
   Corollary soundness_fundamental_exp_ann {P} (pred_P : PredicativeSig P) :
-    forall Γ A so M, {{ Γ ⊫ M : A @ so }} -> {{ ⟪ pred_P ⟫ Γ ⊩u M : A @ so }}.
+    forall anns Γ A so M, {{ Γ with anns ⊫ M : A @ so }} -> {{ ⟪ pred_P ⟫ Γ with anns ⊩u M : A @ so }}.
   Proof. solve_it pred_P. Qed.
 
   Corollary soundness_fundamental_typ_ann {P} (pred_P : PredicativeSig P) :
-    forall Γ A so, {{ Γ ⊫ A @ so }} -> {{ ⟪ pred_P ⟫ Γ ⊩u A @ so }}.
+    forall anns Γ A so, {{ Γ with anns ⊫ A @ so }} -> {{ ⟪ pred_P ⟫ Γ with anns ⊩u A @ so }}.
   Proof. solve_it pred_P. Qed.
 
   Corollary soundness_fundamental_sub_ann {P} (pred_P : PredicativeSig P) :
-    forall Γ Δ σ, {{ Γ ⊫s σ : Δ }} -> {{ ⟪ pred_P ⟫ Γ ⊩s σ : Δ }}.
+    forall anns anns' Γ Δ σ, {{ Γ with anns ⊫s σ : Δ with anns' }} -> {{ ⟪ pred_P ⟫ Γ with anns ⊩s σ : Δ with anns' }}.
   Proof. solve_it pred_P. Qed.
 
 
   Theorem soundness_fundamental_ctx {P} (pred_P : PredicativeSig P) :
-    forall Γ, {{ ⊢ Γ }} -> {{ ⟪ pred_P ⟫ ⊩ Γ }}.
+    forall Γ, {{ ⊢ Γ }} -> exists anns, {{ ⟪ pred_P ⟫ ⊩ Γ with anns }}.
   Proof.
     intros.
-    assert {{ ⊫ Γ }} by mauto 2.
+    assert (exists anns, {{ ⊫ Γ with anns }}) as [anns] by mauto 2.
+    eexists.
     eapply soundness_fundamental_ctx_ann; mauto 2.
   Qed.
 
   Theorem soundness_fundamental_exp {P} (pred_P : PredicativeSig P) :
-    forall Γ M A, {{ Γ ⊢ M : A }} -> exists so, {{ ⟪ pred_P ⟫ Γ ⊩u M : A @ so }}.
+    forall Γ M A, {{ Γ ⊢ M : A }} -> exists anns so, {{ ⟪ pred_P ⟫ Γ with anns ⊩u M : A @ so }}.
   Proof.
     intros.
-    assert (exists so, {{ Γ ⊫ M : A @ so }}) as [so] by mauto 2.
-    eexists.
+    assert (exists anns, {{ ⊫ Γ with anns }}) as [anns] by mauto 3.
+    assert (exists so, {{ Γ with anns ⊫ M : A @ so }}) as [so] by mauto 2.
+    do 2 eexists.
     eapply soundness_fundamental_exp_ann; mauto 2.
   Qed.
 
   Theorem soundness_fundamental_typ {P} (pred_P : PredicativeSig P) :
-    forall Γ A, {{ Γ ⊢ A }} -> exists so, {{ ⟪ pred_P ⟫ Γ ⊩u A @ so }}.
+    forall Γ A, {{ Γ ⊢ A }} -> exists anns so, {{ ⟪ pred_P ⟫ Γ with anns ⊩u A @ so }}.
   Proof.
     intros.
-    assert (exists so, {{ Γ ⊫ A @ so }}) as [so] by mauto 2.
-    eexists.
+    assert (exists anns, {{ ⊫ Γ with anns }}) as [anns] by mauto 3.
+    assert (exists so, {{ Γ with anns ⊫ A @ so }}) as [so] by mauto 2.
+    do 2 eexists.
     eapply soundness_fundamental_typ_ann; mauto 2.
   Qed.
 
   Theorem soundness_fundamental_sub {P} (pred_P : PredicativeSig P):
-    forall Γ σ Δ, {{ Γ ⊢s σ : Δ }} -> {{ ⟪ pred_P ⟫ Γ ⊩s σ : Δ }}.
+    forall Γ σ Δ, {{ Γ ⊢s σ : Δ }} -> exists annsΓ annsΔ, {{ ⟪ pred_P ⟫ Γ with annsΓ ⊩s σ : Δ with annsΔ }}.
   Proof.
     intros.
-    assert {{ Γ ⊫s σ : Δ }} by mauto 2.
+    assert (exists anns, {{ ⊫ Γ with anns }}) as [anns] by mauto 3.
+    assert (exists anns', {{ Γ with anns ⊫s σ : Δ with anns' }}) as [anns'] by mauto 2.
+    do 2 eexists.
     eapply soundness_fundamental_sub_ann; mauto 2.
   Qed.
 End soundness_fundamental.

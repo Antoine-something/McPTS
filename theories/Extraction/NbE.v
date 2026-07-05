@@ -14,7 +14,7 @@ Inductive initial_env_order {P : PtsSig} : (ctx P) -> Prop :=
   `( initial_env_order Γ ->
      (forall ρ, initial_env Γ ρ ->
            eval_exp_order A ρ) ->
-     initial_env_order {{{ Γ, A@s }}}).
+     initial_env_order {{{ Γ, A }}}).
 
 #[local]
 Hint Constructors initial_env_order : mcpts.
@@ -44,7 +44,7 @@ Section InitialEnvImpl.
   #[tactic="impl_obl_tac",derive(equations=no,eliminator=no)]
   Equations initial_env_impl {P : PtsSig} (Γ : ctx P) (H : initial_env_order Γ) : { ρ | initial_env Γ ρ } by struct H :=
   | nil, H => exist _ empty_env _
-  | {{{ Γ, A@s }}}, H =>
+  | {{{ Γ, A }}}, H =>
       let (ρ, Hρ) := initial_env_impl Γ _ in
       let (a, Ha) := eval_exp_impl A ρ _ in
       exist _ d{{{ ρ ↦ ⇑! a (length Γ) }}} _.
