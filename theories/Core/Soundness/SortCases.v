@@ -33,7 +33,7 @@ Lemma glu_rel_exp_of_typ_unsorted {P} (pred_P : PredicativeSig P) : forall {anns
             {{ ⟦ A ⟧ ρ ↘ a }} /\
               {{ Dom a ≈ a ∈ per_sort pred_P s }} /\
               forall typ_rel exp_rel, {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} -> {{ Δ ⊢ A[σ] ® typ_rel }}) ->
-    {{ ⟪ pred_P ⟫ Γ with anns ⊩u A : Sort@s @ ^None }}.
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩u A : Sort@s @ ^so_None }}.
 Proof.
   intros * ? Hbody.
   eexists; split; mauto.
@@ -74,7 +74,7 @@ Qed.
 Lemma glu_rel_exp_typ_unsorted {P} (pred_P : PredicativeSig P) : forall {anns Γ s s'},
     Ax_typ P s s' ->
     {{ ⟪ pred_P ⟫ ⊩ Γ with anns }} ->
-    {{ ⟪ pred_P ⟫ Γ with anns ⊩u Sort@s : Sort@s' @ ^None }}.
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩u Sort@s : Sort@s' @ ^so_None }}.
 Proof.
   intros * Hax [].
   eapply glu_rel_exp_of_typ_unsorted; mauto 3.
@@ -145,7 +145,7 @@ Proof.
     intros.
     destruct_glu_rel_sub_with_sub.
     rewrite <- H7 in H8.
-    assert (glu_rel_exp_with_sub_unsorted pred_P None Δ0 A {{{ Sort@s }}} {{{ σ∘σ0 }}} ρ') by mauto 2.
+    assert (glu_rel_exp_with_sub_unsorted pred_P so_None Δ0 A {{{ Sort@s }}} {{{ σ∘σ0 }}} ρ') by mauto 2.
     dependent destruction H9.
     inversion H9; subst.
     econstructor; mauto 4.
@@ -186,7 +186,7 @@ Hint Resolve glu_rel_typ_sort : mcpts.
 Lemma glu_rel_typ_unsorted_sort_ax {P} (pred_P : PredicativeSig P) : forall {anns Γ s s'},
     Ax_typ P s s' ->
     {{ ⟪ pred_P ⟫ ⊩ Γ with anns }} ->
-    {{ ⟪ pred_P ⟫ Γ with anns ⊩u Sort@s @ ^(Some s') }}.
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩u Sort@s @ ^(so_Some s') }}.
 Proof.
   intros.
   mauto 3.
@@ -197,7 +197,7 @@ Hint Resolve glu_rel_typ_unsorted_sort_ax : mcpts.
 
 Lemma glu_rel_typ_unsorted_sort_none {P} (pred_P : PredicativeSig P) : forall {anns Γ s},
     {{ ⟪ pred_P ⟫ ⊩ Γ with anns }} ->
-    {{ ⟪ pred_P ⟫ Γ with anns ⊩u Sort@s @ ^None}}.
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩u Sort@s @ ^so_None}}.
 Proof.
   intros * [SbΓ].
   eexists; split; [eassumption |].
@@ -234,7 +234,7 @@ Hint Resolve glu_rel_typ_sorted : mcpts.
 
 Lemma glu_rel_typ_unsorted_sorted {P} (pred_P : PredicativeSig P) : forall {anns Γ A s so},
     {{ ⟪ pred_P ⟫ Γ with anns ⊩u A : Sort@s @ so }} ->
-    {{ ⟪ pred_P ⟫ Γ with anns ⊩u A @ ^(Some s) }}.
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩u A @ ^(so_Some s) }}.
 Proof.
   intros * [SbΓ []].
   eexists; split; mauto 2.
@@ -260,11 +260,11 @@ Hint Resolve glu_rel_typ_unsorted_sorted : mcpts.
 
 Lemma glu_exp_with_sub_unsorted_typ_none {P} (pred_P : PredicativeSig P) : forall {anns Γ A s so},
     {{ ⟪ pred_P ⟫ Γ with anns ⊩u A : Sort@s @ so }} ->
-    {{ ⟪ pred_P ⟫ Γ with anns ⊩u A : Sort@s @ ^None }}.
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩u A : Sort@s @ ^so_None }}.
 Proof.
   intros.
   assert {{ ⟪ pred_P ⟫ ⊩ Γ with anns }} by mauto 2.
-  assert {{ ⟪ pred_P ⟫ Γ with anns ⊩u Sort@s @ ^None }} by mauto 3.
+  assert {{ ⟪ pred_P ⟫ Γ with anns ⊩u Sort@s @ ^so_None }} by mauto 3.
   mauto 2.
 Qed.
 

@@ -95,7 +95,7 @@ Qed.
 
 Lemma glu_rel_exp_with_sub_implies_glu_rel_exp_with_sub_unsorted {P} (pred_P : PredicativeSig P) : forall {s Δ A M σ ρ},
     glu_rel_exp_with_sub pred_P s Δ M A σ ρ ->
-    glu_rel_exp_with_sub_unsorted pred_P (Some s) Δ M A σ ρ.
+    glu_rel_exp_with_sub_unsorted pred_P (so_Some s) Δ M A σ ρ.
 Proof.
   intros.
   inversion H; subst.
@@ -107,7 +107,7 @@ Qed.
 
 Lemma glu_rel_typ_with_sub_implies_glu_rel_typ_with_sub_unsorted {P} (pred_P : PredicativeSig P) : forall {s Δ A σ ρ},
     glu_rel_typ_with_sub pred_P s Δ A σ ρ ->
-    glu_rel_typ_with_sub_unsorted pred_P (Some s) Δ A σ ρ.
+    glu_rel_typ_with_sub_unsorted pred_P (so_Some s) Δ A σ ρ.
 Proof.
   intros.
   inversion H; subst.
@@ -120,9 +120,9 @@ Qed.
 
 Lemma glu_rel_sub_extend_unsorted {P} (pred_P : PredicativeSig P) : forall {anns Γ σ anns' Δ M A},
     {{ ⟪ pred_P ⟫ Γ with anns ⊩s σ : Δ with anns' }} ->
-    {{ ⟪ pred_P ⟫ Δ with anns' ⊩u A @ ^None }} ->
-    {{ ⟪ pred_P ⟫ Γ with anns ⊩u M : A[σ] @ ^None }} ->
-    {{ ⟪ pred_P ⟫ Γ with anns ⊩s (σ ,, M) : Δ , A with None::anns' }}.
+    {{ ⟪ pred_P ⟫ Δ with anns' ⊩u A @ ^so_None }} ->
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩u M : A[σ] @ ^so_None }} ->
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩s (σ ,, M) : Δ , A with so_None::anns' }}.
 Proof.
   intros * Hσ HA HM.
   assert {{ Γ ⊢s σ : Δ }} by mauto 3.
@@ -182,9 +182,9 @@ Qed.
 
 Lemma glu_rel_sub_extend_sorted {P} (pred_P : PredicativeSig P) : forall {anns s Γ σ anns' Δ M A},
     {{ ⟪ pred_P ⟫ Γ with anns ⊩s σ : Δ with anns' }} ->
-    {{ ⟪ pred_P ⟫ Δ with anns' ⊩u A @ ^(Some s) }} ->
-    {{ ⟪ pred_P ⟫ Γ with anns ⊩u M : A[σ] @ ^(Some s) }} ->
-    {{ ⟪ pred_P ⟫ Γ with anns ⊩s (σ ,, M) : Δ , A with (Some s)::anns' }}.
+    {{ ⟪ pred_P ⟫ Δ with anns' ⊩u A @ ^(so_Some s) }} ->
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩u M : A[σ] @ ^(so_Some s) }} ->
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩s (σ ,, M) : Δ , A with (so_Some s)::anns' }}.
 Proof.
   intros * Hσ HA HM.
   assert {{ Γ ⊢s σ : Δ }} by mauto 3.

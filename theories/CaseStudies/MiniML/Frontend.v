@@ -35,6 +35,21 @@ Notation "s [<=] t" := (StrSet.Subset s t) (at level 70, no associativity).
 
 (** * Concrete Syntax Tree *)
 Module Cst.
+  Inductive obj' : Set :=
+  (** Sorts *)
+  | st' : obj'
+  (** Functions, without rule annotations (it can be inferred since there is only one possible rule) *)
+  | pi' : string -> obj' -> obj' -> obj'
+  | fn' : string -> obj' -> obj' -> obj'
+  | app' : obj' -> obj' -> obj'
+  (** Variables *)
+  | var' : string -> obj'
+  (** Natural numbers *)
+  | nat' : obj'
+  | zero' : obj'
+  | succ' : obj' -> obj'
+  | natrec' : obj' -> string -> obj' -> obj' -> string -> string -> obj' -> obj'.
+  
   Inductive obj : Set :=
   (** Sorts *)
   | st : obj
@@ -48,10 +63,10 @@ Module Cst.
   | nat : obj
   | zero : obj
   | succ : obj -> obj
-  | natrec : obj -> string -> obj -> obj -> string -> string -> obj -> obj.
+  | natrec : obj -> string -> obj -> obj -> string -> string -> obj -> obj.  
 End Cst.
 
-
+        
 Fixpoint elaborate' (cst : Cst.obj) (ctx : list string) : option (exp MiniML_Sig) :=
   match cst with
   (* Sort *)

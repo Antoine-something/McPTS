@@ -106,13 +106,12 @@ theories/Extraction/PseudoMonadic.v
 theories/Extraction/Subtyping.v
 theories/Extraction/TypeCheck.v
 
-# # ./Entrypoint.v
-
 
 ## Case studies ##
 theories/CaseStudies/MiniML/Signature.v
 theories/CaseStudies/MiniML/Frontend.v
 theories/CaseStudies/MiniML/Parser.v
+theories/CaseStudies/MiniML/Entrypoint.v
 
 theories/CaseStudies/LF/Signature.v
 # theories/CaseStudies/LF/Frontend.v

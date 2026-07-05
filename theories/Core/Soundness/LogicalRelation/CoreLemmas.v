@@ -520,7 +520,7 @@ Ltac apply_predicate_equivalence :=
   clear_predicate_equivalence.
 
 Lemma glu_typ_elem_sort_lvl {P} (pred_P : PredicativeSig P) : forall s typ_rel exp_rel a,
-    {{ DG a ∈ glu_typ_elem pred_P (Some s) ↘ typ_rel ↘ exp_rel }} ->
+    {{ DG a ∈ glu_typ_elem pred_P (so_Some s) ↘ typ_rel ↘ exp_rel }} ->
     forall Γ A,
       {{ Γ ⊢ A ® typ_rel }} ->
       {{ Γ ⊢ A : Sort@s }}.
@@ -546,7 +546,7 @@ Proof.
 Qed.
 
 Lemma glu_typ_elem_none_typ_resp_typ_eq {P} (pred_P : PredicativeSig P) : forall typ_rel exp_rel a,
-    {{ DG a ∈ glu_typ_elem pred_P None ↘ typ_rel ↘ exp_rel }} ->
+    {{ DG a ∈ glu_typ_elem pred_P so_None ↘ typ_rel ↘ exp_rel }} ->
     forall Γ A A',
       {{ Γ ⊢ A ® typ_rel }} ->
       {{ Γ ⊢ A ≈ A' }} ->
@@ -558,7 +558,7 @@ Proof.
   simpl_glu_rel.
   transitivity A; mauto 3.
 Qed.
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) typ_rel exp_rel a (H : glu_typ_elem pred_P None typ_rel exp_rel a) Γ : (typ_rel Γ)
+Add Parametric Morphism {P} (pred_P : PredicativeSig P) typ_rel exp_rel a (H : glu_typ_elem pred_P so_None typ_rel exp_rel a) Γ : (typ_rel Γ)
     with signature wf_typ_eq Γ  ==> iff as glu_typ_elem_typ_morphism_iff1.
 Proof.
   split; intros;
@@ -567,7 +567,7 @@ Proof.
 Qed.
 
 Lemma glu_typ_elem_some_typ_resp_exp_eq {P} (pred_P : PredicativeSig P) : forall s typ_rel exp_rel a,
-    {{ DG a ∈ glu_typ_elem pred_P (Some s) ↘ typ_rel ↘ exp_rel }} ->
+    {{ DG a ∈ glu_typ_elem pred_P (so_Some s) ↘ typ_rel ↘ exp_rel }} ->
     forall Γ A A',
       {{ Γ ⊢ A ® typ_rel }} ->
       {{ Γ ⊢ A ≈ A' : Sort@s }} ->
@@ -578,14 +578,14 @@ Proof.
   inversion_clear H.
   eapply glu_sort_elem_typ_resp_exp_eq; mauto 2.
 Qed.
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) s typ_rel exp_rel a (H : glu_typ_elem pred_P (Some s) typ_rel exp_rel a) Γ : (typ_rel Γ)
+Add Parametric Morphism {P} (pred_P : PredicativeSig P) s typ_rel exp_rel a (H : glu_typ_elem pred_P (so_Some s) typ_rel exp_rel a) Γ : (typ_rel Γ)
     with signature wf_exp_eq Γ {{{ Sort@s }}}  ==> iff as glu_typ_elem_some_typ_morphism_iff1.
 Proof.
   split; intros; eapply glu_typ_elem_some_typ_resp_exp_eq; mauto 2.
 Qed.
 
 Lemma glu_typ_elem_none_trm_resp_typ_eq {P} (pred_P : PredicativeSig P) : forall typ_rel exp_rel a,
-    {{ DG a ∈ glu_typ_elem pred_P None ↘ typ_rel ↘ exp_rel }} ->
+    {{ DG a ∈ glu_typ_elem pred_P so_None ↘ typ_rel ↘ exp_rel }} ->
     forall Γ M A m A',
       {{ Γ ⊢ M : A ® m ∈ exp_rel }} ->
       {{ Γ ⊢ A ≈ A' }} ->
@@ -599,7 +599,7 @@ Proof.
   destruct_conjs.
   split; mauto.
 Qed.
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) typ_rel exp_rel a (H : glu_typ_elem pred_P None typ_rel exp_rel a) Γ : (exp_rel Γ)
+Add Parametric Morphism {P} (pred_P : PredicativeSig P) typ_rel exp_rel a (H : glu_typ_elem pred_P so_None typ_rel exp_rel a) Γ : (exp_rel Γ)
     with signature wf_typ_eq Γ  ==> eq ==> eq ==> iff as glu_typ_elem_none_trm_morphism_iff1.
 Proof.
   split; intros;
@@ -608,7 +608,7 @@ Proof.
 Qed.
 
 Lemma glu_typ_elem_some_trm_resp_typ_exp_eq {P} (pred_P : PredicativeSig P) : forall s typ_rel exp_rel a,
-    {{ DG a ∈ glu_typ_elem pred_P (Some s) ↘ typ_rel ↘ exp_rel }} ->
+    {{ DG a ∈ glu_typ_elem pred_P (so_Some s) ↘ typ_rel ↘ exp_rel }} ->
     forall Γ M A m A',
       {{ Γ ⊢ M : A ® m ∈ exp_rel }} ->
       {{ Γ ⊢ A ≈ A' : Sort@s }} ->
@@ -619,7 +619,7 @@ Proof.
   inversion_clear H.
   eapply glu_sort_elem_trm_resp_typ_exp_eq; mauto 2.
 Qed.
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) s typ_rel exp_rel a (H : glu_typ_elem pred_P (Some s) typ_rel exp_rel a) Γ : (exp_rel Γ)
+Add Parametric Morphism {P} (pred_P : PredicativeSig P) s typ_rel exp_rel a (H : glu_typ_elem pred_P (so_Some s) typ_rel exp_rel a) Γ : (exp_rel Γ)
     with signature wf_exp_eq Γ {{{ Sort@s }}}  ==> eq ==> eq ==> iff as glu_typ_elem_some_trm_morphism_iff1.
 Proof.
   split; intros;
@@ -714,7 +714,7 @@ Proof.
 Qed.
 
 Lemma glu_typ_elem_trm_sort_lvl {P} (pred_P : PredicativeSig P) : forall s typ_rel exp_rel a,
-    {{ DG a ∈ glu_typ_elem pred_P (Some s) ↘ typ_rel ↘ exp_rel }} ->
+    {{ DG a ∈ glu_typ_elem pred_P (so_Some s) ↘ typ_rel ↘ exp_rel }} ->
     forall Γ M A m,
       {{ Γ ⊢ M : A ® m ∈ exp_rel }} ->
       {{ Γ ⊢ A : Sort@s }}.
@@ -1430,11 +1430,11 @@ Ltac saturate_glu_info1 :=
       H1 : ?exp_rel _ _ _ _ |- _ =>
       pose proof (glu_sort_elem_trm_escape _ _ _ _ _ H _ _ _ _ H1);
       fail_if_dup
-  | H : glu_typ_elem _ (Some ?s) ?typ_rel _ _,
+  | H : glu_typ_elem _ (so_Some ?s) ?typ_rel _ _,
       H1 : ?typ_rel _ _ |- _ =>
       pose proof (glu_typ_elem_sort_lvl _ _ _ _ _ H _ _ H1);
       fail_if_dup
-  | H : glu_typ_elem _ None ?typ_rel _ _,
+  | H : glu_typ_elem _ so_None ?typ_rel _ _,
       H1 : ?typ_rel _ _ |- _ =>
       pose proof (glu_typ_elem_wf_typ _ _ _ _ _ H _ _ H1);
       fail_if_dup
@@ -1723,7 +1723,7 @@ Proof.
     mauto 3.
 Qed.
 
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) a Γ : (glu_elem_bot_unsorted pred_P None a Γ)
+Add Parametric Morphism {P} (pred_P : PredicativeSig P) a Γ : (glu_elem_bot_unsorted pred_P so_None a Γ)
     with signature wf_typ_eq Γ  ==> eq ==> eq ==> iff as glu_elem_bot_unsorted_morphism_iff2.
 Proof.
   intros A A' HAA' *.  

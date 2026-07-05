@@ -63,8 +63,8 @@ Hint Resolve glu_rel_typ_to_wf_exp : mcpts.
 
 Lemma glu_rel_ctx_extend_sorted {P} (pred_P : PredicativeSig P) : forall {anns Γ A s},
     {{ ⟪ pred_P ⟫ ⊩ Γ with anns }} ->
-    {{ ⟪ pred_P ⟫ Γ with anns ⊩u A @ ^(Some s) }} ->
-    {{ ⟪ pred_P ⟫ ⊩ Γ, A with (Some s)::anns}}.
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩u A @ ^(so_Some s) }} ->
+    {{ ⟪ pred_P ⟫ ⊩ Γ, A with (so_Some s)::anns}}.
 Proof.
   intros * [Sb] HA.
   assert {{ ⟪ pred_P ⟫ Γ with anns ⊩ A @ s }} by mauto 2.
@@ -78,8 +78,8 @@ Qed.
 
 Lemma glu_rel_ctx_extend_unsorted {P} (pred_P : PredicativeSig P) : forall {anns Γ A},
     {{ ⟪ pred_P ⟫ ⊩ Γ with anns }} ->
-    {{ ⟪ pred_P ⟫ Γ with anns ⊩u A @ ^None }} ->
-    {{ ⟪ pred_P ⟫ ⊩ Γ, A with None::anns}}.
+    {{ ⟪ pred_P ⟫ Γ with anns ⊩u A @ ^so_None }} ->
+    {{ ⟪ pred_P ⟫ ⊩ Γ, A with so_None::anns}}.
 Proof.
   intros * [Sb] HA.
   inversion HA; subst.

@@ -23,7 +23,7 @@ Proof.
   functional_initial_env_rewrite_clear.
   assert {{ Γ ⊢s Id ® p ∈ Sb }} by (eapply initial_env_glu_rel_exp; mauto).
   destruct_glu_rel_exp_with_sub_unsorted.
-  - assert {{ Γ ⊢ M[Id] : A[Id] ® m ∈ glu_elem_top_unsorted pred_P None d{{{ Sort@s }}} }} by (eapply realize_glu_elem_top_unsorted; mauto).
+  - assert {{ Γ ⊢ M[Id] : A[Id] ® m ∈ glu_elem_top_unsorted pred_P so_None d{{{ Sort@s }}} }} by (eapply realize_glu_elem_top_unsorted; mauto).
     simpl in H8.
     dependent destruction H8.
     match_by_head (@per_top P) ltac:(fun H => destruct (H (length Γ)) as [W []]).

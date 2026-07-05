@@ -675,9 +675,9 @@ Qed.
 Hint Resolve realize_glu_typ_top_unsorted realize_glu_elem_top_unsorted : mcpts.
 
 Lemma var_glu_elem_bot_unsorted {P} (pred_P : PredicativeSig P) : forall a typ_rel exp_rel Γ A,
-    {{ DG a ∈ glu_typ_elem pred_P None ↘ typ_rel ↘ exp_rel }} ->
+    {{ DG a ∈ glu_typ_elem pred_P so_None ↘ typ_rel ↘ exp_rel }} ->
     {{ Γ ⊢ A ® typ_rel }} ->
-    {{ Γ, A ⊢ #0 : A[Wk] ® !(length Γ) ∈ glu_elem_bot_unsorted pred_P None a }}.
+    {{ Γ, A ⊢ #0 : A[Wk] ® !(length Γ) ∈ glu_elem_bot_unsorted pred_P so_None a }}.
 Proof.
   intros.
   saturate_glu_info.

@@ -31,3 +31,11 @@ Proof.
   induction 1; intros; eauto.
   econstructor; eauto.
 Qed.
+
+
+Inductive SortOption (P : PtsSig) : Type :=
+| so_None : SortOption P
+| so_Some : P -> SortOption P.
+
+Arguments so_None {P}.
+Arguments so_Some {P} s.
