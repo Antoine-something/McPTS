@@ -112,7 +112,7 @@ theories/Extraction/TypeCheck.v
 ## Case studies ##
 theories/CaseStudies/MiniML/Signature.v
 theories/CaseStudies/MiniML/Frontend.v
-# theories/CaseStudies/MiniML/Parser.v
+theories/CaseStudies/MiniML/Parser.v
 
 theories/CaseStudies/LF/Signature.v
 # theories/CaseStudies/LF/Frontend.v

@@ -38,7 +38,7 @@ Module Cst.
   Inductive obj : Set :=
   (** Sorts *)
   | st : obj
-  (** Functions, without rule annotations.  Co-domains can also be removed once we have implementations *)
+  (** Functions, without rule annotations (it can be inferred since there is only one possible rule) *)
   | pi : string -> obj -> obj -> obj
   | fn : string -> obj -> obj -> obj -> obj
   | app : obj -> obj -> obj
