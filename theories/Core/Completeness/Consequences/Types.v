@@ -84,12 +84,12 @@ Proof.
   unfold per_sort in *.
   destruct_conjs.
   
-  assert (exists A' s', {{ #x : A'@s'  ∈ Γ }} /\ {{ Γ ⊢ A' ⊆ Sort@s }}) as [A' [s' [? _]]] by mauto 2.
+  assert (exists A', {{ #x : A' ∈ Γ }} /\ {{ Γ ⊢ A' ⊆ Sort@s }}) as [A' [? _]] by mauto 2.
   assert (exists a, {{ #| ρ[x] |↘ ⇑! a (length Γ - x - 1) }}) as [? Heq] by mauto 2.
   destruct Histyp;
     invert_rel_typ_body.
   (* unfold per_bot in H5. *)
-  assert (exists A'' s'', {{ #x1 : A''@s''  ∈ Γ }} /\ {{ Γ ⊢ A'' ⊆ Sort@s }}) as [A'' [s'' [? _]]] by mauto 2.
+  assert (exists A'', {{ #x1 : A''  ∈ Γ }} /\ {{ Γ ⊢ A'' ⊆ Sort@s }}) as [A'' [? _]] by mauto 2.
   assert (exists a', {{ #| ρ[x1] |↘ ⇑! a' (length Γ - x1 - 1) }}) as [? Heq'] by mauto 2.
   assert (x < length Γ) by mauto 2.
   assert (x1 < length Γ) by mauto 2.  
@@ -123,7 +123,7 @@ Proof.
   gen_presups.
   
   inversion_clear HB.
-  assert (exists A' s', {{ #x : A'@s'  ∈ Γ }} /\ {{ Γ ⊢ A' ⊆ Sort@s }}) as [A' [s' [? ?]]] by mauto 2.
+  assert (exists A', {{ #x : A'  ∈ Γ }} /\ {{ Γ ⊢ A' ⊆ Sort@s }}) as [A' [? ?]] by mauto 2.
   assert (exists a, {{ #| ρ[x] |↘ ⇑! a (length Γ - x - 1) }}) as [? Heq] by mauto 2.  
   simplify_evals.
 
@@ -136,7 +136,7 @@ Proof.
     invert_rel_typ_body.
   
   inversion_clear HA.
-  assert (exists A'' s'', {{ #x3 : A''@s''  ∈ Γ }} /\ {{ Γ ⊢ A'' ⊆ Sort@s1 }}) as [A'' [s'' [? ?]]] by mauto 2.
+  assert (exists A'', {{ #x3 : A'' ∈ Γ }} /\ {{ Γ ⊢ A'' ⊆ Sort@s1 }}) as [A'' [? ?]] by mauto 2.
   assert (exists a', {{ #| ρ[x3] |↘ ⇑! a' (length Γ - x3 - 1) }}) as [? Heq'] by mauto 2.
   simplify_evals.
   assert (x3 < length Γ) by mauto 2.
@@ -168,7 +168,7 @@ Proof.
   gen_presups.
   
   inversion_clear HA.
-  assert (exists A' s', {{ #x : A'@s'  ∈ Γ }} /\ {{ Γ ⊢ A' ⊆ Sort@s }}) as [A' [s' [? ?]]] by mauto 2.
+  assert (exists A', {{ #x : A' ∈ Γ }} /\ {{ Γ ⊢ A' ⊆ Sort@s }}) as [A' [? ?]] by mauto 2.
   assert (exists a, {{ #| ρ[x] |↘ ⇑! a (length Γ - x - 1) }}) as [? Heq] by mauto 2.  
   destruct Histyp; simplify_evals; inversion_clear H10.
 
@@ -182,7 +182,7 @@ Proof.
     destruct (per_subtyp_pi_inv_right pred_P H9) as [a' [ρ' [B']]].
     inversion H10.
   - inversion_clear HB.
-    assert (exists A'' s'', {{ #x1 : A''@s''  ∈ Γ }} /\ {{ Γ ⊢ A'' ⊆ Sort@s1 }}) as [A'' [s'' [? ?]]] by mauto 2.
+    assert (exists A'', {{ #x1 : A'' ∈ Γ }} /\ {{ Γ ⊢ A'' ⊆ Sort@s1 }}) as [A'' [? ?]] by mauto 2.
     assert (exists a, {{ #| ρ[x1] |↘ ⇑! a (length Γ - x1 - 1) }}) as [? Heq] by mauto 2.
     simplify_evals.
 
@@ -213,7 +213,7 @@ Proof.
   gen_presups.
   
   inversion_clear HB.
-  assert (exists A' s', {{ #x : A'@s'  ∈ Γ }} /\ {{ Γ ⊢ A' ⊆ Sort@s }}) as [A' [s' [? ?]]] by mauto 2.
+  assert (exists A', {{ #x : A' ∈ Γ }} /\ {{ Γ ⊢ A' ⊆ Sort@s }}) as [A' [? ?]] by mauto 2.
   assert (exists a, {{ #| ρ[x] |↘ ⇑! a (length Γ - x - 1) }}) as [? Heq] by mauto 2.  
   destruct Histyp; simplify_evals; inversion_clear H8.
 
@@ -227,7 +227,7 @@ Proof.
     destruct (per_subtyp_pi_inv_left pred_P H9) as [a' [ρ' [B']]].
     inversion H8 .
   - inversion_clear HA.
-    assert (exists A'' s'', {{ #x1 : A''@s''  ∈ Γ }} /\ {{ Γ ⊢ A'' ⊆ Sort@s1 }}) as [A'' [s'' [? ?]]] by mauto 2.
+    assert (exists A'', {{ #x1 : A'' ∈ Γ }} /\ {{ Γ ⊢ A'' ⊆ Sort@s1 }}) as [A'' [? ?]] by mauto 2.
     assert (exists a, {{ #| ρ[x1] |↘ ⇑! a (length Γ - x1 - 1) }}) as [? Heq] by mauto 2.
     simplify_evals.
 

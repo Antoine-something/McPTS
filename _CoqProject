@@ -65,11 +65,11 @@ theories/Core/Soundness/FunctionCases.v
 theories/Core/Soundness/NatCases.v
 theories/Core/Soundness/Extension/SystemAnnotated.v
 theories/Core/Soundness/FundamentalTheorem.v
-# theories/Core/Soundness.v
+theories/Core/Soundness.v
 
-# theories/Core/Completeness/Consequences/Types.v
-# theories/Core/Completeness/Consequences/Rules.v
-# theories/Core/Semantic/Consequences.v
+theories/Core/Completeness/Consequences/Types.v
+theories/Core/Completeness/Consequences/Rules.v
+theories/Core/Semantic/Consequences.v
 
 # theories/Frontend/Elaborator.v
 # theories/Algorithmic/Subtyping/Definitions.v
