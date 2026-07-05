@@ -6,6 +6,8 @@ From McPTS.CaseStudies.MiniML Require Import Frontend.
 
 Parameter loc : Type.
 
+Arguments eq_refl {_} _.
+
 %}
 
 %token <loc*string> VAR
