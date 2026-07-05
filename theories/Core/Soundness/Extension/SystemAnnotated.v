@@ -111,17 +111,17 @@ with wf_sub_ann {P} : ctx_anns P -> ctx_anns P -> ctx P -> ctx P -> sub P -> Pro
   `( {{ ⊫ Γ with anns }} ->
      {{ Γ with anns ⊫s Id : Γ with anns }} )
 | wfa_sub_weaken :
-  `( {{ ⊫ Γ, A with (Some s)::anns }} ->
-     {{ Γ, A with (Some s)::anns ⊫s Wk : Γ with anns}} )
+  `( {{ ⊫ Γ, A with so::anns }} ->
+     {{ Γ, A with so::anns ⊫s Wk : Γ with anns}} )
 | wfa_sub_compose :
   `( {{ Γ1 with anns1 ⊫s σ2 : Γ2 with anns2 }} ->
      {{ Γ2 with anns2 ⊫s σ1 : Γ3 with anns3 }} ->
      {{ Γ1 with anns1 ⊫s σ1∘σ2 : Γ3 with anns3 }} )
 | wfa_sub_extend :
   `( {{ Γ with anns ⊫s σ : Δ with anns' }} ->
-     {{ Δ with anns' ⊫ A : Sort@s @ so }} ->
-     {{ Γ with anns ⊫ M : A[σ] @ ^(Some s) }} ->
-     {{ Γ with anns ⊫s σ,,M : Δ, A with (Some s)::anns'  }} )
+     {{ Δ with anns' ⊫ A @ so }} ->
+     {{ Γ with anns ⊫ M : A[σ] @ so }} ->
+     {{ Γ with anns ⊫s σ,,M : Δ, A with so::anns'  }} )
 | wfa_sub_conv :
   `( {{ Γ with anns ⊫s σ : Δ with anns' }} ->
      {{ ⊫ Δ' with anns'' }} ->
@@ -164,25 +164,35 @@ Ltac apply_fullness_all P full_P :=
 #[local]
 Ltac gen_annotated_judg_IH P ann_ctx ann_exp ann_typ ann_sub :=
   match goal with 
-  | H1 : {{ ⊢ ^?Γ }} |- _ => idtac H1;
+  | H1 : {{ ⊢ ^?Γ }} |- _ => 
       let HΓ := fresh "HΓ" in
-      pose proof ann_ctx P Γ H1 as HΓ
+      pose proof ann_ctx P Γ H1 as HΓ;
+      destruct HΓ as [anns]
   | H1 : {{ ^?Γ ⊢ ^?M : ^?A }},
-      H2 : {{ ⊫ ^?Γ' with ?anns }} |- _ => idtac H1 H2;
+      H2 : {{ ⊫ ^?Γ' with ?anns }} |- _ => 
         constr_eq Γ Γ';
         let HM := fresh "HM" in
-        pose proof ann_exp P anns Γ M A H1 H2 as HM
+        pose proof ann_exp P anns Γ M A H2 H1 as HM
   | H1: {{ ^?Γ ⊢ ^?A }},
-      H2 : {{ ⊫ ^?Γ' with ?anns }} |- _ => idtac H1 H2;
+      H2 : {{ ⊫ ^?Γ' with ?anns }} |- _ =>
       constr_eq Γ Γ';
       let HA := fresh "HA" in
-      pose proof ann_typ P anns Γ A H1 H2 as HA
+      pose proof ann_typ P anns Γ A H2 H1 as HA
   | H1: {{ ^?Γ ⊢s ^?σ : ^?Δ }},
-      H2 : {{ ⊫ ^?Γ' with ?anns }} |- _ => idtac H1 H2;
+      H2 : {{ ⊫ ^?Γ' with ?anns }} |- _ => 
       constr_eq Γ Γ';
       let Hσ := fresh "Hσ" in
-      pose proof ann_sub P anns Γ σ Δ H1 H2 as Hσ
+      pose proof ann_sub P anns Γ σ Δ H2 H1 as Hσ
   end.
+
+
+Ltac gen_ext_wf_ctx P :=
+match goal with
+    | H1 : {{ ^?Γ with ?anns ⊫ ^?A : Sort@?s @ ^?so }},
+        H2 : {{ ⊫ ^?Γ with ?anns }} |- _ =>
+        assert {{ ⊫ Γ, A with (Some s)::anns }} by mauto
+    end.
+                
 
 #[local]
 Ltac gen_sort_none P :=
@@ -258,80 +268,6 @@ Qed.
 #[local]
   Hint Resolve presup_typ_ann_ctx_ann : mcpts.
 
-
-Lemma wf_ctx_implies_wf_ctx_ann {P} : forall {Γ : ctx P},
-    {{ ⊢ Γ }} -> exists anns, {{ ⊫ Γ with anns }}
-with wf_exp_implies_wf_exp_ann {P} : forall {anns : ctx_anns P} {Γ M A},
-    {{ Γ ⊢ M : A }} -> {{ ⊫ Γ with anns }} -> exists so, {{ Γ with anns ⊫ M : A @ so }}
-with wf_typ_implies_wf_typ_ann {P} : forall {anns : ctx_anns P} {Γ A},
-    {{ Γ ⊢ A }} -> {{ ⊫ Γ with anns }} -> exists so, {{ Γ with anns ⊫ A @ so }}
-with wf_sub_implies_wf_sub_ann {P} : forall {anns : ctx_anns P} {Γ σ Δ},
-    {{ Γ ⊢s σ : Δ }} -> {{ ⊫ Γ with anns }} -> exists anns', {{ Γ with anns ⊫s σ : Δ with anns' }}.
-  all: inversion_clear 1; intros;
-    try (gen_annotated_judg_IH P wf_ctx_implies_wf_ctx_ann wf_exp_implies_wf_exp_ann wf_typ_implies_wf_typ_ann wf_sub_implies_wf_sub_ann);
-     clear wf_ctx_implies_wf_ctx_ann wf_exp_implies_wf_exp_ann wf_typ_implies_wf_typ_ann wf_sub_implies_wf_sub_ann;
-    destruct_conjs;
-    mauto 4.
-Admitted.
-
-(*   - eexists. *)
-(*     econstructor; mauto 3. *)
-  
-(*   - repeat eexists. *)
-(*     econstructor; mauto 4. *)
-    
-(*     econstructor; mauto 4. *)
-(*   - assert {{ Γ ⊫ Π r A0 B : Sort@s3 @ ^None }} by mauto 3. *)
-(*     assert {{ Γ ⊫ Π r A0 B @ ^(Some s3) }} by mauto 3. *)
-(*     assert {{ Γ ⊫ M0 : Π r A0 B @ ^(Some s3) }} by mauto 2. *)
-(*     assert {{ Γ ⊫ A0 @ ^(Some s1) }} by mauto 2. *)
-(*     assert {{ Γ ⊫ N : A0 @ ^(Some s1) }} by mauto 2. *)
-(*     eexists; mauto 2. *)
-(*   - eexists; econstructor; mauto 3. *)
-(*     eapply wfa_exp_conv_ann; mauto 3. *)
-(*     do 2 (econstructor; mauto 3). *)
-(*   - assert {{ Γ ⊫s Id : Γ }} by mauto 4. *)
-(*     assert {{ Γ ⊢ ℕ : Sort@s }} by mauto 3. *)
-(*     assert {{ Γ ⊢ ℕ[Id] : Sort@s }} by mauto 4. *)
-(*     assert {{ Γ ⊢ ℕ ≈ ℕ[Id] : Sort@s }} by mauto 3. *)
-(*     assert {{ Γ ⊢ ℕ ⊆ ℕ[Id] }} by mauto 3. *)
-(*     assert {{ Γ ⊫ zero : ℕ[Id] @ ^(Some s) }} by (eapply wfa_exp_conv; mauto). *)
-(*     assert {{ Γ ⊫s Id,,zero : Γ, ℕ@s }} by (econstructor; mauto 3). *)
-(*     assert {{ Γ ⊫ A0[Id,,zero] @ ^(Some s') }} by mauto 3. *)
-(*     assert {{ Γ ⊫ MZ : A0[Id,,zero] @ ^(Some s') }} by mauto 3. *)
-(*     assert {{ Γ ⊢ ℕ : Sort@s }} by mauto 3. *)
-(*     assert {{ Γ ⊫ ℕ @ ^(Some s) }} by mauto 4. *)
-(*     assert {{ Γ, ℕ@s ⊢s Wk : Γ }} by mauto 3. *)
-(*     assert {{ Γ, ℕ@s ⊫s Wk : Γ }} by mauto 3. *)
-(*     assert {{ Γ, ℕ@s, A0@s' ⊢s Wk : Γ, ℕ@s }} by mauto 3. *)
-(*     assert {{ Γ, ℕ@s, A0@s' ⊫s Wk : Γ, ℕ@s }} by mauto 3. *)
-(*     assert {{ Γ, ℕ@s, A0@s' ⊫s Wk∘Wk : Γ }} by mauto 3. *)
-(*     assert {{ Γ, ℕ@s, A0@s' ⊢ ℕ[Wk][Wk] ≈ ℕ : Sort@s }} by mauto 3. *)
-(*     assert {{ Γ, ℕ@s, A0@s' ⊢ ℕ[Wk][Wk] ≈ ℕ[Wk∘Wk] : Sort@s }} by mauto 3. *)
-(*     assert {{ Γ, ℕ@s, A0@s' ⊫ #1 : ℕ[Wk][Wk] @ ^(Some s) }} by mauto 4. *)
-(*     assert {{ Γ, ℕ@s, A0@s' ⊫ #1 : ℕ @ ^(Some s) }} by (eapply wfa_exp_conv; mauto 4). *)
-(*     assert {{ Γ, ℕ@s, A0@s' ⊫ succ #1 : ℕ @ ^(Some s) }} by mauto 3. *)
-(*     assert {{ Γ, ℕ@s, A0@s' ⊢ ℕ ⊆ ℕ[Wk∘Wk] }} by (econstructor; mauto 4). *)
-(*     assert {{ Γ, ℕ@s, A0@s' ⊫ succ #1 : ℕ[Wk∘Wk] @ ^(Some s) }} by (eapply wfa_exp_conv; mauto 4). *)
-(*     assert {{ Γ, ℕ@s, A0@s' ⊫s Wk∘Wk,,succ #1 : Γ, ℕ@s }} by (econstructor; mauto 3). *)
-(*     assert {{ Γ, ℕ@s, A0@s' ⊫ A0[Wk∘Wk,,succ #1] @ ^(Some s') }} by mauto 3. *)
-(*     assert {{ Γ, ℕ@s, A0@s' ⊫ MS : A0[Wk∘Wk,,succ #1] @ ^(Some s') }} by mauto 3. *)
-(*     eexists; econstructor; mauto 3. *)
-(*   - assert (exists so, {{ Δ ⊫ A0 @ so }}) as [so] by mauto 3. *)
-(*     assert {{ Δ ⊫ M0 : A0 @ so }} by mauto 2. *)
-(*     assert {{ Γ ⊢ M0[σ] : A0[σ] }} by mauto 2. *)
-(*     destruct so. *)
-(*     + assert {{ Γ ⊫ M0[σ] : A0[σ] @ ^None }}. *)
-(*       econstructor; mauto. *)
-(*       eexists; mauto 3. *)
-(*     + mauto 3. *)
-(*   - assert {{ Γ ⊫ M : A[σ0] @ ^ (Some s) }} by mauto 4. *)
-(*     mauto 3. *)
-(* Qed. *)
-
-#[export]
-  Hint Resolve wf_ctx_implies_wf_ctx_ann wf_exp_implies_wf_exp_ann wf_typ_implies_wf_typ_ann wf_sub_implies_wf_sub_ann : mcpts.
-
 Lemma ann_lookup_implies_lookup {P} : forall {anns : ctx_anns P} {so Γ x A},
     {{ #x : A @ so ∈ Γ with anns }} ->
     {{ ⊢ Γ }} ->
@@ -342,6 +278,156 @@ Qed.
 
 #[export]
   Hint Resolve ann_lookup_implies_lookup : mcpts.
+
+Lemma lookup_implies_ann_lookup {P} : forall {anns : ctx_anns P} {Γ x A},
+    {{ #x : A ∈ Γ }} ->
+    {{ ⊫ Γ with anns }} ->
+    exists so, {{ #x : A @ so ∈ Γ with anns }}.
+Proof with mautosolve.
+  intros.
+  gen anns.
+  induction H.
+  - intros.
+    inversion H0; subst.
+    eexists.
+    mauto 2.
+  - intros.
+    inversion H0; subst.
+    assert (exists so : SortOption P, {{ # n : A @ so ∈ Γ with anns0 }}) as [] by mauto 2.
+    eexists; econstructor; mauto.
+Qed.
+
+#[export]
+  Hint Resolve lookup_implies_ann_lookup : mcpts.
+
+
+Lemma wf_ctx_implies_wf_ctx_ann {P} : forall {Γ : ctx P},
+    {{ ⊢ Γ }} -> exists anns, {{ ⊫ Γ with anns }}
+with wf_exp_implies_wf_exp_ann {P} : forall {anns : ctx_anns P} {Γ M A},
+     {{ ⊫ Γ with anns }} -> {{ Γ ⊢ M : A }} -> exists so, {{ Γ with anns ⊫ M : A @ so }}
+with wf_typ_implies_wf_typ_ann {P} : forall {anns : ctx_anns P} {Γ A},
+     {{ ⊫ Γ with anns }} -> {{ Γ ⊢ A }} -> exists so, {{ Γ with anns ⊫ A @ so }}
+with wf_sub_implies_wf_sub_ann {P} : forall {anns : ctx_anns P} {Γ σ Δ},
+    {{ ⊫ Γ with anns }} -> {{ Γ ⊢s σ : Δ }} -> exists anns', {{ Γ with anns ⊫s σ : Δ with anns' }}.
+Proof.
+  2,3,4: intros * Hanns H; gen anns; inversion_clear H; intros;
+    try (gen_annotated_judg_IH P wf_ctx_implies_wf_ctx_ann wf_exp_implies_wf_exp_ann wf_typ_implies_wf_typ_ann wf_sub_implies_wf_sub_ann);
+    try (gen_annotated_judg_IH P wf_ctx_implies_wf_ctx_ann wf_exp_implies_wf_exp_ann wf_typ_implies_wf_typ_ann wf_sub_implies_wf_sub_ann);
+  destruct_conjs;
+  try (gen_ext_wf_ctx P);
+  destruct_conjs;
+    try (gen_annotated_judg_IH P wf_ctx_implies_wf_ctx_ann wf_exp_implies_wf_exp_ann wf_typ_implies_wf_typ_ann wf_sub_implies_wf_sub_ann);
+    destruct_conjs;
+    try solve[
+        clear wf_ctx_implies_wf_ctx_ann wf_exp_implies_wf_exp_ann wf_typ_implies_wf_typ_ann wf_sub_implies_wf_sub_ann;
+        mauto 4].
+  intros.
+  inversion_clear H.
+  - eexists.
+    econstructor.
+  - epose proof (wf_ctx_implies_wf_ctx_ann _ _ H0) as [anns].
+    epose proof (wf_typ_implies_wf_typ_ann _ _ _ _ H H1) as [so].
+    eexists; econstructor; eassumption.
+    
+
+    
+  
+  - eexists.
+    epose proof wf_exp_implies_wf_exp_ann P ((Some s1)::anns) {{{ Γ, A0 }}} B {{{ Sort@s2 }}} H4 H1.
+    clear wf_ctx_implies_wf_ctx_ann wf_exp_implies_wf_exp_ann wf_typ_implies_wf_typ_ann wf_sub_implies_wf_sub_ann.
+    destruct_conjs.
+    econstructor; mauto.
+    
+
+  - clear HM0 HM1 H H5.
+    epose proof wf_exp_implies_wf_exp_ann P anns Γ A0 {{{ Sort@s1 }}} Hanns H0 as [so].
+    assert {{ ⊫ Γ, A0 with {{{ anns, ^ (Some s1) }}} }} by mauto 3.
+    epose proof wf_exp_implies_wf_exp_ann P ((Some s1)::anns) {{{ Γ, A0 }}} B {{{ Sort@s2 }}} H5 H1 as [so'].
+    epose proof wf_exp_implies_wf_exp_ann P anns Γ _ _ Hanns H2 as [soΠ].
+    eexists.
+    clear wf_ctx_implies_wf_ctx_ann wf_exp_implies_wf_exp_ann wf_typ_implies_wf_typ_ann wf_sub_implies_wf_sub_ann.
+    destruct_conjs.
+    econstructor; mauto.
+
+  - assert {{ ⊢ Γ, A }} by mauto 2.
+    assert (exists so : SortOption P, {{ # x : A @ so ∈ Γ with anns }}) as [so'] by mauto 2.
+    clear wf_ctx_implies_wf_ctx_ann wf_exp_implies_wf_exp_ann wf_typ_implies_wf_typ_ann wf_sub_implies_wf_sub_ann.
+    eexists; mauto.
+  - clear wf_ctx_implies_wf_ctx_ann wf_exp_implies_wf_exp_ann wf_typ_implies_wf_typ_ann wf_sub_implies_wf_sub_ann.
+    eexists; mauto.
+  - clear HM0 HM1 H H5.
+    assert {{ ⊢ Γ, ℕ }} by mauto 2.
+    assert {{ ⊫ Γ, ℕ with (Some s)::anns }} by mauto 4.
+    assert (exists so : SortOption P, {{ Γ, ℕ with {{{ anns, ^ (Some s) }}} ⊫ A0 @ so }}) as [so] by mauto 2.
+    assert {{ ⊢ Γ, ℕ, A0 }} by mauto 2.
+    assert {{ ⊫ Γ, ℕ, A0 with so::(Some s)::anns }} by mauto 3.
+    assert (exists so, {{ Γ with anns ⊫ MZ : A0[Id,,zero] @ so }}) as [so'] by mauto 2.
+    assert (exists so', {{ Γ, ℕ, A0 with so::(Some s)::anns ⊫ MS : A0[Wk∘Wk,,succ #1] @ so' }}) as [so''] by mauto 2.
+    clear wf_ctx_implies_wf_ctx_ann wf_exp_implies_wf_exp_ann wf_typ_implies_wf_typ_ann wf_sub_implies_wf_sub_ann.
+    assert  {{ Γ with anns ⊫ zero : ℕ @ ^ (Some s) }} by mauto 2.
+    assert {{ Γ with anns ⊫ ℕ[Id] @ ^(Some s) }} by mauto 4.
+    assert {{ Γ with anns ⊫ ℕ @ ^(Some s) }} by mauto 4.
+    assert {{ Γ with anns ⊫ zero : ℕ[Id] @ ^ (Some s) }} by (econstructor; mauto).
+    assert {{ Γ with anns ⊫s Id,,zero : Γ, ℕ with {{{ anns, ^ (Some s) }}} }} by mauto 4.
+    assert {{ Γ ⊢ A0[Id,,zero] ⊆ A0[Id,,zero] }} by (gen_presup H1; mauto 3).
+    assert {{ Γ with anns ⊫ MZ : A0[Id,,zero] @ so }} by mauto 3.
+    assert {{ Γ, ℕ, A0 ⊢ A0[Wk∘Wk,,succ #1] ⊆ A0[Wk∘Wk,,succ #1] }} by (gen_presup H2; mauto 3).
+    assert {{ Γ, ℕ, A0 ⊢ ℕ[Wk][Wk] ≈ ℕ : Sort@s }} by mauto 4.
+    assert {{ Γ, ℕ, A0 ⊢ ℕ[Wk][Wk] ⊆ ℕ }} by mauto 3.
+    assert {{ Γ, ℕ, A0 ⊢ ℕ ⊆ ℕ[Wk][Wk] }} by mauto 4.
+    assert {{ Γ, ℕ, A0 ⊢s Wk∘Wk : Γ }} by mauto 4.
+    assert {{ Γ, ℕ, A0 ⊢ ℕ[Wk∘Wk] : Sort@s }} by mauto 3.
+    assert {{ Γ, ℕ, A0 ⊢ ℕ[Wk][Wk] ≈ ℕ[Wk∘Wk] : Sort@s }} by (econstructor; mauto 3).
+    assert {{ Γ, ℕ, A0 ⊢ ℕ[Wk][Wk] ⊆ ℕ[Wk∘Wk] }} by mauto 3.
+    assert {{ Γ, ℕ, A0 with {{{ anns, ^ (Some s), so }}} ⊫ ℕ[Wk][Wk] @ ^ (Some s) }} by (do 2 (econstructor; mauto 3)).
+    assert {{ # 1 : ℕ[Wk][Wk] @ Some s ∈ Γ, ℕ, A0 with {{{ anns, ^ (Some s), so }}} }} by mauto 3.
+    assert {{ Γ, ℕ, A0 with {{{ anns, ^ (Some s), so }}} ⊫ #1 : ℕ[Wk][Wk] @ ^ (Some s) }} by mauto 2.
+    assert {{ Γ, ℕ, A0 with {{{ anns, ^ (Some s), so }}} ⊫ #1 : ℕ @ ^ (Some s) }} by mauto 4.
+    assert {{ Γ, ℕ, A0 with {{{ anns, ^ (Some s), so }}} ⊫ succ #1 : ℕ[Wk][Wk] @ ^ (Some s) }} by mauto .
+    assert {{ Γ, ℕ, A0 with {{{ anns, ^ (Some s), so }}} ⊫ ℕ[Wk∘Wk] @ ^ (Some s) }} by (econstructor; mauto 4).
+    assert {{ Γ, ℕ, A0 with {{{ anns, ^ (Some s), so }}} ⊫s Wk∘Wk,,succ #1 : Γ, ℕ with (Some s)::anns }} by (econstructor; mauto 4).
+
+    eexists; mauto.
+  - clear Hσ0 Hσ1 H H4.
+    assert {{ ⊫ Δ with Hσ }} by mauto 2.
+    assert (exists so, {{ Δ with Hσ ⊫ M0 : A0 @ so }}) as [so] by mauto 2.
+    assert (exists so, {{ Δ with Hσ ⊫ A0 @ so }}) as [so'] by mauto 2.
+    clear wf_ctx_implies_wf_ctx_ann wf_exp_implies_wf_exp_ann wf_typ_implies_wf_typ_ann wf_sub_implies_wf_sub_ann.
+    mauto.
+  - clear HM0 HM1 H H5.
+    assert (exists so, {{ Γ with anns ⊫ A @ so }}) as [so] by mauto 2.
+    clear wf_ctx_implies_wf_ctx_ann wf_exp_implies_wf_exp_ann wf_typ_implies_wf_typ_ann wf_sub_implies_wf_sub_ann.
+    eexists; mauto 2.
+  - clear Hσ0 Hσ1 H H3.
+    assert (exists anns' : list (SortOption P), {{ Γ with anns ⊫s σ : Δ with anns' }}) as [anns'] by mauto 2.
+    assert {{ ⊫ Δ with anns' }} by mauto 2.
+    assert (exists so : SortOption P, {{ Δ with anns' ⊫ A0 @ so }}) as [so] by mauto 2.
+    clear wf_ctx_implies_wf_ctx_ann wf_exp_implies_wf_exp_ann wf_typ_implies_wf_typ_ann wf_sub_implies_wf_sub_ann.
+    eexists; mauto.
+  - inversion Hanns; subst.
+    eexists.
+    econstructor; eassumption.
+  - clear Hσ0 Hσ1 H H3.
+    assert (exists anns', {{ Γ with anns ⊫s σ2 : Γ2 with anns' }}) as [anns'] by mauto 2.
+    assert {{ ⊫ Γ2 with anns' }} by mauto 2.
+    assert (exists anns'', {{ Γ2 with anns' ⊫s σ1 : Δ with anns'' }}) as [anns''] by mauto 2.
+    assert {{ ⊫ Δ with anns'' }} by mauto 2.
+    clear wf_ctx_implies_wf_ctx_ann wf_exp_implies_wf_exp_ann wf_typ_implies_wf_typ_ann wf_sub_implies_wf_sub_ann.
+    eexists; mauto.
+  - clear HM0 HM1 H H4.
+    assert (exists anns', {{ Γ with anns ⊫s σ0 : Δ0 with anns' }}) as [anns'] by mauto 2.
+    assert (exists so, {{ Δ0 with anns' ⊫ A @ so }}) as [so] by mauto 3.
+    clear wf_ctx_implies_wf_ctx_ann wf_exp_implies_wf_exp_ann wf_typ_implies_wf_typ_ann wf_sub_implies_wf_sub_ann.
+    eexists; mauto.
+  - assert {{ ⊫ Δ0 with Hσ }} by mauto 2.
+    assert (exists anns', {{ ⊫ Δ with anns' }}) as [anns'] by mauto 2.
+    eexists.
+    econstructor; mauto 2.
+Qed.    
+
+#[export]
+  Hint Resolve wf_ctx_implies_wf_ctx_ann wf_exp_implies_wf_exp_ann wf_typ_implies_wf_typ_ann wf_sub_implies_wf_sub_ann : mcpts.
+
 
 Lemma wf_judg_ann_implies_wf_judg {P} :
   (forall (anns : ctx_anns P) (Γ : ctx P), {{ ⊫ Γ with anns }} -> {{ ⊢ Γ }}) /\
