@@ -111,7 +111,7 @@ Proof.
     econstructor; mauto 2.
     progressive_inversion.
     mauto.
-  - assert {{ ⊢ Γ , A@s1 ≈ Γ , A'@s1 }} by mauto.
+  - assert {{ ⊢ Γ , A ≈ Γ , A' }} by mauto.
     eapply (@ctxeq_nbe_eq P pred_P) in H5; [ |eassumption].
     match goal with
     | H : _ |- _ => apply (@completeness P pred_P) in H

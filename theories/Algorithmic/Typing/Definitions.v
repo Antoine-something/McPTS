@@ -31,7 +31,7 @@ where "Γ '⊢a' M ⟸ A" := (alg_type_check Γ A M) (in custom judg) : type_sco
 
 with alg_type_infer {P} : ctx P -> nf P -> exp P -> Prop :=
 (** Variables *)
-| ati_var : `( {{ #x : A @ s ∈ Γ }} ->
+| ati_var : `( {{ #x : A ∈ Γ }} ->
                nbe_ty Γ A B ->
                {{ Γ ⊢a #x ⟹ B }} )
 
@@ -42,14 +42,14 @@ with alg_type_infer {P} : ctx P -> nf P -> exp P -> Prop :=
 (** Functions *)
 | atc_pi : `( forall {r : Ru_pi P s1 s2 s3},
                  {{  Γ ⊢a A ⟸ Sort@s1 }} ->
-                 {{  Γ, A@s1 ⊢a B ⟸ Sort@s2 }} ->
+                 {{  Γ, A ⊢a B ⟸ Sort@s2 }} ->
                  {{  Γ ⊢a Π r A B ⟹ Sort@s3 }} )
 
 | ati_lam : `( forall {r : Ru_pi P s1 s2 s3},
                   {{ Γ ⊢a A ⟸ Sort@s1 }} ->
-                  {{ Γ, A@s1 ⊢a B ⟸ Sort@s2 }} ->
-                  {{ Γ, A@s1 ⊢a M ⟸ B }} ->
-                  nbe {{{ Γ, A@s1 }}} B {{{ Sort@s2 }}} D ->
+                  {{ Γ, A ⊢a B ⟸ Sort@s2 }} ->
+                  {{ Γ, A ⊢a M ⟸ B }} ->
+                  nbe {{{ Γ, A }}} B {{{ Sort@s2 }}} D ->
                   nbe Γ A {{{ Sort@s1 }}} C ->
                   {{ Γ ⊢a λ r A B M ⟹ Π r C D }} )
              
@@ -68,28 +68,26 @@ with alg_type_infer {P} : ctx P -> nf P -> exp P -> Prop :=
                 {{ Γ ⊢a M ⟸ ℕ }} ->
                 {{ Γ ⊢a succ M ⟹ ℕ }} )
 | ati_rec : `( Ru_nat P s ->
-               {{ Γ, ℕ@s ⊢a A ⟹ Sort@s' }} ->
-               st_subtyp s' s'' ->
+               {{ Γ, ℕ ⊢aty A }} ->
                {{ Γ ⊢a MZ ⟸ A[Id,,zero] }} ->
-               {{ Γ, ℕ@s, A@s'' ⊢a MS ⟸ A[Wk∘Wk,,succ #1] }} ->
+               {{ Γ, ℕ, A ⊢a MS ⟸ A[Wk∘Wk,,succ #1] }} ->
                {{ Γ ⊢a N ⟸ ℕ }} ->
                nbe_ty Γ {{{ A[Id,,N] }}} B ->
                {{ Γ ⊢a rec N return A | zero -> MZ | succ -> MS end ⟹ B }} )
-where "Γ '⊢a' M ⟹ A" := (alg_type_infer Γ A M) (in custom judg) : type_scope.
-
-#[export]
-Hint Constructors alg_type_check alg_type_infer : mcpts.
-
-Inductive alg_wf_type {P} : ctx P -> typ P -> Prop :=
+where "Γ '⊢a' M ⟹ A" := (alg_type_infer Γ A M) (in custom judg) : type_scope
+with alg_wf_type {P} : ctx P -> typ P -> Prop :=
 | awt_sort : `( {{ Γ ⊢aty Sort@s }} )
 | awt_sorted : `( {{ Γ ⊢a A ⟹ Sort@s }} ->
                   {{ Γ ⊢aty A }} )
 where "Γ '⊢aty' A" := (alg_wf_type Γ A) (in custom judg) : type_scope.
 
-
+#[export]
+Hint Constructors alg_type_check alg_type_infer alg_wf_type : mcpts.
 
 Scheme alg_type_check_mut_ind := Induction for alg_type_check Sort Prop
-with alg_type_infer_mut_ind := Induction for alg_type_infer Sort Prop.
+with alg_type_infer_mut_ind := Induction for alg_type_infer Sort Prop
+with alg_wf_type_mut_ind := Induction for alg_wf_type Sort Prop.
 Combined Scheme alg_type_mut_ind from
   alg_type_check_mut_ind,
-  alg_type_infer_mut_ind.
+  alg_type_infer_mut_ind,
+  alg_wf_type_mut_ind.
