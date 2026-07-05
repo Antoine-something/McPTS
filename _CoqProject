@@ -83,10 +83,11 @@ theories/Extraction/Evaluation.v
 theories/Extraction/Readback.v
 theories/Extraction/NbE.v
 theories/Extraction/PseudoMonadic.v
-# theories/Extraction/Subtyping.v
+theories/Extraction/Subtyping.v
+theories/Extraction/TypeCheck.v
 # # ./Entrypoint.v
 
-# # ./Extraction/TypeCheck.v
+# ./Extraction/TypeCheck.v
 
 # # ./Frontend/Parser.v
 
