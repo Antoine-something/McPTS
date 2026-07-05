@@ -1424,7 +1424,7 @@ Proof.
     assert {{ Γ, ℕ, A ⊢ ℕ[Wk][Wk] ⊆ ℕ }} by mauto 3.
     assert {{ ⟪ pred_P ⟫ Γ, ℕ, A with so::(Some sn)::anns ⊩u  ℕ : Sort@sn @ ^None }} by mauto 3.
     assert {{ #1 : ℕ[Wk][Wk] @ (Some sn) ∈ Γ, ℕ, A with so::(Some sn)::anns }} by mauto 2.
-    assert {{ ⟪ pred_P ⟫ Γ, ℕ, A with so::(Some sn)::anns ⊩ #1 : ℕ[Wk][Wk] @ ^ sn }} by info_mauto 4.
+    assert {{ ⟪ pred_P ⟫ Γ, ℕ, A with so::(Some sn)::anns ⊩ #1 : ℕ[Wk][Wk] @ ^ sn }} by mauto 4.
     assert {{ ⟪ pred_P ⟫ Γ, ℕ, A with so::(Some sn)::anns ⊩ #1 : ℕ @ sn }} by mauto 4.
     assert {{ ⟪ pred_P ⟫ Γ, ℕ, A with so::(Some sn)::anns  ⊩ succ #1 : ℕ @ sn }} by mauto 4.
     assert {{ ⟪ pred_P ⟫ Γ, ℕ, A with so::(Some sn)::anns ⊩u succ #1 : ℕ @ ^ (Some sn) }} by mauto 3.
@@ -1470,7 +1470,7 @@ Proof.
   assert {{ ⟪ pred_P ⟫ ⊩ Γ with anns }} as [SbΓ] by mauto 3.
   assert {{ ⟪ pred_P ⟫ Γ with anns ⊩u ℕ : Sort@sn @ ^None }} as Hℕ by mauto 4.
   pose (SbΓℕ := cons_glu_sub_pred pred_P (Some sn) Γ {{{ ℕ }}} SbΓ).
-  assert {{ EG Γ, ℕ ∈ glu_ctx_env pred_P ((Some sn)::anns)↘ SbΓℕ }} by (invert_glu_rel_exp_unsorted Hℕ; econstructor; info_mauto 4; reflexivity).
+  assert {{ EG Γ, ℕ ∈ glu_ctx_env pred_P ((Some sn)::anns)↘ SbΓℕ }} by (invert_glu_rel_exp_unsorted Hℕ; econstructor; mauto 4; reflexivity).
   pose (SbΓℕA := cons_glu_sub_pred pred_P (Some s) {{{ Γ, ℕ }}} {{{ A }}} SbΓℕ).
   assert {{ EG Γ, ℕ, A ∈ glu_ctx_env pred_P ((Some s)::(Some sn)::anns) ↘ SbΓℕA }} by (invert_glu_rel_typ_unsorted HA; econstructor; mauto 4; try reflexivity).
   pose proof HM.
@@ -1513,7 +1513,7 @@ Proof.
   assert {{ ⟪ pred_P ⟫ ⊩ Γ with anns }} as [SbΓ] by mauto 3.
   assert {{ ⟪ pred_P ⟫ Γ with anns ⊩u ℕ : Sort@sn @ ^None }} as Hℕ by mauto 4.
   pose (SbΓℕ := cons_glu_sub_pred pred_P (Some sn) Γ {{{ ℕ }}} SbΓ).
-  assert {{ EG Γ, ℕ ∈ glu_ctx_env pred_P ((Some sn)::anns)↘ SbΓℕ }} by (invert_glu_rel_exp_unsorted Hℕ; econstructor; info_mauto 4; reflexivity).
+  assert {{ EG Γ, ℕ ∈ glu_ctx_env pred_P ((Some sn)::anns)↘ SbΓℕ }} by (invert_glu_rel_exp_unsorted Hℕ; econstructor; mauto 4; reflexivity).
   pose (SbΓℕA := cons_glu_sub_pred pred_P None {{{ Γ, ℕ }}} {{{ A }}} SbΓℕ).
   assert {{ EG Γ, ℕ, A ∈ glu_ctx_env pred_P (None::(Some sn)::anns) ↘ SbΓℕA }} by (invert_glu_rel_typ_unsorted HA; econstructor; mauto 4; try reflexivity).
   pose proof HM.
