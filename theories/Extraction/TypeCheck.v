@@ -14,9 +14,9 @@ Section lookup.
   Ltac impl_obl_tac1 :=
     match goal with
     | |- ~ _ => intro
-    | H: {{ ⊢ ^_, ^_ @ ^_ }} |- _ => inversion_clear H
-    | H: {{ # _ : ^_ @ ^_ ∈ ⋅ }} |- _ => inversion_clear H
-    | H: {{ # (S _) : ^_ @ ^_ ∈ ^_, ^_ @ ^_ }} |- _ => inversion_clear H
+    | H: {{ ⊢ ^_, ^_ }} |- _ => inversion_clear H
+    | H: {{ # _ : ^_ ∈ ⋅ }} |- _ => inversion_clear H
+    | H: {{ # (S _) : ^_ ∈ ^_, ^_ }} |- _ => inversion_clear H
     end.
 
   #[local]
@@ -26,12 +26,12 @@ Section lookup.
     intuition (mauto 4).
 
   #[tactic="impl_obl_tac",derive(equations=no,eliminator=no)]
-  Equations lookup {P} (dec_P : DecidableSig P) (Γ : ctx P) (HΓ : {{ ⊢ Γ }}) x : { A & {s | {{ #x : A @ s ∈ Γ }} } } + { forall A s, ~ {{ #x : A @ s ∈ Γ }} } :=
-  | dec_P, {{{ Γ, A@s }}}, HΓ, x with x => {
-    | 0 => pureo (existT _ {{{ A[Wk] }}} (exist _ s _))
+  Equations lookup {P} (dec_P : DecidableSig P) (Γ : ctx P) (HΓ : {{ ⊢ Γ }}) x : { A | {{ #x : A ∈ Γ }} } + { forall A, ~ {{ #x : A ∈ Γ }} } :=
+  | dec_P, {{{ Γ, A }}}, HΓ, x with x => {
+    | 0 => pureo (exist _ {{{ A[Wk] }}} _)
     | S x' => 
-        let*o (existT _ B (exist _ s' _)) := lookup dec_P Γ _ x' while _ in
-        pureo (existT _ {{{ B[Wk] }}} (exist _ s' _))
+        let*o (exist _ B _) := lookup dec_P Γ _ x' while _ in
+        pureo (exist _ {{{ B[Wk] }}} _)
     }
   | dec_P, {{{ ⋅ }}}, HΓ, x => inright _.
 End lookup.
@@ -60,11 +60,14 @@ Section type_check.
   | ti_nat : type_infer_order {{{ ℕ }}}
   | ti_zero : type_infer_order {{{ zero }}}
   | ti_succ : forall {M}, type_check_order M -> type_infer_order {{{ succ M }}}
-  | ti_natrec : forall {A MZ MS M}, type_check_order M -> type_infer_order A -> type_check_order MZ -> type_check_order MS -> type_infer_order {{{ rec M return A | zero -> MZ | succ -> MS end }}}
+  | ti_natrec : forall {A MZ MS M}, type_check_order M -> type_aty_order A -> type_check_order MZ -> type_check_order MS -> type_infer_order {{{ rec M return A | zero -> MZ | succ -> MS end }}}
   | ti_pi : forall {s1 s2 s3} {r : Ru_pi P s1 s2 s3} {A B}, type_check_order A -> type_check_order B -> type_infer_order {{{ Π r A B }}}
   | ti_fn : forall {s1 s2 s3} {r : Ru_pi P s1 s2 s3} {A B M}, type_check_order A -> type_check_order B -> type_check_order M -> type_infer_order {{{ λ r A B M }}}
   | ti_app : forall {M N}, type_infer_order M -> type_check_order N -> type_infer_order {{{ M N }}}
   | ti_vlookup : forall {x}, type_infer_order {{{ #x }}}
+  with type_aty_order {P} : typ P -> Prop :=
+  | aty_st : forall {s}, type_aty_order {{{ Sort@s }}}
+  | aty_sted : forall {A}, type_infer_order A -> type_aty_order A
   .
 
   #[local]
@@ -77,11 +80,12 @@ Section type_check.
     intros M HM.
     enough (type_check_order M) as [] by eassumption.
     induction HM; progressive_inversion; do 2 constructor; trivial with mcpts.
+    econstructor; eassumption.
   Qed.
 
   #[local]
   Ltac clear_defs :=
-    do 2 lazymatch goal with
+    do 3 lazymatch goal with
       | H: (forall (Γ : ?ctx) (A : ?expA),
                {{ Γ ⊢ A }} ->
                forall M : ?expM,
@@ -109,6 +113,22 @@ Section type_check.
                forall M : ?expM,
                  type_infer_order M ->
                  ({ B : nf ?P | {{ Γ ⊢a M ⟹ B }} /\{{ Γ ⊢aty ^(nf_to_exp B) }} } + { forall C : nf ?P, ~ {{ Γ ⊢a M ⟹ C }} }))
+        |- _ =>
+          clear H
+      | H: (let H := fixproto in
+            forall (P : PtsSig), DecidableSig P -> PredicativeSig P -> FunctionalSig P -> 
+            forall Γ : ?ctx,
+              {{ ⊢ Γ }} ->
+              forall A : ?expA,
+                type_aty_order A ->
+                { {{ Γ ⊢aty A }} } + { ~ {{ Γ ⊢aty A }} })
+        |- _ =>
+          clear H
+      | H: (forall (Γ : ?ctx),
+               {{ ⊢ Γ }} ->
+               forall A : ?expA,
+                 type_aty_order A ->
+                 ({ {{ Γ ⊢aty A }} } + { ~ {{ Γ ⊢aty A }} }))
         |- _ =>
           clear H
     end.
@@ -139,6 +159,14 @@ Section type_check.
       let*o->b (exist _ B _) := type_infer dec_P pred_P func_P Γ _ M _ while _ in
       let*b _ := subtyping_impl dec_P Γ (B : nf P) A _ while _ in
       pureb _
+  with type_aty {P : PtsSig} (dec_P : DecidableSig P) (pred_P : PredicativeSig P) (func_P : FunctionalSig P) (Γ : ctx P) (HΓ : {{ ⊢ Γ }}) A (H : type_aty_order A) : { {{ Γ ⊢aty A }} } + { ~ {{ Γ ⊢aty A }} } by struct H :=
+  | dec_P, pred_P, func_P, Γ, HΓ, A, H with A => {
+    | {{{ Sort@s }}} => pureb _
+    | A' =>
+        let*o->b (exist _ UA _) := type_infer dec_P pred_P func_P Γ _ A' _ while _ in
+        let*o->b (exist _ s _) :=  get_level_of_sort_nf dec_P UA while _ in
+        pureb _
+    }
   with type_infer {P : PtsSig} (dec_P : DecidableSig P) (pred_P : PredicativeSig P) (func_P : FunctionalSig P) (Γ : ctx P) (HΓ : {{ ⊢ Γ }}) M (H : type_infer_order M) : { A : nf P | {{ Γ ⊢a M ⟹ A }} /\ {{ Γ ⊢aty A }} } + { forall A, ~ {{ Γ ⊢a M ⟹ A }} } by struct H :=
   | dec_P, pred_P, func_P, Γ, HΓ, M, H with M => {
     | {{{ Sort@s }}} =>
@@ -156,23 +184,22 @@ Section type_check.
         pureo (exist _ n{{{ ℕ }}} _)
     | {{{ rec M' return A' | zero -> MZ | succ -> MS end }}} =>
         let*o (existT _ s _) := dec_ru_nat dec_P while _ in
-        let*o (exist _ UA' _) := type_infer dec_P pred_P func_P {{{ Γ, ℕ@s }}} _ A' _ while _ in
-        let*o (exist _ s' _) :=  get_level_of_sort_nf dec_P UA' while _ in
+        let*b->o _ := type_aty dec_P pred_P func_P {{{ Γ, ℕ }}} _ A' _ while _ in
         let*b->o _ := type_check dec_P pred_P func_P Γ {{{ A'[Id,,zero] }}} _ MZ _ while _ in
-        let*b->o _ := type_check dec_P pred_P func_P {{{ Γ, ℕ@s, A'@s' }}} {{{ A'[Wk∘Wk,,succ #1] }}} _ MS _ while _ in
+        let*b->o _ := type_check dec_P pred_P func_P {{{ Γ, ℕ, A' }}} {{{ A'[Wk∘Wk,,succ #1] }}} _ MS _ while _ in
         let*b->o _ := type_check dec_P pred_P func_P Γ {{{ ℕ }}} _ M' _ while _ in
         let (A'', _) := nbe_ty_impl Γ {{{ A'[Id,,M'] }}} _ in
         pureo (exist _ A'' _)
     | {{{ Π r B C }}} =>
         let*b->o _ := type_check dec_P pred_P func_P Γ {{{ Sort@s1 }}} _ B _ while _ in
-        let*b->o _ := type_check dec_P pred_P func_P {{{ Γ, B@s1 }}} {{{ Sort@s2 }}} _ C _ while _ in
+        let*b->o _ := type_check dec_P pred_P func_P {{{ Γ, B }}} {{{ Sort@s2 }}} _ C _ while _ in
         pureo (exist _ n{{{ Sort@s3 }}} _)
     | {{{ λ r A' B' M' }}} =>
         let*b->o _ := type_check dec_P pred_P func_P Γ {{{ Sort@s4 }}} _ A' _ while _ in
-        let*b->o _ := type_check dec_P pred_P func_P {{{ Γ, A'@s4 }}} {{{ Sort@s5 }}} _ B' _ while _ in
-        let*b->o _ := type_check dec_P pred_P func_P {{{ Γ, A'@s4 }}} B' _ M' _ while _ in
+        let*b->o _ := type_check dec_P pred_P func_P {{{ Γ, A' }}} {{{ Sort@s5 }}} _ B' _ while _ in
+        let*b->o _ := type_check dec_P pred_P func_P {{{ Γ, A' }}} B' _ M' _ while _ in
         let (A'', _) := nbe_impl Γ A' {{{ Sort@s4 }}} _ in
-        let (B'', _) := nbe_impl {{{ Γ, A'@s4 }}} B' {{{ Sort@s5 }}} _ in
+        let (B'', _) := nbe_impl {{{ Γ, A' }}} B' {{{ Sort@s5 }}} _ in
         pureo (exist _ n{{{ Π r A'' B'' }}} _)
     | {{{ M' N' }}} =>
         let*o (exist _ C _) := type_infer dec_P pred_P func_P Γ _ M' _ while _ in
@@ -182,7 +209,7 @@ Section type_check.
         let (B', _) := nbe_ty_impl Γ {{{ ^(B : nf P)[Id,,N'] }}} _ in
         pureo (exist _ B' _)
     | {{{ #x }}} =>
-        let*o (existT _ A (exist _ s' _)) := lookup dec_P Γ _ x while _ in
+        let*o (exist _ A _) := lookup dec_P Γ _ x while _ in
         let (A', _) := nbe_ty_impl Γ A _ in
         pureo (exist _ A' _)
     | _ => inright _
@@ -198,16 +225,19 @@ Section type_check.
   #[local]
   Ltac impl_type_check_infer_obl_tac :=
     lazymatch goal with
-      | H: type_check_order ?A |- type_infer_order ?A =>
-          inversion_clear H; eassumption
-      | |- type_infer_order _ => invert_type_check_infer_order; eassumption
-      | |- type_check_order _ => invert_type_check_infer_order; eassumption
+    | H: type_check_order ?A |- type_infer_order ?A =>
+        inversion_clear H; eassumption
+    | H: type_aty_order ?A |- type_infer_order ?A =>
+        inversion_clear H; eassumption
+    | |- type_infer_order _ => invert_type_check_infer_order; eassumption
+    | |- type_check_order _ => invert_type_check_infer_order; eassumption
+    | |- type_aty_order _ => invert_type_check_infer_order; eassumption
       end.
 
   #[local]
   Ltac impl_wf_context_obl_tac :=
     lazymatch goal with
-      | |- {{ ⊢ ^?Γ, ^?A@^?s }} =>
+      | |- {{ ⊢ ^?Γ, ^?A }} =>
           gen_presups;
           assert {{ ⊢ Γ }} by mauto 2;
           unshelve (eassert {{ Γ ⊢ A : ^n{{{ Sort@_ }}} }}; solve [mauto 2 using alg_type_infer_sound]); solve [constructor]
@@ -221,8 +251,19 @@ Section type_check.
           let H := fresh "H" in
           intros H; inversion_clear H;
           functional_alg_type_infer_rewrite_clear;
+          solve [intuition]
+    end.
+
+  #[local]
+  Ltac impl_ill_typed_obl_tac' :=
+    match goal with
+      | |- ~ _ =>
+          let H := fresh "H" in
+          intros H; inversion_clear H;
+          functional_alg_type_infer_rewrite_clear;
           solve [firstorder | congruence]
       end.
+
 
   #[local]
   Ltac resolve_alg_sound :=
@@ -289,6 +330,20 @@ Section type_check.
     | |- (_ /\ _) => split; mautosolve 3
     end.
 
+  Ltac impl_aty_type_check :=
+      match goal with
+      | H1 : {{ ^?Γ ⊢a ^?M ⟹ ^?B }},
+          H2 : {{ ^?Γ ⊢a ^(nf_to_exp ?B) ⊆ ^?A }} |- {{ Γ ⊢a M ⟸ A }} =>
+          eapply atc_conv; eauto
+      end.
+
+   Ltac impl_aty_constructor :=
+      match goal with
+      | _ : _ |- {{ ^?Γ ⊢aty ^?A }} => solve [econstructor; eauto]
+      end.
+
+ 
+      
   Solve Obligations with
     (clean_obl;
      first
@@ -299,6 +354,8 @@ Section type_check.
        | impl_subtyping_order_obl_tac
        | impl_exist_lvl_wf_exp_obl_tac
        | impl_infer_spec_obl_tac
+       | impl_aty_constructor
+       | impl_aty_type_check
        | idtac
        ]
     ).
@@ -306,15 +363,11 @@ Section type_check.
   Next Obligation.
     mautosolve 3.
   Qed.
-  
   Next Obligation.
-    mautosolve 3.
-  Qed.
-
-  Next Obligation.
-    dependent destruction H.
-    assert {{ Γ ⊢ B : Sort@s1 }} by mauto 3 using alg_type_check_sound.
-    mauto 3.
+    assert {{ Γ ⊢ Sort@s1 }} by mauto 2.
+    resolve_alg_sound.
+    assert {{ ⊢ Γ, B }} by mauto 3.
+    mautosolve 2.
   Qed.
 
   Next Obligation.
@@ -330,7 +383,7 @@ Section type_check.
   Next Obligation.
     dependent destruction H.
     assert {{ Γ ⊢ A' : Sort@s4 }} by mauto 3 using alg_type_check_sound.
-    mauto 3.
+    mauto 4.
   Qed.
 
   Next Obligation.
@@ -341,8 +394,8 @@ Section type_check.
 
   Next Obligation.
     assert {{ Γ ⊢ A' : Sort@s4 }} by mauto 3 using alg_type_check_sound.
-    assert {{ ⊢ Γ, A'@s4 }} by mauto 2.
-    assert {{ Γ, A'@s4 ⊢ B' : Sort@s5 }} by mauto 3 using alg_type_check_sound.
+    assert {{ ⊢ Γ, A' }} by mauto 3.
+    assert {{ Γ, A' ⊢ B' : Sort@s5 }} by mauto 3 using alg_type_check_sound.
     mauto 2.
   Qed.
 
@@ -354,7 +407,7 @@ Section type_check.
   Next Obligation.
     simplify_nbe_order.
     assert {{ Γ ⊢ A' : Sort@s4 }} by mauto 3 using alg_type_check_sound.
-    assert {{ ⊢ Γ, A'@s4 }} by mauto 2.
+    assert {{ ⊢ Γ, A' }} by mauto 3.
     mauto 3 using alg_type_check_sound.
   Qed.
 
@@ -364,12 +417,12 @@ Section type_check.
     assert (user_exp P B'') by trivial using user_exp_nf.    
     enough {{ Γ ⊢ Π r A'' B'' : Sort@s6 }}; [eapply alg_aty_complete; mauto 2|].
     assert {{ Γ ⊢ A' : Sort@s4 }} by mauto 3 using alg_type_check_sound.
-    assert {{ Γ, A'@s4 ⊢ B' : Sort@s5 }} by (eapply alg_type_check_sound; mauto 3).
+    assert {{ Γ, A' ⊢ B' : Sort@s5 }} by (eapply alg_type_check_sound; mauto 4).
 
     assert {{ Γ ⊢ A' ≈ A'' : Sort@s4 }} by mauto 2 using soundness'.
-    assert {{ Γ, A'@s4 ⊢ B' ≈ B'' : Sort@s5 }} by mauto 2 using soundness'.
+    assert {{ Γ, A' ⊢ B' ≈ B'' : Sort@s5 }} by mauto 2 using soundness'.
     gen_presups.
-    assert {{ ⊢ Γ, A'@s4 ≈ Γ, ^(nf_to_exp A'')@s4 }} by mauto 3.
+    assert {{ ⊢ Γ, A' ≈ Γ, ^(nf_to_exp A'') }} by mauto 4.
     econstructor; mauto 2.
   Qed.
 
@@ -395,6 +448,19 @@ Section type_check.
     dependent destruction H3.
     dependent destruction H2.
     dependent destruction e.
+    intros Hf.
+    inversion Hf; subst.
+    functional_alg_type_infer_rewrite_clear.
+    inversion H3; subst.
+    intuition.
+  Qed.
+
+  Next Obligation.
+    dependent destruction H5.
+    dependent destruction H4.
+    dependent destruction H3.
+    dependent destruction H2.
+    dependent destruction e.
     inversion a0; subst.
     simplify_nbe_order.
     resolve_alg_sound.
@@ -403,7 +469,8 @@ Section type_check.
     gen_presup H4.
     assert {{ Γ ⊢ A0 ⊆ A }} by mauto 3 using alg_subtyping_sound.
     assert {{ Γ ⊢ N' : A }} by mauto 2.
-    mauto 4.
+    assert {{ Γ ⊢s Id,,N' : Γ, ^(nf_to_exp A) }} by mauto 4.
+    mauto 3.
   Qed.
 
   Next Obligation.
@@ -415,9 +482,9 @@ Section type_check.
     split; [mautosolve 3|].
     assert {{ Γ ⊢ Π r A B }} by (mauto 2 using alg_aty_sound).
     eapply wf_typ_pi_inversion in H2 as [].
-    assert {{ Γ, ^(nf_to_exp A)@s1 ⊢ B }} by (gen_presups; mauto 2).
+    assert {{ Γ, ^(nf_to_exp A) ⊢ B }} by (gen_presups; mauto 2).
     assert {{ Γ ⊢ N' : A }} by mauto 3 using alg_type_check_sound.
-    assert {{ Γ ⊢s Id,,N' : Γ, ^(nf_to_exp A)@s1 }} by mauto 2.
+    assert {{ Γ ⊢s Id,,N' : Γ, ^(nf_to_exp A) }} by mauto .
     assert {{ Γ ⊢ B[Id,,N'] }} by mauto 2.
     assert {{ Γ ⊢ B[Id,,N'] ≈ B' }} by mauto 2 using soundness_ty'.
     assert (user_exp P B') by trivial using user_exp_nf.    
@@ -439,168 +506,56 @@ Section type_check.
 
   
   Next Obligation.    
-    split; mautosolve 4.
-  Qed.
-
-  Next Obligation.
     mautosolve 3.
   Qed.
 
   Next Obligation.
-    split; mautosolve 4.
-  Qed.
-
-  Next Obligation.
-    intros Hf.
-    inversion Hf; subst.
-    functional_alg_type_infer_rewrite_clear.
-    assert (s = s0) by (eapply Func_ru_nat; eassumption); subst.
-    intuition.
-  Qed.
-
-  Next Obligation.
-    intros Hf.
-    inversion Hf; subst.
-    assert (s = s0) by (eapply Func_ru_nat; eassumption); subst.
-    functional_alg_type_infer_rewrite_clear.
-    intuition.
-  Qed.
-  
-  Next Obligation.
-    assert {{ Γ ⊢ ℕ : Sort@s }} by mauto 2.
-    assert {{ ⊢ Γ, ℕ@s }} by mauto 2.
-    resolve_alg_sound.
-    simpl in *.
-    assert {{ Γ, ℕ@s ⊢ A' }} by mauto 2.
-    assert {{ Γ ⊢ zero : ℕ }} by mauto 2.
-    assert {{ Γ ⊢s Id,,zero : Γ, ℕ@s }} by mauto 2.
-    mauto 2.
-  Qed.
-
-  Next Obligation.
-    assert {{ Γ ⊢ ℕ : Sort@s }} by mauto 2.
-    assert {{ ⊢ Γ, ℕ@s }} by mauto 2.
-    resolve_alg_sound.
-    simpl in *.
-    assert {{ ⊢ Γ, ℕ@s, A'@s' }} by mauto 2.
-    assert {{ Γ ⊢s Id,,zero : Γ, ℕ@s }} by mauto 3.
-    assert {{ Γ ⊢ A'[Id,,zero] : Sort@s' }} by mauto 3.
-    assert {{ Γ, ℕ@s, A'@s' ⊢s Wk∘Wk : Γ }} by (econstructor; mauto 3).
-    assert {{ Γ, ℕ@s, A'@s' ⊢s Wk∘Wk,,succ #1 : Γ, ℕ@s }} by mauto 4.
-    assert {{ Γ, ℕ@s, A'@s' ⊢ A'[Wk∘Wk,,succ #1] : Sort@s' }} by mauto 4.
-    mauto 2.
-  Qed.
-
-  Next Obligation.
-    
-    inversion 1.
-    assert (pat0 = s) by (eapply Func_ru_nat; mauto 2).
-    assert (s0 = s) by (eapply Func_ru_nat; mauto 2).
-    subst.
-    
-  Admitted.
-
-  Inductive ctx_st_subtyp {P} : ctx P -> ctx P -> Prop :=
-  | css_nil : ctx_st_subtyp {{{ ⋅ }}} {{{ ⋅ }}}
-  | css_cons : forall Γ Γ' s s' A,
-      ctx_st_subtyp Γ Γ' ->
-      st_subtyp s s' ->
-      {{ Γ ⊢ A : Sort@s }} ->
-      {{ Γ' ⊢ A : Sort@s }} ->
-      ctx_st_subtyp {{{ Γ, A@s }}} {{{ Γ', A@s' }}}
-  .
-
-  #[local]
-   Hint Constructors ctx_st_subtyp : mcpts.
-  
-  Lemma ctx_st_subtyp_implies_wf_ctx {P} : forall {Γ Γ' : ctx P},
-      ctx_st_subtyp Γ Γ' ->
-      {{ ⊢ Γ }} /\ {{ ⊢ Γ' }}.
-  Proof.
-    induction 1; split; destruct_conjs; mauto 2.
-    assert {{ Γ' ⊢ Sort@s ⊆ Sort@s' }} by mauto 2.
+    assert {{ Γ ⊢ ℕ }} by mauto 3.
     mauto 3.
   Qed.
 
+  Next Obligation.
+    assert {{ Γ ⊢ ℕ }} by mauto 3.
+    assert {{ ⊢ Γ, ℕ }} by mauto 2.
+    resolve_alg_sound.
+    assert {{ Γ ⊢s Id,,zero : Γ, ℕ }} by mauto 3.
+    mauto 2.
+  Qed.
 
-  #[local]
-    Ltac gen_ctx_st_subtyp_presup H :=
-    match type of H with
-    | ctx_st_subtyp ?Γ ?Γ' =>
-        let HΓ := fresh "HΓ" in
-        let HΓ' := fresh "HΓ'" in
-        pose proof ctx_st_subtyp_implies_wf_ctx H as [HΓ HΓ']
-    | _ => idtac
-    end.
+  Next Obligation.
+    assert {{ Γ ⊢ ℕ }} by mauto 3.
+    assert {{ ⊢ Γ, ℕ }} by mauto 2.
+    resolve_alg_sound.
+    assert {{ ⊢ Γ, ℕ, A' }} by mauto 2.
+    assert {{ Γ, ℕ ⊢s Wk : Γ }} by mauto 3.
+    assert {{ Γ, ℕ, A' ⊢s Wk : Γ, ℕ }} by mauto 4.
+    assert {{ Γ, ℕ, A' ⊢s Wk∘Wk : Γ }} by mauto 3.
+    assert {{ Γ, ℕ, A' ⊢s Wk∘Wk,,succ #1 : Γ, ℕ }} by mauto 4.
+    mauto 2.
+  Qed.
 
-  Ltac gen_ctx_st_subtyp_presups := match_by_head ctx_st_subtyp ltac:(fun H => gen_ctx_st_subtyp_presup H).    
-  
-  Lemma ctx_st_subtyp_exp {P} : forall {Γ : ctx P} {M A}, {{ Γ ⊢ M : A }} -> forall {Δ}, ctx_st_subtyp Δ Γ -> {{ Δ ⊢ M : A }}.
-  Proof.
-    induction 1; intros;
-      gen_ctx_st_subtyp_presups;
-      mauto 3.
-    - assert {{ Δ ⊢ A : Sort@s1 }} by mauto 2.
-      assert (ctx_st_subtyp {{{ Δ, A@s1 }}} {{{ Γ, A@s1 }}}) by mauto 2.
-      assert {{ Δ, A@s1 ⊢ B : Sort@s2 }} by mauto 2.
-      mauto 2.
-
-    - assert {{ Δ ⊢ A : Sort@s1 }} by mauto 2.
-      assert (ctx_st_subtyp {{{ Δ, A@s1 }}} {{{ Γ, A@s1 }}}) by mauto 2.
-      assert {{ Δ, A@s1 ⊢ B : Sort@s2 }} by mauto 2.
-      assert {{ Δ, A@s1 ⊢ M : B }} by mauto 2.
-      mauto 2.
-      
-    - admit.
-    - admit.
-
-    - 
-      assert {{ Δ ⊢ ℕ : Sort@s }} by mauto 2.
-      assert (ctx_st_subtyp {{{ Δ, ℕ@s }}} {{{ Γ, ℕ@s }}}) by mauto 3.
-      assert {{ Δ, ℕ@s ⊢ A : Sort@s' }} by mauto 2.
-      assert (ctx_st_subtyp {{{ Δ, ℕ@s, A@s' }}} {{{ Γ, ℕ@s, A@s' }}}) by mauto 3.
-
-      assert {{ Δ ⊢ MZ : A[Id,,zero] }} by mauto 2.
-      assert {{ Δ ⊢ M : ℕ }} by mauto 2.
-      assert {{ Δ, ℕ@s, A@s' ⊢ MS : A[Wk∘Wk,,succ #1] }} by mauto 2.
-      mauto 2.
-
-    - admit. (* need another lemma for well-formed substitution *)
-      
-    - admit. (* need another lemma for subtyping *)
-  Admitted.
-  
-  Lemma ctx_st_subtyp_irrelevance {P} : forall {Γ Γ' : ctx P},
-      ctx_st_subtyp Γ Γ' ->
-      forall M A, {{ Γ' ⊢ M : A }} -> {{ Γ ⊢ M : A }}.
-  Proof.
-    induction 1; intros; mauto 2.
-    
-  
   Next Obligation.
     mautosolve 3.
   Qed.
-  
+
+
   Next Obligation.
     simplify_nbe_order.
-    assert {{ Γ ⊢ ℕ : Sort@s }} by mauto 2.
-    assert {{ ⊢ Γ, ℕ@s }} by mauto 2.
-    resolve_alg_sound.
-    simpl in H4.
-    assert {{ Γ, ℕ@s ⊢ A' }} by mauto 2.
+    assert {{ Γ ⊢ ℕ }} by mauto 3.
     assert {{ Γ ⊢ M' : ℕ }} by mauto 3 using alg_type_check_sound.
-    assert {{ Γ ⊢s Id,,M' : Γ, ℕ@s }} by mauto 2.
-    mauto 3.
+    assert {{ ⊢ Γ, ℕ }} by mauto 3.
+    resolve_alg_sound.
+    assert {{ Γ ⊢s Id,,M' : Γ, ℕ }} by mauto 3.
+    mauto 2.
   Qed.
-                
+    
   Final Obligation.
     split; [mautosolve 3|].
-    assert {{ Γ ⊢ ℕ : Sort@s }} by mauto 2.
-    assert {{ ⊢ Γ, ℕ@s }} by mauto 2.
+    assert {{ Γ ⊢ ℕ }} by mauto 3.
+    assert {{ ⊢ Γ, ℕ }} by mauto 2.
     resolve_alg_sound.
-    simpl in H4.
     assert {{ Γ ⊢ M' : ℕ }} by mauto 3 using alg_type_check_sound.
-    assert {{ Γ ⊢s Id,,M' : Γ, ℕ@s }} by mauto 2.
+    assert {{ Γ ⊢s Id,,M' : Γ, ℕ }} by mauto 2.
     assert {{ Γ ⊢ A'[Id,,M'] }} by mauto 3.
     assert {{ Γ ⊢ A'[Id,,M'] ≈ A'' }} by mauto 2 using soundness_ty'.
     assert (user_exp P A'') by trivial using user_exp_nf.  
@@ -609,48 +564,64 @@ Section type_check.
 
   Extraction Inline type_check_functional type_infer_functional.
 
-  Lemma type_infer_order_soundness : forall Γ M A,
+  Lemma type_infer_order_soundness {P} : forall {Γ : ctx P} M A,
       {{ Γ ⊢a M ⟹ A }} ->
       type_infer_order M
-  with type_check_order_soundness : forall Γ M A,
+  with type_check_order_soundness {P} : forall {Γ : ctx P} M A,
       {{ Γ ⊢a M ⟸ A }} ->
-      type_check_order M.
+      type_check_order M
+  with type_aty_order_soundness {P} : forall {Γ : ctx P} A,
+      {{ Γ ⊢aty A }} ->
+      type_aty_order A.
   Proof.
     - clear type_infer_order_soundness.
       induction 1; mauto 3.
       + econstructor; mauto 3.
       + econstructor; mauto 3.
       + econstructor; mauto 3.
-      + econstructor; mauto 3.
     - clear type_check_order_soundness.
       induction 1; mauto 3.
+    - clear type_aty_order_soundness.
+      induction 1; mauto 3.
+      + econstructor; mauto 3.
+      + econstructor; mauto 3.
   Qed.
 End type_check.
 
 #[local]
-Hint Resolve type_check_order_soundness type_infer_order_soundness : mcpts.
+Hint Resolve type_check_order_soundness type_infer_order_soundness type_aty_order_soundness : mcpts.
 
-Lemma type_check_complete' : forall Γ M A (HA : exists i, {{ Γ ⊢ A : Sort@i }}),
+Lemma type_check_complete' {P} (dec_P : DecidableSig P) (pred_P : PredicativeSig P) (func_P : FunctionalSig P) : forall {Γ : ctx P} M A (HA : {{ Γ ⊢ A }}),
     {{ Γ ⊢a M ⟸ A }} ->
-    exists H H', type_check Γ A HA M H = left H'.
+    exists H H', type_check dec_P pred_P func_P Γ A HA M H = left H'.
 Proof.
-  intros ? ? ? [] ?.
+  intros.
   assert (Horder : type_check_order M) by mauto.
   exists Horder.
   dec_complete.
 Qed.
 
-Lemma type_infer_complete : forall Γ M A (HΓ : {{ ⊢ Γ }}),
+Lemma type_infer_complete {P} (dec_P : DecidableSig P) (pred_P : PredicativeSig P) (func_P : FunctionalSig P) : forall Γ M A (HΓ : {{ ⊢ Γ }}),
     {{ Γ ⊢a M ⟹ A }} ->
-    exists H H', type_infer Γ HΓ M H = inleft (exist _ A H').
+    exists H H', type_infer dec_P pred_P func_P Γ HΓ M H = inleft (exist _ A H').
 Proof.
   intros.
   assert (Horder : type_infer_order M) by mauto.
   exists Horder.
-  destruct (type_infer Γ HΓ M Horder) as [[? []] |].
+  destruct (type_infer dec_P pred_P func_P Γ HΓ M Horder) as [[? []] |].
   - functional_alg_type_infer_rewrite_clear.
     eexists; reflexivity.
   - contradict H; intuition.
+Qed.
+
+Lemma type_aty_complete {P} (dec_P : DecidableSig P) (pred_P : PredicativeSig P) (func_P : FunctionalSig P) : forall {Γ : ctx P} A (HΓ : {{ ⊢ Γ }}),
+    {{ Γ ⊢aty A }} ->
+    exists H H', type_aty dec_P pred_P func_P Γ HΓ A H = left H'.
+Proof.
+  intros.
+  assert (Horder : type_aty_order A) by mauto.
+  exists Horder.
+  dec_complete.
 Qed.
 
 Section type_check_closed.
@@ -658,43 +629,33 @@ Section type_check_closed.
   Ltac impl_obl_tac :=
     unfold not in *;
     intros;
-    mauto 3 using user_exp_to_type_infer_order, type_check_order, type_infer_order.
+    mauto 3 using user_exp_to_type_infer_order, type_check_order, type_infer_order, type_aty_order.
 
   #[tactic="impl_obl_tac",derive(equations=no,eliminator=no)]
-  Equations type_check_closed A (HA : user_exp A) M (HM : user_exp M) : { {{ ⋅ ⊢ M : A }} } + { ~ {{ ⋅ ⊢ M : A }} } :=
-  | A, HA, M, HM =>
-      let*o->b (exist _ UA _) := type_infer {{{ ⋅ }}} _ A _ while _ in
-      let*o->b (exist _ i _) :=  get_level_of_type_nf UA while _ in
-      let*b _ := type_check {{{ ⋅ }}} A _ M _ while _ in
+  Equations type_check_closed {P : PtsSig} (dec_P : DecidableSig P) (pred_P : PredicativeSig P) (func_P : FunctionalSig P) A (HA : user_exp P A) M (HM : user_exp P M) : { {{ ⋅ ⊢ M : A }} } + { ~ {{ ⋅ ⊢ M : A }} } :=
+  | dec_P, pred_P, func_P, A, HA, M, HM =>
+      let*b _ := type_aty dec_P pred_P func_P {{{ ⋅ }}} _ A _ while _ in
+      let*b _ := type_check dec_P pred_P func_P {{{ ⋅ }}} A _ M _ while _ in
       pureb _
   .
   Next Obligation. (* False *)
-    assert {{ ⊢ ⋅ }} by mauto 2.
-    assert (exists i, {{ ⋅ ⊢ A : Sort@i }}) as [i] by (gen_presups; eauto 2).
-    assert (exists j, {{ ⋅ ⊢a A ⟹ Sort@j }} /\ j <= i) as [j []] by mauto 3.
+    pose proof (@wf_ctx_empty P).
+    assert {{ ⋅ ⊢ A }} by (gen_presups; eauto 2).
+    assert {{ ⋅ ⊢aty A }} by mauto 2 using alg_aty_sound.
     firstorder.
   Qed.
-  Next Obligation. (* False *)
-    assert (exists i, {{ ⋅ ⊢ A : Sort@i }}) as [i] by (gen_presups; eauto 2).
-    assert (exists j, {{ ⋅ ⊢a A ⟹ Sort@j }} /\ j <= i) as [j []] by mauto 3.
-    functional_alg_type_infer_rewrite_clear.
-    intuition.
+  Next Obligation.
+    pose proof (@wf_ctx_empty P).
+    eapply alg_aty_sound; mauto 2.
   Qed.
-  Next Obligation. (* exists i, {{ ⋅ ⊢ A : Sort@i }} *)
-    assert {{ ⊢ ⋅ }} by mauto 2.
-    assert {{ ⋅ ⊢ A : ^n{{{ Sort@i }}} }} by mauto 2 using alg_type_infer_sound.
-    simpl in *.
-    firstorder.
-  Qed.
-  Next Obligation. (* {{ ⋅ ⊢ M : A }} *)
-    assert {{ ⊢ ⋅ }} by mauto 2.
-    assert {{ ⋅ ⊢ A : ^n{{{ Sort@i }}} }} by mauto 3 using alg_type_infer_sound.
-    simpl in *.
-    mauto 3 using alg_type_check_sound.
+  Next Obligation.
+    pose proof (@wf_ctx_empty P).
+    eapply alg_type_check_sound; mauto 2.
+    eapply alg_aty_sound; mauto 2.
   Qed.
 End type_check_closed.
 
-Lemma type_check_closed_complete : forall A (HA : user_exp A) M (HM : user_exp M),
+Lemma type_check_closed_complete {P : PtsSig} (dec_P : DecidableSig P) (pred_P : PredicativeSig P) (func_P : FunctionalSig P) : forall A (HA : user_exp P A) M (HM : user_exp P M),
     {{ ⋅ ⊢ M : A }} ->
-    exists H', type_check_closed A HA M HM = left H'.
+    exists H', type_check_closed dec_P pred_P func_P A HA M HM = left H'.
 Proof. intros; dec_complete. Qed.
