@@ -7,6 +7,7 @@ From McPTS Require Import PtsSignature LibTactics.
 From McPTS.Core Require Import Base Completeness Soundness.
 From McPTS.Core.Syntactic Require Import SystemOpt.
 From McPTS.Extraction Require Import NbE TypeCheck.
+From McPTS.Frontend Require Import Elaborator.
 From McPTS.CaseStudies.MiniML Require Import Signature Frontend Parser.
 Import MenhirLibParser.Inter.
 Import Syntax_Notations.

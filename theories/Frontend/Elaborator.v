@@ -30,7 +30,7 @@ Fixpoint lookup (s : string) (ctx : list string) : option nat :=
 .
 
 (** * Concrete Syntax Tree *)
-Module Cst.
+Module CstAnn.
   Inductive obj (P : PtsSig) : Set :=
   (** Sorts *)
   | st : P -> obj P
@@ -55,40 +55,40 @@ Module Cst.
   Arguments zero {_}.
   Arguments succ {_}.
   Arguments natrec {_}.
-End Cst.
+End CstAnn.
 
 
-Fixpoint elaborate {P} (cst : Cst.obj P) (ctx : list string) : option (exp P) :=
+Fixpoint elaborate {P} (cst : CstAnn.obj P) (ctx : list string) : option (exp P) :=
   match cst with
-  | Cst.var s =>
+  | CstAnn.var s =>
       match lookup s ctx with
       | Some n => Some (a_var n)
       | None => None
       end
-  | Cst.st s => Some (a_st s)
-  | Cst.nat => Some a_nat
-  | Cst.zero => Some a_zero
-  | Cst.succ c =>
+  | CstAnn.st s => Some (a_st s)
+  | CstAnn.nat => Some a_nat
+  | CstAnn.zero => Some a_zero
+  | CstAnn.succ c =>
       match elaborate c ctx with
       | Some a => Some (a_succ a)
       | None => None
       end
-  | Cst.natrec n mx m z sx sr s =>
+  | CstAnn.natrec n mx m z sx sr s =>
       match elaborate m (mx :: ctx), elaborate z ctx, elaborate s (sr :: sx :: ctx), elaborate n ctx with
       | Some m, Some z, Some s, Some n => Some (a_natrec m z s n)
       | _, _, _, _ => None
       end
-  | Cst.pi r s t c =>
+  | CstAnn.pi r s t c =>
       match elaborate c (s :: ctx), elaborate t ctx with
       | Some a, Some t => Some (a_pi r t a)
       | _, _ => None
       end
-  | Cst.fn r s t b c =>
+  | CstAnn.fn r s t b c =>
       match elaborate c (s :: ctx), elaborate b (s :: ctx), elaborate t ctx with
       | Some a, Some b, Some t => Some (a_fn r t b a)
       | _, _, _ => None
       end
-  | Cst.app c1 c2 =>
+  | CstAnn.app c1 c2 =>
       match elaborate c1 ctx, elaborate c2 ctx with
       | None, _ => None
       | _, None => None
@@ -173,21 +173,21 @@ Proof.
 Qed.
 
 (** This function finds all the variables in an object *)
-Fixpoint cst_variables {P} (cst : Cst.obj P) : StrSet.t :=
+Fixpoint cst_variables {P} (cst : CstAnn.obj P) : StrSet.t :=
  match cst with
  (** Sorts *)
- | Cst.st s => StrSet.empty
+ | CstAnn.st s => StrSet.empty
  (** Functions *)   
- | Cst.pi r s t c => StrSet.union (cst_variables t) (StrSet.remove s (cst_variables c))
- | Cst.fn r s t b c => StrSet.union (StrSet.union (cst_variables t) (StrSet.remove s (cst_variables b))) (StrSet.remove s (cst_variables c))
- | Cst.app c1 c2 => StrSet.union (cst_variables c1) (cst_variables c2)
+ | CstAnn.pi r s t c => StrSet.union (cst_variables t) (StrSet.remove s (cst_variables c))
+ | CstAnn.fn r s t b c => StrSet.union (StrSet.union (cst_variables t) (StrSet.remove s (cst_variables b))) (StrSet.remove s (cst_variables c))
+ | CstAnn.app c1 c2 => StrSet.union (cst_variables c1) (cst_variables c2)
  (** Variables *)
- | Cst.var s => StrSet.singleton s
+ | CstAnn.var s => StrSet.singleton s
  (** Natural numbers *)               
- | Cst.nat => StrSet.empty
- | Cst.zero => StrSet.empty
- | Cst.succ c => cst_variables c
- | Cst.natrec n mx m z sx sy s => StrSet.union (StrSet.union (cst_variables n) (StrSet.remove mx (cst_variables m))) (StrSet.union (cst_variables z) (StrSet.remove sx (StrSet.remove sy (cst_variables s))))
+ | CstAnn.nat => StrSet.empty
+ | CstAnn.zero => StrSet.empty
+ | CstAnn.succ c => cst_variables c
+ | CstAnn.natrec n mx m z sx sy s => StrSet.union (StrSet.union (cst_variables n) (StrSet.remove mx (cst_variables m))) (StrSet.union (cst_variables z) (StrSet.remove sx (StrSet.remove sy (cst_variables s))))
  end
 .
 
@@ -272,7 +272,7 @@ Qed.
 
 (** If the set of free variables in a cst are contained in a context
     then elaboration succeeds with that context, and the result is a closed term *)
-Lemma well_scoped {P} (cst : Cst.obj P) : forall ctx,  cst_variables cst [<=] StrSProp.of_list ctx  ->
+Lemma well_scoped {P} (cst : CstAnn.obj P) : forall ctx,  cst_variables cst [<=] StrSProp.of_list ctx  ->
 exists a : exp P, (elaborate cst ctx = Some a) /\ (closed_at a (List.length ctx)).
 Proof.
   induction cst; intros; simpl in *; mauto.
@@ -314,9 +314,9 @@ Proof.
       destruct (IHcst4 _ H3) as [ast''' [-> ?]]; mauto.
 Qed.
 
-Example test_elab {P} : @elaborate P Cst.nat nil = Some a_nat.
+Example test_elab {P} : @elaborate P CstAnn.nat nil = Some a_nat.
 Proof. reflexivity. Qed.
 
 Example test_elab2 {P} : forall {s1 s2 s3} {r : Ru_pi P s1 s2 s3},
-    @elaborate P (Cst.fn r "s" Cst.nat Cst.nat (Cst.fn r "x" Cst.nat Cst.nat (Cst.fn r "s" Cst.nat Cst.nat (Cst.var "q")))) nil = None.
+    @elaborate P (CstAnn.fn r "s" CstAnn.nat CstAnn.nat (CstAnn.fn r "x" CstAnn.nat CstAnn.nat (CstAnn.fn r "s" CstAnn.nat CstAnn.nat (CstAnn.var "q")))) nil = None.
 Proof. reflexivity. Qed.

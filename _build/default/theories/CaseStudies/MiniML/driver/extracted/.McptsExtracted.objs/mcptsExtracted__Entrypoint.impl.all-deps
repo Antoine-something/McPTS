@@ -5,6 +5,7 @@ mcptsExtracted__BinPos
 mcptsExtracted__Datatypes
 mcptsExtracted__Decidability
 mcptsExtracted__Domain
+mcptsExtracted__Elaborator
 mcptsExtracted__Equality
 mcptsExtracted__Evaluation
 mcptsExtracted__FMapAVL

@@ -27,6 +27,9 @@ module Decidability = McptsExtracted__Decidability
 (** @canonical McptsExtracted.Domain *)
 module Domain = McptsExtracted__Domain
 
+(** @canonical McptsExtracted.Elaborator *)
+module Elaborator = McptsExtracted__Elaborator
+
 (** @canonical McptsExtracted.Entrypoint *)
 module Entrypoint = McptsExtracted__Entrypoint
 

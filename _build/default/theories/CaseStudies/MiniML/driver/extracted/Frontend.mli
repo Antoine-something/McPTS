@@ -1,8 +1,6 @@
-open Nat
+open Elaborator
 open Signature
 open Syntax
-
-val lookup : string -> string list -> int option
 
 module Cst :
  sig
@@ -17,5 +15,7 @@ module Cst :
   | Coq_succ of obj
   | Coq_natrec of obj * string * obj * obj * string * string * obj
  end
+
+val annotate' : Cst.obj -> CstAnn.obj
 
 val elaborate' : Cst.obj -> string list -> exp option
