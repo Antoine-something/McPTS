@@ -24,8 +24,6 @@ Module Cst.
   | natrec : obj -> string -> obj -> obj -> string -> string -> obj -> obj.  
 End Cst.
 
-Definition obj := CstAnn.obj MiniML_Sig.
-
 Fixpoint annotate' (cst : Cst.obj) : CstAnn.obj MiniML_Sig :=
   match cst with
   (* Sort *)
