@@ -12,14 +12,15 @@ Arguments eq_refl {_} _.
 
 %token <loc*string> VAR
 %token <loc*nat> INT
-%token <loc> END LAMBDA NAT PI REC RETURN SUCC TYPE ZERO (* keywords *)
-%token <loc> ARROW "->" BAR "|" COLON ":" COMMA "," DARROW "=>" LPAREN "(" RPAREN ")" DOT "." EOF (* symbols *)
+%token <loc> END LAMBDA NAT PI REC RETURN SUCC TYPE ZERO LET IN (* keywords *)
+%token <loc> ARROW "->" BAR "|" COLON ":" COMMA "," DARROW "=>" LPAREN "(" RPAREN ")" DOT "." EOF DEF ":=" (* symbols *)
 
 %start <Cst.obj * Cst.obj> prog
 %type <Cst.obj> obj app_obj atomic_obj
 %type <Cst.obj * Cst.obj> ann_obj
 %type <string * Cst.obj> param
 %type <list (string * Cst.obj)> params
+%type <(string * Cst.obj) * Cst.obj> let_defn
 
 %on_error_reduce obj params app_obj atomic_obj
 
@@ -38,6 +39,8 @@ let obj :=
     END; { Cst.natrec escr (snd mx) em ez (snd sx) (snd sr) es }
 
   | SUCC; ~ = atomic_obj; { Cst.succ atomic_obj }
+
+  | LET; ds = let_defn; IN; body = ann_obj; {Cst.app (Cst.fn (fst (fst ds)) (snd (fst ds)) (snd body) (fst body)) (snd ds) }
 
 let app_obj :=
   | ~ = app_obj; ~ = atomic_obj; { Cst.app app_obj atomic_obj }
@@ -66,6 +69,11 @@ let param :=
 (* (M : B) *)
 let ann_obj :=
   | "("; exp = obj; ":"; ann = obj; ")"; { (exp, ann) }
+
+
+(* (x : A) := t *)
+let let_defn :=
+  | ~ = param; ":="; ~ = obj; { (param, obj) }
 %%
 
 Extract Constant loc => "Lexing.position * Lexing.position".

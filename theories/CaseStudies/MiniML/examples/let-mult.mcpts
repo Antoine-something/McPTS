@@ -1,0 +1,19 @@
+let (add : forall (x : Nat) -> forall (y : Nat) -> Nat) :=
+  (fun (x : Nat) ->
+    (fun (y : Nat) ->
+      (rec x return z . Nat
+      | zero => y
+      | succ n, r => succ r
+      end : Nat)
+    : (forall (y : Nat) -> Nat)))
+in
+(let (mult : forall (x : Nat) -> forall (y : Nat) -> Nat) :=
+   (fun (x : Nat) ->
+     (fun (y : Nat) ->
+       (rec x return z . Nat
+       | zero => zero
+       | succ n, r => add r y
+       end : Nat)
+     : forall (y : Nat) -> Nat))
+in (mult 3 5 : Nat) : Nat)
+: Nat

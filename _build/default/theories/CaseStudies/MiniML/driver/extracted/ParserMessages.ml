@@ -6,13 +6,27 @@
 let message =
   fun s ->
     match s with
-    | 55 ->
+    | 62 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 61 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 60 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 56 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 54 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 53 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 52 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 51 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 50 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 49 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 48 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 47 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
@@ -32,34 +46,30 @@ let message =
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 39 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 38 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 37 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 36 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 35 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 34 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 33 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 32 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 28 ->
+    | 30 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 27 ->
+    | 29 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 25 ->
+    | 22 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 19 ->
+    | 21 ->
+        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 20 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 18 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 17 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 15 ->
+    | 16 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 15 ->
+        "A parenthesized paremeter is expect.\nFor example,\n  \"(x : Nat)\" in \"fun (x : Nat) -> (x : Nat)\"\n"
     | 14 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 13 ->
@@ -71,16 +81,16 @@ let message =
     | 10 ->
         "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
     | 9 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "A parenthesized paremeter is expect.\nFor example,\n  \"(x : Nat)\" in \"fun (x : Nat) -> (x : Nat)\"\n"
     | 8 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "A list of parenthesized parameters is expected.\nFor example,\n  \"(x : Nat) (y : Nat)\" in \"forall (x : Nat) (y : Nat) -> Nat\"\n"
     | 7 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "A scrutinee expression is expected.\nThis token is invalid for the beginning of an expression.\n"
     | 6 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "Empty brackets are not allowed\n"
     | 4 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "Expected an expression after 'succ'\n"
     | 0 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "This token is invalid for the beginning of a program.\n"
     | _ ->
         raise Not_found

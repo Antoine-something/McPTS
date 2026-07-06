@@ -23,11 +23,14 @@ module Coq__1 : sig
  | PI of loc
  | NAT of loc
  | LPAREN of loc
+ | LET of loc
  | LAMBDA of loc
  | INT of (loc * int)
+ | IN of loc
  | EOF of loc
  | END of loc
  | DOT of loc
+ | DEF of loc
  | DARROW of loc
  | COMMA of loc
  | COLON of loc
@@ -44,11 +47,14 @@ module Gram :
   | COLON't
   | COMMA't
   | DARROW't
+  | DEF't
   | DOT't
   | END't
   | EOF't
+  | IN't
   | INT't
   | LAMBDA't
+  | LET't
   | LPAREN't
   | NAT't
   | PI't
@@ -70,6 +76,7 @@ module Gram :
   | Coq_ann_obj'nt
   | Coq_app_obj'nt
   | Coq_atomic_obj'nt
+  | Coq_let_defn'nt
   | Coq_obj'nt
   | Coq_param'nt
   | Coq_params'nt
@@ -108,11 +115,13 @@ module Gram :
   | Prod'params'1
   | Prod'params'0
   | Prod'param'0
+  | Prod'obj'5
   | Prod'obj'4
   | Prod'obj'3
   | Prod'obj'2
   | Prod'obj'1
   | Prod'obj'0
+  | Prod'let_defn'0
   | Prod'atomic_obj'5
   | Prod'atomic_obj'4
   | Prod'atomic_obj'3
@@ -186,11 +195,14 @@ module Aut :
     | COLON't
     | COMMA't
     | DARROW't
+    | DEF't
     | DOT't
     | END't
     | EOF't
+    | IN't
     | INT't
     | LAMBDA't
+    | LET't
     | LPAREN't
     | NAT't
     | PI't
@@ -212,6 +224,7 @@ module Aut :
     | Coq_ann_obj'nt
     | Coq_app_obj'nt
     | Coq_atomic_obj'nt
+    | Coq_let_defn'nt
     | Coq_obj'nt
     | Coq_param'nt
     | Coq_params'nt
@@ -252,11 +265,13 @@ module Aut :
     | Prod'params'1
     | Prod'params'0
     | Prod'param'0
+    | Prod'obj'5
     | Prod'obj'4
     | Prod'obj'3
     | Prod'obj'2
     | Prod'obj'1
     | Prod'obj'0
+    | Prod'let_defn'0
     | Prod'atomic_obj'5
     | Prod'atomic_obj'4
     | Prod'atomic_obj'3
@@ -327,11 +342,14 @@ module Aut :
     | COLON't
     | COMMA't
     | DARROW't
+    | DEF't
     | DOT't
     | END't
     | EOF't
+    | IN't
     | INT't
     | LAMBDA't
+    | LET't
     | LPAREN't
     | NAT't
     | PI't
@@ -353,6 +371,7 @@ module Aut :
     | Coq_ann_obj'nt
     | Coq_app_obj'nt
     | Coq_atomic_obj'nt
+    | Coq_let_defn'nt
     | Coq_obj'nt
     | Coq_param'nt
     | Coq_params'nt
@@ -393,11 +412,13 @@ module Aut :
     | Prod'params'1
     | Prod'params'0
     | Prod'param'0
+    | Prod'obj'5
     | Prod'obj'4
     | Prod'obj'3
     | Prod'obj'2
     | Prod'obj'1
     | Prod'obj'0
+    | Prod'let_defn'0
     | Prod'atomic_obj'5
     | Prod'atomic_obj'4
     | Prod'atomic_obj'3
@@ -465,10 +486,17 @@ module Aut :
   val first_nterm : Coq__2.nonterminal -> Coq__2.terminal list
 
   type noninitstate' =
+  | Nis'63
+  | Nis'62
+  | Nis'61
+  | Nis'60
+  | Nis'58
+  | Nis'57
   | Nis'56
   | Nis'55
   | Nis'54
   | Nis'53
+  | Nis'52
   | Nis'51
   | Nis'50
   | Nis'49

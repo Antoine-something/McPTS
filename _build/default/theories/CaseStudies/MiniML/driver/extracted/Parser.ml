@@ -24,11 +24,14 @@ module Coq__1 = struct
  | PI of loc
  | NAT of loc
  | LPAREN of loc
+ | LET of loc
  | LAMBDA of loc
  | INT of (loc * int)
+ | IN of loc
  | EOF of loc
  | END of loc
  | DOT of loc
+ | DEF of loc
  | DARROW of loc
  | COMMA of loc
  | COLON of loc
@@ -45,11 +48,14 @@ module Gram =
   | COLON't
   | COMMA't
   | DARROW't
+  | DEF't
   | DOT't
   | END't
   | EOF't
+  | IN't
   | INT't
   | LAMBDA't
+  | LET't
   | LPAREN't
   | NAT't
   | PI't
@@ -73,112 +79,36 @@ module Gram =
       | COLON't -> (fun p->1+2*p) 1
       | COMMA't -> (fun p->2*p) ((fun p->2*p) 1)
       | DARROW't -> (fun p->1+2*p) ((fun p->2*p) 1)
-      | DOT't -> (fun p->2*p) ((fun p->1+2*p) 1)
-      | END't -> (fun p->1+2*p) ((fun p->1+2*p) 1)
-      | EOF't -> (fun p->2*p) ((fun p->2*p) ((fun p->2*p) 1))
-      | INT't -> (fun p->1+2*p) ((fun p->2*p) ((fun p->2*p) 1))
-      | LAMBDA't -> (fun p->2*p) ((fun p->1+2*p) ((fun p->2*p) 1))
-      | LPAREN't -> (fun p->1+2*p) ((fun p->1+2*p) ((fun p->2*p) 1))
-      | NAT't -> (fun p->2*p) ((fun p->2*p) ((fun p->1+2*p) 1))
-      | PI't -> (fun p->1+2*p) ((fun p->2*p) ((fun p->1+2*p) 1))
-      | REC't -> (fun p->2*p) ((fun p->1+2*p) ((fun p->1+2*p) 1))
-      | RETURN't -> (fun p->1+2*p) ((fun p->1+2*p) ((fun p->1+2*p) 1))
-      | RPAREN't ->
-        (fun p->2*p) ((fun p->2*p) ((fun p->2*p) ((fun p->2*p) 1)))
-      | SUCC't ->
-        (fun p->1+2*p) ((fun p->2*p) ((fun p->2*p) ((fun p->2*p) 1)))
-      | TYPE't ->
+      | DEF't -> (fun p->2*p) ((fun p->1+2*p) 1)
+      | DOT't -> (fun p->1+2*p) ((fun p->1+2*p) 1)
+      | END't -> (fun p->2*p) ((fun p->2*p) ((fun p->2*p) 1))
+      | EOF't -> (fun p->1+2*p) ((fun p->2*p) ((fun p->2*p) 1))
+      | IN't -> (fun p->2*p) ((fun p->1+2*p) ((fun p->2*p) 1))
+      | INT't -> (fun p->1+2*p) ((fun p->1+2*p) ((fun p->2*p) 1))
+      | LAMBDA't -> (fun p->2*p) ((fun p->2*p) ((fun p->1+2*p) 1))
+      | LET't -> (fun p->1+2*p) ((fun p->2*p) ((fun p->1+2*p) 1))
+      | LPAREN't -> (fun p->2*p) ((fun p->1+2*p) ((fun p->1+2*p) 1))
+      | NAT't -> (fun p->1+2*p) ((fun p->1+2*p) ((fun p->1+2*p) 1))
+      | PI't -> (fun p->2*p) ((fun p->2*p) ((fun p->2*p) ((fun p->2*p) 1)))
+      | REC't -> (fun p->1+2*p) ((fun p->2*p) ((fun p->2*p) ((fun p->2*p) 1)))
+      | RETURN't ->
         (fun p->2*p) ((fun p->1+2*p) ((fun p->2*p) ((fun p->2*p) 1)))
-      | VAR't ->
+      | RPAREN't ->
         (fun p->1+2*p) ((fun p->1+2*p) ((fun p->2*p) ((fun p->2*p) 1)))
+      | SUCC't ->
+        (fun p->2*p) ((fun p->2*p) ((fun p->1+2*p) ((fun p->2*p) 1)))
+      | TYPE't ->
+        (fun p->1+2*p) ((fun p->2*p) ((fun p->1+2*p) ((fun p->2*p) 1)))
+      | VAR't ->
+        (fun p->2*p) ((fun p->1+2*p) ((fun p->1+2*p) ((fun p->2*p) 1)))
       | ZERO't ->
-        (fun p->2*p) ((fun p->2*p) ((fun p->1+2*p) ((fun p->2*p) 1))));
+        (fun p->1+2*p) ((fun p->1+2*p) ((fun p->1+2*p) ((fun p->2*p) 1))));
       surj = (fun n ->
       (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
         (fun p ->
         (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-          (fun p0 ->
-          (fun f2p1 f2p f1 p ->
-  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-            (fun p1 ->
-            (fun f2p1 f2p f1 p ->
-  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-              (fun _ -> ARROW't)
-              (fun _ -> ARROW't)
-              (fun _ -> RETURN't)
-              p1)
-            (fun p1 ->
-            (fun f2p1 f2p f1 p ->
-  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-              (fun _ -> ARROW't)
-              (fun p2 ->
-              (fun f2p1 f2p f1 p ->
-  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                (fun _ -> ARROW't)
-                (fun _ -> ARROW't)
-                (fun _ -> VAR't)
-                p2)
-              (fun _ -> LPAREN't)
-              p1)
-            (fun _ -> END't)
-            p0)
-          (fun p0 ->
-          (fun f2p1 f2p f1 p ->
-  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-            (fun p1 ->
-            (fun f2p1 f2p f1 p ->
-  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-              (fun _ -> ARROW't)
-              (fun _ -> ARROW't)
-              (fun _ -> PI't)
-              p1)
-            (fun p1 ->
-            (fun f2p1 f2p f1 p ->
-  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-              (fun _ -> ARROW't)
-              (fun p2 ->
-              (fun f2p1 f2p f1 p ->
-  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                (fun _ -> ARROW't)
-                (fun _ -> ARROW't)
-                (fun _ -> SUCC't)
-                p2)
-              (fun _ -> INT't)
-              p1)
-            (fun _ -> DARROW't)
-            p0)
-          (fun _ -> COLON't)
-          p)
-        (fun p ->
-        (fun f2p1 f2p f1 p ->
-  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-          (fun p0 ->
-          (fun f2p1 f2p f1 p ->
-  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-            (fun p1 ->
-            (fun f2p1 f2p f1 p ->
-  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-              (fun _ -> ARROW't)
-              (fun _ -> ARROW't)
-              (fun _ -> REC't)
-              p1)
-            (fun p1 ->
-            (fun f2p1 f2p f1 p ->
-  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-              (fun _ -> ARROW't)
-              (fun p2 ->
-              (fun f2p1 f2p f1 p ->
-  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                (fun _ -> ARROW't)
-                (fun _ -> ARROW't)
-                (fun _ -> TYPE't)
-                p2)
-              (fun _ -> LAMBDA't)
-              p1)
-            (fun _ -> DOT't)
-            p0)
           (fun p0 ->
           (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
@@ -206,14 +136,112 @@ module Gram =
                 (fun _ -> ARROW't)
                 (fun _ -> RPAREN't)
                 p2)
+              (fun _ -> INT't)
+              p1)
+            (fun _ -> DOT't)
+            p0)
+          (fun p0 ->
+          (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
+            (fun p1 ->
+            (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
+              (fun _ -> ARROW't)
+              (fun p2 ->
+              (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
+                (fun _ -> ARROW't)
+                (fun _ -> ARROW't)
+                (fun _ -> TYPE't)
+                p2)
+              (fun _ -> LET't)
+              p1)
+            (fun p1 ->
+            (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
+              (fun _ -> ARROW't)
+              (fun p2 ->
+              (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
+                (fun _ -> ARROW't)
+                (fun _ -> ARROW't)
+                (fun _ -> REC't)
+                p2)
               (fun _ -> EOF't)
+              p1)
+            (fun _ -> DARROW't)
+            p0)
+          (fun _ -> COLON't)
+          p)
+        (fun p ->
+        (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
+          (fun p0 ->
+          (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
+            (fun p1 ->
+            (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
+              (fun _ -> ARROW't)
+              (fun p2 ->
+              (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
+                (fun _ -> ARROW't)
+                (fun _ -> ARROW't)
+                (fun _ -> VAR't)
+                p2)
+              (fun _ -> LPAREN't)
+              p1)
+            (fun p1 ->
+            (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
+              (fun _ -> ARROW't)
+              (fun p2 ->
+              (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
+                (fun _ -> ARROW't)
+                (fun _ -> ARROW't)
+                (fun _ -> RETURN't)
+                p2)
+              (fun _ -> IN't)
+              p1)
+            (fun _ -> DEF't)
+            p0)
+          (fun p0 ->
+          (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
+            (fun p1 ->
+            (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
+              (fun _ -> ARROW't)
+              (fun p2 ->
+              (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
+                (fun _ -> ARROW't)
+                (fun _ -> ARROW't)
+                (fun _ -> SUCC't)
+                p2)
+              (fun _ -> LAMBDA't)
+              p1)
+            (fun p1 ->
+            (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
+              (fun _ -> ARROW't)
+              (fun p2 ->
+              (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
+                (fun _ -> ARROW't)
+                (fun _ -> ARROW't)
+                (fun _ -> PI't)
+                p2)
+              (fun _ -> END't)
               p1)
             (fun _ -> COMMA't)
             p0)
           (fun _ -> BAR't)
           p)
         (fun _ -> ARROW't)
-        n); inj_bound = ((fun p->2*p) ((fun p->2*p) ((fun p->1+2*p)
+        n); inj_bound = ((fun p->1+2*p) ((fun p->1+2*p) ((fun p->1+2*p)
       ((fun p->2*p) 1)))) }
 
   (** val coq_TerminalAlph : terminal coq_Alphabet **)
@@ -225,6 +253,7 @@ module Gram =
   | Coq_ann_obj'nt
   | Coq_app_obj'nt
   | Coq_atomic_obj'nt
+  | Coq_let_defn'nt
   | Coq_obj'nt
   | Coq_param'nt
   | Coq_params'nt
@@ -240,31 +269,14 @@ module Gram =
       | Coq_ann_obj'nt -> 1
       | Coq_app_obj'nt -> (fun p->2*p) 1
       | Coq_atomic_obj'nt -> (fun p->1+2*p) 1
-      | Coq_obj'nt -> (fun p->2*p) ((fun p->2*p) 1)
-      | Coq_param'nt -> (fun p->1+2*p) ((fun p->2*p) 1)
-      | Coq_params'nt -> (fun p->2*p) ((fun p->1+2*p) 1)
-      | Coq_prog'nt -> (fun p->1+2*p) ((fun p->1+2*p) 1)); surj = (fun n ->
+      | Coq_let_defn'nt -> (fun p->2*p) ((fun p->2*p) 1)
+      | Coq_obj'nt -> (fun p->1+2*p) ((fun p->2*p) 1)
+      | Coq_param'nt -> (fun p->2*p) ((fun p->1+2*p) 1)
+      | Coq_params'nt -> (fun p->1+2*p) ((fun p->1+2*p) 1)
+      | Coq_prog'nt -> (fun p->2*p) ((fun p->2*p) ((fun p->2*p) 1))); surj =
+      (fun n ->
       (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-        (fun p ->
-        (fun f2p1 f2p f1 p ->
-  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-          (fun p0 ->
-          (fun f2p1 f2p f1 p ->
-  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-            (fun _ -> Coq_ann_obj'nt)
-            (fun _ -> Coq_ann_obj'nt)
-            (fun _ -> Coq_prog'nt)
-            p0)
-          (fun p0 ->
-          (fun f2p1 f2p f1 p ->
-  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-            (fun _ -> Coq_ann_obj'nt)
-            (fun _ -> Coq_ann_obj'nt)
-            (fun _ -> Coq_param'nt)
-            p0)
-          (fun _ -> Coq_atomic_obj'nt)
-          p)
         (fun p ->
         (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
@@ -282,10 +294,35 @@ module Gram =
             (fun _ -> Coq_ann_obj'nt)
             (fun _ -> Coq_obj'nt)
             p0)
+          (fun _ -> Coq_atomic_obj'nt)
+          p)
+        (fun p ->
+        (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
+          (fun p0 ->
+          (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
+            (fun _ -> Coq_ann_obj'nt)
+            (fun _ -> Coq_ann_obj'nt)
+            (fun _ -> Coq_param'nt)
+            p0)
+          (fun p0 ->
+          (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
+            (fun _ -> Coq_ann_obj'nt)
+            (fun p1 ->
+            (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
+              (fun _ -> Coq_ann_obj'nt)
+              (fun _ -> Coq_ann_obj'nt)
+              (fun _ -> Coq_prog'nt)
+              p1)
+            (fun _ -> Coq_let_defn'nt)
+            p0)
           (fun _ -> Coq_app_obj'nt)
           p)
         (fun _ -> Coq_ann_obj'nt)
-        n); inj_bound = ((fun p->1+2*p) ((fun p->1+2*p) 1)) }
+        n); inj_bound = ((fun p->2*p) ((fun p->2*p) ((fun p->2*p) 1))) }
 
   (** val coq_NonTerminalAlph : nonterminal coq_Alphabet **)
 
@@ -348,11 +385,14 @@ module Gram =
   | PI _ -> PI't
   | NAT _ -> NAT't
   | LPAREN _ -> LPAREN't
+  | LET _ -> LET't
   | LAMBDA _ -> LAMBDA't
   | INT _ -> INT't
+  | IN _ -> IN't
   | EOF _ -> EOF't
   | END _ -> END't
   | DOT _ -> DOT't
+  | DEF _ -> DEF't
   | DARROW _ -> DARROW't
   | COMMA _ -> COMMA't
   | COLON _ -> COLON't
@@ -372,11 +412,14 @@ module Gram =
   | PI x -> Obj.magic x
   | NAT x -> Obj.magic x
   | LPAREN x -> Obj.magic x
+  | LET x -> Obj.magic x
   | LAMBDA x -> Obj.magic x
   | INT x -> Obj.magic x
+  | IN x -> Obj.magic x
   | EOF x -> Obj.magic x
   | END x -> Obj.magic x
   | DOT x -> Obj.magic x
+  | DEF x -> Obj.magic x
   | DARROW x -> Obj.magic x
   | COMMA x -> Obj.magic x
   | COLON x -> Obj.magic x
@@ -388,11 +431,13 @@ module Gram =
   | Prod'params'1
   | Prod'params'0
   | Prod'param'0
+  | Prod'obj'5
   | Prod'obj'4
   | Prod'obj'3
   | Prod'obj'2
   | Prod'obj'1
   | Prod'obj'0
+  | Prod'let_defn'0
   | Prod'atomic_obj'5
   | Prod'atomic_obj'4
   | Prod'atomic_obj'3
@@ -414,49 +459,34 @@ module Gram =
       | Prod'params'1 -> (fun p->2*p) 1
       | Prod'params'0 -> (fun p->1+2*p) 1
       | Prod'param'0 -> (fun p->2*p) ((fun p->2*p) 1)
-      | Prod'obj'4 -> (fun p->1+2*p) ((fun p->2*p) 1)
-      | Prod'obj'3 -> (fun p->2*p) ((fun p->1+2*p) 1)
-      | Prod'obj'2 -> (fun p->1+2*p) ((fun p->1+2*p) 1)
-      | Prod'obj'1 -> (fun p->2*p) ((fun p->2*p) ((fun p->2*p) 1))
-      | Prod'obj'0 -> (fun p->1+2*p) ((fun p->2*p) ((fun p->2*p) 1))
-      | Prod'atomic_obj'5 -> (fun p->2*p) ((fun p->1+2*p) ((fun p->2*p) 1))
-      | Prod'atomic_obj'4 -> (fun p->1+2*p) ((fun p->1+2*p) ((fun p->2*p) 1))
-      | Prod'atomic_obj'3 -> (fun p->2*p) ((fun p->2*p) ((fun p->1+2*p) 1))
-      | Prod'atomic_obj'2 -> (fun p->1+2*p) ((fun p->2*p) ((fun p->1+2*p) 1))
-      | Prod'atomic_obj'1 -> (fun p->2*p) ((fun p->1+2*p) ((fun p->1+2*p) 1))
-      | Prod'atomic_obj'0 ->
+      | Prod'obj'5 -> (fun p->1+2*p) ((fun p->2*p) 1)
+      | Prod'obj'4 -> (fun p->2*p) ((fun p->1+2*p) 1)
+      | Prod'obj'3 -> (fun p->1+2*p) ((fun p->1+2*p) 1)
+      | Prod'obj'2 -> (fun p->2*p) ((fun p->2*p) ((fun p->2*p) 1))
+      | Prod'obj'1 -> (fun p->1+2*p) ((fun p->2*p) ((fun p->2*p) 1))
+      | Prod'obj'0 -> (fun p->2*p) ((fun p->1+2*p) ((fun p->2*p) 1))
+      | Prod'let_defn'0 -> (fun p->1+2*p) ((fun p->1+2*p) ((fun p->2*p) 1))
+      | Prod'atomic_obj'5 -> (fun p->2*p) ((fun p->2*p) ((fun p->1+2*p) 1))
+      | Prod'atomic_obj'4 -> (fun p->1+2*p) ((fun p->2*p) ((fun p->1+2*p) 1))
+      | Prod'atomic_obj'3 -> (fun p->2*p) ((fun p->1+2*p) ((fun p->1+2*p) 1))
+      | Prod'atomic_obj'2 ->
         (fun p->1+2*p) ((fun p->1+2*p) ((fun p->1+2*p) 1))
-      | Prod'app_obj'1 ->
+      | Prod'atomic_obj'1 ->
         (fun p->2*p) ((fun p->2*p) ((fun p->2*p) ((fun p->2*p) 1)))
-      | Prod'app_obj'0 ->
+      | Prod'atomic_obj'0 ->
         (fun p->1+2*p) ((fun p->2*p) ((fun p->2*p) ((fun p->2*p) 1)))
+      | Prod'app_obj'1 ->
+        (fun p->2*p) ((fun p->1+2*p) ((fun p->2*p) ((fun p->2*p) 1)))
+      | Prod'app_obj'0 ->
+        (fun p->1+2*p) ((fun p->1+2*p) ((fun p->2*p) ((fun p->2*p) 1)))
       | Prod'ann_obj'0 ->
-        (fun p->2*p) ((fun p->1+2*p) ((fun p->2*p) ((fun p->2*p) 1))));
+        (fun p->2*p) ((fun p->2*p) ((fun p->1+2*p) ((fun p->2*p) 1))));
       surj = (fun n ->
       (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
         (fun p ->
         (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-          (fun p0 ->
-          (fun f2p1 f2p f1 p ->
-  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-            (fun p1 ->
-            (fun f2p1 f2p f1 p ->
-  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-              (fun _ -> Prod'prog'0)
-              (fun _ -> Prod'prog'0)
-              (fun _ -> Prod'atomic_obj'0)
-              p1)
-            (fun p1 ->
-            (fun f2p1 f2p f1 p ->
-  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-              (fun _ -> Prod'prog'0)
-              (fun _ -> Prod'prog'0)
-              (fun _ -> Prod'atomic_obj'4)
-              p1)
-            (fun _ -> Prod'obj'2)
-            p0)
           (fun p0 ->
           (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
@@ -478,15 +508,10 @@ module Gram =
                 (fun _ -> Prod'prog'0)
                 (fun _ -> Prod'app_obj'0)
                 p2)
-              (fun _ -> Prod'obj'0)
+              (fun _ -> Prod'let_defn'0)
               p1)
-            (fun _ -> Prod'obj'4)
+            (fun _ -> Prod'obj'3)
             p0)
-          (fun _ -> Prod'params'0)
-          p)
-        (fun p ->
-        (fun f2p1 f2p f1 p ->
-  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
           (fun p0 ->
           (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
@@ -495,7 +520,7 @@ module Gram =
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
               (fun _ -> Prod'prog'0)
               (fun _ -> Prod'prog'0)
-              (fun _ -> Prod'atomic_obj'1)
+              (fun _ -> Prod'atomic_obj'4)
               p1)
             (fun p1 ->
             (fun f2p1 f2p f1 p ->
@@ -506,12 +531,17 @@ module Gram =
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
                 (fun _ -> Prod'prog'0)
                 (fun _ -> Prod'prog'0)
-                (fun _ -> Prod'ann_obj'0)
+                (fun _ -> Prod'atomic_obj'0)
                 p2)
-              (fun _ -> Prod'atomic_obj'5)
+              (fun _ -> Prod'obj'1)
               p1)
-            (fun _ -> Prod'obj'3)
+            (fun _ -> Prod'obj'5)
             p0)
+          (fun _ -> Prod'params'0)
+          p)
+        (fun p ->
+        (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
           (fun p0 ->
           (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
@@ -533,14 +563,45 @@ module Gram =
                 (fun _ -> Prod'prog'0)
                 (fun _ -> Prod'app_obj'1)
                 p2)
-              (fun _ -> Prod'obj'1)
+              (fun _ -> Prod'obj'0)
+              p1)
+            (fun _ -> Prod'obj'4)
+            p0)
+          (fun p0 ->
+          (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
+            (fun p1 ->
+            (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
+              (fun _ -> Prod'prog'0)
+              (fun p2 ->
+              (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
+                (fun _ -> Prod'prog'0)
+                (fun _ -> Prod'prog'0)
+                (fun _ -> Prod'ann_obj'0)
+                p2)
+              (fun _ -> Prod'atomic_obj'5)
+              p1)
+            (fun p1 ->
+            (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
+              (fun _ -> Prod'prog'0)
+              (fun p2 ->
+              (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
+                (fun _ -> Prod'prog'0)
+                (fun _ -> Prod'prog'0)
+                (fun _ -> Prod'atomic_obj'1)
+                p2)
+              (fun _ -> Prod'obj'2)
               p1)
             (fun _ -> Prod'param'0)
             p0)
           (fun _ -> Prod'params'1)
           p)
         (fun _ -> Prod'prog'0)
-        n); inj_bound = ((fun p->2*p) ((fun p->1+2*p) ((fun p->2*p)
+        n); inj_bound = ((fun p->2*p) ((fun p->2*p) ((fun p->1+2*p)
       ((fun p->2*p) 1)))) }
 
   (** val coq_ProductionAlph : production coq_Alphabet **)
@@ -572,6 +633,12 @@ module Gram =
       ((Obj.magic (Coq_param'nt, ((T RPAREN't) :: ((NT Coq_obj'nt) :: ((T
          COLON't) :: ((T VAR't) :: ((T LPAREN't) :: []))))))),
       (Obj.magic (fun _ obj0 _ x _ -> ((snd x), obj0)))))
+  | Prod'obj'5 ->
+    Obj.magic (Coq_existT
+      ((Obj.magic (Coq_obj'nt, ((NT Coq_ann_obj'nt) :: ((T IN't) :: ((NT
+         Coq_let_defn'nt) :: ((T LET't) :: [])))))),
+      (Obj.magic (fun body _ ds _ -> Cst.Coq_app ((Cst.Coq_fn
+        ((fst (fst ds)), (snd (fst ds)), (snd body), (fst body))), (snd ds))))))
   | Prod'obj'4 ->
     Obj.magic (Coq_existT
       ((Obj.magic (Coq_obj'nt, ((NT Coq_atomic_obj'nt) :: ((T
@@ -604,6 +671,11 @@ module Gram =
       (Obj.magic (fun obj0 _ params _ ->
         fold_left (fun acc arg -> Cst.Coq_pi ((fst arg), (snd arg), acc))
           params obj0))))
+  | Prod'let_defn'0 ->
+    Obj.magic (Coq_existT
+      ((Obj.magic (Coq_let_defn'nt, ((NT Coq_obj'nt) :: ((T DEF't) :: ((NT
+         Coq_param'nt) :: []))))),
+      (Obj.magic (fun obj0 _ param -> (param, obj0)))))
   | Prod'atomic_obj'5 ->
     Obj.magic (Coq_existT
       ((Obj.magic (Coq_atomic_obj'nt, ((T RPAREN't) :: ((NT
@@ -765,16 +837,23 @@ module Aut =
   | Coq__2.Coq_atomic_obj'nt ->
     Coq__2.ZERO't :: (Coq__2.VAR't :: (Coq__2.TYPE't :: (Coq__2.NAT't :: (Coq__2.LPAREN't :: (Coq__2.INT't :: [])))))
   | Coq__2.Coq_obj'nt ->
-    Coq__2.ZERO't :: (Coq__2.VAR't :: (Coq__2.TYPE't :: (Coq__2.SUCC't :: (Coq__2.REC't :: (Coq__2.PI't :: (Coq__2.NAT't :: (Coq__2.LPAREN't :: (Coq__2.LAMBDA't :: (Coq__2.INT't :: [])))))))))
+    Coq__2.ZERO't :: (Coq__2.VAR't :: (Coq__2.TYPE't :: (Coq__2.SUCC't :: (Coq__2.REC't :: (Coq__2.PI't :: (Coq__2.NAT't :: (Coq__2.LPAREN't :: (Coq__2.LET't :: (Coq__2.LAMBDA't :: (Coq__2.INT't :: []))))))))))
   | Coq__2.Coq_prog'nt ->
-    Coq__2.ZERO't :: (Coq__2.VAR't :: (Coq__2.TYPE't :: (Coq__2.SUCC't :: (Coq__2.REC't :: (Coq__2.PI't :: (Coq__2.NAT't :: (Coq__2.LPAREN't :: (Coq__2.LAMBDA't :: (Coq__2.INT't :: [])))))))))
+    Coq__2.ZERO't :: (Coq__2.VAR't :: (Coq__2.TYPE't :: (Coq__2.SUCC't :: (Coq__2.REC't :: (Coq__2.PI't :: (Coq__2.NAT't :: (Coq__2.LPAREN't :: (Coq__2.LET't :: (Coq__2.LAMBDA't :: (Coq__2.INT't :: []))))))))))
   | _ -> Coq__2.LPAREN't :: []
 
   type noninitstate' =
+  | Nis'63
+  | Nis'62
+  | Nis'61
+  | Nis'60
+  | Nis'58
+  | Nis'57
   | Nis'56
   | Nis'55
   | Nis'54
   | Nis'53
+  | Nis'52
   | Nis'51
   | Nis'50
   | Nis'49
@@ -834,123 +913,144 @@ module Aut =
   let noninitstateNum =
     { inj = (fun x ->
       match x with
-      | Nis'56 -> 1
-      | Nis'55 -> (fun p->2*p) 1
-      | Nis'54 -> (fun p->1+2*p) 1
-      | Nis'53 -> (fun p->2*p) ((fun p->2*p) 1)
-      | Nis'51 -> (fun p->1+2*p) ((fun p->2*p) 1)
-      | Nis'50 -> (fun p->2*p) ((fun p->1+2*p) 1)
-      | Nis'49 -> (fun p->1+2*p) ((fun p->1+2*p) 1)
-      | Nis'48 -> (fun p->2*p) ((fun p->2*p) ((fun p->2*p) 1))
-      | Nis'47 -> (fun p->1+2*p) ((fun p->2*p) ((fun p->2*p) 1))
-      | Nis'46 -> (fun p->2*p) ((fun p->1+2*p) ((fun p->2*p) 1))
-      | Nis'45 -> (fun p->1+2*p) ((fun p->1+2*p) ((fun p->2*p) 1))
-      | Nis'44 -> (fun p->2*p) ((fun p->2*p) ((fun p->1+2*p) 1))
-      | Nis'43 -> (fun p->1+2*p) ((fun p->2*p) ((fun p->1+2*p) 1))
-      | Nis'42 -> (fun p->2*p) ((fun p->1+2*p) ((fun p->1+2*p) 1))
-      | Nis'41 -> (fun p->1+2*p) ((fun p->1+2*p) ((fun p->1+2*p) 1))
-      | Nis'40 -> (fun p->2*p) ((fun p->2*p) ((fun p->2*p) ((fun p->2*p) 1)))
-      | Nis'39 ->
+      | Nis'63 -> 1
+      | Nis'62 -> (fun p->2*p) 1
+      | Nis'61 -> (fun p->1+2*p) 1
+      | Nis'60 -> (fun p->2*p) ((fun p->2*p) 1)
+      | Nis'58 -> (fun p->1+2*p) ((fun p->2*p) 1)
+      | Nis'57 -> (fun p->2*p) ((fun p->1+2*p) 1)
+      | Nis'56 -> (fun p->1+2*p) ((fun p->1+2*p) 1)
+      | Nis'55 -> (fun p->2*p) ((fun p->2*p) ((fun p->2*p) 1))
+      | Nis'54 -> (fun p->1+2*p) ((fun p->2*p) ((fun p->2*p) 1))
+      | Nis'53 -> (fun p->2*p) ((fun p->1+2*p) ((fun p->2*p) 1))
+      | Nis'52 -> (fun p->1+2*p) ((fun p->1+2*p) ((fun p->2*p) 1))
+      | Nis'51 -> (fun p->2*p) ((fun p->2*p) ((fun p->1+2*p) 1))
+      | Nis'50 -> (fun p->1+2*p) ((fun p->2*p) ((fun p->1+2*p) 1))
+      | Nis'49 -> (fun p->2*p) ((fun p->1+2*p) ((fun p->1+2*p) 1))
+      | Nis'48 -> (fun p->1+2*p) ((fun p->1+2*p) ((fun p->1+2*p) 1))
+      | Nis'47 -> (fun p->2*p) ((fun p->2*p) ((fun p->2*p) ((fun p->2*p) 1)))
+      | Nis'46 ->
         (fun p->1+2*p) ((fun p->2*p) ((fun p->2*p) ((fun p->2*p) 1)))
-      | Nis'38 ->
+      | Nis'45 ->
         (fun p->2*p) ((fun p->1+2*p) ((fun p->2*p) ((fun p->2*p) 1)))
-      | Nis'37 ->
+      | Nis'44 ->
         (fun p->1+2*p) ((fun p->1+2*p) ((fun p->2*p) ((fun p->2*p) 1)))
-      | Nis'36 ->
+      | Nis'43 ->
         (fun p->2*p) ((fun p->2*p) ((fun p->1+2*p) ((fun p->2*p) 1)))
-      | Nis'35 ->
+      | Nis'42 ->
         (fun p->1+2*p) ((fun p->2*p) ((fun p->1+2*p) ((fun p->2*p) 1)))
-      | Nis'34 ->
+      | Nis'41 ->
         (fun p->2*p) ((fun p->1+2*p) ((fun p->1+2*p) ((fun p->2*p) 1)))
-      | Nis'33 ->
+      | Nis'40 ->
         (fun p->1+2*p) ((fun p->1+2*p) ((fun p->1+2*p) ((fun p->2*p) 1)))
-      | Nis'32 ->
+      | Nis'39 ->
         (fun p->2*p) ((fun p->2*p) ((fun p->2*p) ((fun p->1+2*p) 1)))
-      | Nis'31 ->
+      | Nis'38 ->
         (fun p->1+2*p) ((fun p->2*p) ((fun p->2*p) ((fun p->1+2*p) 1)))
-      | Nis'30 ->
+      | Nis'37 ->
         (fun p->2*p) ((fun p->1+2*p) ((fun p->2*p) ((fun p->1+2*p) 1)))
-      | Nis'29 ->
+      | Nis'36 ->
         (fun p->1+2*p) ((fun p->1+2*p) ((fun p->2*p) ((fun p->1+2*p) 1)))
-      | Nis'28 ->
+      | Nis'35 ->
         (fun p->2*p) ((fun p->2*p) ((fun p->1+2*p) ((fun p->1+2*p) 1)))
-      | Nis'27 ->
+      | Nis'34 ->
         (fun p->1+2*p) ((fun p->2*p) ((fun p->1+2*p) ((fun p->1+2*p) 1)))
-      | Nis'26 ->
+      | Nis'33 ->
         (fun p->2*p) ((fun p->1+2*p) ((fun p->1+2*p) ((fun p->1+2*p) 1)))
-      | Nis'25 ->
+      | Nis'32 ->
         (fun p->1+2*p) ((fun p->1+2*p) ((fun p->1+2*p) ((fun p->1+2*p) 1)))
-      | Nis'24 ->
+      | Nis'31 ->
         (fun p->2*p) ((fun p->2*p) ((fun p->2*p) ((fun p->2*p) ((fun p->2*p)
           1))))
-      | Nis'23 ->
+      | Nis'30 ->
         (fun p->1+2*p) ((fun p->2*p) ((fun p->2*p) ((fun p->2*p)
           ((fun p->2*p) 1))))
-      | Nis'22 ->
+      | Nis'29 ->
         (fun p->2*p) ((fun p->1+2*p) ((fun p->2*p) ((fun p->2*p)
           ((fun p->2*p) 1))))
-      | Nis'21 ->
+      | Nis'28 ->
         (fun p->1+2*p) ((fun p->1+2*p) ((fun p->2*p) ((fun p->2*p)
           ((fun p->2*p) 1))))
-      | Nis'20 ->
+      | Nis'27 ->
         (fun p->2*p) ((fun p->2*p) ((fun p->1+2*p) ((fun p->2*p)
           ((fun p->2*p) 1))))
-      | Nis'19 ->
+      | Nis'26 ->
         (fun p->1+2*p) ((fun p->2*p) ((fun p->1+2*p) ((fun p->2*p)
           ((fun p->2*p) 1))))
-      | Nis'18 ->
+      | Nis'25 ->
         (fun p->2*p) ((fun p->1+2*p) ((fun p->1+2*p) ((fun p->2*p)
           ((fun p->2*p) 1))))
-      | Nis'17 ->
+      | Nis'24 ->
         (fun p->1+2*p) ((fun p->1+2*p) ((fun p->1+2*p) ((fun p->2*p)
           ((fun p->2*p) 1))))
-      | Nis'16 ->
+      | Nis'23 ->
         (fun p->2*p) ((fun p->2*p) ((fun p->2*p) ((fun p->1+2*p)
           ((fun p->2*p) 1))))
-      | Nis'15 ->
+      | Nis'22 ->
         (fun p->1+2*p) ((fun p->2*p) ((fun p->2*p) ((fun p->1+2*p)
           ((fun p->2*p) 1))))
-      | Nis'14 ->
+      | Nis'21 ->
         (fun p->2*p) ((fun p->1+2*p) ((fun p->2*p) ((fun p->1+2*p)
           ((fun p->2*p) 1))))
-      | Nis'13 ->
+      | Nis'20 ->
         (fun p->1+2*p) ((fun p->1+2*p) ((fun p->2*p) ((fun p->1+2*p)
           ((fun p->2*p) 1))))
-      | Nis'12 ->
+      | Nis'19 ->
         (fun p->2*p) ((fun p->2*p) ((fun p->1+2*p) ((fun p->1+2*p)
           ((fun p->2*p) 1))))
-      | Nis'11 ->
+      | Nis'18 ->
         (fun p->1+2*p) ((fun p->2*p) ((fun p->1+2*p) ((fun p->1+2*p)
           ((fun p->2*p) 1))))
-      | Nis'10 ->
+      | Nis'17 ->
         (fun p->2*p) ((fun p->1+2*p) ((fun p->1+2*p) ((fun p->1+2*p)
           ((fun p->2*p) 1))))
-      | Nis'9 ->
+      | Nis'16 ->
         (fun p->1+2*p) ((fun p->1+2*p) ((fun p->1+2*p) ((fun p->1+2*p)
           ((fun p->2*p) 1))))
-      | Nis'8 ->
+      | Nis'15 ->
         (fun p->2*p) ((fun p->2*p) ((fun p->2*p) ((fun p->2*p)
           ((fun p->1+2*p) 1))))
-      | Nis'7 ->
+      | Nis'14 ->
         (fun p->1+2*p) ((fun p->2*p) ((fun p->2*p) ((fun p->2*p)
           ((fun p->1+2*p) 1))))
-      | Nis'6 ->
+      | Nis'13 ->
         (fun p->2*p) ((fun p->1+2*p) ((fun p->2*p) ((fun p->2*p)
           ((fun p->1+2*p) 1))))
-      | Nis'5 ->
+      | Nis'12 ->
         (fun p->1+2*p) ((fun p->1+2*p) ((fun p->2*p) ((fun p->2*p)
           ((fun p->1+2*p) 1))))
-      | Nis'4 ->
+      | Nis'11 ->
         (fun p->2*p) ((fun p->2*p) ((fun p->1+2*p) ((fun p->2*p)
           ((fun p->1+2*p) 1))))
-      | Nis'3 ->
+      | Nis'10 ->
         (fun p->1+2*p) ((fun p->2*p) ((fun p->1+2*p) ((fun p->2*p)
           ((fun p->1+2*p) 1))))
-      | Nis'2 ->
+      | Nis'9 ->
         (fun p->2*p) ((fun p->1+2*p) ((fun p->1+2*p) ((fun p->2*p)
           ((fun p->1+2*p) 1))))
-      | Nis'1 ->
+      | Nis'8 ->
         (fun p->1+2*p) ((fun p->1+2*p) ((fun p->1+2*p) ((fun p->2*p)
+          ((fun p->1+2*p) 1))))
+      | Nis'7 ->
+        (fun p->2*p) ((fun p->2*p) ((fun p->2*p) ((fun p->1+2*p)
+          ((fun p->1+2*p) 1))))
+      | Nis'6 ->
+        (fun p->1+2*p) ((fun p->2*p) ((fun p->2*p) ((fun p->1+2*p)
+          ((fun p->1+2*p) 1))))
+      | Nis'5 ->
+        (fun p->2*p) ((fun p->1+2*p) ((fun p->2*p) ((fun p->1+2*p)
+          ((fun p->1+2*p) 1))))
+      | Nis'4 ->
+        (fun p->1+2*p) ((fun p->1+2*p) ((fun p->2*p) ((fun p->1+2*p)
+          ((fun p->1+2*p) 1))))
+      | Nis'3 ->
+        (fun p->2*p) ((fun p->2*p) ((fun p->1+2*p) ((fun p->1+2*p)
+          ((fun p->1+2*p) 1))))
+      | Nis'2 ->
+        (fun p->1+2*p) ((fun p->2*p) ((fun p->1+2*p) ((fun p->1+2*p)
+          ((fun p->1+2*p) 1))))
+      | Nis'1 ->
+        (fun p->2*p) ((fun p->1+2*p) ((fun p->1+2*p) ((fun p->1+2*p)
           ((fun p->1+2*p) 1))))); surj = (fun n ->
       (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
@@ -966,15 +1066,15 @@ module Aut =
               (fun p2 ->
               (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                (fun _ -> Nis'56)
+                (fun _ -> Nis'63)
                 (fun p3 ->
                 (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'9)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'16)
                   p3)
-                (fun _ -> Nis'25)
+                (fun _ -> Nis'32)
                 p2)
               (fun p2 ->
               (fun f2p1 f2p f1 p ->
@@ -982,20 +1082,20 @@ module Aut =
                 (fun p3 ->
                 (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'1)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'8)
                   p3)
                 (fun p3 ->
                 (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'17)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'24)
                   p3)
-                (fun _ -> Nis'33)
+                (fun _ -> Nis'40)
                 p2)
-              (fun _ -> Nis'41)
+              (fun _ -> Nis'48)
               p1)
             (fun p1 ->
             (fun f2p1 f2p f1 p ->
@@ -1003,15 +1103,21 @@ module Aut =
               (fun p2 ->
               (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                (fun _ -> Nis'56)
                 (fun p3 ->
                 (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'13)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'4)
                   p3)
-                (fun _ -> Nis'29)
+                (fun p3 ->
+                (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'20)
+                  p3)
+                (fun _ -> Nis'36)
                 p2)
               (fun p2 ->
               (fun f2p1 f2p f1 p ->
@@ -1019,22 +1125,22 @@ module Aut =
                 (fun p3 ->
                 (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'5)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'12)
                   p3)
                 (fun p3 ->
                 (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'21)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'28)
                   p3)
-                (fun _ -> Nis'37)
+                (fun _ -> Nis'44)
                 p2)
-              (fun _ -> Nis'45)
+              (fun _ -> Nis'52)
               p1)
-            (fun _ -> Nis'49)
+            (fun _ -> Nis'56)
             p0)
           (fun p0 ->
           (fun f2p1 f2p f1 p ->
@@ -1045,15 +1151,21 @@ module Aut =
               (fun p2 ->
               (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                (fun _ -> Nis'56)
                 (fun p3 ->
                 (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'11)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'2)
                   p3)
-                (fun _ -> Nis'27)
+                (fun p3 ->
+                (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'18)
+                  p3)
+                (fun _ -> Nis'34)
                 p2)
               (fun p2 ->
               (fun f2p1 f2p f1 p ->
@@ -1061,20 +1173,20 @@ module Aut =
                 (fun p3 ->
                 (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'3)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'10)
                   p3)
                 (fun p3 ->
                 (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'19)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'26)
                   p3)
-                (fun _ -> Nis'35)
+                (fun _ -> Nis'42)
                 p2)
-              (fun _ -> Nis'43)
+              (fun _ -> Nis'50)
               p1)
             (fun p1 ->
             (fun f2p1 f2p f1 p ->
@@ -1082,15 +1194,21 @@ module Aut =
               (fun p2 ->
               (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                (fun _ -> Nis'56)
                 (fun p3 ->
                 (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'15)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'6)
                   p3)
-                (fun _ -> Nis'31)
+                (fun p3 ->
+                (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'22)
+                  p3)
+                (fun _ -> Nis'38)
                 p2)
               (fun p2 ->
               (fun f2p1 f2p f1 p ->
@@ -1098,24 +1216,24 @@ module Aut =
                 (fun p3 ->
                 (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'7)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'14)
                   p3)
                 (fun p3 ->
                 (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'23)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'30)
                   p3)
-                (fun _ -> Nis'39)
+                (fun _ -> Nis'46)
                 p2)
-              (fun _ -> Nis'47)
+              (fun _ -> Nis'54)
               p1)
-            (fun _ -> Nis'51)
+            (fun _ -> Nis'58)
             p0)
-          (fun _ -> Nis'54)
+          (fun _ -> Nis'61)
           p)
         (fun p ->
         (fun f2p1 f2p f1 p ->
@@ -1129,15 +1247,21 @@ module Aut =
               (fun p2 ->
               (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                (fun _ -> Nis'56)
                 (fun p3 ->
                 (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'10)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'1)
                   p3)
-                (fun _ -> Nis'26)
+                (fun p3 ->
+                (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'17)
+                  p3)
+                (fun _ -> Nis'33)
                 p2)
               (fun p2 ->
               (fun f2p1 f2p f1 p ->
@@ -1145,20 +1269,20 @@ module Aut =
                 (fun p3 ->
                 (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'2)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'9)
                   p3)
                 (fun p3 ->
                 (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'18)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'25)
                   p3)
-                (fun _ -> Nis'34)
+                (fun _ -> Nis'41)
                 p2)
-              (fun _ -> Nis'42)
+              (fun _ -> Nis'49)
               p1)
             (fun p1 ->
             (fun f2p1 f2p f1 p ->
@@ -1166,15 +1290,21 @@ module Aut =
               (fun p2 ->
               (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                (fun _ -> Nis'56)
                 (fun p3 ->
                 (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'14)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'5)
                   p3)
-                (fun _ -> Nis'30)
+                (fun p3 ->
+                (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'21)
+                  p3)
+                (fun _ -> Nis'37)
                 p2)
               (fun p2 ->
               (fun f2p1 f2p f1 p ->
@@ -1182,22 +1312,22 @@ module Aut =
                 (fun p3 ->
                 (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'6)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'13)
                   p3)
                 (fun p3 ->
                 (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'22)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'29)
                   p3)
-                (fun _ -> Nis'38)
+                (fun _ -> Nis'45)
                 p2)
-              (fun _ -> Nis'46)
+              (fun _ -> Nis'53)
               p1)
-            (fun _ -> Nis'50)
+            (fun _ -> Nis'57)
             p0)
           (fun p0 ->
           (fun f2p1 f2p f1 p ->
@@ -1208,15 +1338,21 @@ module Aut =
               (fun p2 ->
               (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                (fun _ -> Nis'56)
                 (fun p3 ->
                 (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'12)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'3)
                   p3)
-                (fun _ -> Nis'28)
+                (fun p3 ->
+                (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'19)
+                  p3)
+                (fun _ -> Nis'35)
                 p2)
               (fun p2 ->
               (fun f2p1 f2p f1 p ->
@@ -1224,20 +1360,20 @@ module Aut =
                 (fun p3 ->
                 (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'4)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'11)
                   p3)
                 (fun p3 ->
                 (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'20)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'27)
                   p3)
-                (fun _ -> Nis'36)
+                (fun _ -> Nis'43)
                 p2)
-              (fun _ -> Nis'44)
+              (fun _ -> Nis'51)
               p1)
             (fun p1 ->
             (fun f2p1 f2p f1 p ->
@@ -1245,15 +1381,21 @@ module Aut =
               (fun p2 ->
               (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                (fun _ -> Nis'56)
                 (fun p3 ->
                 (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'16)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'7)
                   p3)
-                (fun _ -> Nis'32)
+                (fun p3 ->
+                (fun f2p1 f2p f1 p ->
+  if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'23)
+                  p3)
+                (fun _ -> Nis'39)
                 p2)
               (fun p2 ->
               (fun f2p1 f2p f1 p ->
@@ -1261,28 +1403,28 @@ module Aut =
                 (fun p3 ->
                 (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'8)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'15)
                   p3)
                 (fun p3 ->
                 (fun f2p1 f2p f1 p ->
   if p<=1 then f1 () else if p mod 2 = 0 then f2p (p/2) else f2p1 (p/2))
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'56)
-                  (fun _ -> Nis'24)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'63)
+                  (fun _ -> Nis'31)
                   p3)
-                (fun _ -> Nis'40)
+                (fun _ -> Nis'47)
                 p2)
-              (fun _ -> Nis'48)
+              (fun _ -> Nis'55)
               p1)
-            (fun _ -> Nis'53)
+            (fun _ -> Nis'60)
             p0)
-          (fun _ -> Nis'55)
+          (fun _ -> Nis'62)
           p)
-        (fun _ -> Nis'56)
-        n); inj_bound = ((fun p->1+2*p) ((fun p->1+2*p) ((fun p->1+2*p)
-      ((fun p->2*p) ((fun p->1+2*p) 1))))) }
+        (fun _ -> Nis'63)
+        n); inj_bound = ((fun p->2*p) ((fun p->1+2*p) ((fun p->1+2*p)
+      ((fun p->1+2*p) ((fun p->1+2*p) 1))))) }
 
   (** val coq_NonInitStateAlph : noninitstate coq_Alphabet **)
 
@@ -1292,39 +1434,45 @@ module Aut =
   (** val last_symb_of_non_init_state : noninitstate -> Coq__2.symbol **)
 
   let last_symb_of_non_init_state = function
-  | Nis'56 -> Coq__2.T Coq__2.EOF't
-  | Nis'54 -> Coq__2.T Coq__2.COLON't
-  | Nis'51 -> Coq__2.NT Coq__2.Coq_atomic_obj'nt
-  | Nis'50 -> Coq__2.T Coq__2.RPAREN't
-  | Nis'48 -> Coq__2.T Coq__2.END't
+  | Nis'63 -> Coq__2.T Coq__2.EOF't
+  | Nis'61 -> Coq__2.T Coq__2.COLON't
+  | Nis'58 -> Coq__2.NT Coq__2.Coq_atomic_obj'nt
+  | Nis'57 -> Coq__2.T Coq__2.RPAREN't
+  | Nis'55 -> Coq__2.T Coq__2.END't
+  | Nis'53 -> Coq__2.T Coq__2.DARROW't
+  | Nis'52 -> Coq__2.T Coq__2.VAR't
+  | Nis'51 -> Coq__2.T Coq__2.COMMA't
+  | Nis'50 -> Coq__2.T Coq__2.VAR't
+  | Nis'49 -> Coq__2.T Coq__2.SUCC't
+  | Nis'48 -> Coq__2.T Coq__2.BAR't
   | Nis'46 -> Coq__2.T Coq__2.DARROW't
-  | Nis'45 -> Coq__2.T Coq__2.VAR't
-  | Nis'44 -> Coq__2.T Coq__2.COMMA't
-  | Nis'43 -> Coq__2.T Coq__2.VAR't
-  | Nis'42 -> Coq__2.T Coq__2.SUCC't
-  | Nis'41 -> Coq__2.T Coq__2.BAR't
-  | Nis'39 -> Coq__2.T Coq__2.DARROW't
-  | Nis'38 -> Coq__2.T Coq__2.ZERO't
-  | Nis'37 -> Coq__2.T Coq__2.BAR't
-  | Nis'35 -> Coq__2.T Coq__2.DOT't
-  | Nis'34 -> Coq__2.T Coq__2.VAR't
-  | Nis'33 -> Coq__2.T Coq__2.RETURN't
-  | Nis'31 -> Coq__2.NT Coq__2.Coq_param'nt
-  | Nis'30 -> Coq__2.NT Coq__2.Coq_param'nt
-  | Nis'28 -> Coq__2.T Coq__2.ARROW't
-  | Nis'27 -> Coq__2.NT Coq__2.Coq_params'nt
-  | Nis'26 -> Coq__2.T Coq__2.RPAREN't
-  | Nis'24 -> Coq__2.NT Coq__2.Coq_ann_obj'nt
-  | Nis'23 -> Coq__2.NT Coq__2.Coq_atomic_obj'nt
-  | Nis'22 -> Coq__2.NT Coq__2.Coq_app_obj'nt
-  | Nis'21 -> Coq__2.NT Coq__2.Coq_atomic_obj'nt
-  | Nis'20 -> Coq__2.T Coq__2.RPAREN't
-  | Nis'18 -> Coq__2.T Coq__2.COLON't
-  | Nis'16 -> Coq__2.T Coq__2.INT't
-  | Nis'15 -> Coq__2.T Coq__2.LPAREN't
-  | Nis'14 -> Coq__2.T Coq__2.ARROW't
+  | Nis'45 -> Coq__2.T Coq__2.ZERO't
+  | Nis'44 -> Coq__2.T Coq__2.BAR't
+  | Nis'42 -> Coq__2.T Coq__2.DOT't
+  | Nis'41 -> Coq__2.T Coq__2.VAR't
+  | Nis'40 -> Coq__2.T Coq__2.RETURN't
+  | Nis'38 -> Coq__2.NT Coq__2.Coq_param'nt
+  | Nis'37 -> Coq__2.NT Coq__2.Coq_param'nt
+  | Nis'35 -> Coq__2.T Coq__2.ARROW't
+  | Nis'34 -> Coq__2.NT Coq__2.Coq_params'nt
+  | Nis'33 -> Coq__2.T Coq__2.RPAREN't
+  | Nis'31 -> Coq__2.NT Coq__2.Coq_ann_obj'nt
+  | Nis'30 -> Coq__2.T Coq__2.IN't
+  | Nis'29 -> Coq__2.NT Coq__2.Coq_let_defn'nt
+  | Nis'27 -> Coq__2.NT Coq__2.Coq_ann_obj'nt
+  | Nis'26 -> Coq__2.NT Coq__2.Coq_atomic_obj'nt
+  | Nis'25 -> Coq__2.NT Coq__2.Coq_app_obj'nt
+  | Nis'24 -> Coq__2.NT Coq__2.Coq_atomic_obj'nt
+  | Nis'23 -> Coq__2.T Coq__2.RPAREN't
+  | Nis'21 -> Coq__2.T Coq__2.COLON't
+  | Nis'19 -> Coq__2.T Coq__2.INT't
+  | Nis'18 -> Coq__2.T Coq__2.LPAREN't
+  | Nis'17 -> Coq__2.T Coq__2.ARROW't
+  | Nis'16 -> Coq__2.NT Coq__2.Coq_param'nt
+  | Nis'15 -> Coq__2.T Coq__2.LAMBDA't
+  | Nis'14 -> Coq__2.T Coq__2.DEF't
   | Nis'13 -> Coq__2.NT Coq__2.Coq_param'nt
-  | Nis'12 -> Coq__2.T Coq__2.LAMBDA't
+  | Nis'12 -> Coq__2.T Coq__2.LET't
   | Nis'11 -> Coq__2.T Coq__2.COLON't
   | Nis'10 -> Coq__2.T Coq__2.VAR't
   | Nis'9 -> Coq__2.T Coq__2.LPAREN't
@@ -1466,8 +1614,9 @@ module Aut =
   | Init _ ->
     Lookahead_act (fun terminal0 ->
       match terminal0 with
-      | Coq__2.INT't -> Shift_act Nis'16
-      | Coq__2.LAMBDA't -> Shift_act Nis'12
+      | Coq__2.INT't -> Shift_act Nis'19
+      | Coq__2.LAMBDA't -> Shift_act Nis'15
+      | Coq__2.LET't -> Shift_act Nis'12
       | Coq__2.LPAREN't -> Shift_act Nis'6
       | Coq__2.NAT't -> Shift_act Nis'5
       | Coq__2.PI't -> Shift_act Nis'8
@@ -1479,29 +1628,59 @@ module Aut =
       | _ -> Fail_act)
   | Ninit n ->
     (match n with
-     | Nis'56 -> Default_reduce_act Coq__2.Prod'prog'0
-     | Nis'55 ->
+     | Nis'63 -> Default_reduce_act Coq__2.Prod'prog'0
+     | Nis'62 ->
        Lookahead_act (fun terminal0 ->
          match terminal0 with
-         | Coq__2.EOF't -> Shift_act Nis'56
+         | Coq__2.EOF't -> Shift_act Nis'63
          | _ -> Fail_act)
-     | Nis'53 ->
+     | Nis'60 ->
        Lookahead_act (fun terminal0 ->
          match terminal0 with
-         | Coq__2.COLON't -> Shift_act Nis'54
+         | Coq__2.COLON't -> Shift_act Nis'61
          | _ -> Fail_act)
-     | Nis'51 -> Default_reduce_act Coq__2.Prod'obj'4
-     | Nis'50 -> Default_reduce_act Coq__2.Prod'atomic_obj'5
+     | Nis'58 -> Default_reduce_act Coq__2.Prod'obj'4
+     | Nis'57 -> Default_reduce_act Coq__2.Prod'atomic_obj'5
+     | Nis'56 ->
+       Lookahead_act (fun terminal0 ->
+         match terminal0 with
+         | Coq__2.RPAREN't -> Shift_act Nis'57
+         | _ -> Fail_act)
+     | Nis'55 -> Default_reduce_act Coq__2.Prod'obj'3
+     | Nis'54 ->
+       Lookahead_act (fun terminal0 ->
+         match terminal0 with
+         | Coq__2.END't -> Shift_act Nis'55
+         | _ -> Fail_act)
+     | Nis'52 ->
+       Lookahead_act (fun terminal0 ->
+         match terminal0 with
+         | Coq__2.DARROW't -> Shift_act Nis'53
+         | _ -> Fail_act)
+     | Nis'51 ->
+       Lookahead_act (fun terminal0 ->
+         match terminal0 with
+         | Coq__2.VAR't -> Shift_act Nis'52
+         | _ -> Fail_act)
+     | Nis'50 ->
+       Lookahead_act (fun terminal0 ->
+         match terminal0 with
+         | Coq__2.COMMA't -> Shift_act Nis'51
+         | _ -> Fail_act)
      | Nis'49 ->
        Lookahead_act (fun terminal0 ->
          match terminal0 with
-         | Coq__2.RPAREN't -> Shift_act Nis'50
+         | Coq__2.VAR't -> Shift_act Nis'50
          | _ -> Fail_act)
-     | Nis'48 -> Default_reduce_act Coq__2.Prod'obj'3
+     | Nis'48 ->
+       Lookahead_act (fun terminal0 ->
+         match terminal0 with
+         | Coq__2.SUCC't -> Shift_act Nis'49
+         | _ -> Fail_act)
      | Nis'47 ->
        Lookahead_act (fun terminal0 ->
          match terminal0 with
-         | Coq__2.END't -> Shift_act Nis'48
+         | Coq__2.BAR't -> Shift_act Nis'48
          | _ -> Fail_act)
      | Nis'45 ->
        Lookahead_act (fun terminal0 ->
@@ -1511,107 +1690,99 @@ module Aut =
      | Nis'44 ->
        Lookahead_act (fun terminal0 ->
          match terminal0 with
-         | Coq__2.VAR't -> Shift_act Nis'45
+         | Coq__2.ZERO't -> Shift_act Nis'45
          | _ -> Fail_act)
      | Nis'43 ->
        Lookahead_act (fun terminal0 ->
          match terminal0 with
-         | Coq__2.COMMA't -> Shift_act Nis'44
-         | _ -> Fail_act)
-     | Nis'42 ->
-       Lookahead_act (fun terminal0 ->
-         match terminal0 with
-         | Coq__2.VAR't -> Shift_act Nis'43
+         | Coq__2.BAR't -> Shift_act Nis'44
          | _ -> Fail_act)
      | Nis'41 ->
        Lookahead_act (fun terminal0 ->
          match terminal0 with
-         | Coq__2.SUCC't -> Shift_act Nis'42
+         | Coq__2.DOT't -> Shift_act Nis'42
          | _ -> Fail_act)
      | Nis'40 ->
        Lookahead_act (fun terminal0 ->
          match terminal0 with
-         | Coq__2.BAR't -> Shift_act Nis'41
+         | Coq__2.VAR't -> Shift_act Nis'41
          | _ -> Fail_act)
-     | Nis'38 ->
+     | Nis'39 ->
        Lookahead_act (fun terminal0 ->
          match terminal0 with
-         | Coq__2.DARROW't -> Shift_act Nis'39
+         | Coq__2.RETURN't -> Shift_act Nis'40
          | _ -> Fail_act)
-     | Nis'37 ->
-       Lookahead_act (fun terminal0 ->
-         match terminal0 with
-         | Coq__2.ZERO't -> Shift_act Nis'38
-         | _ -> Fail_act)
-     | Nis'36 ->
-       Lookahead_act (fun terminal0 ->
-         match terminal0 with
-         | Coq__2.BAR't -> Shift_act Nis'37
-         | _ -> Fail_act)
+     | Nis'38 -> Default_reduce_act Coq__2.Prod'params'1
+     | Nis'37 -> Default_reduce_act Coq__2.Prod'params'0
+     | Nis'36 -> Default_reduce_act Coq__2.Prod'obj'0
      | Nis'34 ->
        Lookahead_act (fun terminal0 ->
          match terminal0 with
-         | Coq__2.DOT't -> Shift_act Nis'35
+         | Coq__2.ARROW't -> Shift_act Nis'35
+         | Coq__2.LPAREN't -> Shift_act Nis'9
          | _ -> Fail_act)
-     | Nis'33 ->
-       Lookahead_act (fun terminal0 ->
-         match terminal0 with
-         | Coq__2.VAR't -> Shift_act Nis'34
-         | _ -> Fail_act)
+     | Nis'33 -> Default_reduce_act Coq__2.Prod'param'0
      | Nis'32 ->
        Lookahead_act (fun terminal0 ->
          match terminal0 with
-         | Coq__2.RETURN't -> Shift_act Nis'33
+         | Coq__2.RPAREN't -> Shift_act Nis'33
          | _ -> Fail_act)
-     | Nis'31 -> Default_reduce_act Coq__2.Prod'params'1
-     | Nis'30 -> Default_reduce_act Coq__2.Prod'params'0
-     | Nis'29 -> Default_reduce_act Coq__2.Prod'obj'0
-     | Nis'27 ->
+     | Nis'31 -> Default_reduce_act Coq__2.Prod'obj'5
+     | Nis'30 ->
        Lookahead_act (fun terminal0 ->
          match terminal0 with
-         | Coq__2.ARROW't -> Shift_act Nis'28
-         | Coq__2.LPAREN't -> Shift_act Nis'9
+         | Coq__2.LPAREN't -> Shift_act Nis'18
          | _ -> Fail_act)
-     | Nis'26 -> Default_reduce_act Coq__2.Prod'param'0
+     | Nis'29 ->
+       Lookahead_act (fun terminal0 ->
+         match terminal0 with
+         | Coq__2.IN't -> Shift_act Nis'30
+         | _ -> Fail_act)
+     | Nis'28 -> Default_reduce_act Coq__2.Prod'let_defn'0
+     | Nis'27 -> Default_reduce_act Coq__2.Prod'obj'1
+     | Nis'26 -> Default_reduce_act Coq__2.Prod'app_obj'0
      | Nis'25 ->
        Lookahead_act (fun terminal0 ->
          match terminal0 with
-         | Coq__2.RPAREN't -> Shift_act Nis'26
-         | _ -> Fail_act)
-     | Nis'24 -> Default_reduce_act Coq__2.Prod'obj'1
-     | Nis'23 -> Default_reduce_act Coq__2.Prod'app_obj'0
-     | Nis'22 ->
-       Lookahead_act (fun terminal0 ->
-         match terminal0 with
-         | Coq__2.INT't -> Shift_act Nis'16
+         | Coq__2.INT't -> Shift_act Nis'19
          | Coq__2.LPAREN't -> Shift_act Nis'6
          | Coq__2.NAT't -> Shift_act Nis'5
          | Coq__2.TYPE't -> Shift_act Nis'3
          | Coq__2.VAR't -> Shift_act Nis'2
          | Coq__2.ZERO't -> Shift_act Nis'1
          | _ -> Reduce_act Coq__2.Prod'obj'2)
-     | Nis'21 -> Default_reduce_act Coq__2.Prod'app_obj'1
-     | Nis'20 -> Default_reduce_act Coq__2.Prod'ann_obj'0
-     | Nis'19 ->
+     | Nis'24 -> Default_reduce_act Coq__2.Prod'app_obj'1
+     | Nis'23 -> Default_reduce_act Coq__2.Prod'ann_obj'0
+     | Nis'22 ->
        Lookahead_act (fun terminal0 ->
          match terminal0 with
-         | Coq__2.RPAREN't -> Shift_act Nis'20
+         | Coq__2.RPAREN't -> Shift_act Nis'23
          | _ -> Fail_act)
+     | Nis'20 ->
+       Lookahead_act (fun terminal0 ->
+         match terminal0 with
+         | Coq__2.COLON't -> Shift_act Nis'21
+         | _ -> Fail_act)
+     | Nis'19 -> Default_reduce_act Coq__2.Prod'atomic_obj'3
      | Nis'17 ->
        Lookahead_act (fun terminal0 ->
          match terminal0 with
-         | Coq__2.COLON't -> Shift_act Nis'18
+         | Coq__2.LPAREN't -> Shift_act Nis'18
          | _ -> Fail_act)
-     | Nis'16 -> Default_reduce_act Coq__2.Prod'atomic_obj'3
-     | Nis'14 ->
+     | Nis'16 ->
        Lookahead_act (fun terminal0 ->
          match terminal0 with
-         | Coq__2.LPAREN't -> Shift_act Nis'15
+         | Coq__2.ARROW't -> Shift_act Nis'17
+         | _ -> Fail_act)
+     | Nis'15 ->
+       Lookahead_act (fun terminal0 ->
+         match terminal0 with
+         | Coq__2.LPAREN't -> Shift_act Nis'9
          | _ -> Fail_act)
      | Nis'13 ->
        Lookahead_act (fun terminal0 ->
          match terminal0 with
-         | Coq__2.ARROW't -> Shift_act Nis'14
+         | Coq__2.DEF't -> Shift_act Nis'14
          | _ -> Fail_act)
      | Nis'12 ->
        Lookahead_act (fun terminal0 ->
@@ -1637,7 +1808,7 @@ module Aut =
      | Nis'4 ->
        Lookahead_act (fun terminal0 ->
          match terminal0 with
-         | Coq__2.INT't -> Shift_act Nis'16
+         | Coq__2.INT't -> Shift_act Nis'19
          | Coq__2.LPAREN't -> Shift_act Nis'6
          | Coq__2.NAT't -> Shift_act Nis'5
          | Coq__2.TYPE't -> Shift_act Nis'3
@@ -1650,8 +1821,9 @@ module Aut =
      | _ ->
        Lookahead_act (fun terminal0 ->
          match terminal0 with
-         | Coq__2.INT't -> Shift_act Nis'16
-         | Coq__2.LAMBDA't -> Shift_act Nis'12
+         | Coq__2.INT't -> Shift_act Nis'19
+         | Coq__2.LAMBDA't -> Shift_act Nis'15
+         | Coq__2.LET't -> Shift_act Nis'12
          | Coq__2.LPAREN't -> Shift_act Nis'6
          | Coq__2.NAT't -> Shift_act Nis'5
          | Coq__2.PI't -> Shift_act Nis'8
@@ -1668,96 +1840,111 @@ module Aut =
     match state0 with
     | Init _ ->
       (match nt with
-       | Coq__2.Coq_app_obj'nt -> Some Nis'22
-       | Coq__2.Coq_atomic_obj'nt -> Some Nis'21
-       | Coq__2.Coq_obj'nt -> Some Nis'53
+       | Coq__2.Coq_app_obj'nt -> Some Nis'25
+       | Coq__2.Coq_atomic_obj'nt -> Some Nis'24
+       | Coq__2.Coq_obj'nt -> Some Nis'60
        | _ -> None)
     | Ninit n ->
       (match n with
-       | Nis'54 ->
+       | Nis'61 ->
          (match nt with
-          | Coq__2.Coq_app_obj'nt -> Some Nis'22
-          | Coq__2.Coq_atomic_obj'nt -> Some Nis'21
-          | Coq__2.Coq_obj'nt -> Some Nis'55
+          | Coq__2.Coq_app_obj'nt -> Some Nis'25
+          | Coq__2.Coq_atomic_obj'nt -> Some Nis'24
+          | Coq__2.Coq_obj'nt -> Some Nis'62
+          | _ -> None)
+       | Nis'53 ->
+         (match nt with
+          | Coq__2.Coq_app_obj'nt -> Some Nis'25
+          | Coq__2.Coq_atomic_obj'nt -> Some Nis'24
+          | Coq__2.Coq_obj'nt -> Some Nis'54
           | _ -> None)
        | Nis'46 ->
          (match nt with
-          | Coq__2.Coq_app_obj'nt -> Some Nis'22
-          | Coq__2.Coq_atomic_obj'nt -> Some Nis'21
+          | Coq__2.Coq_app_obj'nt -> Some Nis'25
+          | Coq__2.Coq_atomic_obj'nt -> Some Nis'24
           | Coq__2.Coq_obj'nt -> Some Nis'47
           | _ -> None)
-       | Nis'39 ->
+       | Nis'42 ->
          (match nt with
-          | Coq__2.Coq_app_obj'nt -> Some Nis'22
-          | Coq__2.Coq_atomic_obj'nt -> Some Nis'21
-          | Coq__2.Coq_obj'nt -> Some Nis'40
+          | Coq__2.Coq_app_obj'nt -> Some Nis'25
+          | Coq__2.Coq_atomic_obj'nt -> Some Nis'24
+          | Coq__2.Coq_obj'nt -> Some Nis'43
           | _ -> None)
        | Nis'35 ->
          (match nt with
-          | Coq__2.Coq_app_obj'nt -> Some Nis'22
-          | Coq__2.Coq_atomic_obj'nt -> Some Nis'21
+          | Coq__2.Coq_app_obj'nt -> Some Nis'25
+          | Coq__2.Coq_atomic_obj'nt -> Some Nis'24
           | Coq__2.Coq_obj'nt -> Some Nis'36
           | _ -> None)
-       | Nis'28 ->
+       | Nis'34 ->
          (match nt with
-          | Coq__2.Coq_app_obj'nt -> Some Nis'22
-          | Coq__2.Coq_atomic_obj'nt -> Some Nis'21
-          | Coq__2.Coq_obj'nt -> Some Nis'29
+          | Coq__2.Coq_param'nt -> Some Nis'37
           | _ -> None)
-       | Nis'27 ->
+       | Nis'30 ->
          (match nt with
-          | Coq__2.Coq_param'nt -> Some Nis'30
+          | Coq__2.Coq_ann_obj'nt -> Some Nis'31
           | _ -> None)
-       | Nis'22 ->
+       | Nis'25 ->
          (match nt with
-          | Coq__2.Coq_atomic_obj'nt -> Some Nis'23
+          | Coq__2.Coq_atomic_obj'nt -> Some Nis'26
+          | _ -> None)
+       | Nis'21 ->
+         (match nt with
+          | Coq__2.Coq_app_obj'nt -> Some Nis'25
+          | Coq__2.Coq_atomic_obj'nt -> Some Nis'24
+          | Coq__2.Coq_obj'nt -> Some Nis'22
           | _ -> None)
        | Nis'18 ->
          (match nt with
-          | Coq__2.Coq_app_obj'nt -> Some Nis'22
-          | Coq__2.Coq_atomic_obj'nt -> Some Nis'21
-          | Coq__2.Coq_obj'nt -> Some Nis'19
+          | Coq__2.Coq_app_obj'nt -> Some Nis'25
+          | Coq__2.Coq_atomic_obj'nt -> Some Nis'24
+          | Coq__2.Coq_obj'nt -> Some Nis'20
+          | _ -> None)
+       | Nis'17 ->
+         (match nt with
+          | Coq__2.Coq_ann_obj'nt -> Some Nis'27
           | _ -> None)
        | Nis'15 ->
          (match nt with
-          | Coq__2.Coq_app_obj'nt -> Some Nis'22
-          | Coq__2.Coq_atomic_obj'nt -> Some Nis'21
-          | Coq__2.Coq_obj'nt -> Some Nis'17
+          | Coq__2.Coq_param'nt -> Some Nis'16
           | _ -> None)
        | Nis'14 ->
          (match nt with
-          | Coq__2.Coq_ann_obj'nt -> Some Nis'24
+          | Coq__2.Coq_app_obj'nt -> Some Nis'25
+          | Coq__2.Coq_atomic_obj'nt -> Some Nis'24
+          | Coq__2.Coq_obj'nt -> Some Nis'28
           | _ -> None)
        | Nis'12 ->
          (match nt with
+          | Coq__2.Coq_let_defn'nt -> Some Nis'29
           | Coq__2.Coq_param'nt -> Some Nis'13
           | _ -> None)
        | Nis'11 ->
          (match nt with
-          | Coq__2.Coq_app_obj'nt -> Some Nis'22
-          | Coq__2.Coq_atomic_obj'nt -> Some Nis'21
-          | Coq__2.Coq_obj'nt -> Some Nis'25
+          | Coq__2.Coq_app_obj'nt -> Some Nis'25
+          | Coq__2.Coq_atomic_obj'nt -> Some Nis'24
+          | Coq__2.Coq_obj'nt -> Some Nis'32
           | _ -> None)
        | Nis'8 ->
          (match nt with
-          | Coq__2.Coq_param'nt -> Some Nis'31
-          | Coq__2.Coq_params'nt -> Some Nis'27
+          | Coq__2.Coq_param'nt -> Some Nis'38
+          | Coq__2.Coq_params'nt -> Some Nis'34
           | _ -> None)
        | Nis'7 ->
          (match nt with
-          | Coq__2.Coq_app_obj'nt -> Some Nis'22
-          | Coq__2.Coq_atomic_obj'nt -> Some Nis'21
-          | Coq__2.Coq_obj'nt -> Some Nis'32
+          | Coq__2.Coq_app_obj'nt -> Some Nis'25
+          | Coq__2.Coq_atomic_obj'nt -> Some Nis'24
+          | Coq__2.Coq_obj'nt -> Some Nis'39
           | _ -> None)
        | Nis'6 ->
          (match nt with
-          | Coq__2.Coq_app_obj'nt -> Some Nis'22
-          | Coq__2.Coq_atomic_obj'nt -> Some Nis'21
-          | Coq__2.Coq_obj'nt -> Some Nis'49
+          | Coq__2.Coq_app_obj'nt -> Some Nis'25
+          | Coq__2.Coq_atomic_obj'nt -> Some Nis'24
+          | Coq__2.Coq_obj'nt -> Some Nis'56
           | _ -> None)
        | Nis'4 ->
          (match nt with
-          | Coq__2.Coq_atomic_obj'nt -> Some Nis'51
+          | Coq__2.Coq_atomic_obj'nt -> Some Nis'58
           | _ -> None)
        | _ -> None)
 
@@ -1780,6 +1967,24 @@ module Aut =
   | Init _ -> 0
   | Ninit n ->
     (match n with
+     | Nis'63 ->
+       ((fun p->1+2*p) ((fun p->1+2*p) ((fun p->1+2*p) ((fun p->1+2*p)
+         ((fun p->1+2*p) 1)))))
+     | Nis'62 ->
+       ((fun p->2*p) ((fun p->1+2*p) ((fun p->1+2*p) ((fun p->1+2*p)
+         ((fun p->1+2*p) 1)))))
+     | Nis'61 ->
+       ((fun p->1+2*p) ((fun p->2*p) ((fun p->1+2*p) ((fun p->1+2*p)
+         ((fun p->1+2*p) 1)))))
+     | Nis'60 ->
+       ((fun p->2*p) ((fun p->2*p) ((fun p->1+2*p) ((fun p->1+2*p)
+         ((fun p->1+2*p) 1)))))
+     | Nis'58 ->
+       ((fun p->2*p) ((fun p->1+2*p) ((fun p->2*p) ((fun p->1+2*p)
+         ((fun p->1+2*p) 1)))))
+     | Nis'57 ->
+       ((fun p->1+2*p) ((fun p->2*p) ((fun p->2*p) ((fun p->1+2*p)
+         ((fun p->1+2*p) 1)))))
      | Nis'56 ->
        ((fun p->2*p) ((fun p->2*p) ((fun p->2*p) ((fun p->1+2*p)
          ((fun p->1+2*p) 1)))))
@@ -1791,6 +1996,9 @@ module Aut =
          ((fun p->1+2*p) 1)))))
      | Nis'53 ->
        ((fun p->1+2*p) ((fun p->2*p) ((fun p->1+2*p) ((fun p->2*p)
+         ((fun p->1+2*p) 1)))))
+     | Nis'52 ->
+       ((fun p->2*p) ((fun p->2*p) ((fun p->1+2*p) ((fun p->2*p)
          ((fun p->1+2*p) 1)))))
      | Nis'51 ->
        ((fun p->1+2*p) ((fun p->1+2*p) ((fun p->2*p) ((fun p->2*p)

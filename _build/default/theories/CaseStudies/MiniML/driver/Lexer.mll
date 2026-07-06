@@ -40,7 +40,10 @@
     | VAR (_, s) -> s
     | EOF _ -> "<EOF>"
     | DOT _ -> "."
-
+    | LET _ -> "let"
+    | IN _ -> "in"
+    | DEF _ -> ":="
+      
   let get_range_of_token : token -> (position * position) =
     function
     | ARROW r
@@ -62,6 +65,9 @@
     | EOF r
     | INT (r, _)
     | DOT r
+    | LET r
+    | IN r
+    | DEF r
     | VAR (r, _) -> r
 
   let format_token (f: Format.formatter) (t: token): unit =
@@ -98,6 +104,9 @@ rule read =
   | "Type" { TYPE (get_range lexbuf) }
   | eof { EOF (get_range lexbuf) }
   | "." { DOT (get_range lexbuf) }
+  | "let" {LET (get_range lexbuf) }
+  | "in" {IN (get_range lexbuf) }
+  | ":=" {DEF (get_range lexbuf) }
   | ident { VAR (get_range lexbuf, Lexing.lexeme lexbuf) }
   | _ as c { failwith (Format.asprintf "@[<v 2>Lexer error:@ @[<v 2>Unexpected character %C@ at %a@]@]@." c format_position lexbuf.lex_start_p) }
 and comment =

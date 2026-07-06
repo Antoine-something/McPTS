@@ -6,81 +6,91 @@
 let message =
   fun s ->
     match s with
-    | 55 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+    | 62 ->
+        "Expected token \"EOF\"\n"
+    | 61 ->
+        "Expected an expression.\nThis token is invalid for the beginning of an expression.\n"
+    | 60 ->
+        "Either an expression or \":\" is expected.\nThis token is invalid for the beginning of an expression.\n"
+    | 56 ->
+        "Either an expression or \")\" is expected.\nThis token is invalid for the beginning of an expression.\n"
     | 54 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "Expected token \"end\" after successor branch\n"
     | 53 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "Expected expression in the successor branch\n"
+    | 52 ->
+        "Expected token \"=>\" after variable name in successor branch\n"
+    | 51 ->
+        "Expected variable name after token \",\"\n"
+    | 50 ->
+        "Expected token \",\" after variable name\n"
     | 49 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "Expected variable binding after \"succ\"\n"
+    | 48 ->
+        "Expected token \"succ\" in the successor branch\n"
     | 47 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "Expected token \"|\" at the start of successor branch\n"
     | 46 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "Expected an expression in the \"zero\" branch\nThis token is invalid for the beginning of an expression.\n"
     | 45 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "Expected symbol \"=>\" in the \"zero\" branch\n"
     | 44 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "Expected token \"zero\"\n"
     | 43 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "Expected token \"|\"\n"
     | 42 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "Expected expression after \".\"\nThis token is invalid for the beginning of an expression.\n"
     | 41 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "\".\" is expected after the scrutinee name of the motive of a natural number recursion.\n"
     | 40 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "Expected a variable name after \"return\" keyword\n"
     | 39 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 38 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 37 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 36 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "Either an expression or \"return\" keyword is expected.\nThis token is invalid for the beginning of an expression.\n"
     | 35 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "Expected output type\n"
     | 34 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 33 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "Expected symbol \"->\" after list of parameters in function type\n"
     | 32 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 28 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 27 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 25 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
-    | 19 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "Ill-formed type in parameter of a function\n"
+    | 30 ->
+        "Expected annotated expression in body of \"let\"-expression\n"
+    | 29 ->
+        "Expected one expression in definition\n"
+    | 22 ->
+        "Expected closing parenthesis\n"
+    | 21 ->
+        "Expected type annotation \"?type\" in body of a function\n"
+    | 20 ->
+        "Expected annotated expression in body of a function\n"
     | 18 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "Expected annotated expression in body of a function.\n\"()\" is not a valid a function body\n"
     | 17 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "Expected annotated expression in body of a function\n"
+    | 16 ->
+        "Expected symbol '->'\n"
     | 15 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "A parenthesized paremeter is expect.\nFor example,\n  \"(x : Nat)\" in \"fun (x : Nat) -> (x : Nat)\"\n"
     | 14 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "Expected annotated expression in body of 'let'-expression\n"
     | 13 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "Expected a value for the variable\n"
     | 12 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "A variable binding is expected after a \"let\"\n"
     | 11 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "A parameter should have \"?type\" after \":\",\nwhere \"?type\" is the type of the parameter.\n"
     | 10 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "A parameter should have \": ?type\" after the parameter name,\nwhere \"?type\" is the type of the parameter.\n"
     | 9 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "A parameter should start with a valid identifier.\n"
     | 8 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "A list of parenthesized parameters is expected.\nFor example,\n  \"(x : Nat) (y : Nat)\" in \"forall (x : Nat) (y : Nat) -> Nat\"\n"
     | 7 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "A scrutinee expression is expected.\nThis token is invalid for the beginning of an expression.\n"
     | 6 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "\"()\" is an invalid expression.\n\"()\" should have an expression in it to be an expression.\n"
     | 4 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "Expected an expression after 'succ'\n"
     | 0 ->
-        "<YOUR SYNTAX ERROR MESSAGE HERE>\n"
+        "This token is invalid for the beginning of a program.\n"
     | _ ->
         raise Not_found

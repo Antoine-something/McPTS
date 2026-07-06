@@ -1,0 +1,8 @@
+fun (x : Nat) ->
+  (fun (y : Nat) ->
+     (rec x return z . Nat
+     | zero => y
+     | succ n, r => succ r
+     end : Nat)
+     : (forall (y : Nat) -> Nat))
+: forall (x : Nat) -> forall (y : Nat) -> Nat
