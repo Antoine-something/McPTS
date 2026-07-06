@@ -1,0 +1,27 @@
+(include_subdirs no)
+
+(library
+ (name McptsLib)
+ (public_name mcpts.driver)
+ (modules Main Lexer PrettyPrinter Test)
+ (libraries McptsExtracted)
+ (inline_tests
+  (deps
+   (glob_files_rec ../examples/*.mctt)))
+ (preprocess
+  (pps ppx_expect)))
+
+(executable
+ (name mcpts)
+ (public_name mcpts)
+ (modules Mcpts)
+ (libraries McptsLib))
+
+(env
+ (dev
+  (flags
+   (:standard -w -67 -w -32 -w -33 -w -39))))
+
+(ocamllex Lexer)
+
+(documentation)

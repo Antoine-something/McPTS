@@ -1,0 +1,4 @@
+(lang dune 3.18)
+(name mcpts)
+(sections (lib .) (doc ../../doc/mcpts))
+(files (lib (META dune-package opam)) (doc (LICENSE README.md)))

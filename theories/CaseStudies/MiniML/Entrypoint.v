@@ -64,4 +64,4 @@ Qed.
 Extraction Language OCaml.
 
 Set Extraction Flag 1007.
-Set Extraction Output Directory "driver/extracted".
+Set Extraction Output Directory "theories/CaseStudies/MiniML/driver/extracted".
