@@ -1,0 +1,5 @@
+fun (n : Nat) : Type@1 -> (
+  rec n return y . Type@0 
+  | zero => Nat
+  | succ n, r => forall (a : Nat) : Type@0 -> r
+  end : Type@0) : forall (n : Nat) : Type@1 -> Type@0
