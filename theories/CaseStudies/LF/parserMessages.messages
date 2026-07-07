@@ -8,7 +8,7 @@ prog: RPAREN
 ##
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+This token is invalid for the beginning of a program.
 
 prog: SUCC SUCC
 ##
@@ -20,7 +20,7 @@ prog: SUCC SUCC
 ## SUCC
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Expected an expression after 'succ'
 
 prog: LPAREN RPAREN
 ##
@@ -32,7 +32,8 @@ prog: LPAREN RPAREN
 ## LPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+"()" is an invalid expression.
+"()" should have an expression in it to be an expression.
 
 prog: REC RPAREN
 ##
@@ -44,7 +45,8 @@ prog: REC RPAREN
 ## REC
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+A scrutinee expression is expected.
+This token is invalid for the beginning of an expression.
 
 prog: PI ZERO
 ##
@@ -56,7 +58,9 @@ prog: PI ZERO
 ## PI
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+A list of parenthesized parameters is expected.
+For example,
+  "(x : Nat) (y : Nat)" in "forall (x : Nat) (y : Nat) -> Nat"
 
 prog: LAMBDA LPAREN ZERO
 ##
@@ -68,7 +72,7 @@ prog: LAMBDA LPAREN ZERO
 ## LPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+A parameter should start with a valid identifier.
 
 prog: LAMBDA LPAREN VAR ZERO
 ##
@@ -80,7 +84,8 @@ prog: LAMBDA LPAREN VAR ZERO
 ## LPAREN VAR
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+A parameter should have ": ?type" after the parameter name,
+where "?type" is the type of the parameter.
 
 prog: LAMBDA LPAREN VAR COLON RPAREN
 ##
@@ -92,7 +97,8 @@ prog: LAMBDA LPAREN VAR COLON RPAREN
 ## LPAREN VAR COLON
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+A parameter should have "?type" after ":",
+where "?type" is the type of the parameter.
 
 prog: LET ZERO
 ##
@@ -104,9 +110,9 @@ prog: LET ZERO
 ## LET
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+A variable binding is expected after a "let"
 
-prog: LET LPAREN VAR COLON KIND RPAREN ZERO
+prog: LET LPAREN VAR COLON INT RPAREN ZERO
 ##
 ## Ends in an error in state: 13.
 ##
@@ -116,43 +122,8 @@ prog: LET LPAREN VAR COLON KIND RPAREN ZERO
 ## param
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Expected a value for the variable
 
-prog: LET LPAREN VAR COLON KIND RPAREN COLON ZERO
-##
-## Ends in an error in state: 14.
-##
-## let_defn -> param COLON . sort DEF obj [ IN ]
-##
-## The known suffix of the stack is as follows:
-## param COLON
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-prog: LET LPAREN VAR COLON KIND RPAREN COLON KIND ZERO
-##
-## Ends in an error in state: 16.
-##
-## let_defn -> param COLON sort . DEF obj [ IN ]
-##
-## The known suffix of the stack is as follows:
-## param COLON sort
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-prog: LET LPAREN VAR COLON KIND RPAREN COLON KIND DEF RPAREN
-##
-## Ends in an error in state: 17.
-##
-## let_defn -> param COLON sort DEF . obj [ IN ]
-##
-## The known suffix of the stack is as follows:
-## param COLON sort DEF
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
 
 prog: LAMBDA ZERO
 ##
@@ -164,9 +135,11 @@ prog: LAMBDA ZERO
 ## LAMBDA
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+A parenthesized paremeter is expected.
+For example,
+  "(x : Nat)" in "fun (x : Nat) -> (x : Nat)"
 
-prog: LAMBDA LPAREN VAR COLON KIND RPAREN ZERO
+prog: LAMBDA LPAREN VAR COLON INT RPAREN ZERO
 ##
 ## Ends in an error in state: 19.
 ##
@@ -176,9 +149,347 @@ prog: LAMBDA LPAREN VAR COLON KIND RPAREN ZERO
 ## LAMBDA param
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Expected symbol ':'
 
-prog: LAMBDA LPAREN VAR COLON KIND RPAREN COLON ZERO
+
+prog: LAMBDA LPAREN VAR COLON INT SUCC
+##
+## Ends in an error in state: 38.
+##
+## param -> LPAREN VAR COLON obj . RPAREN [ LPAREN COLON ]
+##
+## The known suffix of the stack is as follows:
+## LPAREN VAR COLON obj
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 31, spurious reduction of production obj -> app_obj
+##
+
+Ill-formed type in parameter of a function
+
+prog: PI LPAREN VAR COLON INT RPAREN ZERO
+##
+## Ends in an error in state: 40.
+##
+## obj -> PI params . COLON sort ARROW obj [ RPAREN RETURN IN EOF END COLON BAR ]
+## params -> params . param [ LPAREN COLON ]
+##
+## The known suffix of the stack is as follows:
+## PI params
+##
+
+Expected symbol ':'
+
+
+prog: REC INT SUCC
+##
+## Ends in an error in state: 47.
+##
+## obj -> REC obj . RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## REC obj
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 31, spurious reduction of production obj -> app_obj
+##
+
+Either an expression or "return" keyword is expected.
+This token is invalid for the beginning of an expression.
+
+prog: REC INT RETURN ZERO
+##
+## Ends in an error in state: 48.
+##
+## obj -> REC obj RETURN . VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## REC obj RETURN
+##
+
+Expected a variable name after "return" keyword
+
+prog: REC INT RETURN VAR ZERO
+##
+## Ends in an error in state: 49.
+##
+## obj -> REC obj RETURN VAR . DOT obj BAR ZERO DARROW obj BAR SUCC VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## REC obj RETURN VAR
+##
+
+"." is expected after the scrutinee name of the motive of a natural number recursion.
+
+prog: REC INT RETURN VAR DOT RPAREN
+##
+## Ends in an error in state: 50.
+##
+## obj -> REC obj RETURN VAR DOT . obj BAR ZERO DARROW obj BAR SUCC VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## REC obj RETURN VAR DOT
+##
+
+Expected expression after "."
+This token is invalid for the beginning of an expression.
+
+prog: REC INT RETURN VAR DOT INT SUCC
+##
+## Ends in an error in state: 51.
+##
+## obj -> REC obj RETURN VAR DOT obj . BAR ZERO DARROW obj BAR SUCC VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## REC obj RETURN VAR DOT obj
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 31, spurious reduction of production obj -> app_obj
+##
+
+Expected token "|"
+
+prog: REC INT RETURN VAR DOT INT BAR VAR
+##
+## Ends in an error in state: 52.
+##
+## obj -> REC obj RETURN VAR DOT obj BAR . ZERO DARROW obj BAR SUCC VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## REC obj RETURN VAR DOT obj BAR
+##
+
+Expected token "zero"
+
+prog: REC INT RETURN VAR DOT INT BAR ZERO ZERO
+##
+## Ends in an error in state: 53.
+##
+## obj -> REC obj RETURN VAR DOT obj BAR ZERO . DARROW obj BAR SUCC VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## REC obj RETURN VAR DOT obj BAR ZERO
+##
+
+Expected symbol "=>" in the "zero" branch
+
+prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW RPAREN
+##
+## Ends in an error in state: 54.
+##
+## obj -> REC obj RETURN VAR DOT obj BAR ZERO DARROW . obj BAR SUCC VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## REC obj RETURN VAR DOT obj BAR ZERO DARROW
+##
+
+Expected an expression in the "zero" branch
+This token is invalid for the beginning of an expression.
+
+
+prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT SUCC
+##
+## Ends in an error in state: 55.
+##
+## obj -> REC obj RETURN VAR DOT obj BAR ZERO DARROW obj . BAR SUCC VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## REC obj RETURN VAR DOT obj BAR ZERO DARROW obj
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 31, spurious reduction of production obj -> app_obj
+##
+
+Expected token "|" at the start of successor branch
+
+prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT BAR ZERO
+##
+## Ends in an error in state: 56.
+##
+## obj -> REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR . SUCC VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR
+##
+
+Expected token "succ" in the successor branch
+
+prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT BAR SUCC ZERO
+##
+## Ends in an error in state: 57.
+##
+## obj -> REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC . VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC
+##
+
+Expected variable binding after "succ"
+
+prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT BAR SUCC VAR ZERO
+##
+## Ends in an error in state: 58.
+##
+## obj -> REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR . COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR
+##
+
+Expected token "," after variable name
+
+prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT BAR SUCC VAR COMMA ZERO
+##
+## Ends in an error in state: 59.
+##
+## obj -> REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR COMMA . VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR COMMA
+##
+
+Expected variable name after token ","
+
+prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT BAR SUCC VAR COMMA VAR ZERO
+##
+## Ends in an error in state: 60.
+##
+## obj -> REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR COMMA VAR . DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR COMMA VAR
+##
+
+Expected token "=>" after variable name in successor branch
+
+prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT BAR SUCC VAR COMMA VAR DARROW RPAREN
+##
+## Ends in an error in state: 61.
+##
+## obj -> REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR COMMA VAR DARROW . obj END [ RPAREN RETURN IN EOF END COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR COMMA VAR DARROW
+##
+
+Expected expression in the successor branch
+
+prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT BAR SUCC VAR COMMA VAR DARROW INT SUCC
+##
+## Ends in an error in state: 62.
+##
+## obj -> REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR COMMA VAR DARROW obj . END [ RPAREN RETURN IN EOF END COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR COMMA VAR DARROW obj
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 31, spurious reduction of production obj -> app_obj
+##
+
+Expected token "end" after successor branch
+
+prog: LPAREN INT SUCC
+##
+## Ends in an error in state: 64.
+##
+## atomic_obj -> LPAREN obj . RPAREN [ ZERO VAR TYPE RPAREN RETURN NAT LPAREN KIND INT IN EOF END COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## LPAREN obj
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 31, spurious reduction of production obj -> app_obj
+##
+
+Either an expression or ")" is expected.
+This token is invalid for the beginning of an expression.
+
+prog: INT SUCC
+##
+## Ends in an error in state: 68.
+##
+## prog -> obj . COLON obj EOF [ # ]
+##
+## The known suffix of the stack is as follows:
+## obj
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 31, spurious reduction of production obj -> app_obj
+##
+
+Either an expression or ":" is expected.
+This token is invalid for the beginning of an expression.
+
+prog: INT COLON RPAREN
+##
+## Ends in an error in state: 69.
+##
+## prog -> obj COLON . obj EOF [ # ]
+##
+## The known suffix of the stack is as follows:
+## obj COLON
+##
+
+Expected an expression.
+This token is invalid for the beginning of an expression.
+
+prog: INT COLON INT SUCC
+##
+## Ends in an error in state: 70.
+##
+## prog -> obj COLON obj . EOF [ # ]
+##
+## The known suffix of the stack is as follows:
+## obj COLON obj
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 31, spurious reduction of production obj -> app_obj
+##
+
+Expected token "EOF"
+
+
+
+prog: LET LPAREN VAR COLON INT RPAREN COLON ZERO
+##
+## Ends in an error in state: 14.
+##
+## let_defn -> param COLON . sort DEF obj [ IN ]
+##
+## The known suffix of the stack is as follows:
+## param COLON
+##
+
+Annotation must be sort "Type" or "Kind"
+
+
+
+prog: LAMBDA LPAREN VAR COLON INT RPAREN COLON ZERO
 ##
 ## Ends in an error in state: 20.
 ##
@@ -188,7 +499,47 @@ prog: LAMBDA LPAREN VAR COLON KIND RPAREN COLON ZERO
 ## LAMBDA param COLON
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Annotation must be sort "Type" or "Kind"
+
+
+
+prog: PI LPAREN VAR COLON INT RPAREN COLON ZERO
+##
+## Ends in an error in state: 41.
+##
+## obj -> PI params COLON . sort ARROW obj [ RPAREN RETURN IN EOF END COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## PI params COLON
+##
+
+Annotation must be sort "Type" or "Kind"
+
+
+
+prog: LET LPAREN VAR COLON KIND RPAREN COLON KIND ZERO
+##
+## Ends in an error in state: 16.
+##
+## let_defn -> param COLON sort . DEF obj [ IN ]
+##
+## The known suffix of the stack is as follows:
+## param COLON sort
+##
+
+Expected symbol ":=".
+
+prog: LET LPAREN VAR COLON KIND RPAREN COLON KIND DEF RPAREN
+##
+## Ends in an error in state: 17.
+##
+## let_defn -> param COLON sort DEF . obj [ IN ]
+##
+## The known suffix of the stack is as follows:
+## param COLON sort DEF
+##
+
+Expected a value for the variable.
 
 prog: LAMBDA LPAREN VAR COLON KIND RPAREN COLON KIND ZERO
 ##
@@ -200,7 +551,7 @@ prog: LAMBDA LPAREN VAR COLON KIND RPAREN COLON KIND ZERO
 ## LAMBDA param COLON sort
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Expected symbol "->".
 
 prog: LAMBDA LPAREN VAR COLON KIND RPAREN COLON KIND ARROW ZERO
 ##
@@ -212,7 +563,7 @@ prog: LAMBDA LPAREN VAR COLON KIND RPAREN COLON KIND ARROW ZERO
 ## LAMBDA param COLON sort ARROW
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Expected annotated expression in body of a function
 
 prog: LAMBDA LPAREN VAR COLON KIND RPAREN COLON KIND ARROW LPAREN RPAREN
 ##
@@ -224,7 +575,8 @@ prog: LAMBDA LPAREN VAR COLON KIND RPAREN COLON KIND ARROW LPAREN RPAREN
 ## LPAREN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Expected annotated expression in body of a function.
+"()" is not a valid a function body
 
 prog: LAMBDA LPAREN VAR COLON KIND RPAREN COLON KIND ARROW LPAREN KIND SUCC
 ##
@@ -242,7 +594,7 @@ prog: LAMBDA LPAREN VAR COLON KIND RPAREN COLON KIND ARROW LPAREN KIND SUCC
 ## In state 31, spurious reduction of production obj -> app_obj
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Expected annotated expression in body of a function
 
 prog: LAMBDA LPAREN VAR COLON KIND RPAREN COLON KIND ARROW LPAREN KIND COLON RPAREN
 ##
@@ -254,7 +606,7 @@ prog: LAMBDA LPAREN VAR COLON KIND RPAREN COLON KIND ARROW LPAREN KIND COLON RPA
 ## LPAREN obj COLON
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Expected type annotation "Type" or "Kind" in body of a function
 
 prog: LAMBDA LPAREN VAR COLON KIND RPAREN COLON KIND ARROW LPAREN KIND COLON KIND SUCC
 ##
@@ -272,7 +624,7 @@ prog: LAMBDA LPAREN VAR COLON KIND RPAREN COLON KIND ARROW LPAREN KIND COLON KIN
 ## In state 31, spurious reduction of production obj -> app_obj
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Test Message8
 
 prog: LET LPAREN VAR COLON KIND RPAREN COLON KIND DEF KIND SUCC
 ##
@@ -291,7 +643,7 @@ prog: LET LPAREN VAR COLON KIND RPAREN COLON KIND DEF KIND SUCC
 ## In state 34, spurious reduction of production let_defn -> param COLON sort DEF obj
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Test Message9
 
 prog: LET LPAREN VAR COLON KIND RPAREN COLON KIND DEF KIND IN ZERO
 ##
@@ -303,50 +655,7 @@ prog: LET LPAREN VAR COLON KIND RPAREN COLON KIND DEF KIND IN ZERO
 ## LET let_defn IN
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-prog: LAMBDA LPAREN VAR COLON KIND SUCC
-##
-## Ends in an error in state: 38.
-##
-## param -> LPAREN VAR COLON obj . RPAREN [ LPAREN COLON ]
-##
-## The known suffix of the stack is as follows:
-## LPAREN VAR COLON obj
-##
-## WARNING: This example involves spurious reductions.
-## This implies that, although the LR(1) items shown above provide an
-## accurate view of the past (what has been recognized so far), they
-## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 31, spurious reduction of production obj -> app_obj
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-prog: PI LPAREN VAR COLON KIND RPAREN ZERO
-##
-## Ends in an error in state: 40.
-##
-## obj -> PI params . COLON sort ARROW obj [ RPAREN RETURN IN EOF END COLON BAR ]
-## params -> params . param [ LPAREN COLON ]
-##
-## The known suffix of the stack is as follows:
-## PI params
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-prog: PI LPAREN VAR COLON KIND RPAREN COLON ZERO
-##
-## Ends in an error in state: 41.
-##
-## obj -> PI params COLON . sort ARROW obj [ RPAREN RETURN IN EOF END COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## PI params COLON
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Test Message10
 
 prog: PI LPAREN VAR COLON KIND RPAREN COLON KIND ZERO
 ##
@@ -358,7 +667,7 @@ prog: PI LPAREN VAR COLON KIND RPAREN COLON KIND ZERO
 ## PI params COLON sort
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Test Message11
 
 prog: PI LPAREN VAR COLON KIND RPAREN COLON KIND ARROW RPAREN
 ##
@@ -370,286 +679,4 @@ prog: PI LPAREN VAR COLON KIND RPAREN COLON KIND ARROW RPAREN
 ## PI params COLON sort ARROW
 ##
 
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-prog: REC KIND SUCC
-##
-## Ends in an error in state: 47.
-##
-## obj -> REC obj . RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## REC obj
-##
-## WARNING: This example involves spurious reductions.
-## This implies that, although the LR(1) items shown above provide an
-## accurate view of the past (what has been recognized so far), they
-## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 31, spurious reduction of production obj -> app_obj
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-prog: REC KIND RETURN ZERO
-##
-## Ends in an error in state: 48.
-##
-## obj -> REC obj RETURN . VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## REC obj RETURN
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-prog: REC KIND RETURN VAR ZERO
-##
-## Ends in an error in state: 49.
-##
-## obj -> REC obj RETURN VAR . DOT obj BAR ZERO DARROW obj BAR SUCC VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## REC obj RETURN VAR
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-prog: REC KIND RETURN VAR DOT RPAREN
-##
-## Ends in an error in state: 50.
-##
-## obj -> REC obj RETURN VAR DOT . obj BAR ZERO DARROW obj BAR SUCC VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## REC obj RETURN VAR DOT
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-prog: REC KIND RETURN VAR DOT KIND SUCC
-##
-## Ends in an error in state: 51.
-##
-## obj -> REC obj RETURN VAR DOT obj . BAR ZERO DARROW obj BAR SUCC VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## REC obj RETURN VAR DOT obj
-##
-## WARNING: This example involves spurious reductions.
-## This implies that, although the LR(1) items shown above provide an
-## accurate view of the past (what has been recognized so far), they
-## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 31, spurious reduction of production obj -> app_obj
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-prog: REC KIND RETURN VAR DOT KIND BAR VAR
-##
-## Ends in an error in state: 52.
-##
-## obj -> REC obj RETURN VAR DOT obj BAR . ZERO DARROW obj BAR SUCC VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## REC obj RETURN VAR DOT obj BAR
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-prog: REC KIND RETURN VAR DOT KIND BAR ZERO ZERO
-##
-## Ends in an error in state: 53.
-##
-## obj -> REC obj RETURN VAR DOT obj BAR ZERO . DARROW obj BAR SUCC VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## REC obj RETURN VAR DOT obj BAR ZERO
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-prog: REC KIND RETURN VAR DOT KIND BAR ZERO DARROW RPAREN
-##
-## Ends in an error in state: 54.
-##
-## obj -> REC obj RETURN VAR DOT obj BAR ZERO DARROW . obj BAR SUCC VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## REC obj RETURN VAR DOT obj BAR ZERO DARROW
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-prog: REC KIND RETURN VAR DOT KIND BAR ZERO DARROW KIND SUCC
-##
-## Ends in an error in state: 55.
-##
-## obj -> REC obj RETURN VAR DOT obj BAR ZERO DARROW obj . BAR SUCC VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## REC obj RETURN VAR DOT obj BAR ZERO DARROW obj
-##
-## WARNING: This example involves spurious reductions.
-## This implies that, although the LR(1) items shown above provide an
-## accurate view of the past (what has been recognized so far), they
-## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 31, spurious reduction of production obj -> app_obj
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-prog: REC KIND RETURN VAR DOT KIND BAR ZERO DARROW KIND BAR ZERO
-##
-## Ends in an error in state: 56.
-##
-## obj -> REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR . SUCC VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-prog: REC KIND RETURN VAR DOT KIND BAR ZERO DARROW KIND BAR SUCC ZERO
-##
-## Ends in an error in state: 57.
-##
-## obj -> REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC . VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-prog: REC KIND RETURN VAR DOT KIND BAR ZERO DARROW KIND BAR SUCC VAR ZERO
-##
-## Ends in an error in state: 58.
-##
-## obj -> REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR . COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-prog: REC KIND RETURN VAR DOT KIND BAR ZERO DARROW KIND BAR SUCC VAR COMMA ZERO
-##
-## Ends in an error in state: 59.
-##
-## obj -> REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR COMMA . VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR COMMA
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-prog: REC KIND RETURN VAR DOT KIND BAR ZERO DARROW KIND BAR SUCC VAR COMMA VAR ZERO
-##
-## Ends in an error in state: 60.
-##
-## obj -> REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR COMMA VAR . DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR COMMA VAR
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-prog: REC KIND RETURN VAR DOT KIND BAR ZERO DARROW KIND BAR SUCC VAR COMMA VAR DARROW RPAREN
-##
-## Ends in an error in state: 61.
-##
-## obj -> REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR COMMA VAR DARROW . obj END [ RPAREN RETURN IN EOF END COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR COMMA VAR DARROW
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-prog: REC KIND RETURN VAR DOT KIND BAR ZERO DARROW KIND BAR SUCC VAR COMMA VAR DARROW KIND SUCC
-##
-## Ends in an error in state: 62.
-##
-## obj -> REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR COMMA VAR DARROW obj . END [ RPAREN RETURN IN EOF END COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR COMMA VAR DARROW obj
-##
-## WARNING: This example involves spurious reductions.
-## This implies that, although the LR(1) items shown above provide an
-## accurate view of the past (what has been recognized so far), they
-## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 31, spurious reduction of production obj -> app_obj
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-prog: LPAREN KIND SUCC
-##
-## Ends in an error in state: 64.
-##
-## atomic_obj -> LPAREN obj . RPAREN [ ZERO VAR TYPE RPAREN RETURN NAT LPAREN KIND INT IN EOF END COLON BAR ]
-##
-## The known suffix of the stack is as follows:
-## LPAREN obj
-##
-## WARNING: This example involves spurious reductions.
-## This implies that, although the LR(1) items shown above provide an
-## accurate view of the past (what has been recognized so far), they
-## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 31, spurious reduction of production obj -> app_obj
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-prog: KIND SUCC
-##
-## Ends in an error in state: 68.
-##
-## prog -> obj . COLON obj EOF [ # ]
-##
-## The known suffix of the stack is as follows:
-## obj
-##
-## WARNING: This example involves spurious reductions.
-## This implies that, although the LR(1) items shown above provide an
-## accurate view of the past (what has been recognized so far), they
-## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 31, spurious reduction of production obj -> app_obj
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-prog: KIND COLON RPAREN
-##
-## Ends in an error in state: 69.
-##
-## prog -> obj COLON . obj EOF [ # ]
-##
-## The known suffix of the stack is as follows:
-## obj COLON
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
-
-prog: KIND COLON KIND SUCC
-##
-## Ends in an error in state: 70.
-##
-## prog -> obj COLON obj . EOF [ # ]
-##
-## The known suffix of the stack is as follows:
-## obj COLON obj
-##
-## WARNING: This example involves spurious reductions.
-## This implies that, although the LR(1) items shown above provide an
-## accurate view of the past (what has been recognized so far), they
-## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 31, spurious reduction of production obj -> app_obj
-##
-
-<YOUR SYNTAX ERROR MESSAGE HERE>
+Test Message12
