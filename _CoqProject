@@ -114,8 +114,9 @@ theories/CaseStudies/MiniML/Parser.v
 theories/CaseStudies/MiniML/Entrypoint.v
 
 theories/CaseStudies/LF/Signature.v
-# theories/CaseStudies/LF/Frontend.v
-# theories/CaseStudies/LF/Parser.v
+theories/CaseStudies/LF/Frontend.v
+theories/CaseStudies/LF/Parser.v
+theories/CaseStudies/LF/Entrypoint.v
 
 
 # theories/Instantiations/STLC.v

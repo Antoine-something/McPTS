@@ -1,9 +1,9 @@
 (include_subdirs no)
 
 (library
- (name McptsLib_MiniML)
+ (name McptsLib_LF)
  (modules Main Lexer PrettyPrinter Test)
- (libraries McptsExtracted_MiniML)
+ (libraries McptsExtracted_LF)
  (inline_tests
   (deps
    (glob_files_rec ../examples/*.mctt)))
@@ -11,9 +11,9 @@
   (pps ppx_expect)))
 
 (executable
- (name mcpts_miniml)
+ (name mcpts_lf)
  (modules Mcpts)
- (libraries McptsLib_MiniML))
+ (libraries McptsLib_LF))
 
 (env
  (dev
