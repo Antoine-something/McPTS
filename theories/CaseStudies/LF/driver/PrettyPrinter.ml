@@ -83,7 +83,7 @@ let rec format_obj_prec (p : int) (f : Format.formatter) : Cst.obj -> unit =
      pp_open_hvbox f 2;
      pp_print_paren_if (p >= 1) impl f ();
      pp_close_box f ()
-  | Cst.Coq_fn (px, sort, ep, _, ebody) ->
+  | Cst.Coq_fn (px, sort, ep, b, ebody) ->
      let params, ebody' = get_fn_params_of_obj ebody in
      let impl f () =
        pp_print_string f "fun ";
@@ -96,7 +96,7 @@ let rec format_obj_prec (p : int) (f : Format.formatter) : Cst.obj -> unit =
          then pp_print_space f ()
          else pp_force_newline f ()
        end;
-       fprintf f ": %a -> @[<hov 2>%a@]" format_obj sort format_obj ebody'
+       fprintf f ": %a -> (@[<hov 2>%a@] : %a)" format_obj sort format_obj ebody' format_obj b
      in
      pp_open_hvbox f 2;
      pp_print_paren_if (p >= 1) impl f ();
@@ -131,9 +131,14 @@ let exp_to_obj =
         "A" ^ string_of_int !suffix),
       fun () -> suffix := 0 )
   in
+  let extract_sort (st : Obj.t) : Cst.obj =
+    match (Obj.magic st) with
+    | Coq_s_typ -> Cst.Coq_s_typ
+    | Coq_s_knd  -> Cst.Coq_s_knd
+  in  
   let rec impl (ctx : string list) : exp -> Cst.obj = function
     | Coq_a_var x -> Cst.Coq_var (List.nth ctx x)
-    | Coq_a_st _ -> Cst.Coq_s_knd
+    | Coq_a_st st -> extract_sort st
     | Coq_a_nat -> Cst.Coq_nat
     | Coq_a_zero -> Cst.Coq_zero
     | Coq_a_succ e -> Cst.Coq_succ (impl ctx e)
@@ -146,19 +151,17 @@ let exp_to_obj =
        let ez' = impl ctx ez in
        let es' = impl (sr :: sx :: ctx) es in
        Cst.Coq_natrec (escr', mx, em', ez', sx, sr, es')
-    | Coq_a_pi (_, _, _, _, ep, eret) ->
+    | Coq_a_pi (_, st, _, _, ep, eret) ->
        let px = match ep with Coq_a_st _ -> new_tyvar () | _ -> new_var () in
        let ep' = impl ctx ep in
        let eret' = impl (px :: ctx) eret in
-       let s2' = Cst.Coq_s_typ in
-       Cst.Coq_pi (px, s2', ep', eret')
-    | Coq_a_fn (_, _, _, _, ep, eb, ebody) ->
+       Cst.Coq_pi (px, extract_sort st, ep', eret')
+    | Coq_a_fn (_, st, _, _, ep, eb, ebody) ->
        let px = match ep with Coq_a_st _ -> new_tyvar () | _ -> new_var () in
        let ep' = impl ctx ep in
        let eb' = impl (px :: ctx) eb in
        let ebody' = impl (px :: ctx) ebody in
-       let s2' = Cst.Coq_s_knd in
-       Cst.Coq_fn (px, s2', ep', eb', ebody')
+       Cst.Coq_fn (px, extract_sort st, ep', eb', ebody')
     | Coq_a_app (ef, ea) ->
        let ef' = impl ctx ef in
        let ea' = impl ctx ea in

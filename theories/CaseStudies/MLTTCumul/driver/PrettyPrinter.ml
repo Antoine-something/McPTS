@@ -76,12 +76,12 @@ let rec format_obj_prec (p : int) (f : Format.formatter) : Cst.obj -> unit =
          then pp_print_space f ()
          else pp_force_newline f ()
        end;
-       fprintf f ": Type@ %d -> @[<hov 2>%a@]" i format_obj eret'
+       fprintf f ": Type%@%d -> (@[<hov 2>%a@]" i format_obj eret'
      in
      pp_open_hvbox f 2;
      pp_print_paren_if (p >= 1) impl f ();
      pp_close_box f ()
-  | Cst.Coq_fn (px, i, ep, _, ebody) ->
+  | Cst.Coq_fn (px, i, ep, b, ebody) ->
      let params, ebody' = get_fn_params_of_obj ebody in
      let impl f () =
        pp_print_string f "fun ";
@@ -94,7 +94,7 @@ let rec format_obj_prec (p : int) (f : Format.formatter) : Cst.obj -> unit =
          then pp_print_space f ()
          else pp_force_newline f ()
        end;
-       fprintf f "Type@ %d -> @[<hov 2>%a@]" i format_obj ebody'
+       fprintf f ": Type%@%d -> (@[<hov 2>%a@] : %a)" i format_obj ebody' format_obj b
      in
      pp_open_hvbox f 2;
      pp_print_paren_if (p >= 1) impl f ();
@@ -131,7 +131,7 @@ let exp_to_obj =
   in
   let rec impl (ctx : string list) : exp -> Cst.obj = function
     | Coq_a_var x -> Cst.Coq_var (List.nth ctx x)
-    | Coq_a_st _ -> Cst.Coq_s_univ 0
+    | Coq_a_st st -> Cst.Coq_s_univ (Obj.magic st : int)
     | Coq_a_nat -> Cst.Coq_nat
     | Coq_a_zero -> Cst.Coq_zero
     | Coq_a_succ e -> Cst.Coq_succ (impl ctx e)
@@ -144,17 +144,17 @@ let exp_to_obj =
        let ez' = impl ctx ez in
        let es' = impl (sr :: sx :: ctx) es in
        Cst.Coq_natrec (escr', mx, em', ez', sx, sr, es')
-    | Coq_a_pi (_, _, _, _, ep, eret) ->
+    | Coq_a_pi (_, st, _, _, ep, eret) ->
        let px = match ep with Coq_a_st _ -> new_tyvar () | _ -> new_var () in
        let ep' = impl ctx ep in
        let eret' = impl (px :: ctx) eret in
-       Cst.Coq_pi (px, 0, ep', eret')
-    | Coq_a_fn (_, _, _, _, ep, eb, ebody) ->
+       Cst.Coq_pi (px, (Obj.magic st : int), ep', eret')
+    | Coq_a_fn (_, st, _, _, ep, eb, ebody) ->
        let px = match ep with Coq_a_st _ -> new_tyvar () | _ -> new_var () in
        let ep' = impl ctx ep in
        let eb' = impl (px :: ctx) eb in
        let ebody' = impl (px :: ctx) ebody in
-       Cst.Coq_fn (px, 0, ep', eb', ebody')
+       Cst.Coq_fn (px, (Obj.magic st : int), ep', eb', ebody')
     | Coq_a_app (ef, ea) ->
        let ef' = impl ctx ef in
        let ea' = impl ctx ea in

@@ -69,7 +69,7 @@ let message =
     | 16 ->
         "Expected symbol '->'\n"
     | 15 ->
-        "A parenthesized paremeter is expect.\nFor example,\n  \"(x : Nat)\" in \"fun (x : Nat) -> (x : Nat)\"\n"
+        "A parenthesized paremeter is expected.\nFor example,\n  \"(x : Nat)\" in \"fun (x : Nat) -> (x : Nat)\"\n"
     | 14 ->
         "Expected annotated expression in body of 'let'-expression\n"
     | 13 ->

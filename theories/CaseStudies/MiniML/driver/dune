@@ -7,7 +7,7 @@
  (libraries McptsExtracted_MiniML)
  (inline_tests
   (deps
-   (glob_files_rec ../examples/*.mctt)))
+   (glob_files_rec ../examples/*.mcpts)))
  (preprocess
   (pps ppx_expect)))
 
