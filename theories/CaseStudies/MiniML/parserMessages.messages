@@ -146,7 +146,7 @@ prog: LAMBDA ZERO
 ## LAMBDA
 ##
 
-A parenthesized paremeter is expect.
+A parenthesized paremeter is expected.
 For example,
   "(x : Nat)" in "fun (x : Nat) -> (x : Nat)"
 
