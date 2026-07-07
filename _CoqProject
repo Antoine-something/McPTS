@@ -118,6 +118,10 @@ theories/CaseStudies/LF/Frontend.v
 theories/CaseStudies/LF/Parser.v
 theories/CaseStudies/LF/Entrypoint.v
 
+theories/CaseStudies/MLTTCumul/Signature.v
+theories/CaseStudies/MLTTCumul/Frontend.v
+theories/CaseStudies/MLTTCumul/Parser.v
+theories/CaseStudies/MLTTCumul/Entrypoint.v
 
 # theories/Instantiations/STLC.v
 # theories/Instantiations/LF.v

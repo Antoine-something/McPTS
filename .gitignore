@@ -58,3 +58,7 @@ dep.html
 # Others
 *.sh
 notes.txt
+
+# Extracted files
+theories/**/driver/extracted/*.ml
+theories/**/driver/extracted/*.mli

@@ -1,0 +1,27 @@
+(include_subdirs no)
+
+(library
+ (name McptsLib_MLTTCumul)
+ (public_name mcpts.driver_mlttcumul)
+ (modules Main Lexer PrettyPrinter Test)
+ (libraries McptsExtracted_MLTTCumul)
+ (inline_tests
+  (deps
+   (glob_files_rec ../examples/*.mctt)))
+ (preprocess
+  (pps ppx_expect)))
+
+(executable
+ (name mcpts_mlttcumul)
+ (public_name mcpts_mlttcumul)
+ (modules Mcpts_mlttcumul)
+ (libraries McptsLib_MLTTCumul))
+
+(env
+ (dev
+  (flags
+   (:standard -w -67 -w -32 -w -33 -w -39))))
+
+(ocamllex Lexer)
+
+(documentation)
