@@ -1,8 +1,9 @@
-open McptsExtracted.Entrypoint
-open McptsExtracted.Syntax
-open McptsExtracted.Frontend
-module Parser = McptsExtracted.Parser
-module ParserMessages = McptsExtracted.ParserMessages
+open McptsExtracted_LF.Entrypoint
+open McptsExtracted_LF.Syntax
+open McptsExtracted_LF.Frontend
+open McptsExtracted_LF.Signature
+module Parser = McptsExtracted_LF.Parser
+module ParserMessages = McptsExtracted_LF.ParserMessages
 
 (************************************************************)
 (* Formatting helpers *)
@@ -27,14 +28,14 @@ let rec get_nat_of_obj : Cst.obj -> int option = function
 
 let rec get_fn_params_of_obj : Cst.obj -> (string * Cst.obj) list * Cst.obj =
   function
-  | Cst.Coq_fn (px, ep, _, ebody) ->
+  | Cst.Coq_fn (px, _, ep, _, ebody) ->
      let params, ebody' = get_fn_params_of_obj ebody in
      ((px, ep) :: params, ebody')
   | ebody -> ([], ebody)
 
 let rec get_pi_params_of_obj : Cst.obj -> (string * Cst.obj) list * Cst.obj =
   function
-  | Cst.Coq_pi (px, ep, eret) ->
+  | Cst.Coq_pi (px, _, ep, eret) ->
      let params, eret' = get_pi_params_of_obj eret in
      ((px, ep) :: params, eret')
   | eret -> ([], eret)
@@ -43,7 +44,8 @@ let rec format_obj_prec (p : int) (f : Format.formatter) : Cst.obj -> unit =
   let open Format in
   function
   | Cst.Coq_var x -> pp_print_string f x
-  | Cst.Coq_st -> fprintf f "Type"
+  | Cst.Coq_s_typ -> fprintf f "Type"
+  | Cst.Coq_s_knd -> fprintf f "Kind"
   | Cst.Coq_nat -> fprintf f "Nat"
   | Cst.Coq_zero -> fprintf f "0"
   | Cst.Coq_succ e -> begin
@@ -63,7 +65,7 @@ let rec format_obj_prec (p : int) (f : Format.formatter) : Cst.obj -> unit =
          format_obj escr mx format_obj em format_obj ez sx sr format_obj es
      in
      pp_print_paren_if (p >= 1) impl f ()
-  | Cst.Coq_pi (px, ep, eret) ->
+  | Cst.Coq_pi (px, sort, ep, eret) ->
      let params, eret' = get_pi_params_of_obj eret in
      let impl f () =
        pp_print_string f "forall ";
@@ -76,12 +78,12 @@ let rec format_obj_prec (p : int) (f : Format.formatter) : Cst.obj -> unit =
          then pp_print_space f ()
          else pp_force_newline f ()
        end;
-       fprintf f "-> @[<hov 2>%a@]" format_obj eret'
+       fprintf f ": %a -> @[<hov 2>%a@]" format_obj sort format_obj eret'
      in
      pp_open_hvbox f 2;
      pp_print_paren_if (p >= 1) impl f ();
      pp_close_box f ()
-  | Cst.Coq_fn (px, ep, _, ebody) ->
+  | Cst.Coq_fn (px, sort, ep, _, ebody) ->
      let params, ebody' = get_fn_params_of_obj ebody in
      let impl f () =
        pp_print_string f "fun ";
@@ -94,7 +96,7 @@ let rec format_obj_prec (p : int) (f : Format.formatter) : Cst.obj -> unit =
          then pp_print_space f ()
          else pp_force_newline f ()
        end;
-       fprintf f "-> @[<hov 2>%a@]" format_obj ebody'
+       fprintf f ": %a -> @[<hov 2>%a@]" format_obj sort format_obj ebody'
      in
      pp_open_hvbox f 2;
      pp_print_paren_if (p >= 1) impl f ();
@@ -131,7 +133,7 @@ let exp_to_obj =
   in
   let rec impl (ctx : string list) : exp -> Cst.obj = function
     | Coq_a_var x -> Cst.Coq_var (List.nth ctx x)
-    | Coq_a_st _ -> Cst.Coq_st
+    | Coq_a_st _ -> Cst.Coq_s_knd
     | Coq_a_nat -> Cst.Coq_nat
     | Coq_a_zero -> Cst.Coq_zero
     | Coq_a_succ e -> Cst.Coq_succ (impl ctx e)
@@ -148,13 +150,15 @@ let exp_to_obj =
        let px = match ep with Coq_a_st _ -> new_tyvar () | _ -> new_var () in
        let ep' = impl ctx ep in
        let eret' = impl (px :: ctx) eret in
-       Cst.Coq_pi (px, ep', eret')
+       let s2' = Cst.Coq_s_typ in
+       Cst.Coq_pi (px, s2', ep', eret')
     | Coq_a_fn (_, _, _, _, ep, eb, ebody) ->
        let px = match ep with Coq_a_st _ -> new_tyvar () | _ -> new_var () in
        let ep' = impl ctx ep in
        let eb' = impl (px :: ctx) eb in
        let ebody' = impl (px :: ctx) ebody in
-       Cst.Coq_fn (px, ep', eb', ebody')
+       let s2' = Cst.Coq_s_knd in
+       Cst.Coq_fn (px, s2', ep', eb', ebody')
     | Coq_a_app (ef, ea) ->
        let ef' = impl ctx ef in
        let ea' = impl ctx ea in
@@ -172,7 +176,7 @@ let format_exp f exp = format_obj f (exp_to_obj exp)
 (* Formatting nf *)
 (************************************************************)
 
-let format_nf f nf = format_exp f (nf_to_exp McptsExtracted.Signature.coq_MiniML_Sig nf)
+let format_nf f nf = format_exp f (nf_to_exp McptsExtracted_LF.Signature.coq_LF_Sig nf)
 
 (************************************************************)
 (* Formatting main_result *)

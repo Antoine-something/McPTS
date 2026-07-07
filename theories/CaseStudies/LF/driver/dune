@@ -2,6 +2,7 @@
 
 (library
  (name McptsLib_LF)
+ (public_name mcpts.driver_lf)
  (modules Main Lexer PrettyPrinter Test)
  (libraries McptsExtracted_LF)
  (inline_tests
@@ -12,7 +13,8 @@
 
 (executable
  (name mcpts_lf)
- (modules Mcpts)
+ (public_name mcpts_lf)
+ (modules Mcpts_lf)
  (libraries McptsLib_LF))
 
 (env

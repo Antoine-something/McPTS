@@ -1,7 +1,7 @@
 (* Unit test cases for parsing *)
 
 open Main
-open McptsExtracted.Entrypoint
+open McptsExtracted_LF.Entrypoint
 
 (** Helper definitions *)
 

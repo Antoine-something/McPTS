@@ -1,5 +1,5 @@
-module Parser = McptsExtracted.Parser
-module Entrypoint = McptsExtracted.Entrypoint
+module Parser = McptsExtracted_MiniML.Parser
+module Entrypoint = McptsExtracted_MiniML.Entrypoint
 open Parser
 open MenhirLibParser.Inter
 open Entrypoint

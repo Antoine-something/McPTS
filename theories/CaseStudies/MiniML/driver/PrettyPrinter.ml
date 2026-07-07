@@ -1,8 +1,8 @@
-open McptsExtracted.Entrypoint
-open McptsExtracted.Syntax
-open McptsExtracted.Frontend
-module Parser = McptsExtracted.Parser
-module ParserMessages = McptsExtracted.ParserMessages
+open McptsExtracted_MiniML.Entrypoint
+open McptsExtracted_MiniML.Syntax
+open McptsExtracted_MiniML.Frontend
+module Parser = McptsExtracted_MiniML.Parser
+module ParserMessages = McptsExtracted_MiniML.ParserMessages
 
 (************************************************************)
 (* Formatting helpers *)
@@ -172,7 +172,7 @@ let format_exp f exp = format_obj f (exp_to_obj exp)
 (* Formatting nf *)
 (************************************************************)
 
-let format_nf f nf = format_exp f (nf_to_exp McptsExtracted.Signature.coq_MiniML_Sig nf)
+let format_nf f nf = format_exp f (nf_to_exp McptsExtracted_MiniML.Signature.coq_MiniML_Sig nf)
 
 (************************************************************)
 (* Formatting main_result *)

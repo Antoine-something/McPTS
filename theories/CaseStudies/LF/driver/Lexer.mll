@@ -1,6 +1,6 @@
 {
   open Lexing
-  open McptsExtracted.Parser
+  open McptsExtracted_LF.Parser
 
   let get_range lexbuf = (lexbuf.lex_start_p, lexbuf.lex_curr_p)
 

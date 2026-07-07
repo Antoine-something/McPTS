@@ -27,8 +27,8 @@ export COQDOCFLAGS
 DOC_BASE ?= ""
 
 post-all:: $(COQPARSERFILE) $(PARSERMESSAGEEXTRACTIONFILE) check_parserMessages
-	@echo "Separate Extraction main." | $(COQTOP) $(COQFLAGS) $(COQLIBS) -topfile Entrypoint.v -l Entrypoint.v
-
+	@echo "Separate Extraction main." | $(COQTOP) $(COQFLAGS) $(COQLIBS) -topfile $(CASESTUDYDIRECTORY)/Entrypoint.v -l $(CASESTUDYDIRECTORY)/Entrypoint.v
+	dune build
 $(COQPARSERFILE): %.v : %.vy
 	@echo "MENHIR $?"
 	@$(MENHIR) --coq "$?"
