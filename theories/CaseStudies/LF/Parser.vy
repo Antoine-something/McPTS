@@ -11,8 +11,7 @@ Arguments eq_refl {_} _.
 %}
 
 %token <loc*string> VAR
-%token <loc*nat> INT
-%token <loc> LAMBDA PI TYPE KIND LET IN DEF_TYPE DEF_EXP (* keywords *)
+%token <loc> LAMBDA PI TYPE KIND LET DEF_TYPE DEF_EXP (* keywords *)
 %token <loc> ARROW "->" COLON ":" LPAREN "(" RPAREN ")" DOT "." COLONEQ ":=" EOF (* symbols *)
 
 %start <Cst.obj * Cst.obj> prog

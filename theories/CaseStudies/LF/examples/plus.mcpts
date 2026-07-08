@@ -1,8 +1,7 @@
 def@type (nat : type).
 def@exp (z : nat).
-def@exp (N : nat).
 def@exp (s : forall (n : nat) : type -> nat).
 def@type (plus : forall (m : nat) (n : nat) (p : nat) : kind -> type).
 def@exp (p_z : forall (N : nat) : type -> plus z N N).
 def@exp (p_s : forall (N1 : nat) (N2 : nat) (N3 : nat) (p1 : plus N1 N2 N3) : type -> plus (s N1) N2 (s N3)).
-let (p_sz_n_sn : plus (s z) N (s N)) := p_s z N N (p_z N).
+let (p_sz_n_sn : forall (N : nat) : type -> plus (s z) N (s N)) := fun (N : nat) : type -> (p_s z N N (p_z N) : plus (s z) N (s N)).
