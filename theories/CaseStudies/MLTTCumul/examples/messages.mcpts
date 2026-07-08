@@ -1,1 +1,0 @@
-(fun (x : Nat) : Type@0 -> (x : Nat)) : (forall (x : Nat) : Type@0 -> )

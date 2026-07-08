@@ -11,7 +11,39 @@ let ((Nary : forall (n : Nat) : Type@1 -> Type@0) :=
      (
        fun (f : Nat) : Type@0 -> (f : Nat)
      )) 
+
+     ((appNary : forall (n : Nat) (f : Nary (succ n)) (arg : Nat) : Type@0 -> Nary n) :=
+     (
+       fun (n : Nat)
+           (f : rec succ n return y . Type@0
+                | zero => Nat
+            | succ m, r => forall (a : Nat) : Type@0 -> r
+            end)
+           (arg : Nat)
+           : Type@0
+         -> (f arg : rec n return y . Type@0 | zero => Nat | succ m, r => forall (a : Nat) : Type@0 -> r end)
+     ))
+
+     ((n : Nat) := 3)
+
+     ((f : Nary n) :=
+     (
+       let ((add : forall (a : Nat) (b : Nat) : Type@0 -> Nat) :=
+            (fun (a : Nat)
+                 (b : Nat)
+                 : Type@0 
+               -> (rec a return y . Nat
+                  | zero => b
+                  | succ m, r => succ r
+                  end : Nat)
+       )) : Type@0
+       in
+       (fun (a : Nat) (b : Nat) (c : Nat) : Type@0 -> (add a (add b c) : Nat) : forall (a : Nat) (b : Nat) (c : Nat) : Type@0 -> Nat)
+     )) : Type@1
      
-     : Type@1
+     in 
      
-     in (zero : Nat) : Nat
+     (((rec n return y . (forall (g : Nary y) : Type@0 -> Nat)
+       | zero => toNat
+       | succ m, r => fun (g : Nary (succ m)) : Type@0 -> (r (appNary m g (succ m)) : Nat)
+       end) f) : Nat) : Nat
