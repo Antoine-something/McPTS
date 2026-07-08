@@ -1,0 +1,4 @@
+def@type (exp : type).
+def@exp (b : exp).
+def@exp (let_hoas : forall (e : exp) (f : forall (e2 : exp) : type -> exp) : type -> exp).
+let (e : exp) := let_hoas b (fun (x : exp) : type -> (x : exp)).

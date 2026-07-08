@@ -21,48 +21,31 @@
   let token_to_string : token -> string =
     function
     | ARROW _ -> "->"
-    | BAR _ -> "|"
     | COLON _ -> ":"
-    | COMMA _ -> ","
-    | DARROW _ -> "=>"
     | LPAREN _ -> "("
     | RPAREN _ -> ")"
-    | ZERO _ -> "zero"
-    | SUCC _ -> "succ"
-    | REC _ -> "rec"
-    | RETURN _ -> "return"
-    | END _ -> "end"
     | LAMBDA _ -> "fun"
     | PI _ -> "forall"
-    | NAT _ -> "Nat"
     | INT (_, i) -> string_of_int i
-    | TYPE _ -> "Type"
-    | KIND _ -> "Kind"
+    | TYPE _ -> "type"
+    | KIND _ -> "kind"
     | VAR (_, s) -> s
     | EOF _ -> "<EOF>"
     | DOT _ -> "."
     | LET _ -> "let"
     | IN _ -> "in"
-    | DEF _ -> ":="
-    | ASSIGN _ -> "assign"
+    | COLONEQ _ -> ":="
+    | DEF_TYPE _ -> "def@type"
+    | DEF_EXP _ -> "def@exp"
       
   let get_range_of_token : token -> (position * position) =
     function
     | ARROW r
-    | BAR r
     | COLON r
-    | COMMA r
-    | DARROW r
     | LPAREN r
     | RPAREN r
-    | ZERO r
-    | SUCC r
-    | REC r
-    | RETURN r
-    | END r
     | LAMBDA r
     | PI r
-    | NAT r
     | TYPE r
     | KIND r
     | EOF r
@@ -70,8 +53,9 @@
     | DOT r
     | LET r
     | IN r
-    | DEF r
-    | ASSIGN r
+    | COLONEQ r
+    | DEF_TYPE r
+    | DEF_EXP r
     | VAR (r, _) -> r
     
 
@@ -88,32 +72,24 @@ let ident = ['a'-'z''A'-'Z''_']['a'-'z''A'-'Z''0'-'9''_']*
 rule read =
   parse
   | "->" { ARROW (get_range lexbuf) }
-  | '|' { BAR (get_range lexbuf) }
   | ':' { COLON (get_range lexbuf) }
-  | ',' { COMMA (get_range lexbuf) }
-  | "=>" { DARROW (get_range lexbuf) }
   | "(*" { comment lexbuf }
   | '(' { LPAREN (get_range lexbuf) }
   | ')' { RPAREN (get_range lexbuf) }
-  | "zero" { ZERO (get_range lexbuf) }
-  | "succ" { SUCC (get_range lexbuf) }
-  | "rec" { REC (get_range lexbuf) }
-  | "return" { RETURN (get_range lexbuf) }
-  | "end" { END (get_range lexbuf) }
   | "fun" { LAMBDA (get_range lexbuf) }
   | "forall" { PI (get_range lexbuf) }
   | [' ' '\t'] { read lexbuf }
   | ['\n'] { new_line lexbuf; read lexbuf }
-  | "Nat" { NAT (get_range lexbuf) }
   | ['0'-'9']+ as lxm { INT (get_range lexbuf, int_of_string lxm) }
-  | "Type" { TYPE (get_range lexbuf) }
-  | "Kind" { KIND (get_range lexbuf) }
+  | "type" { TYPE (get_range lexbuf) }
+  | "kind" { KIND (get_range lexbuf) }
   | eof { EOF (get_range lexbuf) }
   | "." { DOT (get_range lexbuf) }
   | "let" {LET (get_range lexbuf) }
   | "in" {IN (get_range lexbuf) }
-  | ":=" {DEF (get_range lexbuf) }
-  | "assign" {ASSIGN (get_range lexbuf) }
+  | ":=" {COLONEQ (get_range lexbuf) }
+  | "def@type" {DEF_TYPE (get_range lexbuf) }
+  | "def@exp" {DEF_EXP (get_range lexbuf) }
   | ident { VAR (get_range lexbuf, Lexing.lexeme lexbuf) }
   | _ as c { failwith (Format.asprintf "@[<v 2>Lexer error:@ @[<v 2>Unexpected character %C@ at %a@]@]@." c format_position lexbuf.lex_start_p) }
 and comment =
