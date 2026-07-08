@@ -76,7 +76,7 @@ let rec format_obj_prec (p : int) (f : Format.formatter) : Cst.obj -> unit =
          then pp_print_space f ()
          else pp_force_newline f ()
        end;
-       fprintf f ": Type%@%d -> (@[<hov 2>%a@]" i format_obj eret'
+       fprintf f ": Type%@%d -> @[<hov 2>%a@]" i format_obj eret'
      in
      pp_open_hvbox f 2;
      pp_print_paren_if (p >= 1) impl f ();

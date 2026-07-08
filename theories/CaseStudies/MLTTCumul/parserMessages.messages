@@ -122,8 +122,7 @@ prog: LET LPAREN VAR COLON INT RPAREN ZERO
 ## param
 ##
 
-Expected a value for the variable
-
+Expected annotation for let definition
 
 prog: LAMBDA ZERO
 ##

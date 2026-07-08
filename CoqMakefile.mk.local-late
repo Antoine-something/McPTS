@@ -3,7 +3,7 @@ space := $(empty) $(empty)
 
 MENHIR := menhir
 
-CASESTUDYDIRECTORY := theories/CaseStudies/LF
+CASESTUDYDIRECTORY := theories/CaseStudies/MLTTCumul
 
 PARSERMESSAGEBASE := parserMessages.messages
 FRONTENDDIR := Frontend
