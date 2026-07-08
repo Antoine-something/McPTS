@@ -26,7 +26,6 @@ Arguments eq_refl {_} _.
 %%
 
 let prog :=
-  | exp = obj; ":"; ty = obj; EOF; <>
   | ~ = define_defns; EOF; { (define_defns, Cst.s_knd) }
   
 

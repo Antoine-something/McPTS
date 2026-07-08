@@ -20,7 +20,7 @@ prog: SUCC SUCC
 ## SUCC
 ##
 
-Expected an expression after 'succ'
+Expected an expression after 'succ'.
 
 prog: LPAREN RPAREN
 ##
@@ -110,7 +110,7 @@ prog: LET ZERO
 ## LET
 ##
 
-A variable binding is expected after a "let"
+A variable binding is expected after a "let".
 
 
 prog: LAMBDA ZERO
@@ -138,7 +138,7 @@ prog: LAMBDA LPAREN VAR COLON INT RPAREN ZERO
 ## LAMBDA params
 ##
 
-Expected symbol ':'
+Expected symbol ':'.
 
 
 prog: LAMBDA LPAREN VAR COLON INT SUCC
@@ -157,7 +157,7 @@ prog: LAMBDA LPAREN VAR COLON INT SUCC
 ## In state 31, spurious reduction of production obj -> app_obj
 ##
 
-Ill-formed type in parameter of a function
+Ill-formed type in parameter of a function.
 
 prog: PI LPAREN VAR COLON INT RPAREN ZERO
 ##
@@ -170,7 +170,7 @@ prog: PI LPAREN VAR COLON INT RPAREN ZERO
 ## PI params
 ##
 
-Expected symbol ':'
+Expected symbol ':'.
 
 
 prog: REC INT SUCC
@@ -202,7 +202,7 @@ prog: REC INT RETURN ZERO
 ## REC obj RETURN
 ##
 
-Expected a variable name after "return" keyword
+Expected a variable name after "return" keyword.
 
 prog: REC INT RETURN VAR ZERO
 ##
@@ -226,7 +226,7 @@ prog: REC INT RETURN VAR DOT RPAREN
 ## REC obj RETURN VAR DOT
 ##
 
-Expected expression after "."
+Expected expression after ".".
 This token is invalid for the beginning of an expression.
 
 prog: REC INT RETURN VAR DOT INT SUCC
@@ -245,7 +245,7 @@ prog: REC INT RETURN VAR DOT INT SUCC
 ## In state 31, spurious reduction of production obj -> app_obj
 ##
 
-Expected token "|"
+Expected token "|".
 
 prog: REC INT RETURN VAR DOT INT BAR VAR
 ##
@@ -257,7 +257,7 @@ prog: REC INT RETURN VAR DOT INT BAR VAR
 ## REC obj RETURN VAR DOT obj BAR
 ##
 
-Expected token "zero"
+Expected token "zero".
 
 prog: REC INT RETURN VAR DOT INT BAR ZERO ZERO
 ##
@@ -269,7 +269,7 @@ prog: REC INT RETURN VAR DOT INT BAR ZERO ZERO
 ## REC obj RETURN VAR DOT obj BAR ZERO
 ##
 
-Expected symbol "=>" in the "zero" branch
+Expected symbol "=>" in the "zero" branch.
 
 prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW RPAREN
 ##
@@ -301,7 +301,7 @@ prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT SUCC
 ## In state 31, spurious reduction of production obj -> app_obj
 ##
 
-Expected token "|" at the start of successor branch
+Expected token "|" at the start of successor branch.
 
 prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT BAR ZERO
 ##
@@ -313,7 +313,7 @@ prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT BAR ZERO
 ## REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR
 ##
 
-Expected token "succ" in the successor branch
+Expected token "succ" in the successor branch.
 
 prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT BAR SUCC ZERO
 ##
@@ -325,7 +325,7 @@ prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT BAR SUCC ZERO
 ## REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC
 ##
 
-Expected variable binding after "succ"
+Expected variable binding after "succ".
 
 prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT BAR SUCC VAR ZERO
 ##
@@ -337,7 +337,7 @@ prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT BAR SUCC VAR ZERO
 ## REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR
 ##
 
-Expected token "," after variable name
+Expected token "," after variable name.
 
 prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT BAR SUCC VAR COMMA ZERO
 ##
@@ -349,7 +349,7 @@ prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT BAR SUCC VAR COMMA ZERO
 ## REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR COMMA
 ##
 
-Expected variable name after token ","
+Expected variable name after token ",".
 
 prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT BAR SUCC VAR COMMA VAR ZERO
 ##
@@ -361,7 +361,7 @@ prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT BAR SUCC VAR COMMA VAR ZERO
 ## REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR COMMA VAR
 ##
 
-Expected token "=>" after variable name in successor branch
+Expected token "=>" after variable name in successor branch.
 
 prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT BAR SUCC VAR COMMA VAR DARROW RPAREN
 ##
@@ -373,7 +373,7 @@ prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT BAR SUCC VAR COMMA VAR DARR
 ## REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR COMMA VAR DARROW
 ##
 
-Expected expression in the successor branch
+Expected expression in the successor branch.
 
 prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT BAR SUCC VAR COMMA VAR DARROW INT SUCC
 ##
@@ -391,7 +391,7 @@ prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT BAR SUCC VAR COMMA VAR DARR
 ## In state 31, spurious reduction of production obj -> app_obj
 ##
 
-Expected token "end" after successor branch
+Expected token "end" after successor branch.
 
 prog: LPAREN INT SUCC
 ##
@@ -460,7 +460,7 @@ prog: INT COLON INT SUCC
 ## In state 31, spurious reduction of production obj -> app_obj
 ##
 
-Expected token "EOF"
+Expected token "EOF".
 
 prog: TYPE ZERO
 ##
@@ -523,7 +523,7 @@ prog: LAMBDA LPAREN VAR COLON INT RPAREN COLON TYPE AT INT ARROW ZERO
 ## LAMBDA params COLON level ARROW
 ##
 
-Expected annotated expression in body of a function
+Expected annotated expression "(?exp, ?type)" in body of a function.
 
 prog: LAMBDA LPAREN VAR COLON INT RPAREN COLON TYPE AT INT ARROW LPAREN RPAREN
 ##
@@ -535,8 +535,8 @@ prog: LAMBDA LPAREN VAR COLON INT RPAREN COLON TYPE AT INT ARROW LPAREN RPAREN
 ## LPAREN
 ##
 
-Expected annotated expression in body of a function.
-"()" is not a valid a function body
+Expected annotated expression "(?exp, ?type)" in body of a function.
+"()" is not a valid a function body.
 
 prog: LAMBDA LPAREN VAR COLON INT RPAREN COLON TYPE AT INT ARROW LPAREN INT SUCC
 ##
@@ -554,7 +554,7 @@ prog: LAMBDA LPAREN VAR COLON INT RPAREN COLON TYPE AT INT ARROW LPAREN INT SUCC
 ## In state 31, spurious reduction of production obj -> app_obj
 ##
 
-Expected annotated expression in body of a function
+Expected annotated expression "(?exp, ?type)" in body of a function.
 
 prog: LAMBDA LPAREN VAR COLON INT RPAREN COLON TYPE AT INT ARROW LPAREN INT COLON RPAREN
 ##
@@ -566,7 +566,7 @@ prog: LAMBDA LPAREN VAR COLON INT RPAREN COLON TYPE AT INT ARROW LPAREN INT COLO
 ## LPAREN obj COLON
 ##
 
-Expected type annotation "?type" in body of a function
+Expected type annotation "?type" in body of a function.
 
 prog: LAMBDA LPAREN VAR COLON INT RPAREN COLON TYPE AT INT ARROW LPAREN INT COLON INT SUCC
 ##
@@ -584,7 +584,7 @@ prog: LAMBDA LPAREN VAR COLON INT RPAREN COLON TYPE AT INT ARROW LPAREN INT COLO
 ## In state 31, spurious reduction of production obj -> app_obj
 ##
 
-Ill-formed type annotation in body of a function
+Ill-formed type annotation in body of a function.
 
 
 
@@ -610,7 +610,7 @@ prog: PI LPAREN VAR COLON INT RPAREN COLON TYPE AT INT ZERO
 ## PI params COLON level
 ##
 
-Expected symbol "->"
+Expected symbol "->".
 
 prog: PI LPAREN VAR COLON INT RPAREN COLON TYPE AT INT ARROW RPAREN
 ##
@@ -690,7 +690,7 @@ prog: LET LPAREN LPAREN VAR COLON INT RPAREN DEF INT RPAREN ZERO
 ## LET let_defns
 ##
 
-Expected ":"
+Expected ":".
 
 prog: LET LPAREN LPAREN VAR COLON INT RPAREN DEF INT RPAREN COLON ZERO
 ##
@@ -726,4 +726,4 @@ prog: LET LPAREN LPAREN VAR COLON INT RPAREN DEF INT RPAREN COLON TYPE AT INT IN
 ## LET let_defns COLON level IN
 ##
 
-Expected annotated expression in body of a let definition
+Expected annotated expression "(?exp, ?type)" in body of a let definition.
