@@ -1,1 +1,1 @@
-let (x : Nat) : Type@0 := zero in (succ x : Nat) : Nat
+let ((x : Type@0) := Nat) ((y : Nat) := zero) : Type@1  in (succ y : Nat) : Nat

@@ -1,12 +1,17 @@
-let (Nary : forall (n : Nat) : Type@1 -> Type@0) : Type@1 := (
-  fun (n : Nat) : Type@1 -> (
-    rec n return y . Type@0
-    | zero => Nat
-    | succ m, r => forall (a : Nat) : Type@0 -> r
-    end : Type@0
-  )
-) in (
-  let (toNat : forall (f : Nat) : Type@0 -> Nat) : Type@0 := (
-    fun (f : Nat) : Type@0 -> (f : Nat)
-  ) in (zero : Nat) : Nat
-) : Nat
+let ((Nary : forall (n : Nat) : Type@1 -> Type@0) :=
+     (
+       fun (n : Nat) : Type@1
+         -> (rec n return y . Type@0
+            | zero => Nat
+            | succ m, r => forall (a : Nat) : Type@0 -> r
+            end : Type@0)
+     ))
+
+    ((toNat : forall (f : Nary 0) : Type@0 -> Nat) :=
+     (
+       fun (f : Nat) : Type@0 -> (f : Nat)
+     )) 
+     
+     : Type@1
+     
+     in (zero : Nat) : Nat

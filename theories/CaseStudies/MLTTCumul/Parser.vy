@@ -21,7 +21,8 @@ Arguments eq_refl {_} _.
 %type <Cst.obj * Cst.obj> ann_obj
 %type <string * Cst.obj> param
 %type <list (string * Cst.obj)> params
-%type <((string * Cst.obj) * Cst.obj) * nat> let_defn
+%type <list ((string * Cst.obj) * Cst.obj)> let_defns
+%type <((string * Cst.obj) * Cst.obj)> let_defn
 
 %on_error_reduce obj params app_obj atomic_obj level
 
@@ -32,7 +33,15 @@ let prog :=
 
 let obj :=
   | PI; ~ = params; ":"; n = level; "->"; ~ = obj; { List.fold_left (fun acc arg => Cst.pi (fst arg) n (snd arg) acc) params obj }
-  | LAMBDA; ~ = param; ":"; n = level; "->"; ~ = ann_obj; { Cst.fn (fst param) n (snd param) (snd ann_obj) (fst ann_obj) }
+  | LAMBDA; ~ = params; ":"; n = level; "->"; ~ = ann_obj; { 
+    fst (
+      List.fold_left (
+        fun acc arg => (
+          Cst.fn (fst arg) n (snd arg) (snd acc) (fst acc),
+          Cst.pi (fst arg) n (snd arg) (snd acc) 
+        ) 
+      ) params ann_obj
+    )}
   | ~ = app_obj; <>
   | REC; escr = obj; RETURN; mx = VAR; "."; em = obj;
     "|"; ZERO; "=>"; ez = obj;
@@ -40,8 +49,20 @@ let obj :=
     END; { Cst.natrec escr (snd mx) em ez (snd sx) (snd sr) es }
 
   | SUCC; ~ = atomic_obj; { Cst.succ atomic_obj }
-
-  | LET; ds = let_defn; IN; body = ann_obj; {Cst.app (Cst.fn (fst (fst (fst ds))) (snd ds) (snd (fst (fst ds))) (snd body) (fst body)) (snd (fst ds)) }
+  | LET; ds = let_defns; ":"; n = level; IN; body = ann_obj; { 
+    List.fold_left (fun acc arg => Cst.app acc (snd arg)) 
+    (List.rev ds) 
+    (
+      fst (
+        List.fold_left (
+          fun acc arg => (
+            Cst.fn (fst (fst arg)) n (snd (fst arg)) (snd acc) (fst acc),
+            Cst.pi (fst (fst arg)) n (snd (fst arg)) (snd acc) 
+          ) 
+        ) ds body
+      )
+    ) 
+  }
 
 let level :=
   | TYPE; "@"; n = INT; { snd n }
@@ -73,9 +94,14 @@ let param :=
 let ann_obj :=
   | "("; exp = obj; ":"; ann = obj; ")"; { (exp, ann) }
 
-(* (x : A) : s := t *)
+(* Reversed nonempty list of definitions *)
+let let_defns :=
+  | ~ = let_defns; ~ = let_defn; { let_defn :: let_defns }
+  | ~ = let_defn; { [let_defn] }
+
+(* (x : A) := t *)
 let let_defn :=
-  | ~ = param; ":"; n = level; ":="; ~ = obj; { ((param, obj), n) }
+  | "("; ~ = param; ":="; ~ = obj; ")"; { (param, obj) }
 %%
 
 Extract Constant loc => "Lexing.position * Lexing.position".
