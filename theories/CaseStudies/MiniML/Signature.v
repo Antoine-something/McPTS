@@ -77,18 +77,14 @@ Section MiniMLFunctional.
 End MiniMLFunctional.
 
 Section MiniMLDecidable.
-  Lemma MiniML_dec_st : forall (s s' : P), ({s = s'} + {s <> s'})%type.
+  Lemma MiniML_dec_st_eq : forall (s s' : P), ({s = s'} + {s <> s'})%type.
   Proof.
     intros [] []; left; reflexivity.
   Qed.
 
-  Lemma MiniML_dec_ru_pi: forall (s1 s2 s3 : P) (r : Ru_pi P s1 s2 s3) (r' : Ru_pi P s1 s2 s3),
-      ( { r = r'} + {r <> r'} )%type.
+  Lemma MiniML_dec_ax_typ : forall (s : P), ( {s' & Ax_typ P s s'} + {forall s', ~Ax_typ P s s'} )%type.
   Proof.
-    simpl.
-    intros s1 s2 s3 [] r'.
-    dependent destruction r'.
-    left; reflexivity.
+    right; inversion 1.
   Qed.
 
   Lemma MiniML_dec_st_sub : forall (s s' : P), ({st_subtyp s s'} + {~ st_subtyp s s'})%type.
@@ -97,16 +93,25 @@ Section MiniMLDecidable.
     left; reflexivity.
   Qed.
 
+  Lemma MiniML_dec_ru_pi : forall (s1 s2 : P), ({s3 & Ru_pi P s1 s2 s3} + {forall s3, Ru_pi P s1 s2 s3 -> False})%type.
+  Proof.
+    intros [] []; left; eexists; econstructor.
+  Qed.
+  
+  Lemma MiniML_dec_ru_pi_eq : forall (s1 s2 s3 : P) (r : Ru_pi P s1 s2 s3) (r' : Ru_pi P s1 s2 s3),
+      ( { r = r'} + {r <> r'} )%type.
+  Proof.
+    simpl.
+    intros s1 s2 s3 [] r'.
+    dependent destruction r'.
+    left; reflexivity.
+  Qed.
+
   Lemma MiniML_dec_ru_nat : ({s & Ru_nat P s} + {forall s, Ru_nat P s -> False})%type.
   Proof.
     left; eexists; econstructor.
   Qed.
-  
-  Lemma MiniML_dec_ax_typ : forall (s : P), ( {s' & Ax_typ P s s'} + {forall s', ~Ax_typ P s s'} )%type.
-  Proof.
-    right; inversion 1.
-  Qed.
 
   Definition MiniML_Decidable : DecidableSig P :=
-    mkDecidableSig MiniML_Sig MiniML_dec_st MiniML_dec_ru_pi MiniML_dec_st_sub MiniML_dec_ru_nat MiniML_dec_ax_typ.
+    mkDecidableSig MiniML_Sig MiniML_dec_st_eq MiniML_dec_ax_typ MiniML_dec_st_sub MiniML_dec_ru_pi MiniML_dec_ru_pi_eq MiniML_dec_ru_nat.
 End MiniMLDecidable.

@@ -164,18 +164,18 @@ Proof.
     destruct M; destruct M';
       try solve [right; intros H; inversion H];
       try solve [left; reflexivity].
-    + destruct (dec_st dec_P s s0).
+    + destruct (dec_st_eq dec_P s s0).
       * subst.
         left.
         reflexivity.
       * right.
         injection.
         eassumption.
-    + destruct (dec_st dec_P s1 s0); [| right; injection; intros; auto].
-      destruct (dec_st dec_P s2 s4); [| right; injection; intros; auto].
-      destruct (dec_st dec_P s3 s5); [| right; injection; intros; auto].
+    + destruct (dec_st_eq dec_P s1 s0); [| right; injection; intros; auto].
+      destruct (dec_st_eq dec_P s2 s4); [| right; injection; intros; auto].
+      destruct (dec_st_eq dec_P s3 s5); [| right; injection; intros; auto].
       subst.
-      pose proof (dec_ru_pi dec_P _ _ _ r r0).
+      pose proof (dec_ru_pi_eq dec_P _ _ _ r r0).
       destruct H; [| right; injection; intros; simpl_existTs; auto].
       subst.
       destruct (nf_eq_dec P dec_P M1 M'1); [| right; injection; auto].
@@ -183,11 +183,11 @@ Proof.
       subst.
       left.
       reflexivity.
-    + destruct (dec_st dec_P s1 s0); [| right; injection; intros; auto].
-      destruct (dec_st dec_P s2 s4); [| right; injection; intros; auto].
-      destruct (dec_st dec_P s3 s5); [| right; injection; intros; auto].
+    + destruct (dec_st_eq dec_P s1 s0); [| right; injection; intros; auto].
+      destruct (dec_st_eq dec_P s2 s4); [| right; injection; intros; auto].
+      destruct (dec_st_eq dec_P s3 s5); [| right; injection; intros; auto].
       subst.
-      pose proof (dec_ru_pi dec_P _ _ _ r r0).
+      pose proof (dec_ru_pi_eq dec_P _ _ _ r r0).
       destruct H; [| right; injection; intros; simpl_existTs; auto].
       subst.
       destruct (nf_eq_dec P dec_P M1 M'1); [| right; injection; auto].

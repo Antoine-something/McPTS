@@ -28,9 +28,9 @@ Equations subtyping_nf_impl {P : PtsSig} (dec_P : DecidableSig P) (A : nf P) B :
     let*b _ := dec_st_sub dec_P s s' while _ in
     pureb _
 | dec_P, (@nf_pi P s1 s2 s3 r A B), (@nf_pi P s1' s2' s3' r' A' B') =>
-    let*b _ := dec_st dec_P s1 s1' while _ in
-    let*b _ := dec_st dec_P s2 s2' while _ in
-    let*b _ := dec_st dec_P s3 s3' while _ in
+    let*b _ := dec_st_eq dec_P s1 s1' while _ in
+    let*b _ := dec_st_eq dec_P s2 s2' while _ in
+    let*b _ := dec_st_eq dec_P s3 s3' while _ in
     let*b _ := strong_dec_pi dec_P s1 s1' s2 s2' s3 s3' r r' while _ in
     let*b _ := nf_eq_dec dec_P A A' while _ in
     let*b _ := subtyping_nf_impl dec_P B B' while _ in
