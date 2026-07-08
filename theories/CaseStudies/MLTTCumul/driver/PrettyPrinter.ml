@@ -64,6 +64,13 @@ let rec format_obj_prec (p : int) (f : Format.formatter) : Cst.obj -> unit =
      in
      pp_print_paren_if (p >= 1) impl f ()
   | Cst.Coq_pi (px, i, ep, eret) ->
+    let impl f () =
+      fprintf f "forall %a : Type%@%d" format_obj_param (px, ep) i;
+      pp_print_space f ();
+      fprintf f "-> @[<hov 2>%a@]" format_obj eret
+    in 
+     (* fprintf f "forall %a : Type%@%d -> @[<hov 2>%a@]" format_obj_param (px, ep) i format_obj eret *)
+     (*     
      let params, eret' = get_pi_params_of_obj eret in
      let impl f () =
        pp_print_string f "forall ";
@@ -77,24 +84,29 @@ let rec format_obj_prec (p : int) (f : Format.formatter) : Cst.obj -> unit =
          else pp_force_newline f ()
        end;
        fprintf f ": Type%@%d -> @[<hov 2>%a@]" i format_obj eret'
-     in
+     in *)
      pp_open_hvbox f 2;
      pp_print_paren_if (p >= 1) impl f ();
      pp_close_box f ()
   | Cst.Coq_fn (px, i, ep, b, ebody) ->
-     let params, ebody' = get_fn_params_of_obj ebody in
+     (* fprintf f "fun %a : Type%@%d -> (@[<hov 2>%a@] : %a)" format_obj_param (px, ep) i format_obj b format_obj ebody *)
      let impl f () =
-       pp_print_string f "fun ";
-       pp_open_tbox f ();
-       pp_set_tab f ();
-       pp_print_list ~pp_sep:pp_print_tab format_obj_param f ((px, ep) :: params);
-       pp_close_tbox f ();
-       begin
-         if List.compare_length_with params 0 = 0
-         then pp_print_space f ()
-         else pp_force_newline f ()
-       end;
-       fprintf f ": Type%@%d -> (@[<hov 2>%a@] : %a)" i format_obj ebody' format_obj b
+      fprintf f "fun %a : Type%@%d" format_obj_param (px, ep) i;
+      pp_print_space f ();
+      fprintf f "-> (@[<hov 2>%a@] : %a)" format_obj ebody format_obj b
+      (* fprintf f "fun %a : Type%@%d -> (@[<hov 2>%a@] : %a)" format_obj_param (px, ep) i format_obj ebody format_obj b *)
+       (* fprintf f "fun %a " format_obj_param (px, ep); *)
+       (* fprintf f ": Type%@%d" i; *)
+       (* pp_open_tbox f (); *)
+       (* pp_set_tab f (); *)
+       (* pp_print_list ~pp_sep:pp_print_tab format_obj_param f ((px, ep) :: params); *)
+       (* pp_close_tbox f (); *)
+       (* begin *)
+         (* if List.compare_length_with params 0 = 0 *)
+         (* then pp_print_space f () *)
+         (* else pp_force_newline f () *)
+       (* end; *)
+       (* fprintf f "-> (@[<hov 2>%a@] : %a)" format_obj ebody format_obj b *)
      in
      pp_open_hvbox f 2;
      pp_print_paren_if (p >= 1) impl f ();
