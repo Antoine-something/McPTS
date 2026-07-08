@@ -26,14 +26,12 @@
     | RPAREN _ -> ")"
     | LAMBDA _ -> "fun"
     | PI _ -> "forall"
-    | INT (_, i) -> string_of_int i
     | TYPE _ -> "type"
     | KIND _ -> "kind"
     | VAR (_, s) -> s
     | EOF _ -> "<EOF>"
     | DOT _ -> "."
     | LET _ -> "let"
-    | IN _ -> "in"
     | COLONEQ _ -> ":="
     | DEF_TYPE _ -> "def@type"
     | DEF_EXP _ -> "def@exp"
@@ -49,10 +47,8 @@
     | TYPE r
     | KIND r
     | EOF r
-    | INT (r, _)
     | DOT r
     | LET r
-    | IN r
     | COLONEQ r
     | DEF_TYPE r
     | DEF_EXP r
@@ -80,13 +76,11 @@ rule read =
   | "forall" { PI (get_range lexbuf) }
   | [' ' '\t'] { read lexbuf }
   | ['\n'] { new_line lexbuf; read lexbuf }
-  | ['0'-'9']+ as lxm { INT (get_range lexbuf, int_of_string lxm) }
   | "type" { TYPE (get_range lexbuf) }
   | "kind" { KIND (get_range lexbuf) }
   | eof { EOF (get_range lexbuf) }
   | "." { DOT (get_range lexbuf) }
   | "let" {LET (get_range lexbuf) }
-  | "in" {IN (get_range lexbuf) }
   | ":=" {COLONEQ (get_range lexbuf) }
   | "def@type" {DEF_TYPE (get_range lexbuf) }
   | "def@exp" {DEF_EXP (get_range lexbuf) }
