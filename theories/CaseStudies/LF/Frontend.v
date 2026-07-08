@@ -13,8 +13,8 @@ Module Cst.
   | s_typ : obj
   | s_knd : obj
   (** Functions, with codomain sort annotation *)
-  | pi : string -> obj -> obj -> obj -> obj
-  | fn : string -> obj -> obj -> obj -> obj -> obj
+  | pi : string -> obj -> obj -> obj -> obj -> obj
+  | fn : string -> obj -> obj -> obj -> obj -> obj -> obj
   | app : obj -> obj -> obj
   (** Variables *)
   | var : string -> obj
@@ -32,23 +32,25 @@ Fixpoint annotate' (cst : Cst.obj) : option (CstAnn.obj LF_Sig) :=
   | Cst.s_typ => Some (@CstAnn.st LF_Sig s_typ)
   | Cst.s_knd => Some (@CstAnn.st LF_Sig s_knd)
   (* Functions *)
-  | Cst.pi s s2 t c =>
+  | Cst.pi s s1 s2 t c =>
       match (annotate' t), (annotate' c) with
       | Some t, Some c =>
-          match s2 with
-          | Cst.s_typ => Some (@CstAnn.pi LF_Sig _ _ _ f_simple s t c)
-          | Cst.s_knd => Some (@CstAnn.pi LF_Sig _ _ _ f_dep s t c)
-          | _ => None
+          match s1, s2 with
+          | Cst.s_typ, Cst.s_typ => Some (@CstAnn.pi LF_Sig _ _ _ f_simple s t c)
+          | Cst.s_typ, Cst.s_knd => Some (@CstAnn.pi LF_Sig _ _ _ f_dep s t c)
+          | Cst.s_knd, Cst.s_knd => Some (@CstAnn.pi LF_Sig _ _ _ f_def s t c)
+          | _, _ => None
           end
       | _, _ => None
       end
-  | Cst.fn s s2 t b c =>
+  | Cst.fn s s1 s2 t b c =>
       match (annotate' t), (annotate' b), (annotate' c) with
       | Some t, Some b, Some c =>
-          match s2 with
-          | Cst.s_typ => Some (@CstAnn.fn LF_Sig _ _ _ f_simple s t b c)
-          | Cst.s_knd => Some (@CstAnn.fn LF_Sig _ _ _ f_dep s t b c)
-          | _ => None
+          match s1, s2 with
+          | Cst.s_typ, Cst.s_typ => Some (@CstAnn.fn LF_Sig _ _ _ f_simple s t b c)
+          | Cst.s_typ, Cst.s_knd => Some (@CstAnn.fn LF_Sig _ _ _ f_dep s t b c)
+          | Cst.s_knd, Cst.s_knd => Some (@CstAnn.fn LF_Sig _ _ _ f_def s t b c)
+          | _, _ => None
           end
       | _, _, _ => None
       end

@@ -15,7 +15,8 @@ Section LFSig.
 
   Inductive LF_Ru_pi : LF_St -> LF_St -> LF_St -> Set :=
   | f_simple : LF_Ru_pi s_typ s_typ s_typ
-  | f_dep : LF_Ru_pi s_typ s_knd s_knd.
+  | f_dep : LF_Ru_pi s_typ s_knd s_knd
+  | f_def : LF_Ru_pi s_knd s_knd s_knd.
 
   Inductive LF_Ru_nat : LF_St -> Set :=.
 

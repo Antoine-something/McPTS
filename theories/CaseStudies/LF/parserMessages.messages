@@ -66,7 +66,7 @@ prog: LAMBDA LPAREN ZERO
 ##
 ## Ends in an error in state: 9.
 ##
-## param -> LPAREN . VAR COLON obj RPAREN [ LPAREN COLON ]
+## param -> LPAREN . VAR COLON obj RPAREN [ LPAREN DOT COLON ]
 ##
 ## The known suffix of the stack is as follows:
 ## LPAREN
@@ -78,7 +78,7 @@ prog: LAMBDA LPAREN VAR ZERO
 ##
 ## Ends in an error in state: 10.
 ##
-## param -> LPAREN VAR . COLON obj RPAREN [ LPAREN COLON ]
+## param -> LPAREN VAR . COLON obj RPAREN [ LPAREN DOT COLON ]
 ##
 ## The known suffix of the stack is as follows:
 ## LPAREN VAR
@@ -91,7 +91,7 @@ prog: LAMBDA LPAREN VAR COLON RPAREN
 ##
 ## Ends in an error in state: 11.
 ##
-## param -> LPAREN VAR COLON . obj RPAREN [ LPAREN COLON ]
+## param -> LPAREN VAR COLON . obj RPAREN [ LPAREN DOT COLON ]
 ##
 ## The known suffix of the stack is as follows:
 ## LPAREN VAR COLON
@@ -154,9 +154,9 @@ Expected symbol ':'
 
 prog: LAMBDA LPAREN VAR COLON INT SUCC
 ##
-## Ends in an error in state: 38.
+## Ends in an error in state: 45.
 ##
-## param -> LPAREN VAR COLON obj . RPAREN [ LPAREN COLON ]
+## param -> LPAREN VAR COLON obj . RPAREN [ LPAREN DOT COLON ]
 ##
 ## The known suffix of the stack is as follows:
 ## LPAREN VAR COLON obj
@@ -165,14 +165,14 @@ prog: LAMBDA LPAREN VAR COLON INT SUCC
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 31, spurious reduction of production obj -> app_obj
+## In state 38, spurious reduction of production obj -> app_obj
 ##
 
 Ill-formed type in parameter of a function
 
 prog: PI LPAREN VAR COLON INT RPAREN ZERO
 ##
-## Ends in an error in state: 40.
+## Ends in an error in state: 47.
 ##
 ## obj -> PI params . COLON sort ARROW obj [ RPAREN RETURN IN EOF END COLON BAR ]
 ## params -> params . param [ LPAREN COLON ]
@@ -186,7 +186,7 @@ Expected symbol ':'
 
 prog: REC INT SUCC
 ##
-## Ends in an error in state: 47.
+## Ends in an error in state: 54.
 ##
 ## obj -> REC obj . RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
 ##
@@ -197,7 +197,7 @@ prog: REC INT SUCC
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 31, spurious reduction of production obj -> app_obj
+## In state 38, spurious reduction of production obj -> app_obj
 ##
 
 Either an expression or "return" keyword is expected.
@@ -205,7 +205,7 @@ This token is invalid for the beginning of an expression.
 
 prog: REC INT RETURN ZERO
 ##
-## Ends in an error in state: 48.
+## Ends in an error in state: 55.
 ##
 ## obj -> REC obj RETURN . VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
 ##
@@ -217,7 +217,7 @@ Expected a variable name after "return" keyword
 
 prog: REC INT RETURN VAR ZERO
 ##
-## Ends in an error in state: 49.
+## Ends in an error in state: 56.
 ##
 ## obj -> REC obj RETURN VAR . DOT obj BAR ZERO DARROW obj BAR SUCC VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
 ##
@@ -229,7 +229,7 @@ prog: REC INT RETURN VAR ZERO
 
 prog: REC INT RETURN VAR DOT RPAREN
 ##
-## Ends in an error in state: 50.
+## Ends in an error in state: 57.
 ##
 ## obj -> REC obj RETURN VAR DOT . obj BAR ZERO DARROW obj BAR SUCC VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
 ##
@@ -242,7 +242,7 @@ This token is invalid for the beginning of an expression.
 
 prog: REC INT RETURN VAR DOT INT SUCC
 ##
-## Ends in an error in state: 51.
+## Ends in an error in state: 58.
 ##
 ## obj -> REC obj RETURN VAR DOT obj . BAR ZERO DARROW obj BAR SUCC VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
 ##
@@ -253,14 +253,14 @@ prog: REC INT RETURN VAR DOT INT SUCC
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 31, spurious reduction of production obj -> app_obj
+## In state 38, spurious reduction of production obj -> app_obj
 ##
 
 Expected token "|"
 
 prog: REC INT RETURN VAR DOT INT BAR VAR
 ##
-## Ends in an error in state: 52.
+## Ends in an error in state: 59.
 ##
 ## obj -> REC obj RETURN VAR DOT obj BAR . ZERO DARROW obj BAR SUCC VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
 ##
@@ -272,7 +272,7 @@ Expected token "zero"
 
 prog: REC INT RETURN VAR DOT INT BAR ZERO ZERO
 ##
-## Ends in an error in state: 53.
+## Ends in an error in state: 60.
 ##
 ## obj -> REC obj RETURN VAR DOT obj BAR ZERO . DARROW obj BAR SUCC VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
 ##
@@ -284,7 +284,7 @@ Expected symbol "=>" in the "zero" branch
 
 prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW RPAREN
 ##
-## Ends in an error in state: 54.
+## Ends in an error in state: 61.
 ##
 ## obj -> REC obj RETURN VAR DOT obj BAR ZERO DARROW . obj BAR SUCC VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
 ##
@@ -298,7 +298,7 @@ This token is invalid for the beginning of an expression.
 
 prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT SUCC
 ##
-## Ends in an error in state: 55.
+## Ends in an error in state: 62.
 ##
 ## obj -> REC obj RETURN VAR DOT obj BAR ZERO DARROW obj . BAR SUCC VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
 ##
@@ -309,14 +309,14 @@ prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT SUCC
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 31, spurious reduction of production obj -> app_obj
+## In state 38, spurious reduction of production obj -> app_obj
 ##
 
 Expected token "|" at the start of successor branch
 
 prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT BAR ZERO
 ##
-## Ends in an error in state: 56.
+## Ends in an error in state: 63.
 ##
 ## obj -> REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR . SUCC VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
 ##
@@ -328,7 +328,7 @@ Expected token "succ" in the successor branch
 
 prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT BAR SUCC ZERO
 ##
-## Ends in an error in state: 57.
+## Ends in an error in state: 64.
 ##
 ## obj -> REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC . VAR COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
 ##
@@ -340,7 +340,7 @@ Expected variable binding after "succ"
 
 prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT BAR SUCC VAR ZERO
 ##
-## Ends in an error in state: 58.
+## Ends in an error in state: 65.
 ##
 ## obj -> REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR . COMMA VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
 ##
@@ -352,7 +352,7 @@ Expected token "," after variable name
 
 prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT BAR SUCC VAR COMMA ZERO
 ##
-## Ends in an error in state: 59.
+## Ends in an error in state: 66.
 ##
 ## obj -> REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR COMMA . VAR DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
 ##
@@ -364,7 +364,7 @@ Expected variable name after token ","
 
 prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT BAR SUCC VAR COMMA VAR ZERO
 ##
-## Ends in an error in state: 60.
+## Ends in an error in state: 67.
 ##
 ## obj -> REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR COMMA VAR . DARROW obj END [ RPAREN RETURN IN EOF END COLON BAR ]
 ##
@@ -376,7 +376,7 @@ Expected token "=>" after variable name in successor branch
 
 prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT BAR SUCC VAR COMMA VAR DARROW RPAREN
 ##
-## Ends in an error in state: 61.
+## Ends in an error in state: 68.
 ##
 ## obj -> REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR COMMA VAR DARROW . obj END [ RPAREN RETURN IN EOF END COLON BAR ]
 ##
@@ -388,7 +388,7 @@ Expected expression in the successor branch
 
 prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT BAR SUCC VAR COMMA VAR DARROW INT SUCC
 ##
-## Ends in an error in state: 62.
+## Ends in an error in state: 69.
 ##
 ## obj -> REC obj RETURN VAR DOT obj BAR ZERO DARROW obj BAR SUCC VAR COMMA VAR DARROW obj . END [ RPAREN RETURN IN EOF END COLON BAR ]
 ##
@@ -399,14 +399,14 @@ prog: REC INT RETURN VAR DOT INT BAR ZERO DARROW INT BAR SUCC VAR COMMA VAR DARR
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 31, spurious reduction of production obj -> app_obj
+## In state 38, spurious reduction of production obj -> app_obj
 ##
 
 Expected token "end" after successor branch
 
 prog: LPAREN INT SUCC
 ##
-## Ends in an error in state: 64.
+## Ends in an error in state: 71.
 ##
 ## atomic_obj -> LPAREN obj . RPAREN [ ZERO VAR TYPE RPAREN RETURN NAT LPAREN KIND INT IN EOF END COLON BAR ]
 ##
@@ -417,7 +417,7 @@ prog: LPAREN INT SUCC
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 31, spurious reduction of production obj -> app_obj
+## In state 38, spurious reduction of production obj -> app_obj
 ##
 
 Either an expression or ")" is expected.
@@ -425,7 +425,7 @@ This token is invalid for the beginning of an expression.
 
 prog: INT SUCC
 ##
-## Ends in an error in state: 68.
+## Ends in an error in state: 75.
 ##
 ## prog -> obj . COLON obj EOF [ # ]
 ##
@@ -436,7 +436,7 @@ prog: INT SUCC
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 31, spurious reduction of production obj -> app_obj
+## In state 38, spurious reduction of production obj -> app_obj
 ##
 
 Either an expression or ":" is expected.
@@ -444,7 +444,7 @@ This token is invalid for the beginning of an expression.
 
 prog: INT COLON RPAREN
 ##
-## Ends in an error in state: 69.
+## Ends in an error in state: 76.
 ##
 ## prog -> obj COLON . obj EOF [ # ]
 ##
@@ -457,7 +457,7 @@ This token is invalid for the beginning of an expression.
 
 prog: INT COLON INT SUCC
 ##
-## Ends in an error in state: 70.
+## Ends in an error in state: 77.
 ##
 ## prog -> obj COLON obj . EOF [ # ]
 ##
@@ -468,7 +468,7 @@ prog: INT COLON INT SUCC
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 31, spurious reduction of production obj -> app_obj
+## In state 38, spurious reduction of production obj -> app_obj
 ##
 
 Expected token "EOF"
@@ -505,7 +505,7 @@ Annotation must be sort "Type" or "Kind"
 
 prog: PI LPAREN VAR COLON INT RPAREN COLON ZERO
 ##
-## Ends in an error in state: 41.
+## Ends in an error in state: 48.
 ##
 ## obj -> PI params COLON . sort ARROW obj [ RPAREN RETURN IN EOF END COLON BAR ]
 ##
@@ -580,7 +580,7 @@ Expected annotated expression in body of a function.
 
 prog: LAMBDA LPAREN VAR COLON KIND RPAREN COLON KIND ARROW LPAREN KIND SUCC
 ##
-## Ends in an error in state: 26.
+## Ends in an error in state: 29.
 ##
 ## ann_obj -> LPAREN obj . COLON obj RPAREN [ RPAREN RETURN IN EOF END COLON BAR ]
 ##
@@ -591,14 +591,14 @@ prog: LAMBDA LPAREN VAR COLON KIND RPAREN COLON KIND ARROW LPAREN KIND SUCC
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 31, spurious reduction of production obj -> app_obj
+## In state 38, spurious reduction of production obj -> app_obj
 ##
 
 Expected annotated expression in body of a function
 
 prog: LAMBDA LPAREN VAR COLON KIND RPAREN COLON KIND ARROW LPAREN KIND COLON RPAREN
 ##
-## Ends in an error in state: 27.
+## Ends in an error in state: 30.
 ##
 ## ann_obj -> LPAREN obj COLON . obj RPAREN [ RPAREN RETURN IN EOF END COLON BAR ]
 ##
@@ -610,7 +610,7 @@ Expected type annotation "Type" or "Kind" in body of a function
 
 prog: LAMBDA LPAREN VAR COLON KIND RPAREN COLON KIND ARROW LPAREN KIND COLON KIND SUCC
 ##
-## Ends in an error in state: 28.
+## Ends in an error in state: 31.
 ##
 ## ann_obj -> LPAREN obj COLON obj . RPAREN [ RPAREN RETURN IN EOF END COLON BAR ]
 ##
@@ -621,14 +621,14 @@ prog: LAMBDA LPAREN VAR COLON KIND RPAREN COLON KIND ARROW LPAREN KIND COLON KIN
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 31, spurious reduction of production obj -> app_obj
+## In state 38, spurious reduction of production obj -> app_obj
 ##
 
 Test Message8
 
 prog: LET LPAREN VAR COLON KIND RPAREN COLON KIND DEF KIND SUCC
 ##
-## Ends in an error in state: 35.
+## Ends in an error in state: 42.
 ##
 ## obj -> LET let_defn . IN ann_obj [ RPAREN RETURN IN EOF END COLON BAR ]
 ##
@@ -639,15 +639,15 @@ prog: LET LPAREN VAR COLON KIND RPAREN COLON KIND DEF KIND SUCC
 ## This implies that, although the LR(1) items shown above provide an
 ## accurate view of the past (what has been recognized so far), they
 ## may provide an INCOMPLETE view of the future (what was expected next).
-## In state 31, spurious reduction of production obj -> app_obj
-## In state 34, spurious reduction of production let_defn -> param COLON sort DEF obj
+## In state 38, spurious reduction of production obj -> app_obj
+## In state 41, spurious reduction of production let_defn -> param COLON sort DEF obj
 ##
 
 Test Message9
 
 prog: LET LPAREN VAR COLON KIND RPAREN COLON KIND DEF KIND IN ZERO
 ##
-## Ends in an error in state: 36.
+## Ends in an error in state: 43.
 ##
 ## obj -> LET let_defn IN . ann_obj [ RPAREN RETURN IN EOF END COLON BAR ]
 ##
@@ -659,7 +659,7 @@ Test Message10
 
 prog: PI LPAREN VAR COLON KIND RPAREN COLON KIND ZERO
 ##
-## Ends in an error in state: 42.
+## Ends in an error in state: 49.
 ##
 ## obj -> PI params COLON sort . ARROW obj [ RPAREN RETURN IN EOF END COLON BAR ]
 ##
@@ -671,7 +671,7 @@ Test Message11
 
 prog: PI LPAREN VAR COLON KIND RPAREN COLON KIND ARROW RPAREN
 ##
-## Ends in an error in state: 43.
+## Ends in an error in state: 50.
 ##
 ## obj -> PI params COLON sort ARROW . obj [ RPAREN RETURN IN EOF END COLON BAR ]
 ##
@@ -680,3 +680,40 @@ prog: PI LPAREN VAR COLON KIND RPAREN COLON KIND ARROW RPAREN
 ##
 
 Test Message12
+
+prog: ASSIGN ZERO
+##
+## Ends in an error in state: 25.
+##
+## assign_defn -> ASSIGN . param DOT [ LPAREN ASSIGN ]
+##
+## The known suffix of the stack is as follows:
+## ASSIGN
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+prog: ASSIGN LPAREN VAR COLON KIND RPAREN ZERO
+##
+## Ends in an error in state: 26.
+##
+## assign_defn -> ASSIGN param . DOT [ LPAREN ASSIGN ]
+##
+## The known suffix of the stack is as follows:
+## ASSIGN param
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>
+
+prog: ASSIGN LPAREN VAR COLON KIND RPAREN DOT ZERO
+##
+## Ends in an error in state: 34.
+##
+## assign_defns -> assign_defns . assign_defn [ LPAREN ASSIGN ]
+## obj -> assign_defns . ann_obj [ RPAREN RETURN IN EOF END COLON BAR ]
+##
+## The known suffix of the stack is as follows:
+## assign_defns
+##
+
+<YOUR SYNTAX ERROR MESSAGE HERE>

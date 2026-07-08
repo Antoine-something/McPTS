@@ -28,14 +28,14 @@ let rec get_nat_of_obj : Cst.obj -> int option = function
 
 let rec get_fn_params_of_obj : Cst.obj -> (string * Cst.obj) list * Cst.obj =
   function
-  | Cst.Coq_fn (px, _, ep, _, ebody) ->
+  | Cst.Coq_fn (px, _, _, ep, _, ebody) ->
      let params, ebody' = get_fn_params_of_obj ebody in
      ((px, ep) :: params, ebody')
   | ebody -> ([], ebody)
 
 let rec get_pi_params_of_obj : Cst.obj -> (string * Cst.obj) list * Cst.obj =
   function
-  | Cst.Coq_pi (px, _, ep, eret) ->
+  | Cst.Coq_pi (px, _, _, ep, eret) ->
      let params, eret' = get_pi_params_of_obj eret in
      ((px, ep) :: params, eret')
   | eret -> ([], eret)
@@ -65,7 +65,7 @@ let rec format_obj_prec (p : int) (f : Format.formatter) : Cst.obj -> unit =
          format_obj escr mx format_obj em format_obj ez sx sr format_obj es
      in
      pp_print_paren_if (p >= 1) impl f ()
-  | Cst.Coq_pi (px, sort, ep, eret) ->
+  | Cst.Coq_pi (px, _, s2, ep, eret) ->
      let params, eret' = get_pi_params_of_obj eret in
      let impl f () =
        pp_print_string f "forall ";
@@ -78,12 +78,12 @@ let rec format_obj_prec (p : int) (f : Format.formatter) : Cst.obj -> unit =
          then pp_print_space f ()
          else pp_force_newline f ()
        end;
-       fprintf f ": %a -> @[<hov 2>%a@]" format_obj sort format_obj eret'
+       fprintf f ": %a -> @[<hov 2>%a@]" format_obj s2 format_obj eret'
      in
      pp_open_hvbox f 2;
      pp_print_paren_if (p >= 1) impl f ();
      pp_close_box f ()
-  | Cst.Coq_fn (px, sort, ep, b, ebody) ->
+  | Cst.Coq_fn (px, _, s2, ep, b, ebody) ->
      let params, ebody' = get_fn_params_of_obj ebody in
      let impl f () =
        pp_print_string f "fun ";
@@ -96,7 +96,7 @@ let rec format_obj_prec (p : int) (f : Format.formatter) : Cst.obj -> unit =
          then pp_print_space f ()
          else pp_force_newline f ()
        end;
-       fprintf f ": %a -> (@[<hov 2>%a@] : %a)" format_obj sort format_obj ebody' format_obj b
+       fprintf f ": %a -> (@[<hov 2>%a@] : %a)" format_obj s2 format_obj ebody' format_obj b
      in
      pp_open_hvbox f 2;
      pp_print_paren_if (p >= 1) impl f ();
@@ -151,17 +151,17 @@ let exp_to_obj =
        let ez' = impl ctx ez in
        let es' = impl (sr :: sx :: ctx) es in
        Cst.Coq_natrec (escr', mx, em', ez', sx, sr, es')
-    | Coq_a_pi (_, st, _, _, ep, eret) ->
+    | Coq_a_pi (_, s1, s2, _, ep, eret) ->
        let px = match ep with Coq_a_st _ -> new_tyvar () | _ -> new_var () in
        let ep' = impl ctx ep in
        let eret' = impl (px :: ctx) eret in
-       Cst.Coq_pi (px, extract_sort st, ep', eret')
-    | Coq_a_fn (_, st, _, _, ep, eb, ebody) ->
+       Cst.Coq_pi (px, extract_sort s1, extract_sort s2, ep', eret')
+    | Coq_a_fn (_, s1, s2, _, ep, eb, ebody) ->
        let px = match ep with Coq_a_st _ -> new_tyvar () | _ -> new_var () in
        let ep' = impl ctx ep in
        let eb' = impl (px :: ctx) eb in
        let ebody' = impl (px :: ctx) ebody in
-       Cst.Coq_fn (px, extract_sort st, ep', eb', ebody')
+       Cst.Coq_fn (px, extract_sort s1, extract_sort s2, ep', eb', ebody')
     | Coq_a_app (ef, ea) ->
        let ef' = impl ctx ef in
        let ea' = impl ctx ea in

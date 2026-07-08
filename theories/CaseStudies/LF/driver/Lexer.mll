@@ -44,6 +44,7 @@
     | LET _ -> "let"
     | IN _ -> "in"
     | DEF _ -> ":="
+    | ASSIGN _ -> "assign"
       
   let get_range_of_token : token -> (position * position) =
     function
@@ -70,7 +71,9 @@
     | LET r
     | IN r
     | DEF r
+    | ASSIGN r
     | VAR (r, _) -> r
+    
 
   let format_token (f: Format.formatter) (t: token): unit =
     Format.fprintf
@@ -110,6 +113,7 @@ rule read =
   | "let" {LET (get_range lexbuf) }
   | "in" {IN (get_range lexbuf) }
   | ":=" {DEF (get_range lexbuf) }
+  | "assign" {ASSIGN (get_range lexbuf) }
   | ident { VAR (get_range lexbuf, Lexing.lexeme lexbuf) }
   | _ as c { failwith (Format.asprintf "@[<v 2>Lexer error:@ @[<v 2>Unexpected character %C@ at %a@]@]@." c format_position lexbuf.lex_start_p) }
 and comment =
