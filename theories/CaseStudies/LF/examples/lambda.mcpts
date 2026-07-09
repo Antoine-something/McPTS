@@ -1,0 +1,28 @@
+(* Terms *)
+def@type (tm : type).
+def@exp (lam : forall (M : (forall (x:tm) : type -> tm)) : type -> tm).
+def@exp (app : forall (M : tm) (N : tm) : type -> tm).
+
+(* Small step semantics *)
+def@type (step : forall (M : tm) (N : tm) : kind -> type).
+def@exp (beta : forall (M : forall (x:tm) : type -> tm) (N : tm) : type -> step (app (lam M) N) (M N)).
+def@exp (lam_cong : forall (M1 : forall (x : tm) : type -> tm) (M2 : forall (x : tm) : type -> tm)
+			   (s_M1_M2 : forall (x : tm) (s_x_x : step x x) : type -> step (M1 x) (M2 x)) : type ->
+			   step (lam M1) (lam M2)).
+def@exp (app_cong1 : forall (M1 : tm) (M2 : tm) (N : tm) (s_m1_m2 : step M1 M2) : type -> step (app M1 N) (app M2 N)).
+def@exp (app_cong2 : forall (M : tm) (N1 : tm) (N2 : tm) (s_n1_n2 : step N1 N2) : type -> step (app M N1) (app M N2)).
+
+(* Types *)
+def@type (tp : type).
+def@exp (base : tp).
+def@exp (arr : forall (A : tp) (B : tp) : type -> tp).
+
+(* Typing judgment *)
+def@type (oft : forall (M : tm) (A : tp) : kind -> type).
+def@exp (oft_lam : forall (M : forall (x : tm) : type -> tm) (A : tp) (B : tp)
+		   	  (oft_M : forall (x : tm) (oft_x : oft x A) : type -> oft (M x) B) : type ->
+			  oft (lam M) (arr A B)).
+def@exp (oft_app : forall (M : tm) (N : tm) (A : tp) (B : tp)
+		    	  (oft_M : oft M (arr A B))
+			  (oft_n : oft N A) : type ->
+			  oft (app M N) B).
