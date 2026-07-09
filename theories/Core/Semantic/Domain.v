@@ -24,7 +24,7 @@ with domain_ne (P : PtsSig) : Set :=
 | d_natrec : env P -> exp P -> domain P -> exp P -> domain_ne P -> domain_ne P
 with domain_nf (P : PtsSig) : Set :=
 | d_dom : domain P -> domain P -> domain_nf P
-(** Contrary to McTT, environments are lists instead of functions *)
+
 where "'env'" := (fun P => (list (domain P))).
 
 (* Make the signature implicit to all constructors *)
