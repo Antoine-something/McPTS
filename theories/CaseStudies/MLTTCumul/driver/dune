@@ -7,7 +7,7 @@
  (libraries McptsExtracted_MLTTCumul)
  (inline_tests
   (deps
-   (glob_files_rec ../examples/*.mcpts)))
+   (glob_files_rec ../examples/*.mltt)))
  (preprocess
   (pps ppx_expect)))
 

@@ -7,7 +7,7 @@
  (libraries McptsExtracted_LF)
  (inline_tests
   (deps
-   (glob_files_rec ../examples/*.mcpts)))
+   (glob_files_rec ../examples/*.lf)))
  (preprocess
   (pps ppx_expect)))
 
