@@ -7,7 +7,7 @@ Import Syntax_Notations.
 #[local]
 Ltac invert_wf_ctx1 H :=
   match type of H with
-  | {{ ⊢ ^?Γ, ^?A@^?K }} =>
+  | {{ ⊢ ^?Γ, ^?A }} =>
       let HΓ := fresh "HΓ" in
       let HAs := fresh "HAs" in
       pose proof ctx_decomp H as [HΓ HAs];
@@ -33,6 +33,10 @@ Ltac gen_core_presup H :=
       let HΓ := fresh "HΓ" in
       let HΔ := fresh "HΔ" in
       pose proof presup_ctx_eq H as [HΓ HΔ]
+  | {{ ⊢ ^?Γ ⊆ ^?Δ }} =>
+      let HΓ := fresh "HΓ" in
+      let HΔ := fresh "HΔ" in
+      pose proof presup_ctx_sub H as [HΓ HΔ]
   | {{ ^?Γ ⊢ ^?M : ^?A }} =>
       let HΓ := fresh "HΓ" in
       let HAwf := fresh "HAwf" in
@@ -55,7 +59,7 @@ Ltac gen_core_presup H :=
 
 Ltac gen_lookup_presup H :=
   match type of H with
-  | {{ #?x : ^?A@^?K ∈ ^?Γ }} =>
+  | {{ #?x : ^?A ∈ ^?Γ }} =>
       match goal with
       | _: {{ Γ ⊢ A }} |- _ => fail
       | _: {{ Γ ⊢ A : Sort@_ }} |- _ => fail

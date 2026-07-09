@@ -16,9 +16,13 @@ Ltac basic_glu_sort_elem_econstructor :=
 
 Ltac invert_glu_rel1 :=
   match goal with
-  | H : pi_glu_typ_pred _ _ _ _ _ _ _ |- _ =>
+  | H : pi_glu_typ_pred _ _ _ _ _ _ _ _ |- _ =>
       progressive_invert H
-  | H : pi_glu_exp_pred _ _ _ _ _ _ _ _ _ _ |- _ =>
+  | H : pi_glu_exp_pred _ _ _ _ _ _ _ _ _ _ _ |- _ =>
+      progressive_invert H
+  | H : nat_glu_typ_pred _ _ _ _ |- _ =>
+      progressive_invert H
+  | H : nat_glu_exp_pred _ _ _ _ _ _ |- _ =>
       progressive_invert H
   | H : neut_glu_typ_pred _ _ _ _ |- _ =>
       progressive_invert H

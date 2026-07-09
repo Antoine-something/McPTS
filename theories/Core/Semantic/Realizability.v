@@ -6,6 +6,16 @@ From McPTS.Core Require Import Base.
 From McPTS.Core.Semantic Require Export NbE PER.
 Import Domain_Notations.
 
+Lemma per_nat_then_per_top {P} : forall {n m : domain P},
+    {{ Dom n ≈ m ∈ per_nat }} ->
+    {{ Dom ⇓ ℕ n ≈ ⇓ ℕ m ∈ per_top }}.
+Proof with solve [destruct_conjs; eexists; repeat econstructor; eauto].
+  induction 1; simpl in *; intros s;
+    try specialize (IHper_nat s);
+    try specialize (H s)...
+Qed.
+#[export]
+Hint Resolve per_nat_then_per_top : mcpts.
 
 Lemma realize_per_sort_elem_gen {P : PtsSig} {pred_P : PredicativeSig P} : forall {s a a' R},
     {{ DF a ≈ a' ∈ per_sort_elem pred_P s ↘ R }} ->
@@ -57,6 +67,7 @@ Proof with (solve [try (try (eexists; split); econstructor); mauto]).
     end.
     assert {{ Dom ⇓ b fa ≈ ⇓ b' f'a' ∈ per_top }} by eauto.
     specialize (H2 s) as [? []].
+    specialize (H10 (S s)) as [? []].
     specialize (H16 (S s)) as [? []]...
   - intro s.
     (on_all_hyp: fun H => destruct (H s) as [? []])...
@@ -85,7 +96,6 @@ Qed.
 (** We cannot add [per_bot_then_per_elem] as a hint
     because we don't know what "R" is (i.e. the pattern becomes higher-order.)
     In fact, Coq complains it cannot add one if we try. *)
-
 Corollary per_elem_then_per_top {P : PtsSig} {pred_P : PredicativeSig P} : forall {s a a' R b b'},
     {{ DF a ≈ a' ∈ per_sort_elem pred_P s ↘ R }} ->
     {{ Dom b ≈ b' ∈ R }} -> {{ Dom ⇓ a b ≈ ⇓ a' b' ∈ per_top }}.
@@ -105,12 +115,12 @@ Lemma realize_per_typ_elem_gen {P : PtsSig} {pred_P : PredicativeSig P} : forall
     /\ (forall {b b'}, {{ Dom b ≈ b' ∈ R }} -> {{ Dom ⇓ a b ≈ ⇓ a' b' ∈ per_top }}).
 Proof with (solve [try (try (eexists; split); econstructor); mauto]).
   intros * Htypelem. simpl in Htypelem.
-  induction Htypelem.     
+  induction Htypelem.
   - repeat split.
     + econstructor; mauto.
     + intros.
       apply_relation_equivalence.
-      exists per_ne.     
+      exists per_ne.
       per_sort_elem_econstructor; mauto.
       reflexivity.
     + intros.
@@ -122,7 +132,7 @@ Proof with (solve [try (try (eexists; split); econstructor); mauto]).
       intros n.
       assert (exists C : nf P, {{ Rtyp b in n ↘ C }} /\ {{ Rtyp b' in n ↘ C }}) by mauto.
       destruct_conjs.
-      econstructor; mauto.  
+      econstructor; mauto.
   - eapply realize_per_sort_elem_gen; mauto.
 Qed.
 
@@ -146,7 +156,6 @@ Qed.
 (** We cannot add [per_bot_then_per_elem] as a hint
     because we don't know what "R" is (i.e. the pattern becomes higher-order.)
     In fact, Coq complains it cannot add one if we try. *)
-
 Corollary per_typ_elem_then_per_top {P : PtsSig} {pred_P : PredicativeSig P} : forall {a a' R b b'},
     {{ DF a ≈ a' ∈ per_typ_elem pred_P ↘ R }} ->
     {{ Dom b ≈ b' ∈ R }} -> {{ Dom ⇓ a b ≈ ⇓ a' b' ∈ per_top }}.
@@ -166,9 +175,9 @@ Proof.
   - destruct_conjs.
     (on_all_hyp: destruct_rel_by_assumption tail_rel).
     do 2 eexists; repeat split; only 1-2: econstructor; eauto.
-    apply_relation_equivalence.    
+    apply_relation_equivalence.
     econstructor; mauto.
-    eapply per_bot_then_per_elem; eauto.
+    eapply per_bot_then_per_typ_elem; eauto.
     erewrite per_ctx_respects_length; mauto.
     eexists; eauto.
 Qed.
@@ -180,7 +189,3 @@ Proof.
   intros.
   eapply per_bot_then_per_elem; mauto.
 Qed.
-
-
-
-

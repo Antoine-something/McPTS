@@ -11,7 +11,7 @@ Inductive initial_env {P : PtsSig} : ctx P -> env P -> Prop :=
 | initial_env_cons :
   `( initial_env Γ ρ ->
      {{ ⟦ A ⟧ ρ ↘ a }} ->
-     initial_env ({{{ Γ, A@s }}}) d{{{ ρ ↦ ⇑! a (length Γ) }}}).
+     initial_env ({{{ Γ, A }}}) d{{{ ρ ↦ ⇑! a (length Γ) }}}).
 
 #[export]
 Hint Constructors initial_env : mcpts.
@@ -35,9 +35,9 @@ Hint Resolve functional_initial_env : mcpts.
     whether [a] is the evaluation result of A or not.
     If we want to specify that as well, we need a generalized
     version of [drop_env] that can drop [x] elements. *)
-Lemma initial_env_spec {P : PtsSig} : forall x (Γ : ctx P) ρ A s,
+Lemma initial_env_spec {P : PtsSig} : forall x (Γ : ctx P) ρ A,
     initial_env Γ ρ ->
-    {{ #x : A@s ∈ Γ }} ->
+    {{ #x : A ∈ Γ }} ->
     exists m a, {{ #| ρ[x] |↘ m }} /\ m = d{{{ ⇑! a (length Γ - x - 1) }}}.
 Proof.
   induction x; intros * Hinit Hlookup;
@@ -57,6 +57,21 @@ Qed.
 
 #[export]
 Hint Resolve initial_env_spec : mcpts.
+
+Lemma initial_env_spec_subst {P} : forall x (Γ : ctx P) ρ A,
+    initial_env Γ ρ ->
+    {{ #x : A ∈ Γ }} ->
+    exists a, {{ #| ρ[x] |↘ ⇑! a (length Γ - x - 1) }}.
+Proof.
+  intros.
+  eapply initial_env_spec in H0; eauto.
+  destruct_conjs.
+  subst.  
+  eexists; mauto 2.
+Qed.
+
+#[export]
+Hint Resolve initial_env_spec_subst : mcpts.
 
 Ltac functional_initial_env_rewrite_clear1 :=
   let tactic_error o1 o2 := fail 3 "functional_initial_env equality between" o1 "and" o2 "cannot be solved by mauto" in

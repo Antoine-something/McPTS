@@ -60,8 +60,8 @@ Ltac destruct_rel_typ_unsorted :=
     end;
   unmark_all.
 
-(** Sort/Element PER Helper Tactics *)
 
+(** Sort/Element PER Helper Tactics *)
 Ltac basic_invert_per_sort_elem H :=
   progress simp per_sort_elem in H;
   dependent destruction H;

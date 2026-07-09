@@ -1,0 +1,5 @@
+(library
+ (name McptsExtracted_MiniML)
+ (public_name mcpts.extracted_miniml))
+
+(documentation)

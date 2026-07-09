@@ -6,15 +6,15 @@ From McPTS.Core.Completeness Require Import LogicalRelation.
 From McPTS.Core.Syntactic Require Import SystemOpt.
 Import Domain_Notations.
 
-Lemma valid_lookup {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ x A env_relΓ s}
+Lemma valid_lookup {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ x A env_relΓ}
                         (equiv_Γ_Γ : {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_relΓ }}),
-    {{ #x : A@s ∈ Γ }} -> 
+    {{ #x : A ∈ Γ }} ->
     forall ρ ρ' (equiv_p_p' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}),
     exists elem_rel,
       rel_typ_unsorted pred_P A ρ A ρ' elem_rel /\ rel_exp {{{ #x }}} ρ {{{ #x }}} ρ' elem_rel.
 Proof with solve [split; mauto].
-  intros * ? HxinΓ.      
-  assert {{ #x : A@s ∈ Γ }} as HxinΓ' by mauto.
+  intros * ? HxinΓ.
+  assert {{ #x : A ∈ Γ }} as HxinΓ' by mauto.
   remember Γ as Δ eqn:HΔΓ in HxinΓ', equiv_Γ_Γ at 2. clear HΔΓ. rename equiv_Γ_Γ into equiv_Γ_Δ.
   remember A as A' eqn:HAA' in HxinΓ' |- * at 2. clear HAA'.
   gen Δ A' env_relΓ.
@@ -22,7 +22,7 @@ Proof with solve [split; mauto].
   induction HxinΓ; intros * equiv_Γ_Δ HxinΓ0; inversion HxinΓ0; subst; clear HxinΓ0; inversion_clear equiv_Γ_Δ; subst; apply_relation_equivalence.
   - intros ? ? [];
       (on_all_hyp: destruct_rel_by_assumption tail_rel); destruct_conjs.
-    simplify_evals.    
+    simplify_evals.
     eexists.
     split; econstructor; mauto 3.
 
@@ -31,7 +31,7 @@ Proof with solve [split; mauto].
     destruct_conjs.
     (on_all_hyp: destruct_rel_by_assumption tail_rel); destruct_conjs;
     eexists.
-    
+
     assert (rel_typ_unsorted pred_P B d{{{ ρ0 ↯ }}} B0 d{{{ ρ'0 ↯ }}} (head_rel d{{{ ρ0 ↯ }}} d{{{ ρ'0 ↯ }}} equiv_ρ_drop_ρ'_drop)) by mauto.
     destruct_by_head (@rel_typ_unsorted P).
     destruct_by_head (@rel_exp P).
@@ -40,9 +40,9 @@ Proof with solve [split; mauto].
     split; econstructor; mauto.
 Qed.
 
-Lemma valid_exp_var {P} {pred_P : PredicativeSig P} : forall {Γ x A s},
+Lemma valid_exp_var {P} {pred_P : PredicativeSig P} : forall {Γ x A},
     {{ ⟪ pred_P ⟫ ⊨ Γ }} ->
-    {{ # x : A@s ∈ Γ }} ->
+    {{ # x : A ∈ Γ }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u #x : A }}.
 Proof.
   intros * [? equiv_Γ] Hx.
@@ -54,9 +54,9 @@ Qed.
 #[export]
 Hint Resolve valid_exp_var : mcpts.
 
-Lemma rel_exp_var {P} {pred_P : PredicativeSig P} : forall {Γ x A s},
+Lemma rel_exp_var {P} {pred_P : PredicativeSig P} : forall {Γ x A},
     {{ ⟪ pred_P ⟫ ⊨ Γ }} ->
-    {{ # x : A@s ∈ Γ }} ->
+    {{ # x : A ∈ Γ }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u #x ≈ #x : A}}.
 Proof.
   intros.
@@ -85,10 +85,10 @@ Qed.
 #[export]
 Hint Resolve rel_exp_var_0_sub : mcpts.
 
-Lemma rel_exp_var_S_sub {P} {pred_P : PredicativeSig P} : forall {Γ M σ Δ A x B s},
+Lemma rel_exp_var_S_sub {P} {pred_P : PredicativeSig P} : forall {Γ M σ Δ A x B},
   {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }} ->
   {{ ⟪ pred_P ⟫ Γ ⊨u M : A[σ] }} ->
-  {{ #x : B@s ∈ Δ }} ->
+  {{ #x : B ∈ Δ }} ->
   {{ ⟪ pred_P ⟫ Γ ⊨u #(S x)[σ ,, M] ≈ #x[σ] : B[σ] }}.
 Proof with mautosolve.
   intros * [env_relΓ [? [env_relΔ]]] HM HxinΓ.
@@ -113,10 +113,10 @@ Qed.
 #[export]
 Hint Resolve rel_exp_var_S_sub : mcpts.
 
-Lemma rel_exp_var_weaken {P} {pred_P : PredicativeSig P} : forall {Γ B x A s s'},
-    {{ ⟪ pred_P ⟫ ⊨ Γ, B@s }} ->
-    {{ #x : A@s' ∈ Γ }} ->
-    {{ ⟪ pred_P ⟫ Γ, B@s ⊨u #x[Wk] ≈ #(S x) : A[Wk] }}.
+Lemma rel_exp_var_weaken {P} {pred_P : PredicativeSig P} : forall {Γ B x A},
+    {{ ⟪ pred_P ⟫ ⊨ Γ, B }} ->
+    {{ #x : A ∈ Γ }} ->
+    {{ ⟪ pred_P ⟫ Γ, B ⊨u #x[Wk] ≈ #(S x) : A[Wk] }}.
 Proof with mautosolve.
   intros * [env_relΓB] HxinΓ.
   invert_per_ctx_envs_unsorted.
@@ -135,7 +135,7 @@ Proof with mautosolve.
   eexists.
   split; mauto.
     inversion H2; subst;
-    repeat (econstructor; mauto).  
+    repeat (econstructor; mauto).
 Qed.
 
 #[export]

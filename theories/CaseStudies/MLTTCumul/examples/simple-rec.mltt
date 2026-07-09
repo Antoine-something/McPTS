@@ -1,0 +1,4 @@
+(fun (x : Nat) : Type@0 -> (rec x return y . Nat
+  | zero => 1
+  | succ n, r => succ r
+  end : Nat)) : forall (x : Nat) : Type@0 -> Nat

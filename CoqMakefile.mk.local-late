@@ -1,0 +1,86 @@
+empty :=
+space := $(empty) $(empty)
+
+MENHIR := menhir
+
+CASESTUDY ?= MiniML
+CASESTUDYDIRECTORY = theories/CaseStudies/$(CASESTUDY)
+
+PARSERMESSAGEBASE := parserMessages.messages
+FRONTENDDIR := Frontend
+PARSERMESSAGEFILE = $(CASESTUDYDIRECTORY)/$(PARSERMESSAGEBASE)
+PARSERMESSAGETEMPFILE = $(PARSERMESSAGEFILE:%.messages=%.messages.temp)
+PARSERMESSAGEMERGEFILE = $(PARSERMESSAGEFILE:%.messages=%.messages.merge)
+PARSERMESSAGEEXTRACTIONFILE = $(CASESTUDYDIRECTORY)/driver/extracted/ParserMessages.ml
+COQPARSERORIGFILE = $(CASESTUDYDIRECTORY)/Parser.vy
+COQPARSERFILE = $(COQPARSERORIGFILE:%.vy=%.v)
+
+DEPGRAPHSCRIPT := scripts/generate_dep.py
+DEPPOSTPROCESSSCRIPT := scripts/post_process_dep.py
+DEPGRAPHDOT := dep.dot
+DEPGRAPHDOC := dep.html
+EXTRA_DIR := assets/extra
+COQDOCFLAGS := \
+  --toc --toc-depth 2 --html --interpolate \
+  --index indexpage --no-lib-name --parse-comments \
+  --with-header $(EXTRA_DIR)/header.html --with-footer $(EXTRA_DIR)/footer.html
+export COQDOCFLAGS
+DOC_BASE ?= ""
+
+define extract
+	@echo "MENHIR $(COQPARSERORIGFILE)"
+	@$(MENHIR) --coq "$(COQPARSERORIGFILE)"
+	@echo "MENHIR $(COQPARSERORIGFILE) PARSER MESSAGE"
+	@$(MENHIR) --coq "$(COQPARSERORIGFILE)" --compile-errors "$(PARSERMESSAGEFILE)" > "$(PARSERMESSAGEEXTRACTIONFILE)"
+	@echo "MENHIR $(COQPARSERORIGFILE) CHECK PARSER MESSAGE"
+	@$(MENHIR) --coq "$(COQPARSERORIGFILE)" --list-errors > "$(PARSERMESSAGETEMPFILE)"
+	@$(MENHIR) --coq "$(COQPARSERORIGFILE)" --compare-errors "$(PARSERMESSAGETEMPFILE)" --compare-errors "$(PARSERMESSAGEFILE)"
+	@rm "$(PARSERMESSAGETEMPFILE)"
+	@echo "Separate Extraction main." | $(COQTOP) $(COQFLAGS) $(COQLIBS) -topfile $(CASESTUDYDIRECTORY)/Entrypoint.v -l $(CASESTUDYDIRECTORY)/Entrypoint.v
+endef
+
+.PHONY: extract_MiniML extract_LF extract_MLTTCumul
+extract_MiniML: CASESTUDY = MiniML
+extract_LF: CASESTUDY = LF
+extract_MLTTCumul: CASESTUDY = MLTTCumul
+
+extract_MiniML:
+	$(extract)
+
+extract_LF:
+	$(extract)
+
+extract_MLTTCumul:
+	$(extract)
+
+post-all:: extract_MiniML extract_LF extract_MLTTCumul
+	dune build
+
+.PHONY: update_parserMessages
+update_parserMessages:
+	@echo "MENHIR $? UPDATE PARSER MESSAGE"
+	@$(MENHIR) --coq "$(COQPARSERORIGFILE)" --list-errors > "$(PARSERMESSAGETEMPFILE)"
+	@$(MENHIR) --coq "$(COQPARSERORIGFILE)" --merge-errors "$(PARSERMESSAGETEMPFILE)" --merge-errors "$(PARSERMESSAGEFILE)" > "$(PARSERMESSAGEMERGEFILE)"
+	@rm "$(PARSERMESSAGETEMPFILE)"
+	@mv "$(PARSERMESSAGEMERGEFILE)" "$(PARSERMESSAGEFILE)"
+
+%.v : %.vy
+	@echo "MENHIR $?"
+	@$(MENHIR) --coq "$?"
+
+.PHONY: coqdoc
+coqdoc: html
+	cp -R $(EXTRA_DIR)/resources html
+
+$(DEPGRAPHDOT): $(VFILES) $(DEPGRAPHSCRIPT)
+	@coqdep $(VFILES) -f _CoqProject | python3 "$(DEPGRAPHSCRIPT)" | tred > "$@"
+
+$(DEPGRAPHDOC): $(DEPGRAPHDOT) $(DEPPOSTPROCESSSCRIPT)
+	@DOC_BASE=$(DOC_BASE) dot -T svg "$(DEPGRAPHDOT)" | python3 "$(DEPPOSTPROCESSSCRIPT)" > "$(DEPGRAPHDOC)"
+
+.PHONY: depgraphdoc
+depgraphdoc: $(DEPGRAPHDOC)
+
+clean::
+	@echo "CLEAN $(DEPGRAPHDOT) $(DEPGRAPHDOC)"
+	@rm -f $(DEPGRAPHDOT) $(DEPGRAPHDOC)

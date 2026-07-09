@@ -2,21 +2,34 @@
 
 -arg -w -arg -cast-in-pattern,-notation-overridden
 
-theories/PtsSignature.v
 theories/LibTactics.v
 theories/Core/Base.v
 
+## PTS* signatures and their properties ##
+theories/PtsSignature/Signatures.v
+theories/PtsSignature/Predicativity.v
+theories/PtsSignature/Functionality.v
+theories/PtsSignature/Decidability.v
+theories/PtsSignature.v
+
+
+## Declarative definition of PTS* ##
 theories/Core/Syntactic/Syntax.v
 theories/Core/Syntactic/System/Definitions.v
 theories/Core/Syntactic/System/Lemmas.v
 theories/Core/Syntactic/System/Tactics.v
 theories/Core/Syntactic/System.v
+theories/Core/Syntactic/CtxSub.v
 theories/Core/Syntactic/CtxEq.v
 theories/Core/Syntactic/CoreInversions.v
 theories/Core/Syntactic/Presup.v
 theories/Core/Syntactic/SystemOpt.v
 theories/Core/Syntactic/Corollaries.v
+theories/Core/Syntactic/SystemAnnotated/Definitions.v
+theories/Core/Syntactic/SystemAnnotated/Lemmas.v
+theories/Core/Syntactic/SystemAnnotated.v
 
+## Evaluation of PTS* ##
 theories/Core/Semantic/Domain.v
 theories/Core/Semantic/Evaluation/Definitions.v
 theories/Core/Semantic/Evaluation/Lemmas.v
@@ -32,6 +45,8 @@ theories/Core/Semantic/PER/Lemmas.v
 theories/Core/Semantic/PER.v
 theories/Core/Semantic/Realizability.v
 
+
+## Completeness of normalization ##
 theories/Core/Completeness/LogicalRelation/Definitions.v
 theories/Core/Completeness/LogicalRelation/Tactics.v
 theories/Core/Completeness/LogicalRelation/Lemmas.v
@@ -41,10 +56,14 @@ theories/Core/Completeness/ContextCases.v
 theories/Core/Completeness/SubstitutionCases.v
 theories/Core/Completeness/TermStructureCases.v
 theories/Core/Completeness/FunctionCases.v
+theories/Core/Completeness/SubtypingCases.v
 theories/Core/Completeness/VariableCases.v
+theories/Core/Completeness/NatCases.v
 theories/Core/Completeness/FundamentalTheorem.v
 theories/Core/Completeness.v
 
+
+## Soundness of normalization ##
 theories/Core/Soundness/Weakening/Definitions.v
 theories/Core/Soundness/Weakening/Lemmas.v
 theories/Core/Soundness/LogicalRelation/Definitions.v
@@ -59,7 +78,52 @@ theories/Core/Soundness/TermStructureCases.v
 theories/Core/Soundness/SortCases.v
 theories/Core/Soundness/SubstitutionCases.v
 theories/Core/Soundness/FunctionCases.v
-theories/Core/Soundness/Extension/SystemAnnotated.v
-theories/Core/Soundness/Extension/Syntax.v
+theories/Core/Soundness/NatCases.v
 theories/Core/Soundness/FundamentalTheorem.v
 theories/Core/Soundness.v
+
+
+## Consequences of normalization ##
+theories/Core/Completeness/Consequences/Types.v
+theories/Core/Completeness/Consequences/Rules.v
+theories/Core/Semantic/Consequences.v
+
+
+## Algorithmic ##
+theories/Frontend/Elaborator.v
+theories/Algorithmic/Subtyping/Definitions.v
+theories/Algorithmic/Subtyping/Lemmas.v
+theories/Algorithmic/Subtyping.v
+theories/Algorithmic/Typing/Definitions.v
+theories/Algorithmic/Typing/Lemmas.v
+theories/Algorithmic/Typing.v
+
+
+## Extraction ##
+theories/Extraction/Evaluation.v
+theories/Extraction/Readback.v
+theories/Extraction/NbE.v
+theories/Extraction/PseudoMonadic.v
+theories/Extraction/Subtyping.v
+theories/Extraction/TypeCheck.v
+
+
+## Case studies ##
+theories/CaseStudies/MiniML/Signature.v
+theories/CaseStudies/MiniML/Frontend.v
+theories/CaseStudies/MiniML/Parser.v
+theories/CaseStudies/MiniML/Entrypoint.v
+
+theories/CaseStudies/LF/Signature.v
+theories/CaseStudies/LF/Frontend.v
+theories/CaseStudies/LF/Parser.v
+theories/CaseStudies/LF/Entrypoint.v
+
+theories/CaseStudies/MLTTCumul/Signature.v
+theories/CaseStudies/MLTTCumul/Frontend.v
+theories/CaseStudies/MLTTCumul/Parser.v
+theories/CaseStudies/MLTTCumul/Entrypoint.v
+
+theories/CaseStudies/MLTTNonCumul/Signature.v
+theories/CaseStudies/MLTTOmega/Signature.v
+theories/CaseStudies/STLC/Signature.v

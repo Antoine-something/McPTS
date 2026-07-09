@@ -1,77 +1,86 @@
 From McPTS Require Import PtsSignature LibTactics.
 From McPTS.Core Require Import Base.
+From McPTS.Core.Syntactic Require Import SystemAnnotated.
 From McPTS.Core.Soundness Require Import
   ContextCases
   FunctionCases
   SubstitutionCases
   TermStructureCases
+  NatCases
   SortCases.
 From McPTS.Core.Soundness Require Export LogicalRelation.
-From McPTS.Core.Soundness.Extension Require Import SystemAnnotated.
 Import Domain_Notations.
 
 Section soundness_fundamental.
-  Theorem soundness_fundamental {P} (pred_P : PredicativeSig P) (full_P : FullSig P) :
-    (forall Γ, {{ ⊫ Γ }} -> {{ ⟪ pred_P ⟫ ⊩ Γ }}) /\
-      (forall Γ A s M, {{ Γ ⊫ M : A > s }} -> {{ ⟪ pred_P ⟫ Γ ⊩ M : A > s }}) /\
-      (forall Γ A s, {{ Γ ⊫ A > s }} -> {{ ⟪ pred_P ⟫ Γ ⊩ A > s }}) /\
-      (forall Γ Δ σ, {{ Γ ⊫s σ : Δ }} -> {{ ⟪ pred_P ⟫ Γ ⊩s σ : Δ }}).
+  Theorem soundness_fundamental {P} (pred_P : PredicativeSig P) :
+    (forall anns Γ, {{ ⊫ Γ with anns }} -> {{ ⟪ pred_P ⟫ ⊩ Γ with anns }}) /\
+      (forall anns Γ A s M, {{ Γ with anns ⊫ M : A @ s }} -> {{ ⟪ pred_P ⟫ Γ with anns ⊩u M : A @ s }}) /\
+      (forall anns Γ A s, {{ Γ with anns ⊫ A @ s }} -> {{ ⟪ pred_P ⟫ Γ with anns ⊩u A @ s }}) /\
+      (forall anns anns' Γ Δ σ, {{ Γ with anns ⊫s σ : Δ with anns' }} -> {{ ⟪ pred_P ⟫ Γ with anns ⊩s σ : Δ with anns' }}).
   Proof.
-    eapply syntactic_wf_ann_mut_ind; mauto 3; intros.
+    eapply syntactic_wf_ann_mut_ind; mauto.
+    - intros.
+      assert {{ ⊢ Γ }} by mauto 3 using wf_ctx_ann_implies_wf_ctx.
+      assert {{ #x : A ∈ Γ}} by (eapply ann_lookup_implies_lookup; mauto 2).
+      eapply glu_rel_exp_vlookup; mauto 3.
   Qed.
 
   #[local]
-  Ltac solve_it pred_P full_P := pose proof soundness_fundamental pred_P full_P; firstorder.
-  
-  Corollary soundness_fundamental_ctx_ann {P} (pred_P : PredicativeSig P) (full_P : FullSig P) :
-    forall Γ, {{ ⊫ Γ }} -> {{ ⟪ pred_P ⟫ ⊩ Γ }}.
-  Proof. solve_it pred_P full_P. Qed.
-  
-  Corollary soundness_fundamental_exp_ann {P} (pred_P : PredicativeSig P) (full_P : FullSig P) :
-    forall Γ A s M, {{ Γ ⊫ M : A > s }} -> {{ ⟪ pred_P ⟫ Γ ⊩ M : A > s }}.
-  Proof. solve_it pred_P full_P. Qed.
-  
-  Corollary soundness_fundamental_typ_ann {P} (pred_P : PredicativeSig P) (full_P : FullSig P) :
-    forall Γ A s, {{ Γ ⊫ A > s }} -> {{ ⟪ pred_P ⟫ Γ ⊩ A > s }}.
-  Proof. solve_it pred_P full_P. Qed.
-  
-  Corollary soundness_fundamental_sub_ann {P} (pred_P : PredicativeSig P) (full_P : FullSig P) :
-    forall Γ Δ σ, {{ Γ ⊫s σ : Δ }} -> {{ ⟪ pred_P ⟫ Γ ⊩s σ : Δ }}.
-  Proof. solve_it pred_P full_P. Qed.  
+  Ltac solve_it pred_P := pose proof soundness_fundamental pred_P; firstorder.
+
+  Corollary soundness_fundamental_ctx_ann {P} (pred_P : PredicativeSig P) :
+    forall anns Γ, {{ ⊫ Γ with anns }} -> {{ ⟪ pred_P ⟫ ⊩ Γ with anns }}.
+  Proof. solve_it pred_P. Qed.
+
+  Corollary soundness_fundamental_exp_ann {P} (pred_P : PredicativeSig P) :
+    forall anns Γ A so M, {{ Γ with anns ⊫ M : A @ so }} -> {{ ⟪ pred_P ⟫ Γ with anns ⊩u M : A @ so }}.
+  Proof. solve_it pred_P. Qed.
+
+  Corollary soundness_fundamental_typ_ann {P} (pred_P : PredicativeSig P) :
+    forall anns Γ A so, {{ Γ with anns ⊫ A @ so }} -> {{ ⟪ pred_P ⟫ Γ with anns ⊩u A @ so }}.
+  Proof. solve_it pred_P. Qed.
+
+  Corollary soundness_fundamental_sub_ann {P} (pred_P : PredicativeSig P) :
+    forall anns anns' Γ Δ σ, {{ Γ with anns ⊫s σ : Δ with anns' }} -> {{ ⟪ pred_P ⟫ Γ with anns ⊩s σ : Δ with anns' }}.
+  Proof. solve_it pred_P. Qed.
 
 
-  
-  Theorem soundness_fundamental_ctx {P} (pred_P : PredicativeSig P) (full_P : FullSig P) :
-    forall Γ, {{ ⊢ Γ }} -> {{ ⟪ pred_P ⟫ ⊩ Γ }}.
+  Theorem soundness_fundamental_ctx {P} (pred_P : PredicativeSig P) :
+    forall Γ, {{ ⊢ Γ }} -> exists anns, {{ ⟪ pred_P ⟫ ⊩ Γ with anns }}.
   Proof.
     intros.
-    assert {{ ⊫ Γ }} by (eapply wf_ctx_implies_wf_ctx_ann; mauto 2).
+    assert (exists anns, {{ ⊫ Γ with anns }}) as [anns] by mauto 2.
+    eexists.
     eapply soundness_fundamental_ctx_ann; mauto 2.
   Qed.
 
-  Theorem soundness_fundamental_exp {P} (pred_P : PredicativeSig P) (full_P : FullSig P) :
-    forall Γ M A, {{ Γ ⊢ M : A }} -> exists s, {{ ⟪ pred_P ⟫ Γ ⊩ M : A > s }}.
+  Theorem soundness_fundamental_exp {P} (pred_P : PredicativeSig P) :
+    forall Γ M A, {{ Γ ⊢ M : A }} -> exists anns so, {{ ⟪ pred_P ⟫ Γ with anns ⊩u M : A @ so }}.
   Proof.
     intros.
-    assert (exists s, {{ Γ ⊫ M : A > s }}) as [s] by (eapply wf_exp_implies_wf_exp_ann; mauto 2).
-    eexists.
+    assert (exists anns, {{ ⊫ Γ with anns }}) as [anns] by mauto 3.
+    assert (exists so, {{ Γ with anns ⊫ M : A @ so }}) as [so] by mauto 2.
+    do 2 eexists.
     eapply soundness_fundamental_exp_ann; mauto 2.
   Qed.
 
-  Theorem soundness_fundamental_typ {P} (pred_P : PredicativeSig P) (full_P : FullSig P) :
-    forall Γ A, {{ Γ ⊢ A }} -> exists s, {{ ⟪ pred_P ⟫ Γ ⊩ A > s }}.
+  Theorem soundness_fundamental_typ {P} (pred_P : PredicativeSig P) :
+    forall Γ A, {{ Γ ⊢ A }} -> exists anns so, {{ ⟪ pred_P ⟫ Γ with anns ⊩u A @ so }}.
   Proof.
     intros.
-    assert (exists s, {{ Γ ⊫ A > s }}) as [s] by (eapply wf_typ_implies_wf_typ_ann; mauto 2).
-    eexists.
+    assert (exists anns, {{ ⊫ Γ with anns }}) as [anns] by mauto 3.
+    assert (exists so, {{ Γ with anns ⊫ A @ so }}) as [so] by mauto 2.
+    do 2 eexists.
     eapply soundness_fundamental_typ_ann; mauto 2.
   Qed.
-  
-  Theorem soundness_fundamental_sub {P} (pred_P : PredicativeSig P) (full_P : FullSig P) :
-    forall Γ σ Δ, {{ Γ ⊢s σ : Δ }} -> {{ ⟪ pred_P ⟫ Γ ⊩s σ : Δ }}.
+
+  Theorem soundness_fundamental_sub {P} (pred_P : PredicativeSig P):
+    forall Γ σ Δ, {{ Γ ⊢s σ : Δ }} -> exists annsΓ annsΔ, {{ ⟪ pred_P ⟫ Γ with annsΓ ⊩s σ : Δ with annsΔ }}.
   Proof.
     intros.
-    assert {{ Γ ⊫s σ : Δ }} by (eapply wf_sub_implies_wf_sub_ann; mauto 2).
+    assert (exists anns, {{ ⊫ Γ with anns }}) as [anns] by mauto 3.
+    assert (exists anns', {{ Γ with anns ⊫s σ : Δ with anns' }}) as [anns'] by mauto 2.
+    do 2 eexists.
     eapply soundness_fundamental_sub_ann; mauto 2.
-  Qed.  
+  Qed.
 End soundness_fundamental.

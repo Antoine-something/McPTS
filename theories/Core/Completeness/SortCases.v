@@ -58,7 +58,7 @@ Proof.
   inversion_clear H4; apply_relation_equivalence; mauto.
   invert_per_sort_elem H1.
   apply_relation_equivalence.
-  eassumption.  
+  eassumption.
 Qed.
 
 Lemma rel_exp_of_typ_inversion2 {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ env_rel A A' s},
@@ -237,7 +237,7 @@ Hint Resolve rel_exp_typ_sub : mcpts.
 
 
 Lemma rel_exp_axiom {P} {pred_P : PredicativeSig P} : forall {s1 s2 Γ},
-    Ax P s1 s2 ->
+    Ax_typ P s1 s2 ->
     {{ ⟪ pred_P ⟫ ⊨ Γ }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u Sort@s1 : Sort@s2 }}.
 Proof.
@@ -254,13 +254,13 @@ Proof.
     eapply per_sort_elem_core_sort'; mauto.
     reflexivity.
 Qed.
-  
+
 #[export]
 Hint Resolve rel_exp_axiom : mcpts.
 
 
 Lemma rel_exp_axiom_sub {P} {pred_P : PredicativeSig P} : forall {Γ Δ σ s1 s2},
-    Ax P s1 s2 ->
+    Ax_typ P s1 s2 ->
     {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u Sort@s1[σ] ≈ Sort@s1 : Sort@s2 }}.
 Proof.
@@ -277,9 +277,31 @@ Proof.
     reflexivity.
   - econstructor; mauto.
     econstructor; mauto.
-    eapply per_sort_elem_core_sort'; mauto.                       
+    eapply per_sort_elem_core_sort'; mauto.
     reflexivity.
 Qed.
 
 #[export]
 Hint Resolve rel_exp_axiom_sub : mcpts.
+
+Lemma rel_exp_typ_sorted_sub {P} {pred_P : PredicativeSig P} : forall {Γ Δ σ s1 s2},
+    {{ ⟪ pred_P ⟫ Γ ⊨u Sort@s1 : Sort@s2 }} ->         
+    {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨u Sort@s1[σ] ≈ Sort@s1 : Sort@s2 }}.
+Proof.
+  intros * [env_relΓ [? ?]] [? [? env_relΔ]].
+  destruct_conjs.
+  handle_per_ctx_env_irrel.
+  eexists; split; [eassumption|].
+  intros.
+  specialize (H0 ρ ρ' equiv_ρ_ρ') as [elem_rel].
+  assert (rel_sub σ ρ σ ρ' env_relΔ) as [sub_rel] by mauto.
+  destruct_conjs.
+  destruct_by_head @rel_typ_unsorted.
+  destruct_by_head @rel_exp.
+  simplify_evals.
+  eexists; repeat split; mauto 3.
+Qed.
+
+#[export]
+Hint Resolve rel_exp_typ_sorted_sub : mcpts.

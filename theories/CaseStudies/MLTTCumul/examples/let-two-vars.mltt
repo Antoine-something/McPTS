@@ -1,0 +1,4 @@
+let ((x : Nat) := 0) 
+    ((f : forall (y : Nat) : Type@0 -> Nat) := fun (n : Nat) : Type@0 -> (n : Nat)) 
+    : Type@0 
+    in (f x : Nat) : Nat

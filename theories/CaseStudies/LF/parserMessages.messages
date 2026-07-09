@@ -1,0 +1,429 @@
+prog: RPAREN
+##
+## Ends in an error in state: 0.
+##
+## prog' -> . prog [ # ]
+##
+## The known suffix of the stack is as follows:
+##
+##
+
+This token is invalid for the beginning of a program.
+
+
+prog: DEF_EXP LPAREN TYPE
+##
+## Ends in an error in state: 2.
+##
+## param -> LPAREN . VAR COLON obj RPAREN [ LPAREN DOT COLONEQ COLON ]
+##
+## The known suffix of the stack is as follows:
+## LPAREN
+##
+
+A variable "(x : ?A)" is expected after "def@exp", where "?A" is a type.
+
+prog: DEF_EXP LPAREN VAR VAR
+##
+## Ends in an error in state: 3.
+##
+## param -> LPAREN VAR . COLON obj RPAREN [ LPAREN DOT COLONEQ COLON ]
+##
+## The known suffix of the stack is as follows:
+## LPAREN VAR
+##
+
+A variable "(x : ?A)" is expected after "def@exp", where "?A" is a type.
+
+prog: DEF_EXP LPAREN VAR COLON RPAREN
+##
+## Ends in an error in state: 4.
+##
+## param -> LPAREN VAR COLON . obj RPAREN [ LPAREN DOT COLONEQ COLON ]
+##
+## The known suffix of the stack is as follows:
+## LPAREN VAR COLON
+##
+
+A parameter should have "?type" after ":",
+where "?type" is the type of the parameter.
+
+
+prog: DEF_EXP LPAREN VAR COLON KIND PI
+##
+## Ends in an error in state: 34.
+##
+## param -> LPAREN VAR COLON obj . RPAREN [ LPAREN DOT COLONEQ COLON ]
+##
+## The known suffix of the stack is as follows:
+## LPAREN VAR COLON obj
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 26, spurious reduction of production obj -> app_obj
+##
+
+Ill-formed type annotation in parameter of def@exp.
+
+prog: LET VAR
+##
+## Ends in an error in state: 1.
+##
+## define_defns -> LET . param COLONEQ obj DOT define_defns [ EOF ]
+##
+## The known suffix of the stack is as follows:
+## LET
+##
+
+A variable binding is expected after a "let".
+
+prog: LET LPAREN VAR COLON KIND RPAREN VAR
+##
+## Ends in an error in state: 36.
+##
+## define_defns -> LET param . COLONEQ obj DOT define_defns [ EOF ]
+##
+## The known suffix of the stack is as follows:
+## LET param
+##
+
+Expected symbol ":=".
+
+prog: LET LPAREN VAR COLON KIND RPAREN COLONEQ RPAREN
+##
+## Ends in an error in state: 37.
+##
+## define_defns -> LET param COLONEQ . obj DOT define_defns [ EOF ]
+##
+## The known suffix of the stack is as follows:
+## LET param COLONEQ
+##
+
+Expected a value for the variable.
+
+prog: LET LPAREN VAR COLON KIND RPAREN COLONEQ KIND RPAREN
+##
+## Ends in an error in state: 38.
+##
+## define_defns -> LET param COLONEQ obj . DOT define_defns [ EOF ]
+##
+## The known suffix of the stack is as follows:
+## LET param COLONEQ obj
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 26, spurious reduction of production obj -> app_obj
+##
+
+Ill-formed expression in body of let definition.
+
+prog: LET LPAREN VAR COLON KIND RPAREN COLONEQ KIND DOT VAR
+##
+## Ends in an error in state: 39.
+##
+## define_defns -> LET param COLONEQ obj DOT . define_defns [ EOF ]
+##
+## The known suffix of the stack is as follows:
+## LET param COLONEQ obj DOT
+##
+
+Expected EOF or new definition.
+
+prog: DEF_TYPE VAR
+##
+## Ends in an error in state: 40.
+##
+## define_defns -> DEF_TYPE . param DOT define_defns [ EOF ]
+##
+## The known suffix of the stack is as follows:
+## DEF_TYPE
+##
+
+A variable "(x : ?A)" is expected after "def@type", where "?A" is a type.
+
+
+prog: DEF_TYPE LPAREN VAR COLON KIND RPAREN VAR
+##
+## Ends in an error in state: 41.
+##
+## define_defns -> DEF_TYPE param . DOT define_defns [ EOF ]
+##
+## The known suffix of the stack is as follows:
+## DEF_TYPE param
+##
+
+Expected symbol ".".
+
+prog: DEF_TYPE LPAREN VAR COLON KIND RPAREN DOT VAR
+##
+## Ends in an error in state: 42.
+##
+## define_defns -> DEF_TYPE param DOT . define_defns [ EOF ]
+##
+## The known suffix of the stack is as follows:
+## DEF_TYPE param DOT
+##
+
+Expected EOF or new definition.
+
+prog: DEF_EXP VAR
+##
+## Ends in an error in state: 43.
+##
+## define_defns -> DEF_EXP . param DOT define_defns [ EOF ]
+##
+## The known suffix of the stack is as follows:
+## DEF_EXP
+##
+
+A variable "(x : ?A)" is expected after "def@type", where "?A" is a type.
+
+
+prog: DEF_EXP LPAREN VAR COLON KIND RPAREN VAR
+##
+## Ends in an error in state: 44.
+##
+## define_defns -> DEF_EXP param . DOT define_defns [ EOF ]
+##
+## The known suffix of the stack is as follows:
+## DEF_EXP param
+##
+
+Expected symbol ".".
+
+prog: DEF_EXP LPAREN VAR COLON KIND RPAREN DOT VAR
+##
+## Ends in an error in state: 45.
+##
+## define_defns -> DEF_EXP param DOT . define_defns [ EOF ]
+##
+## The known suffix of the stack is as follows:
+## DEF_EXP param DOT
+##
+
+Expected EOF or new definition.
+
+
+
+prog: DEF_EXP LPAREN VAR COLON PI VAR
+##
+## Ends in an error in state: 7.
+##
+## obj -> PI . params COLON sort ARROW obj [ RPAREN DOT COLON ]
+##
+## The known suffix of the stack is as follows:
+## PI
+##
+
+A list of parenthesized parameters is expected after "forall".
+For example, "(x : ?type1) (y : ?type2)".
+
+prog: DEF_EXP LPAREN VAR COLON PI LPAREN VAR COLON KIND RPAREN VAR
+##
+## Ends in an error in state: 8.
+##
+## obj -> PI params . COLON sort ARROW obj [ RPAREN DOT COLON ]
+## params -> params . param [ LPAREN COLON ]
+##
+## The known suffix of the stack is as follows:
+## PI params
+##
+
+Annotation ": ?sort", where "?sort" is either "type" or "kind"
+or another parameter is expected after a list of parameters.
+
+prog: DEF_EXP LPAREN VAR COLON PI LPAREN VAR COLON KIND RPAREN COLON VAR
+##
+## Ends in an error in state: 9.
+##
+## obj -> PI params COLON . sort ARROW obj [ RPAREN DOT COLON ]
+##
+## The known suffix of the stack is as follows:
+## PI params COLON
+##
+
+Annotation must be either "type" or "kind".
+
+prog: DEF_EXP LPAREN VAR COLON PI LPAREN VAR COLON KIND RPAREN COLON KIND VAR
+##
+## Ends in an error in state: 11.
+##
+## obj -> PI params COLON sort . ARROW obj [ RPAREN DOT COLON ]
+##
+## The known suffix of the stack is as follows:
+## PI params COLON sort
+##
+
+Expected symbol "->".
+
+prog: DEF_EXP LPAREN VAR COLON PI LPAREN VAR COLON KIND RPAREN COLON KIND ARROW RPAREN
+##
+## Ends in an error in state: 12.
+##
+## obj -> PI params COLON sort ARROW . obj [ RPAREN DOT COLON ]
+##
+## The known suffix of the stack is as follows:
+## PI params COLON sort ARROW
+##
+
+An expression is expected after "->".
+This token is invalid for the beginning of an expression.
+
+prog: DEF_EXP LPAREN VAR COLON LPAREN RPAREN
+##
+## Ends in an error in state: 13.
+##
+## atomic_obj -> LPAREN . obj RPAREN [ VAR TYPE RPAREN LPAREN KIND DOT COLON ]
+##
+## The known suffix of the stack is as follows:
+## LPAREN
+##
+
+"()" is an invalid expression.
+"()" should have an expression in it to be an expression.
+
+prog: DEF_EXP LPAREN VAR COLON LAMBDA VAR
+##
+## Ends in an error in state: 14.
+##
+## obj -> LAMBDA . params COLON sort ARROW ann_obj [ RPAREN DOT COLON ]
+##
+## The known suffix of the stack is as follows:
+## LAMBDA
+##
+
+A list of parenthesized parameters is expected after "fun".
+For example, "(x : ?type1) (y : ?type2)".
+
+prog: DEF_EXP LPAREN VAR COLON LAMBDA LPAREN VAR COLON KIND RPAREN VAR
+##
+## Ends in an error in state: 15.
+##
+## obj -> LAMBDA params . COLON sort ARROW ann_obj [ RPAREN DOT COLON ]
+## params -> params . param [ LPAREN COLON ]
+##
+## The known suffix of the stack is as follows:
+## LAMBDA params
+##
+
+Annotation ": ?sort", where "?sort" is either "type" or "kind"
+or another parameter is expected after a list of parameters.
+
+prog: DEF_EXP LPAREN VAR COLON LAMBDA LPAREN VAR COLON KIND RPAREN COLON VAR
+##
+## Ends in an error in state: 16.
+##
+## obj -> LAMBDA params COLON . sort ARROW ann_obj [ RPAREN DOT COLON ]
+##
+## The known suffix of the stack is as follows:
+## LAMBDA params COLON
+##
+
+Annotation must be either "type" or "kind".
+
+prog: DEF_EXP LPAREN VAR COLON LAMBDA LPAREN VAR COLON KIND RPAREN COLON KIND VAR
+##
+## Ends in an error in state: 17.
+##
+## obj -> LAMBDA params COLON sort . ARROW ann_obj [ RPAREN DOT COLON ]
+##
+## The known suffix of the stack is as follows:
+## LAMBDA params COLON sort
+##
+
+Expected symbol "->".
+
+prog: DEF_EXP LPAREN VAR COLON LAMBDA LPAREN VAR COLON KIND RPAREN COLON KIND ARROW VAR
+##
+## Ends in an error in state: 18.
+##
+## obj -> LAMBDA params COLON sort ARROW . ann_obj [ RPAREN DOT COLON ]
+##
+## The known suffix of the stack is as follows:
+## LAMBDA params COLON sort ARROW
+##
+
+Expected annotated expression "(?exp, ?type)" in body of a function.
+
+prog: DEF_EXP LPAREN VAR COLON LAMBDA LPAREN VAR COLON KIND RPAREN COLON KIND ARROW LPAREN RPAREN
+##
+## Ends in an error in state: 19.
+##
+## ann_obj -> LPAREN . obj COLON obj RPAREN [ RPAREN DOT COLON ]
+##
+## The known suffix of the stack is as follows:
+## LPAREN
+##
+
+Expected annotated expression "(?exp, ?type)" in body of a function.
+"()" is not a valid a function body.
+
+prog: DEF_EXP LPAREN VAR COLON LAMBDA LPAREN VAR COLON KIND RPAREN COLON KIND ARROW LPAREN KIND RPAREN
+##
+## Ends in an error in state: 21.
+##
+## ann_obj -> LPAREN obj . COLON obj RPAREN [ RPAREN DOT COLON ]
+##
+## The known suffix of the stack is as follows:
+## LPAREN obj
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 26, spurious reduction of production obj -> app_obj
+##
+
+Expected annotated expression "(?exp, ?type)" in body of a function.
+
+prog: DEF_EXP LPAREN VAR COLON LAMBDA LPAREN VAR COLON KIND RPAREN COLON KIND ARROW LPAREN KIND COLON RPAREN
+##
+## Ends in an error in state: 22.
+##
+## ann_obj -> LPAREN obj COLON . obj RPAREN [ RPAREN DOT COLON ]
+##
+## The known suffix of the stack is as follows:
+## LPAREN obj COLON
+##
+
+Expected type annotation "?type" in body of a function.
+
+prog: DEF_EXP LPAREN VAR COLON LAMBDA LPAREN VAR COLON KIND RPAREN COLON KIND ARROW LPAREN KIND COLON KIND PI
+##
+## Ends in an error in state: 23.
+##
+## ann_obj -> LPAREN obj COLON obj . RPAREN [ RPAREN DOT COLON ]
+##
+## The known suffix of the stack is as follows:
+## LPAREN obj COLON obj
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 26, spurious reduction of production obj -> app_obj
+##
+
+Ill-formed type annotation in body of a function.
+
+prog: DEF_EXP LPAREN VAR COLON LPAREN KIND PI
+##
+## Ends in an error in state: 31.
+##
+## atomic_obj -> LPAREN obj . RPAREN [ VAR TYPE RPAREN LPAREN KIND DOT COLON ]
+##
+## The known suffix of the stack is as follows:
+## LPAREN obj
+##
+## WARNING: This example involves spurious reductions.
+## This implies that, although the LR(1) items shown above provide an
+## accurate view of the past (what has been recognized so far), they
+## may provide an INCOMPLETE view of the future (what was expected next).
+## In state 26, spurious reduction of production obj -> app_obj
+##
+
+Ill-formed type annotation in parameter of def@exp.

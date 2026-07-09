@@ -32,9 +32,9 @@ Proof with mautosolve.
   destruct_by_head (@rel_typ_unsorted P).
   destruct_by_head (@rel_exp P).
   handle_per_typ_elem_irrel.
-  
+
   eexists.
-  split; mauto.  
+  split; mauto.
 Qed.
 
 #[export]
@@ -113,7 +113,7 @@ Proof with mautosolve.
   destruct_by_head (@rel_typ_unsorted P).
   destruct_by_head (@rel_exp P).
   handle_per_typ_elem_irrel.
-  eexists.  
+  eexists.
   split; econstructor; mauto.
 Qed.
 
@@ -133,13 +133,13 @@ Qed.
 
 #[export]
 Hint Resolve rel_exp_sub_compose_sort : mcpts.
- 
+
 
 Lemma rel_exp_conv_typ {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M M' A A'},
     {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : A }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨ A ≈ A' }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : A' }}.
-Proof with mautosolve. 
+Proof with mautosolve.
   intros.
   invert_rel_exp_unsorted H;
     inversion_clear H0;
@@ -155,7 +155,7 @@ Proof with mautosolve.
   assert (equiv_ρ_ρ : env_relΓ ρ ρ) by (etransitivity; [|symmetry]; eassumption).
   assert (equiv_ρ'_ρ : env_relΓ ρ' ρ) by (symmetry; mauto).
   assert (equiv_ρ'_ρ' : env_relΓ ρ' ρ') by (etransitivity; [|symmetry]; eassumption).
-    
+
   assert (exists elem_rel : relation (domain P), rel_typ_unsorted pred_P A ρ A ρ' elem_rel /\ rel_exp M ρ M' ρ' elem_rel) by mauto.
   assert (exists elem_rel : relation (domain P), rel_typ_unsorted pred_P A ρ' A' ρ' elem_rel) by mauto.
   assert (exists elem_rel : relation (domain P), rel_typ_unsorted pred_P A ρ A' ρ elem_rel) by mauto.
@@ -164,10 +164,10 @@ Proof with mautosolve.
 
   destruct_by_head (@rel_typ_unsorted P).
   handle_per_typ_elem_irrel.
-  econstructor; mauto. 
+  econstructor; mauto.
   symmetry in H11.
   transitivity a1; mauto.
-  transitivity a'1; mauto.  
+  transitivity a'1; mauto.
 Qed.
 
 Lemma rel_typ_implies_rel_typ_unsorted {P} {pred_P : PredicativeSig P} : forall {Γ A A' s},
@@ -193,7 +193,7 @@ Lemma rel_exp_conv {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M M' A 
     {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : A }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u A ≈ A' : Sort@s }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : A' }}.
-Proof with mautosolve. 
+Proof with mautosolve.
   intros.
   assert {{ ⟪ pred_P ⟫ Γ ⊨ A ≈ A' }} by (eapply rel_typ_implies_rel_typ_unsorted; mauto 2).
   eapply rel_exp_conv_typ; mauto 2.
@@ -279,7 +279,7 @@ Proof.
       rel_exp A ρ A' ρ' elem_rel) by mauto.
   destruct_conjs.
 
-  
+
   destruct_by_head (@rel_typ_unsorted P).
   assert (per_typ_elem pred_P (per_sort pred_P s) a a').
   {
@@ -305,7 +305,7 @@ Qed.
 
 #[export]
 Hint Resolve val_typ_of_val_sort : mcpts.
-  
+
 Lemma rel_typ_sub_cong {P} {pred_P : PredicativeSig P} : forall {Γ Δ σ σ' A A'},
       {{ ⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Δ }} ->
       {{ ⟪ pred_P ⟫ Δ ⊨ A ≈ A' }} ->
@@ -415,7 +415,7 @@ Proof.
   intros * [env_relΓ] [env_relΓ'].
   destruct_conjs.
   handle_per_ctx_env_irrel.
-  
+
   eexists; split; [eassumption|].
   intros.
   assert (equiv_ρ_ρ : env_relΓ ρ ρ) by (etransitivity; [|symmetry]; eassumption).
@@ -458,3 +458,29 @@ Qed.
 
 #[export]
 Hint Resolve presup_rel_exp : mcpts.
+
+Lemma rel_exp_eq_subtyp{P : PtsSig} {pred_P : PredicativeSig P} : forall Γ M M' A A',
+    {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : A }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨ A ⊆ A' }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : A' }}.
+Proof.
+  intros * HM [env_relΓ [? ?]].
+  invert_rel_exp_unsorted HM.
+  econstructor; split; try eassumption.
+  intros.
+  (on_all_hyp: destruct_rel_by_assumption env_relΓ).
+  destruct_by_head (@rel_typ_unsorted P).
+  destruct_by_head (@rel_exp P).
+  simplify_evals.
+  eexists.
+  split; econstructor; eauto using per_sort_elem_cumu.
+  handle_per_sort_elem_irrel.
+  eapply per_elem_subtyping_gen; [| | | try eassumption].
+  - eauto using per_subtyp_sorted_cumu.
+  - eauto using per_sort_elem_cumu.
+  - symmetry.
+    eauto using per_sort_elem_cumu.
+Qed.
+
+#[export]
+Hint Resolve rel_exp_eq_subtyp : mcpts.

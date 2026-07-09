@@ -246,6 +246,36 @@ Tactic Notation "mauto" int_or_var(pow) "using" uconstr(use1) "," uconstr(use2) 
 Tactic Notation "mauto" int_or_var(pow) "using" uconstr(use1) "," uconstr(use2) "," uconstr(use3) "," uconstr(use4) :=
   eauto pow using use1, use2, use3, use4 with mcpts core.
 
+Tactic Notation "info_mauto" :=
+  info_eauto with mcpts core.
+
+Tactic Notation "info_mauto" int_or_var(pow) :=
+  info_eauto pow with mcpts core.
+
+Tactic Notation "info_mauto" "using" uconstr(use) :=
+  info_eauto using use with mcpts core.
+
+Tactic Notation "info_mauto" "using" uconstr(use1) "," uconstr(use2) :=
+  info_eauto using use1, use2 with mcpts core.
+
+Tactic Notation "info_mauto" "using" uconstr(use1) "," uconstr(use2) "," uconstr(use3) :=
+  info_eauto using use1, use2, use3 with mcpts core.
+
+Tactic Notation "info_mauto" "using" uconstr(use1) "," uconstr(use2) "," uconstr(use3) "," uconstr(use4) :=
+  info_eauto using use1, use2, use3, use4 with mcpts core.
+
+Tactic Notation "info_mauto" int_or_var(pow) "using" uconstr(use) :=
+  info_eauto pow using use with mcpts core.
+
+Tactic Notation "info_mauto" int_or_var(pow) "using" uconstr(use1) "," uconstr(use2) :=
+  info_eauto pow using use1, use2 with mcpts core.
+
+Tactic Notation "info_mauto" int_or_var(pow) "using" uconstr(use1) "," uconstr(use2) "," uconstr(use3) :=
+  info_eauto pow using use1, use2, use3 with mcpts core.
+
+Tactic Notation "info_mauto" int_or_var(pow) "using" uconstr(use1) "," uconstr(use2) "," uconstr(use3) "," uconstr(use4) :=
+  info_eauto pow using use1, use2, use3, use4 with mcpts core.
+
 Ltac mautosolve_impl pow := unshelve solve [mauto pow]; solve [constructor].
 
 Tactic Notation "mautosolve" := mautosolve_impl integer:(5).

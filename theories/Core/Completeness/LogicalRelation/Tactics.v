@@ -23,6 +23,10 @@ Ltac eexists_rel_sub :=
   eexists;
   split; [eassumption |].
 
+Ltac eexists_subtyp :=
+  eexists;
+  split; [eassumption |].
+
 Ltac invert_rel_typ_body :=
   simplify_evals;
   match_by_head per_sort_elem ltac:(fun H => directed invert_per_sort_elem H); subst;
@@ -34,7 +38,7 @@ Ltac invert_rel_typ_body :=
 
 Ltac invert_rel_typ_unsorted_body :=
   simplify_evals;
-  match_by_head per_typ_elem ltac:(fun H => inversion_clear H); subst;
+  match_by_head per_typ_elem ltac:(fun H => directed inversion_clear H); subst;
   clear_dups;
   clear_refl_eqs;
   handle_per_typ_elem_irrel;
@@ -42,7 +46,7 @@ Ltac invert_rel_typ_unsorted_body :=
 
 Ltac invert_rel_typ_unsorted_body_nouip :=
   simplify_evals;
-  match_by_head per_typ_elem ltac:(fun H => inversion H); subst;
+  match_by_head per_typ_elem ltac:(fun H => directed inversion H); subst;
   clear_dups;
   clear_refl_eqs;
   handle_per_typ_elem_irrel;

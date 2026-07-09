@@ -25,13 +25,14 @@ Section functional_read.
             A1 = A2).
   Proof with (functional_eval_rewrite_clear; f_equal; solve [eauto]) using.
     apply read_mut_ind; intros.
-    1,3-6,8: progressive_inversion...
-    
-    - progressive_invert H1.
+    1,3-9,10,12,13: progressive_inversion...
+
+    - progressive_invert H2.
       assert (A = A0) by mauto.
       assert (b = b0) by (eapply functional_eval_exp; mauto).
       assert (m' = m'0) by (eapply functional_eval_app; mauto).
-      subst.      
+      subst.
+      assert (B' = B'0) by mauto.
       assert (M = M0) by mauto.
       subst.
       reflexivity.

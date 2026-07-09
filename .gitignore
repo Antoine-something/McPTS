@@ -1,4 +1,8 @@
-.vscode/
+# Dune outputs
+_build
+*.opam
+_opam
+
 
 # LaTeX
 *.aux
@@ -11,25 +15,49 @@
 *.fdb_latexmk
 *.fls
 *.synctex.gz
-#
-*.sh
-notes.txt
+
+
+# Coq compiler outputs
+*.vo
+*.glob
+*.d
+.*.aux
+*.vio
+*.vok
+*.vos
+.lia.cache
+CoqMakefile.mk*
+!CoqMakefile.mk.local
+!CoqMakefile.mk.local-late
+*.log
+theories/html/
+
+
+# Generated coq dependency graph
+dep.dot
+dep.html
+
+
+# Editor related files
+## Emacs
+*.~undo-tree~
+\#*\#
+.\#*
 *~
 *\~
 
-.*.aux
-*.vo
-*.vok
-*.vos
-*.glob
 
-*.cache
+## VSCode
+.vscode/
 
-.CoqMakefile.mk.d
-CoqMakefile.mk.conf
-CoqMakefile.mk
 
-\#*\#
-.\#*
+# Others
+*.sh
+notes.txt
 
-_opam
+# Extracted files
+theories/**/driver/extracted/*.ml
+theories/**/driver/extracted/*.mli
+theories/**/parserMessages.messages.temp
+theories/**/parserMessages.messages.merge
+theories/**/Parser.v

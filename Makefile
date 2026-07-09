@@ -23,8 +23,8 @@ COQMAKEFILE := CoqMakefile.mk
 COQPROJECTFILE := _CoqProject
 PARSERBASE := Parser.ml
 POSTPARSERBASE := Entrypoint.ml
-PARSERFILE := ../driver/extracted/$(PARSERBASE)
-POSTPARSERFILE := ../driver/extracted/$(POSTPARSERBASE)
+PARSERFILE := theories/CaseStudies/*/driver/extracted/$(PARSERBASE)
+POSTPARSERFILE := theories/CaseStudies/*/driver/extracted/$(POSTPARSERBASE)
 COQPARSERFILE := $(patsubst %.vy,%.v,$(shell find ./ -name '*.vy'))
 COQFILES := $(sort $(shell find ./ -name '*.v') $(COQPARSERFILE))
 
@@ -35,20 +35,12 @@ all: $(COQMAKEFILE)
 .PHONY: clean
 clean: $(COQMAKEFILE)
 	@+$(MAKE) -f "$(COQMAKEFILE)" cleanall
-	@echo "CLEAN $(COQPARSERFILE) $(PARSERBASE) $(patsubst %.ml,%.mli,$(PARSERBASE)) $(PARSERFILE) $(patsubst %.ml,%.mli,$(PARSERFILE))"
-	@rm -f "$(COQPARSERFILE)" "$(PARSERBASE)" "$(patsubst %.ml,%.mli,$(PARSERBASE))" "$(PARSERFILE)" "$(patsubst %.ml,%.mli,$(PARSERFILE))"
-	@echo "CLEAN $(POSTPARSERBASE) $(patsubst %.ml,%.mli,$(POSTPARSERBASE)) $(POSTPARSERFILE) $(patsubst %.ml,%.mli,$(POSTPARSERFILE))"
-	@rm -f "$(POSTPARSERBASE)" "$(patsubst %.ml,%.mli,$(POSTPARSERBASE))" "$(POSTPARSERFILE)" "$(patsubst %.ml,%.mli,$(POSTPARSERFILE))"
+	@echo "CLEAN $(COQPARSERFILE) $(PARSERFILE) $(patsubst %.ml,%.mli,$(PARSERFILE))"
+	@rm -f $(COQPARSERFILE) $(PARSERFILE) $(patsubst %.ml,%.mli,$(PARSERFILE))
+	@echo "CLEAN $(POSTPARSERFILE) $(patsubst %.ml,%.mli,$(POSTPARSERFILE))"
+	@rm -f $(POSTPARSERFILE) $(patsubst %.ml,%.mli,$(POSTPARSERFILE))
 	@echo "CLEAN $(COQMAKEFILE) $(COQMAKEFILE).conf"
 	@rm -f "$(COQMAKEFILE)" "$(COQMAKEFILE).conf"
-
-.PHONY: update_CoqProject
-update_CoqProject: clean
-	(echo "-R . Mctt"; \
-        echo ""; \
-        echo "-arg -w -arg -cast-in-pattern,-notation-overridden"; \
-        echo ""; \
-        echo -e "$(subst $(space),\n,$(COQFILES))") > "$(COQPROJECTFILE)"
 
 .PHONY: force
 force: ;
