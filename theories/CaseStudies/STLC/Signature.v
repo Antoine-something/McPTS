@@ -5,11 +5,9 @@ From McPTS Require Import PtsSignature.
 
 Section STLCSig.
   Inductive STLC_St : Set :=
-  | s_typ : STLC_St
-  | s_knd : STLC_St.
+  | s_typ : STLC_St.
 
-  Inductive STLC_Ax_typ : STLC_St -> STLC_St -> Prop :=
-  | at_typ_knd : STLC_Ax_typ s_typ s_knd.
+  Inductive STLC_Ax_typ : STLC_St -> STLC_St -> Prop :=.
 
   Inductive STLC_Ax_sub : STLC_St -> STLC_St -> Prop :=.
 
@@ -25,20 +23,17 @@ End STLCSig.
 Definition P := STLC_Sig.
 
 Section STLCPredicative.
-  Inductive STLC_pred_rel : relation P :=
-  | pr_typ_knd : STLC_pred_rel s_typ s_knd.
+  Inductive STLC_pred_rel : relation P :=.
 
   Lemma STLC_ord_rel : StrictOrder STLC_pred_rel.
   Proof.
     split; inversion_clear 1.
-    inversion 1.
   Qed.
 
   Lemma STLC_wf_rel : well_founded STLC_pred_rel.
   Proof.
     intros x; induction x;
       econstructor; inversion_clear 1.
-    econstructor; inversion_clear 1.
   Qed.
 
   Lemma STLC_ord_ax_typ : forall (s1 s2 : P), Ax_typ P s1 s2 -> STLC_pred_rel s1 s2.
@@ -86,23 +81,18 @@ End STLCFunctional.
 Section STLCDecidable.
   Lemma STLC_dec_st_eq : forall (s s' : P), ({s = s'} + {s <> s'})%type.
   Proof.
-    intros [] [];
-      only 1,4: (left; reflexivity);
-      right; inversion 1.
+    intros [] []; left; reflexivity.
   Qed.
 
   Lemma STLC_dec_ax_typ : forall (s : P), ( {s' & Ax_typ P s s'} + {forall s', ~Ax_typ P s s'} )%type.
   Proof.
-    intros s; destruct s.
-    - left; eexists; econstructor.
-    - right; inversion 1.
+    right; inversion 1.
   Qed.
 
   Lemma STLC_dec_st_sub : forall (s s' : P), ({st_subtyp s s'} + {~ st_subtyp s s'})%type.
   Proof.
-    intros [] [];
-      only 1,4: (left; reflexivity);
-      right; inversion_clear 1; inversion H0.    
+    intros [] [].
+    left; reflexivity.
   Qed.
 
   Lemma STLC_dec_ru_pi : forall (s1 s2 : P), ({s3 & Ru_pi P s1 s2 s3} + {forall s3, Ru_pi P s1 s2 s3 -> False})%type.
