@@ -17,10 +17,6 @@ _opam
 *.synctex.gz
 
 
-# Generated coq files
-theories/**/Parser.v
-
-
 # Coq compiler outputs
 *.vo
 *.glob
@@ -62,3 +58,5 @@ notes.txt
 # Extracted files
 theories/**/driver/extracted/*.ml
 theories/**/driver/extracted/*.mli
+theories/**/parserMessages.messages.temp
+theories/**/parserMessages.messages.merge
