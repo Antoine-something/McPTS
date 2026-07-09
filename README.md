@@ -1,12 +1,15 @@
 # McPTS: Building Correct-By-Construction Proof Checkers For Pure Type Systems
 
-McPTS is a tool to generate verified, runnable typechecker for predicative pure type systems.  
-This project can be instantiated by specifying a PTS signature, along with a proof that it is
-predicative.  From there, it provides an executable, to which we can feed a program in the
-associated PTS to check whether this program has the specified type. McPTS is implemented
-and verified in Rocq.More specifically, we proved that the typechecking algorithm extracted
+McPTS is a tool to generate verified, runnable typechecker for systems of the PTS* framework, which aims to study extensions of pure type systems in a principled, modular manner.
+This project can be instantiated by specifying a PTS* signature, along with a proof that it is
+predicative, functional, and decidable.  From there, it provides an executable, to which we can feed a program in the
+associated PTS* to check whether this program has the specified type. McPTS is implemented
+and verified in Rocq. More specifically, we proved that the typechecking algorithm extracted
 from Rocq is sound and complete: a program passes typechecker if and only if it is a well-typed
-program in the associated PTS.  Despite being elementary, this serves as a basis for future extensions.
+program in the associated PTS*.
+
+McPTS includes three case studies, for MiniML, a variant of LF, and a version of Martin-Löf type theory with a full cumulative universe hierarchy.
+All three verified type checkers are extracted separately in their respective locations in 'theories/CaseStudies'.
 
 McPTS is a fork of McTT, a project with similar goals, but specialized to Martin-Löf type theory.
 
@@ -21,18 +24,34 @@ McPTS is a fork of McTT, a project with similar goals, but specialized to Martin
 We recommend to install dependencies in the following way:
 
 ```bash
+# setup OPAM switch
 opam update
 opam switch create coq-8.20.0 4.14.2
-opam pin add coq 8.20.0
+opam switch coq-8.20.0
+eval $(opam env)
+
+# install Rocq
+opam pin -y add coq 8.20.0
 opam repo add coq-released https://coq.inria.fr/opam/released
-opam install -y menhir coq-equations coq-menhirlib ppx_inline_test
+
+# install dependencies
+opam install -y dune
+dune build mctt.opam
+opam install -y --deps-only
 ```
 
-## Development
+## Build from source
 
-Use the toplevel `make` to build the whole project (from the `mechanization` directory):
+Use the toplevel `make` to build the whole project, including the three examples of verified compilers (from the root directory):
 ```
 make
 ```
 Makefile will try to find out the number of your CPU cores and parallel as much as
 possible.
+
+One `make` finishes, you can run any of the extracted compiler.
+The names of the executable are `mcpts_miniml`, `mcpts_lf`, and `mcpts_mlttcumul`.
+For example:
+```
+dune exec mcpts_mlttcumul theories/CaseStudies/MLTTCumul/examples/let_nary.mcpts
+```
