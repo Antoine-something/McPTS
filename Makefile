@@ -44,7 +44,7 @@ clean: $(COQMAKEFILE)
 
 .PHONY: update_CoqProject
 update_CoqProject: clean
-	(echo "-R . Mctt"; \
+	(echo "-R . McPTS"; \
         echo ""; \
         echo "-arg -w -arg -cast-in-pattern,-notation-overridden"; \
         echo ""; \

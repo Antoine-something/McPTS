@@ -36,8 +36,8 @@ opam repo add coq-released https://coq.inria.fr/opam/released
 
 # install dependencies
 opam install -y dune
-dune build mctt.opam
-opam install -y --deps-only
+dune build mcpts.opam
+opam install -y --deps-only .
 ```
 
 ## Build from source
