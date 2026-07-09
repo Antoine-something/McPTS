@@ -58,3 +58,5 @@ notes.txt
 # Extracted files
 theories/**/driver/extracted/*.ml
 theories/**/driver/extracted/*.mli
+theories/**/parserMessages.messages.temp
+theories/**/parserMessages.messages.merge
