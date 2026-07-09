@@ -10,8 +10,8 @@ let main_of_example s = main_of_filename ("../examples/" ^ s)
 (** Real tests *)
 (* We never expect parser timeout. 2^500 fuel should be large enough! *)
 
-let%expect_test "let_nary.mltt works" = 
-  let _ = main_of_example "let_nary.mltt" in
+let%expect_test "let-nary.mltt works" = 
+  let _ = main_of_example "let-nary.mltt" in
   [%expect
     {|
     Parsed:
@@ -109,8 +109,8 @@ let%expect_test "let_nary.mltt works" =
       6 : Nat
     |}]
 
-let%expect_test "let_two_vars.mltt works" = 
-  let _ = main_of_example "let_two_vars.mltt" in
+let%expect_test "let-two-vars.mltt works" = 
+  let _ = main_of_example "let-two-vars.mltt" in
   [%expect
     {|
     Parsed:

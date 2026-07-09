@@ -20,6 +20,7 @@ Arguments eq_refl {_} _.
 %type <Cst.obj * Cst.obj> ann_obj
 %type <string * Cst.obj> param
 %type <list (string * Cst.obj)> params
+%type <list ((string * Cst.obj) * Cst.obj)> let_defns
 %type <(string * Cst.obj) * Cst.obj> let_defn
 
 %on_error_reduce obj params app_obj atomic_obj
@@ -31,7 +32,15 @@ let prog :=
 
 let obj :=
   | PI; ~ = params; "->"; ~ = obj; { List.fold_left (fun acc arg => Cst.pi (fst arg) (snd arg) acc) params obj }
-  | LAMBDA; ~ = param; "->"; ~ = ann_obj; { Cst.fn (fst param) (snd param) (snd ann_obj) (fst ann_obj) }
+  | LAMBDA; ~ = params; "->"; ~ = ann_obj; { 
+    fst (
+      List.fold_left (
+        fun acc arg => (
+          Cst.fn (fst arg) (snd arg) (snd acc) (fst acc),
+          Cst.pi (fst arg) (snd arg) (snd acc) 
+        ) 
+      ) params ann_obj
+    )}
   | ~ = app_obj; <>
   | REC; escr = obj; RETURN; mx = VAR; "."; em = obj;
     "|"; ZERO; "=>"; ez = obj;
@@ -40,7 +49,20 @@ let obj :=
 
   | SUCC; ~ = atomic_obj; { Cst.succ atomic_obj }
 
-  | LET; ds = let_defn; IN; body = ann_obj; {Cst.app (Cst.fn (fst (fst ds)) (snd (fst ds)) (snd body) (fst body)) (snd ds) }
+  | LET; ds = let_defns; IN; body = ann_obj; { 
+    List.fold_left (fun acc arg => Cst.app acc (snd arg)) 
+    (List.rev ds) 
+    (
+      fst (
+        List.fold_left (
+          fun acc arg => (
+            Cst.fn (fst (fst arg)) (snd (fst arg)) (snd acc) (fst acc),
+            Cst.pi (fst (fst arg)) (snd (fst arg)) (snd acc) 
+          ) 
+        ) ds body
+      )
+    ) 
+  }
 
 let app_obj :=
   | ~ = app_obj; ~ = atomic_obj; { Cst.app app_obj atomic_obj }
@@ -71,9 +93,14 @@ let ann_obj :=
   | "("; exp = obj; ":"; ann = obj; ")"; { (exp, ann) }
 
 
+(* Reversed nonempty list of definitions *)
+let let_defns :=
+  | ~ = let_defns; ~ = let_defn; { let_defn :: let_defns }
+  | ~ = let_defn; { [let_defn] }
+
 (* (x : A) := t *)
 let let_defn :=
-  | ~ = param; ":="; ~ = obj; { (param, obj) }
+  | "("; ~ = param; ":="; ~ = obj; ")"; { (param, obj) }
 %%
 
 Extract Constant loc => "Lexing.position * Lexing.position".

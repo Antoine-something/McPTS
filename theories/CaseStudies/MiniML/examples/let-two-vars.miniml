@@ -1,0 +1,3 @@
+let ((x : Nat) := 0) 
+    ((f : forall (y : Nat) -> Nat) := fun (n : Nat) -> (n : Nat)) 
+    in (f x : Nat) : Nat

@@ -10,6 +10,24 @@ let main_of_example s = main_of_filename ("../examples/" ^ s)
 (** Real tests *)
 (* We never expect parser timeout. 2^500 fuel should be large enough! *)
 
+let%expect_test "let-two-vars.miniml works" = 
+  let _ = main_of_example "let-two-vars.miniml" in
+  [%expect {|
+    Parsed:
+      (fun (x : Nat)
+           (f : forall (y : Nat) -> Nat)
+        -> f x) 0 (fun (n : Nat) -> n)
+      : Nat
+    Elaborated:
+      (fun (x1 : Nat)
+           (x4 : forall (x5 : Nat) -> Nat)
+        -> x4 x1) 0
+        (fun (x6 : Nat) -> x6)
+      : Nat
+    Normalized Result:
+      0 : Nat
+    |}]
+
 let%expect_test "add-numbers.miniml works" = 
   let _ = main_of_example "add-numbers.miniml" in
   [%expect
