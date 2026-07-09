@@ -64,6 +64,10 @@ update_parserMessages:
 	@rm "$(PARSERMESSAGETEMPFILE)"
 	@mv "$(PARSERMESSAGEMERGEFILE)" "$(PARSERMESSAGEFILE)"
 
+%.v : %.vy
+	@echo "MENHIR $?"
+	@$(MENHIR) --coq "$?"
+
 .PHONY: coqdoc
 coqdoc: html
 	cp -R $(EXTRA_DIR)/resources html
