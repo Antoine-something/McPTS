@@ -17,10 +17,6 @@ _opam
 *.synctex.gz
 
 
-# Generated coq files
-theories/**/Parser.v
-
-
 # Coq compiler outputs
 *.vo
 *.glob
