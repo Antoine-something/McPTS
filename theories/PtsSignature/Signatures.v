@@ -32,7 +32,8 @@ Proof.
   econstructor; eauto.
 Qed.
 
-
+(** Sort options, used in the soundness proof *)
+(* We cannot use Rocq's option type because St is defined in Set and 'option' expects something in Type *)
 Inductive SortOption (P : PtsSig) : Type :=
 | so_None : SortOption P
 | so_Some : P -> SortOption P.

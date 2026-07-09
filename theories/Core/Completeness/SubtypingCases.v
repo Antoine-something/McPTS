@@ -101,35 +101,6 @@ Proof.
   repeat split; econstructor; mauto; try econstructor; mauto; try reflexivity.
 Qed.
 
-(* This should go in PER lemmas *)
-Lemma per_subtyp_implies_per_subtyp_sorted {P} {pred_P : PredicativeSig P} : forall b b',
-    {{ ⟪ pred_P ⟫ Sub b <: b' }} ->
-    forall s s1 s2,
-      {{ Dom b ≈ b ∈ per_sort pred_P s1 }} ->
-      {{ Dom b' ≈ b' ∈ per_sort pred_P s2 }} ->
-      st_subtyp s1 s ->
-      st_subtyp s2 s ->
-      {{ ⟪ pred_P ⟫ Subs b <: b' at s }}.
-Proof.
-  intros * H.
-  destruct H.
-  - intros.
-    destruct_by_head @per_sort.
-    econstructor; mauto.
-  - induction H.
-    + intros.
-      destruct_by_head @per_sort.
-      handle_per_sort_elem_irrel.
-      econstructor; mauto.
-    + mauto.
-    + intros.
-      destruct_by_head @per_sort.
-      handle_per_sort_elem_irrel.
-      assert (per_sort_elem pred_P s0 elem_rel d{{{ Π r a ρ B }}} d{{{ Π r a ρ B }}}) by mauto.
-      invert_per_sort_elem H8.
-      econstructor; mauto.
-    + mauto.
-Qed.
 
 Lemma subtyp_pi {P} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru_pi P s1 s2 s3} Γ A A' B B',
   {{ ⟪ pred_P ⟫ Γ ⊨u A ≈ A' : Sort@s1 }} ->

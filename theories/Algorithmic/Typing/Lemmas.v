@@ -205,20 +205,6 @@ Proof.
   repeat eexists; mauto 3.
 Qed.
 
-(* Lemma alg_type_check_typ_implies_alg_type_infer_typ {P} (pred_P : PredicativeSig P) : forall {Γ A s}, *)
-(*     {{ ⊢ Γ }} -> *)
-(*     {{ Γ ⊢a A ⟸ Sort@s }} -> *)
-(*     exists A' s', {{ Γ ⊢a A ⟹ A' }} /\ {{ Γ ⊢ A' ≈ Sort@s' }} /\ st_subtyp s' s. *)
-(* Proof. *)
-(*   intros * ? Hcheck. *)
-(*   inversion Hcheck as [? A' ? ? Hinfer Hsub]; subst. *)
-(*   assert {{ Γ ⊢ A : Sort@s }} by mauto using alg_type_check_sound. *)
-(*   assert {{ Γ ⊢ A : A' }} by mauto 2 using alg_type_infer_sound. *)
-(*   gen_presups. *)
-(*   assert {{ Γ ⊢ A' ⊆ Sort@s }} by mauto 2 using alg_subtyping_sound. *)
-(*   pose proof (subtyp_sort_is_sort pred_P H) as [s' []]. *)
-(*   repeat eexists; mauto 3. *)
-(* Qed. *)
 
 #[export]
 Hint Resolve alg_type_check_typ_implies_alg_type_infer_typ : mcpts.
@@ -236,7 +222,6 @@ Proof.
   gen_presups.
   assert {{ Γ ⊢ A' ⊆ Π r A B }} by mauto 3 using alg_subtyping_sound.
 
-  (* This should follow by consequences of normalization *)
   assert (exists A0 B0,  {{ Γ ⊢ A' ≈  Π r A0 B0 }}) as [A0 [B0]]by mauto 3.
   assert {{ Γ ⊢ Π r A0 B0 ⊆ Π r A B }} by mauto 4.
   assert ({{ Γ ⊢ A0 ≈ A : Sort@s1 }} /\ {{ Γ, A ⊢ B0 ⊆ B }}) as [] by mauto 2 using subtyp_pi_inversion.
@@ -254,28 +239,6 @@ Proof.
   do 2 eexists; repeat split; mauto 2 using alg_subtyping_complete.
 Qed.
 
-
-(* Lemma alg_type_check_pi_implies_alg_type_infer_pi {P} (pred_P : PredicativeSig P) : forall {Γ M A B s1 s2 s3 s} {r : Ru_pi P s1 s2 s3}, *)
-(*     {{ ⊢ Γ }} -> *)
-(*     {{ Γ ⊢ Π r A B : Sort@s }} -> *)
-(*     {{ Γ ⊢a M ⟸ Π r A B }} -> *)
-(*     exists A' A0 B0, {{ Γ ⊢a M ⟹ A' }} /\ {{ Γ ⊢ A' ≈ Π r A0 B0 }} /\ {{ Γ ⊢ A0 ≈ A : Sort@s1 }} /\  {{ Γ, A@s1 ⊢a B0 ⊆ B }}. *)
-(* Proof. *)
-(*   intros * ? ? Hcheck. *)
-(*   assert ({{ Γ ⊢ A : Sort@s1 }} /\ {{ Γ, A@s1 ⊢ B : Sort@s2 }} /\ {{ Γ ⊢ Sort@s3 ⊆ Sort@s }}) as [? []] by mauto 3. *)
-(*   inversion Hcheck as [? A' ? ? Hinfer Hsub]; subst. *)
-(*   assert {{ Γ ⊢ M : A' }} by mauto 3 using alg_type_infer_sound. *)
-(*   gen_presups. *)
-(*   assert {{ Γ ⊢ A' ⊆ Π r A B }} by mauto 3 using alg_subtyping_sound. *)
-
-(*   (* This should follow by consequences of normalization *) *)
-(*   assert (exists A0 B0,  {{ Γ ⊢ A' ≈  Π r A0 B0 }}) as [A0 [B0]]by mauto 3. *)
-(*   assert {{ Γ ⊢ Π r A0 B0 ⊆ Π r A B }} by mauto 4. *)
-(*   assert ({{ Γ ⊢ A0 ≈ A : Sort@s1 }} /\ {{ Γ, A@s1 ⊢ B0 ⊆ B }}) as [] by mauto 2 using subtyp_pi_inversion. *)
-(*   assert {{ Γ, A@s1 ⊢a B0 ⊆ B }} by mauto 2 using alg_subtyping_complete. *)
-(*   do 3 eexists. *)
-(*   repeat split; mauto 3. *)
-(* Qed. *)
 
 #[export]
 Hint Resolve alg_type_check_pi_implies_alg_type_infer_pi : mcpts.
@@ -313,9 +276,6 @@ Proof.
   inversion H2; subst.
   reflexivity.
 Qed.
-
-(* Lemma idempotent_nbe_ty_nf {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {A}, *)
-(*     nbe *)
   
 
 Ltac invert_ue :=

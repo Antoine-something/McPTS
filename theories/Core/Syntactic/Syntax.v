@@ -3,34 +3,6 @@ From Coq Require Import Program.Equality.
 From McPTS Require Import PtsSignature.
 From McPTS.Core Require Import Base.
 
-(** * Concrete Syntax Tree *)  
-Module Cst.
-  Inductive obj (P : PtsSig) : Set :=
-  (** Sorts *)
-  | st : P -> obj P
-  (** Functions *)
-  | pi : forall s1 s2 s3 (r : Ru_pi P s1 s2 s3), string -> obj P -> obj P -> obj P
-  | fn : forall s1 s2 s3 (r : Ru_pi P s1 s2 s3), string -> obj P -> obj P -> obj P -> obj P
-  | app : obj P -> obj P -> obj P
-  (** Variables *)
-  | var : string -> obj P
-  (** Natural numbers *)
-  | nat : obj P
-  | zero : obj P
-  | succ : obj P -> obj P
-  | natrec : obj P -> string -> obj P -> obj P -> string -> string -> obj P -> obj P.
-
-  Arguments st {_}.
-  Arguments pi {_ _ _ _}.
-  Arguments fn {_ _ _ _ _}.
-  Arguments app {_}.
-  Arguments var {_}.
-  Arguments nat {_}.
-  Arguments zero {_}.
-  Arguments succ {_}.
-  Arguments natrec {_}.
-End Cst.
-
 
 (** * Abstract Syntax Tree *)
 Inductive exp (P : PtsSig) : Set :=
@@ -55,6 +27,7 @@ with sub (P : PtsSig) : Set :=
 | a_compose : sub P -> sub P -> sub P
 | a_extend : sub P -> exp P -> sub P.
 
+(* Make the signature implicit to all constructors *)
 Arguments a_st {_}.
 Arguments a_pi {_ _ _ _}.
 Arguments a_fn {_ _ _ _}.

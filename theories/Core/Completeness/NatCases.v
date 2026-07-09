@@ -496,7 +496,6 @@ Proof.
     destruct_by_head (@rel_exp P).
     destruct_by_head (@rel_typ_unsorted P).
     simplify_evals.
-    (* pose proof (per_typ_elem_and_per_sort_elem_implies_per_sort_elem pred_P ltac:(eassumption) ltac:(eassumption)). *)
     handle_per_typ_elem_irrel.
     do 3 eexists; repeat split; mauto.
   - intros.

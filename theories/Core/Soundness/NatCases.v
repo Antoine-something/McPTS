@@ -1,5 +1,6 @@
 From McPTS Require Import PtsSignature LibTactics.
 From McPTS.Core Require Import Base.
+From McPTS.Core.Syntactic Require Import SystemAnnotated.
 From McPTS.Core.Completeness Require Import FundamentalTheorem.
 From McPTS.Core.Semantic Require Import Realizability.
 From McPTS.Core.Soundness Require Import
@@ -9,71 +10,6 @@ From McPTS.Core.Soundness Require Import
   TermStructureCases
   SortCases.
 Import Domain_Notations.
-
-(* Move *)
-Definition glu_rel_typ_resp_sub_env_unsorted {P} (pred_P : PredicativeSig P) so Sb A :=
-  forall Δ σ ρ,
-    {{ Δ ⊢s σ ® ρ ∈ Sb }} ->
-    glu_rel_typ_with_sub_unsorted pred_P so Δ A σ ρ.
-Arguments glu_rel_typ_resp_sub_env_unsorted {P} pred_P so Sb A/.
-
-(* Move *)
-Lemma glu_rel_typ_unsorted_clean_inversion1 {P} (pred_P : PredicativeSig P) : forall {anns so Γ Sb A},
-    {{ EG Γ ∈ glu_ctx_env pred_P anns ↘ Sb }} ->
-    {{ ⟪ pred_P ⟫ Γ with anns ⊩u A @ so }} ->
-    glu_rel_typ_resp_sub_env_unsorted pred_P so Sb A.
-Proof.
-  intros * ? [].
-  destruct_conjs.
-  intros ? **.
-  handle_functional_glu_ctx_env P.
-  mauto.
-Qed.
-
-(* Move *)
-#[global]
-Ltac invert_glu_rel_typ_unsorted H :=
-  (unshelve eapply (glu_rel_typ_unsorted_clean_inversion1 _ _) in H; shelve_unifiable; [eassumption |];
-   unfold glu_rel_typ_resp_sub_env_unsorted in H)
-  + (inversion H as [? [? [? ?]]]; subst).
-
-(* Move to syntactic lemmas *)
-Lemma typ_eq_sub_compose_typ {P} : forall {Γ Γ' Γ'' : ctx P} {A A' σ τ},
-    {{ Γ'' ⊢ A' }} ->
-    {{ Γ'' ⊢ A ≈ A' }} ->
-    {{ Γ' ⊢s σ : Γ'' }} ->
-    {{ Γ ⊢s τ : Γ' }} ->
-    {{ Γ ⊢ A[σ∘τ] ≈ A'[σ][τ] }}.
-Proof.
-  intros.
-  (* assert {{ Γ ⊢ Sort@s[σ∘τ] ≈ Sort@s }} by mauto. *)
-  (* assert {{ Γ ⊢ Sort@s[σ∘τ] ⊆ Sort@s }} by mauto. *)
-  assert {{ Γ ⊢ A'[σ∘τ] ≈ A'[σ][τ]  }} by mauto 4.    
-  transitivity {{{ A'[σ∘τ] }}}; mauto 4.
-Qed.
-
-(* Move to realizability *)
-(* Corollary var0_glu_elem_unsorted {P} (pred_P : PredicativeSig P) : forall {a typ_rel exp_rel Γ A}, *)
-(*     {{ DG a ∈ glu_typ_unsorted_elem pred_P ↘ typ_rel ↘ exp_rel }} -> *)
-(*     (typ_rel Γ A) -> *)
-(*     (exp_rel {{{ Γ, A }}} {{{ A[Wk] }}} {{{ #0 }}} d{{{ ⇑! a (length Γ) }}}). *)
-(*     (* {{ Γ ⊢ A ® P }} -> *) *)
-(*     (* {{ Γ, A ⊢ #0 : A[Wk] ® ⇑! a (length Γ) ∈ El }}. *) *)
-(* Proof. *)
-(*   intros. *)
-(*   eapply realize_glu_elem_bot_unsorted; mauto 4. *)
-(*   eauto using var_glu_elem_bot_unsorted. *)
-(* Qed. *)
-Corollary var0_glu_elem_unsorted {P} (pred_P : PredicativeSig P) : forall {a typ_rel exp_rel Γ A},
-    {{ DG a ∈ glu_typ_elem pred_P so_None ↘ typ_rel ↘ exp_rel }} ->
-    {{ Γ ⊢ A ® typ_rel }} ->
-    {{ Γ, A ⊢ #0 : A[Wk] ® ⇑! a (length Γ) ∈ exp_rel }}.
-Proof.
-  intros.
-  eapply realize_glu_elem_bot_unsorted; mauto 4.
-  eauto using var_glu_elem_bot_unsorted.
-Qed.
-
 
 Lemma glu_rel_exp_nat {P} (pred_P : PredicativeSig P) : forall {anns Γ s} {r : Ru_nat P s},
     {{ ⟪ pred_P ⟫ ⊩ Γ with anns }} ->
@@ -662,7 +598,6 @@ Proof.
     econstructor; mauto 4.
     - assert {{ Δ ⊢ A[Wk][σ,,M',,R] ≈ A[Wk∘(σ,,M',,R)] }}.
       {
-        symmetry.
         eapply typ_eq_sub_compose_typ; mauto 3; econstructor; mauto 3.
       }
       assert {{ Δ ⊢s Wk∘(σ,,M',,R) ≈ σ,,M' : Γ, ℕ }} as HWk by mauto 4.
@@ -698,8 +633,7 @@ Proof.
   assert {{ Δ ⊢ A[Wk∘Wk,,succ #1][σ,,M',,R] ≈ A[σ,,succ M'] }}.
   {
     transitivity {{{ A[(Wk∘Wk,,succ #1)∘(σ,,M',,R)] }}}.
-    - symmetry; mauto 3.
-      eapply typ_eq_sub_compose_typ; mauto 3.
+    - eapply typ_eq_sub_compose_typ; mauto 3.
       eapply (@sub_weak_compose_weak_extend_succ_var_1 _ _ _ _ r); mauto 3.
     - enough {{ Δ ⊢s (Wk∘Wk,,succ #1)∘(σ,,M',,R) ≈ σ,,succ M' : Γ, ℕ }} by mauto 4.
       assert {{ Δ ⊢s (Wk∘Wk,,succ #1)∘(σ,,M',,R) ≈ ((Wk∘Wk)∘(σ,,M',,R)),,(succ #1)[σ,,M',,R] : Γ, ℕ }}.
@@ -1169,7 +1103,7 @@ Proof.
   assert {{ Γ ⊢ zero : ℕ }} by mauto 3.
   assert {{ Δ ⊢s σ,,zero[σ] ≈ (Id,,zero)∘σ : Γ, ℕ }} by mauto 5.
   assert {{ Δ ⊢ A[σ,,zero[σ]] ≈ A[(Id,,zero)∘σ] }} by mauto 4.
-  assert {{ Δ ⊢ A[(Id,,zero)∘σ] ≈ A[Id,,zero][σ] }} by (eapply typ_eq_sub_compose_typ; mauto 4).
+  assert {{ Δ ⊢ A[(Id,,zero)∘σ] ≈ A[Id,,zero][σ] }} by (symmetry; eapply typ_eq_sub_compose_typ; mauto 4).
   assert {{ Δ ⊢ A[σ,,zero[σ]] ≈ A[Id,,zero][σ] }} by mauto 4.
   assert {{ Δ ⊢ MZ[σ] : A[q σ][Id,,zero] }} by (eapply wf_conv_typ with (A := {{{ A[Id,,zero][σ] }}}); mauto 4).
   assert {{ Δ, ℕ, A[q σ] ⊢s Wk∘Wk,,succ #1 : Δ, ℕ }} by (eapply (@sub_weak_compose_weak_extend_succ_var_1 _ _ _ _ r); mauto 3).
@@ -1184,10 +1118,6 @@ Proof.
     eapply wf_conv_typ; mauto 4.
   - assert {{ Δ ⊢ MZ[σ] : A[Id,,zero][σ] ® mz ∈ glu_elem_top_unsorted pred_P so_None d{{{ Sort@s0 }}} }} as Hglu_top_unsorted by (eapply realize_glu_elem_top_unsorted; eassumption).
     inversion Hglu_top_unsorted; subst.
-    (* inversion H22; subst. *)
-    (* inversion H6; subst. *)
-    (* apply_predicate_equivalence. *)
-    (* handle_functional_glu_typ_elem P. *)
     
     assert {{ ⟪ pred_P ⟫ ⊨ Γ }} as [env_relΓ] by mauto 3 using completeness_fundamental_ctx.
     assert {{ ⟪ pred_P ⟫ Γ, ℕ ⊨ A }} as [env_relΓℕ] by mauto 3 using completeness_fundamental_typ.
@@ -1277,7 +1207,6 @@ Proof.
               d{{{ ρ ↦ ⇑! ℕ (length Δ') }}}) as Hglu_typ_unsorted by mauto 2.
     assert (glu_rel_exp_with_sub_unsorted pred_P so_None Δ MZ {{{ A[Id,,zero] }}} σ ρ) by mauto 2.
     inversion Hglu_typ_unsorted; subst.
-    (* inversion H62; subst. *)
     destruct_glu_rel_exp_with_sub_unsorted.
     simplify_evals.
     handle_functional_glu_typ_elem P.
@@ -1478,7 +1407,6 @@ Proof.
   pose proof HA.
   invert_glu_rel_typ_unsorted HA.
   assert (forall Δ σ ρ, SbΓℕ Δ σ ρ -> glu_rel_typ_with_sub_unsorted pred_P (so_Some s) Δ A σ ρ) by mauto 3.
-  (* eapply glu_rel_exp_implies_glu_rel_exp_unsorted. *)
   eexists; split; [eassumption |].
   intros.
   destruct_glu_rel_by_assumption SbΓ HM.
@@ -1521,7 +1449,6 @@ Proof.
   pose proof HA.
   invert_glu_rel_typ_unsorted HA.
   assert (forall Δ σ ρ, SbΓℕ Δ σ ρ -> glu_rel_typ_with_sub_unsorted pred_P so_None Δ A σ ρ) by mauto 3.
-  (* eapply glu_rel_exp_implies_glu_rel_exp_unsorted. *)
   eexists; split; [eassumption |].
   intros.
   destruct_glu_rel_by_assumption SbΓ HM.

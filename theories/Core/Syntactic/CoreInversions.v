@@ -196,30 +196,9 @@ Proof with mautosolve 3.
     do 2 eexists; repeat split; mauto 2.
 Qed.    
     
-(* (** Here, we get a disjunction because we cannot know in advance if A' is a sort or not *) *)
-(* Lemma wf_exp_sub_inversion {P : PtsSig} : forall {Γ : ctx P} {M σ A}, *)
-(*     {{ Γ ⊢ M[σ] : A }} -> *)
-(*     exists Δ A' s, {{ Γ ⊢s σ : Δ }} /\ {{ Δ ⊢ M : A' }} /\ *)
-(*               (({{ Γ ⊢ A'[σ] ≈ A }} /\ {{ Δ ⊢ A' : Sort@s }}) \/ ({{ Γ ⊢ A' ≈ A }} /\ {{ Δ ⊢ A' ≈ Sort@s }})). *)
-(* Proof with mautosolve 3. *)
-(*   intros * H. *)
-(*   dependent induction H; *)
-(*     gen_core_presups. *)
-(*   - assert {{ Γ ⊢ A0[σ] ≈ A0[σ] : Sort@s }} by mauto 3. *)
-(*     do 3 eexists; repeat split; mauto 4. *)
-
-(*   - do 3 eexists; repeat split; mauto 4. *)
-(*     right; split; mauto 3. *)
-(*   - specialize (IHwf_exp1 M σ A0 ltac:(reflexivity) ltac:(reflexivity)) as [Δ [A' [s']]]. *)
-(*     destruct_conjs. *)
-(*     do 3 eexists; repeat split; mauto. *)
-(*     destruct H5; destruct_conjs. *)
-(*     + left; split; mauto 3. *)
-(*     + right; split; mauto 3. *)
-(* Qed. *)
-
 #[export]
 Hint Resolve wf_exp_sub_inversion : mcpts.
+
 
 (** We omit [wf_conv] as they do not give useful inversions *)
 
@@ -291,4 +270,3 @@ Proof.
     transitivity {{{ Sort@s[σ] }}}; mauto 3.
   - eexists; right; mauto 3.
 Qed.
-

@@ -7,7 +7,6 @@ Reserved Notation "'⟦' M '⟧' ρ '↘' r" (in custom judg at level 80, M cust
 Reserved Notation "'$|' m '&' n '|↘' r" (in custom judg at level 80, m custom domain at level 99, n custom domain at level 99, r custom domain at level 99).
 Reserved Notation "'rec' m '⟦return' A | 'zero' -> MZ | 'succ' -> MS 'end⟧' ρ '↘' r" (in custom judg at level 80, m custom domain at level 99, A custom exp at level 99, MZ custom exp at level 99, MS custom exp at level 99, ρ custom domain at level 99, r custom domain at level 99).
 Reserved Notation "'⟦' σ '⟧s' ρ '↘' ρσ" (in custom judg at level 80, σ custom exp at level 99, ρ custom domain at level 99, ρσ custom domain at level 99).
-(** Since environments are lists and not functions, we need to explicitly define lookups *)
 Reserved Notation "'#|' ρ '[' n ']' '|↘' m" (in custom judg at level 80, ρ custom domain, n constr at level 0, m custom domain at level 99).
 
 

@@ -1887,19 +1887,6 @@ Proof.
     eapply IHwf_typ; mauto 3.
 Qed.
 
-  
-Lemma wf_exp_sort_sort_all_ctx {P} : forall {Γ Δ : ctx P} {s1 s2},
-    {{ ⊢ Δ }} ->
-    {{ Γ ⊢ Sort@s1 : Sort@s2 }} ->
-    {{ Δ ⊢ Sort@s1 : Sort@s2 }}.
-Proof.
-  intros.
-  assert (exists s3, Ax_typ P s1 s3 /\ {{ Γ ⊢ Sort@s3 ⊆ Sort@s2 }}) as [s3 []] by mauto 2.
-  assert {{ Δ ⊢ Sort@s3 ⊆ Sort@s2 }} by admit.   (** Not convinced this is provable *)
-  assert {{ Δ ⊢ Sort@s1 : Sort@s3 }} by mauto 2.
-  eapply wf_exp_conv; mauto 2.
-Abort.
-  
 
 (** *** Type Presuppositions *)
 

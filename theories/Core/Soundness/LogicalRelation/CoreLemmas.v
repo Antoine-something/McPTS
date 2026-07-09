@@ -2,6 +2,7 @@ From Coq Require Import Equivalence Morphisms Morphisms_Prop Morphisms_Relations
 
 From McPTS Require Import PtsSignature LibTactics.
 From McPTS.Core Require Import Base.
+From McPTS.Core.Syntactic Require Import SystemAnnotated.
 From McPTS.Core.Soundness.LogicalRelation Require Import CoreTactics Definitions.
 From McPTS.Core.Soundness.Weakening Require Export Lemmas.
 Import Domain_Notations.
@@ -850,9 +851,6 @@ Proof.
     + split; intros []; econstructor; intuition;
         [rename equiv_m into equiv0_m; assert (equiv_m : in_rel m m) by intuition
         | assert (equiv0_m : in_rel0 m m) by intuition ];
-        (* assert (per_sort_elem pred_P s1 in_rel1 a a) by (pose proof (ord_ru_pi pred_P r) as [ord_dom ord_im]; destruct ord_dom; subst; mauto 2); *)
-        (* handle_per_sort_elem_irrel; *)
-        (* [assert (equiv_m : in_rel m m) by (apply_relation_equivalence; eauto)|]; *)
         assert (equiv1_m : in_rel1 m m) by (apply_relation_equivalence; eauto);
         destruct_rel_mod_eval;
         functional_eval_rewrite_clear;
@@ -1027,18 +1025,6 @@ Proof.
       pose proof (ord_ru_pi_sub pred_P r sub) as [ord_dom ord_im]; destruct ord_im; subst; mauto 2.
     }
     intuition.
-    (* + intuition. *)
-    (* + intuition. *)
-    (* + assert ((s2 = s3 -> glu_sort_elem pred_P s3 (OP m equiv_m) (OEL m equiv_m) a0) /\ *)
-    (*             (pred_rel pred_P s2 s3 -> glu_sort_elem pred_P s2 (OP m equiv_m) (OEL m equiv_m) a0)) by mauto. *)
-    (*   destruct_conjs. *)
-    (*   functional_eval_rewrite_clear. *)
-    (*   intuition. *)
-    (* + assert ((s2 = s3 -> glu_sort_elem pred_P s3 (OP m equiv_m) (OEL m equiv_m) a0) /\ *)
-    (*             (pred_rel pred_P s2 s3 -> glu_sort_elem pred_P s2 (OP m equiv_m) (OEL m equiv_m) a0)) by mauto. *)
-    (*   destruct_conjs. *)
-    (*   functional_eval_rewrite_clear. *)
-    (*   intuition. *)
 
   - assert {{ Dom n ≈ n ∈ in_rel0 }} as equiv0_n by intuition.
     assert (exists mn : domain P, {{ $| m & n |↘ mn }} /\ {{ Δ ⊢ M[σ] N : OT[σ,,N] ® mn ∈ OEL n equiv0_n }}) by mauto 3.
@@ -1053,36 +1039,6 @@ Proof.
     }
     handle_functional_glu_sort_elem P.
     eassumption.
-    
-    (* intuition. *)
-    (* assert (glu_sort_elem pred_P s2 (OP n equiv0_n) (OEL n equiv0_n) b). *)
-    (* { *)
-    (*   specialize (H0 n equiv0_n b ltac:(eassumption)) as []. *)
-      
-    (* } *)
-    (* assert ((s2 = s3 -> glu_sort_elem pred_P s3 (OP n equiv0_n) (OEL n equiv0_n) b) /\ *)
-    (*           (pred_rel pred_P s2 s3 -> glu_sort_elem pred_P s2 (OP n equiv0_n) (OEL n equiv0_n) b)) by mauto. *)
-    (* destruct_conjs. *)
-    (* assert {{ DG b ∈ glu_sort_elem pred_P s2 ↘ OP n equiv0_n ↘ OEL n equiv0_n }} by mauto. *)
-    (* handle_functional_glu_sort_elem P. *)
-    (* + intuition. *)
-    (* + subst. *)
-    (*   assert ((s3 = s3 -> glu_sort_elem pred_P s3 (OP n equiv0_n) (OEL n equiv0_n) b)) by (eapply H0; mauto). *)
-    (*   assert (glu_sort_elem pred_P s3 (OP n equiv0_n) (OEL n equiv0_n) b) by mauto. *)
-    (*   handle_functional_glu_sort_elem P. *)
-    (*   apply_predicate_equivalence. *)
-    (*   intuition. *)
-    (* + assert ((pred_rel pred_P s2 s3 -> glu_sort_elem pred_P s2 (OP n equiv0_n) (OEL n equiv0_n) b)) by (eapply H0; mauto). *)
-    (*   assert (glu_sort_elem pred_P s2 (OP n equiv0_n) (OEL n equiv0_n) b) by mauto. *)
-    (*   handle_functional_glu_sort_elem P. *)
-    (*   apply_predicate_equivalence. *)
-    (*   intuition. *)
-    (* + subst. *)
-    (*   assert ((s3 = s3 -> glu_sort_elem pred_P s3 (OP n equiv0_n) (OEL n equiv0_n) b)) by (eapply H0; mauto). *)
-    (*   assert (glu_sort_elem pred_P s3 (OP n equiv0_n) (OEL n equiv0_n) b) by mauto. *)
-    (*   handle_functional_glu_sort_elem P. *)
-    (*   apply_predicate_equivalence. *)
-    (*   intuition. *)
 
   - assert (exists mn : domain P,
                {{ $| m & n |↘ mn }} /\
@@ -1105,27 +1061,6 @@ Proof.
       pose proof ord_ru_pi_sub pred_P r sub as [? ord_im]; destruct ord_im; subst; mauto 2.
     }
     eexists; intuition.
-    (* eapply H20; mauto 3. *)
-    
-    (* assert (rel_mod_eval (per_sort_elem pred_P s2) B d{{{ ρ ↦ n }}} B d{{{ ρ ↦ n }}} (x3 n n equiv_n)) by mauto. *)
-    (* dependent destruction H4. *)
-    (* functional_eval_rewrite_clear. *)
-    (* eexists. *)
-    (* intuition. *)
-    (* + subst. *)
-    (*   assert (s3 = s3 -> glu_sort_elem pred_P s3 (OP n equiv_n) (OEL n equiv_n) a0). *)
-    (*   { *)
-    (*     eapply H0; mauto. *)
-    (*   } *)
-    (*   assert (glu_sort_elem pred_P s3 (OP n equiv_n) (OEL n equiv_n) a0) by mauto. *)
-    (*   intuition. *)
-    (* + subst. *)
-    (*   assert (s3 = s3 -> glu_sort_elem pred_P s3 (OP n equiv_n) (OEL n equiv_n) a0). *)
-    (*   { *)
-    (*     eapply H0; mauto. *)
-    (*   } *)
-    (*   assert (glu_sort_elem pred_P s3 (OP n equiv_n) (OEL n equiv_n) a0) by mauto. *)
-    (*   intuition. *)
 Qed.
 
 
@@ -1224,13 +1159,8 @@ Proof.
     assert (per_sort_elem pred_P s_out (out_rel0 c c equiv0_c) a0 b) by (pose proof (ord_ru_pi_sub pred_P r sub0) as [? []]; subst; mauto 2).
     assert (glu_sort_elem pred_P s_out (OP c equiv_c) (OEL c equiv_c) a0) by mauto 2.
 
-    resp_per_IH.
-    (* resp_per_IH; *)
-    (*   subst; *)
-    (*   mauto. *)
-      
+    resp_per_IH.      
   - reflexivity. 
-  (* reflexivity. *)
   - simpl_glu_rel.
     invert_per_sort_elem H10.
     econstructor; mauto 3.
@@ -1251,24 +1181,7 @@ Proof.
       transitivity fa1.
       * symmetry; eassumption.
       * eapply H37; eassumption.
-      (* eapply H18. *)
-      (* pose proof (proj1 (H17 _ _) H16). *)
-      (* simpl in *. *)
-
-      (* intros. *)
-      (* saturate_refl_for in_rel. *)
-      (* pose proof (H18 _ _ equiv_n_n') as []. *)
-      (* pose proof (H18 _ _ H19) as []. *)
-      (* pose proof (H10 _ _ equiv_n_n') as []. *)
-      (* pose proof (H10 _ _ H19) as []. *)
-      (* simplify_evals. *)
-      (* econstructor; eauto. *)
-      (* symmetry. *)
-      (* etransitivity. *)
-      (* * symmetry. eassumption. *)
-      (* * handle_per_sort_elem_irrel. *)
-      (*   eapply H24. *)
-      (*   eassumption. *)
+        
     + resp_per_IH.
       destruct_rel_mod_eval.
       handle_per_sort_elem_irrel.

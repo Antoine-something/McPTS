@@ -881,7 +881,6 @@ Proof.
     econstructor; eauto.
     + etransitivity; eassumption.
     + intros.
-      (* (on_all_hyp: fun H => directed invert_per_sort_elem H).       *)
       saturate_refl_for (@per_sort_elem P).
       saturate_refl_for in_rel0.
       (on_all_hyp: fun H => directed invert_per_sort_elem H).

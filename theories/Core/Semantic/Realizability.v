@@ -96,7 +96,6 @@ Qed.
 (** We cannot add [per_bot_then_per_elem] as a hint
     because we don't know what "R" is (i.e. the pattern becomes higher-order.)
     In fact, Coq complains it cannot add one if we try. *)
-
 Corollary per_elem_then_per_top {P : PtsSig} {pred_P : PredicativeSig P} : forall {s a a' R b b'},
     {{ DF a ≈ a' ∈ per_sort_elem pred_P s ↘ R }} ->
     {{ Dom b ≈ b' ∈ R }} -> {{ Dom ⇓ a b ≈ ⇓ a' b' ∈ per_top }}.
@@ -157,7 +156,6 @@ Qed.
 (** We cannot add [per_bot_then_per_elem] as a hint
     because we don't know what "R" is (i.e. the pattern becomes higher-order.)
     In fact, Coq complains it cannot add one if we try. *)
-
 Corollary per_typ_elem_then_per_top {P : PtsSig} {pred_P : PredicativeSig P} : forall {a a' R b b'},
     {{ DF a ≈ a' ∈ per_typ_elem pred_P ↘ R }} ->
     {{ Dom b ≈ b' ∈ R }} -> {{ Dom ⇓ a b ≈ ⇓ a' b' ∈ per_top }}.

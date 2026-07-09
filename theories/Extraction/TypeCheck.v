@@ -638,7 +638,7 @@ Section type_check_closed.
       let*b _ := type_check dec_P pred_P func_P {{{ ⋅ }}} A _ M _ while _ in
       pureb _
   .
-  Next Obligation. (* False *)
+  Next Obligation.
     pose proof (@wf_ctx_empty P).
     assert {{ ⋅ ⊢ A }} by (gen_presups; eauto 2).
     assert {{ ⋅ ⊢aty A }} by mauto 2 using alg_aty_sound.

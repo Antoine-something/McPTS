@@ -1,50 +1,10 @@
 From McPTS Require Import PtsSignature LibTactics.
 From McPTS.Core Require Import Base.
+From McPTS.Core.Syntactic Require Import SystemAnnotated.
 From McPTS.Core.Completeness Require Import FundamentalTheorem.
 From McPTS.Core.Semantic Require Import Realizability.
 From McPTS.Core.Soundness Require Import LogicalRelation.
 Import Domain_Notations.
-
-(* Lemma presup_glu_rel_exp {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {s Γ M A}, *)
-(*     {{ ⟪ pred_P ⟫ Γ ⊩ M : A @ s }} -> *)
-(*     {{ ⟪ pred_P ⟫ ⊩ Γ }} /\ (exists s', {{ ⟪ pred_P ⟫ Γ ⊩ A : Sort@s @ s' }}). *)
-(* Proof. *)
-(*   intros * [? []]. *)
-(*   split; [eexists; eassumption |]. *)
-(*   assert (exists s', Ax P s s') as [s'] by (eapply full_P; mauto). *)
-(*   do 2 eexists; intuition. *)
-(*   destruct_conjs. *)
-(*   destruct_glu_rel_exp_with_sub. *)
-(*   eexists; mauto 4. *)
-(*   assert {{ Δ ⊢ Sort@s[σ] ≈ Sort@s }} by mauto 3. *)
-(*   assert {{ Δ ⊢ A[σ] : Sort@s }} by (eapply glu_sort_elem_trm_sort_lvl; mauto 2). *)
-(*   assert {{ Δ ⊢ A[σ] : Sort@s[σ] }} by mauto 3. *)
-(*   repeat split; mauto 3. *)
-(*   repeat eexists; mauto 2. *)
-(*   eapply glu_sort_elem_trm_typ; mauto 2. *)
-(* Qed. *)
-
-(* Lemma presup_ctx_glu_rel_exp {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {s Γ M A}, *)
-(*     {{ ⟪ pred_P ⟫ Γ ⊩ M : A @ s }} -> *)
-(*     {{ ⟪ pred_P ⟫ ⊩ Γ }}. *)
-(* Proof. *)
-(*   intros * []%presup_glu_rel_exp; *)
-(*     eassumption. *)
-(* Qed. *)
-
-(* #[export] *)
-(* Hint Resolve presup_ctx_glu_rel_exp : mcpts. *)
-
-(* Lemma presup_typ_glu_rel_exp {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {s Γ M A}, *)
-(*     {{ ⟪ pred_P ⟫ Γ ⊩ M : A @ s }} -> *)
-(*     exists s', {{ ⟪ pred_P ⟫ Γ ⊩ A : Sort@s @ s' }}. *)
-(* Proof. *)
-(*   intros * []%presup_glu_rel_exp; *)
-(*     eassumption. *)
-(* Qed. *)
-
-(* #[export] *)
-(* Hint Resolve presup_typ_glu_rel_exp : mcpts. *)
 
 
 Lemma presup_glu_rel_exp_unsorted_typ {P} (pred_P : PredicativeSig P) : forall {s anns Γ M A},
@@ -334,36 +294,6 @@ Qed.
 #[export]
 Hint Resolve glu_rel_exp_vlookup : mcpts.
 
-(* Lemma glu_rel_exp_sub {P} (pred_P : PredicativeSig P) (full_P : FullSig P) : forall {Γ σ Δ M A s}, *)
-(*     {{ ⟪ pred_P ⟫ Γ ⊩s σ : Δ }} -> *)
-(*     {{ ⟪ pred_P ⟫ Δ ⊩ M : A @ s }} -> *)
-(*     {{ ⟪ pred_P ⟫ Γ ⊩ M[σ] : A[σ] @ s }}. *)
-(* Proof . *)
-(*   intros * Hσ HM. *)
-(*   assert {{ Γ ⊢s σ : Δ }} by mauto 3. *)
-(*   assert {{ Δ ⊢ M : A }} by mauto 3. *)
-(*   assert (exists s', {{ ⟪ pred_P ⟫ Δ ⊩ A : Sort@s @ s' }}) as [s'] by mauto 3. *)
-(*   destruct Hσ as [SbΓ [SbΔ]]. *)
-(*   destruct_conjs. *)
-(*   inversion_clear HM as [? []]. *)
-(*   assert {{ Δ ⊢ A : Sort@s }} by mauto 3. *)
-(*   eexists; split; mauto. *)
-(*   intros Δ' τ ρ ?. *)
-(*   destruct_glu_rel_sub_with_sub. *)
-(*   handle_functional_glu_ctx_env P. *)
-(*   rewrite <- H12 in H10. *)
-(*   destruct_glu_rel_exp_with_sub. *)
-(*   assert {{ Dom a ≈ a ∈ per_sort pred_P s }} as [] by mauto. *)
-(*   econstructor; mauto. *)
-
-(*   assert {{ Δ' ⊢ A[σ][τ] ≈ A[σ∘τ] : Sort@s }} as -> by (symmetry; mauto 4). *)
-(*   assert {{ Δ' ⊢ M[σ][τ] ≈ M[σ∘τ] : A[σ∘τ] }} as ->; mauto 3. *)
-(*   symmetry; mauto 3. *)
-(* Qed. *)
-
-(* #[export] *)
-(* Hint Resolve glu_rel_exp_sub : mcpts. *)
-
 
 Lemma glu_rel_exp_sub_typ_unsorted {P} (pred_P : PredicativeSig P) : forall {anns Γ σ anns' Δ M A s},
     {{ ⟪ pred_P ⟫ Γ with anns ⊩s σ : Δ with anns' }} ->
@@ -404,11 +334,9 @@ Proof.
   intros * Hσ HM.
   assert {{ Γ ⊢s σ : Δ }} by mauto 3.
   assert {{ Δ ⊢ M : A }} by mauto 3.
-  (* assert {{ ⟪ pred_P ⟫ Δ ⊩u A : Sort@s @ ^so_None }} by mauto 3. *)
   destruct Hσ as [SbΓ [SbΔ]].
   destruct_conjs.
   inversion_clear HM as [? []].
-  (* assert {{ Δ ⊢ A : Sort@s }} by mauto 3. *)
   eexists; split; mauto.
   intros Δ' τ ρ ?.
   destruct_glu_rel_sub_with_sub.
@@ -481,10 +409,8 @@ Proof.
   intros * Hσ HA.
   assert {{ Γ ⊢s σ : Δ }} by mauto 3.
   assert {{ Δ ⊢ A }} by mauto 3.
-  (* assert {{ ⟪ pred_P ⟫ Δ ⊩u A @ ^(so_Some s) }} by mauto 3. *)
   destruct Hσ as [SbΓ [SbΔ]].
   destruct_conjs.
-  (* assert {{ ⟪ pred_P ⟫ Δ ⊩u A : Sort@s @ ^so_None }} as HA' by mauto 2. *)
   inversion_clear HA as [? []].
 
   eexists; split; mauto.
@@ -675,11 +601,9 @@ Proof.
   eexists; split; mauto 2.
   intros.
   assert (SbΓ' Δ σ ρ) by (eapply H4; eassumption).
-  (* destruct_glu_rel_exp_with_sub. *)
   assert (glu_rel_exp_with_sub_unsorted pred_P so Δ M A σ ρ) by mauto 2.
   dependent destruction H5.
   - inversion_clear H8.
-    (* destruct_glu_rel_typ_with_sub. *)
     assert (glu_rel_typ_with_sub_unsorted pred_P so' Δ A σ ρ) by mauto 2.
     dependent destruction H8.
     + inversion_clear H13.

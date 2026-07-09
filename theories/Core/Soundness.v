@@ -1,12 +1,11 @@
 From McPTS Require Import PtsSignature LibTactics.
 From McPTS.Core Require Import Base.
-From McPTS.Core.Syntactic Require Import CoreInversions.
+From McPTS.Core.Syntactic Require Import CoreInversions SystemAnnotated.
 From McPTS.Core Require Import Completeness.
 From McPTS.Core.Completeness Require Import FundamentalTheorem.
 From McPTS.Core.Semantic Require Import Realizability.
 From McPTS.Core.Semantic Require Export NbE.
 From McPTS.Core.Soundness Require Export FundamentalTheorem.
-From McPTS.Core.Soundness.Extension Require Export SystemAnnotated.
 Import Domain_Notations.
 
 Theorem soundness {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {M A},
@@ -15,7 +14,6 @@ Theorem soundness {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {M A},
 Proof.
   intros * H.
   assert {{ ⊢ Γ }} by mauto 2.
-  (* assert (exists anns : list (SortOption P), {{ ⊫ Γ with anns }}) as [anns] by (apply wf_ctx_implies_wf_ctx_ann; eassumption). *)
   assert {{ ⟪ pred_P ⟫ ⊨ Γ }} as [env_relΓ] by (apply completeness_fundamental_ctx; eassumption).
   destruct (soundness_fundamental_exp pred_P _ _ _ H) as [anns [so [Sb []]]].
   pose proof (per_ctx_then_per_env_initial_env ltac:(eassumption)) as [p].

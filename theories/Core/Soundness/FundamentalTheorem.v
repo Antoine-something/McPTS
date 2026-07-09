@@ -1,5 +1,6 @@
 From McPTS Require Import PtsSignature LibTactics.
 From McPTS.Core Require Import Base.
+From McPTS.Core.Syntactic Require Import SystemAnnotated.
 From McPTS.Core.Soundness Require Import
   ContextCases
   FunctionCases
@@ -8,7 +9,6 @@ From McPTS.Core.Soundness Require Import
   NatCases
   SortCases.
 From McPTS.Core.Soundness Require Export LogicalRelation.
-From McPTS.Core.Soundness.Extension Require Import SystemAnnotated.
 Import Domain_Notations.
 
 Section soundness_fundamental.

@@ -25,7 +25,9 @@ theories/Core/Syntactic/CoreInversions.v
 theories/Core/Syntactic/Presup.v
 theories/Core/Syntactic/SystemOpt.v
 theories/Core/Syntactic/Corollaries.v
-
+theories/Core/Syntactic/SystemAnnotated/Definitions.v
+theories/Core/Syntactic/SystemAnnotated/Lemmas.v
+theories/Core/Syntactic/SystemAnnotated.v
 
 ## Evaluation of PTS* ##
 theories/Core/Semantic/Domain.v
@@ -77,7 +79,6 @@ theories/Core/Soundness/SortCases.v
 theories/Core/Soundness/SubstitutionCases.v
 theories/Core/Soundness/FunctionCases.v
 theories/Core/Soundness/NatCases.v
-theories/Core/Soundness/Extension/SystemAnnotated.v
 theories/Core/Soundness/FundamentalTheorem.v
 theories/Core/Soundness.v
 
@@ -122,11 +123,3 @@ theories/CaseStudies/MLTTCumul/Signature.v
 theories/CaseStudies/MLTTCumul/Frontend.v
 theories/CaseStudies/MLTTCumul/Parser.v
 theories/CaseStudies/MLTTCumul/Entrypoint.v
-
-# theories/Instantiations/STLC.v
-# theories/Instantiations/LF.v
-# theories/Instantiations/CumulMLTT.v
-# theories/Instantiations/NonCumulMLTT.v
-# theories/Instantiations/OmegaTwo.v
-
-

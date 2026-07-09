@@ -140,12 +140,10 @@ Lemma wf_subtyp_subst_eq {P : PtsSig} : forall (Δ : ctx P) A B,
 Proof.
   induction 1; intros * Hσσ'; gen_presup Hσσ'; mauto 3.
   - etransitivity; mauto 3.
-  - (* autorewrite with mcpts. *)
-    assert {{ Γ0 ⊢ Sort@s2[σ'] ≈ Sort@s2 }} by mauto 2.
+  - assert {{ Γ0 ⊢ Sort@s2[σ'] ≈ Sort@s2 }} by mauto 2.
     transitivity {{{ Sort@s1 }}}; mauto 3.
     transitivity {{{ Sort@s2 }}}; mauto 3.
-  - (* autorewrite with mcpts. *)
-    assert {{ Γ0 ⊢ A'[σ] ≈ A'[σ'] : Sort@s1 }} by mauto 2.
+  - assert {{ Γ0 ⊢ A'[σ] ≈ A'[σ'] : Sort@s1 }} by mauto 2.
     assert {{ Γ0, A[σ] ⊢s q σ : Γ, A }} by mauto 3.
     assert {{ Γ0, A'[σ'] ⊢s q σ ≈ q σ' : Γ, A' }} by mauto 5.
     transitivity {{{ Π r (A[σ]) (B[q σ]) }}}; mauto 4.
@@ -677,3 +675,15 @@ Qed.
 #[export]
  Hint Resolve sub_ctx_extend_wf_exp_sort : mcpts.
   
+
+Lemma typ_eq_sub_compose_typ {P} : forall {Γ Γ' Γ'' : ctx P} {A A' σ τ},
+    {{ Γ'' ⊢ A' }} ->
+    {{ Γ'' ⊢ A ≈ A' }} ->
+    {{ Γ' ⊢s σ : Γ'' }} ->
+    {{ Γ ⊢s τ : Γ' }} ->
+    {{ Γ ⊢ A[σ∘τ] ≈ A'[σ][τ] }}.
+Proof.
+  intros.
+  assert {{ Γ ⊢ A'[σ∘τ] ≈ A'[σ][τ]  }} by mauto 4.    
+  transitivity {{{ A'[σ∘τ] }}}; mauto 4.
+Qed.

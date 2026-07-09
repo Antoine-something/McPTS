@@ -81,9 +81,8 @@ Variant per_ne {P : PtsSig} : relation (domain P) :=
 #[export]
 Hint Constructors per_ne : mcpts.
 
-(** * Sort/Element PER *)
-(** ** Sort/Element PER Definition *)
 
+(** ** Sort/Element PER Definition *)
 Section Per_sort_elem_core_def.
   Context
     `(pred_P : PredicativeSig P)
@@ -97,7 +96,6 @@ Section Per_sort_elem_core_def.
   Definition per_sort_rec {s'} (ord : pred_rel pred_P s' s_elem) : relation dom :=
     fun a a' => exists R, per_sort_elem_rec ord R a a'.
 
-  (** Defines 'a = b ∈ Sort_s ↘ R' in the paper *)
   Inductive per_sort_elem_core : relation dom -> dom -> dom -> Prop :=
   | per_sort_elem_core_sort :
     `{ forall (s2 : P)
@@ -226,8 +224,8 @@ Qed.
 #[export]
 Hint Resolve per_sort_elem_core_sort' : mcpts.
 
-(** ** Sort/Element PER Induction Principle *)
 
+(** ** Sort/Element PER Induction Principle *)
 Section Per_sort_elem_ind_def.
   Context
     (P : PtsSig)
@@ -320,7 +318,7 @@ End Per_sort_elem_ind_def.
 Reserved Notation "⟪ pred_P ⟫ 'Subs' a <: b 'at' s" (in custom judg at level 80, pred_P constr, a custom domain, b custom domain, s constr).
 Reserved Notation "⟪ pred_P ⟫ 'Sub' a <: b" (in custom judg at level 80, pred_P constr, a custom domain, b custom domain).
 
-(* Not sure if we want this or just the unsorted version (like for syntactic judgments) *)
+(** Sorted version of subtyping, helps recover per_sort relations in some lemmas *)
 Inductive per_subtyp_sorted `(pred_P : PredicativeSig P) : P -> domain P -> domain P -> Prop :=
 | per_subtyp_sorted_sort :
   `( st_subtyp s1 s2 ->
@@ -409,8 +407,8 @@ Hint Transparent rel_typ_unsorted : mcpts.
 #[export]
 Hint Unfold rel_typ_unsorted : mcpts.
 
-(** * Context/Environment PER *)
 
+(** * Context/Environment PER *)
 Section Per_ctx_env_def.
   Context `(pred_P : PredicativeSig P).
 
