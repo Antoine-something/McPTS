@@ -481,17 +481,6 @@ Proof with mautosolve 5.
     try (eexists; unshelve solve [mauto 4]; constructor).
 
   all: try (econstructor; mautosolve 4).
-  (* - assert {{ Γ ⊢ M'0[σ'] : A0[σ'] }} by mauto 3. *)
-    (* assert {{ Γ ⊢ A0[σ] ≈ A0[σ'] }} by mauto 3. *)
-    (* eapply wf_conv_unsorted; mauto 3. *)
-    
-  (* - assert {{ Γ' ⊢ M0[σ] : A0[σ] }} by mauto 3. *)
-    (* assert {{ Γ ⊢ M0[σ][τ] : A0[σ][τ] }} by mauto 3. *)
-    (* assert {{ Γ ⊢ A0[σ∘τ] ≈ A0[σ][τ] }} by mauto 3. *)
-    (* eapply wf_exp_conv; mauto 3. *)
-    (* econstructor; mauto 3. *)
-  (* - econstructor; mauto 3. *)
-  (* eapply wf_conv; mauto 5. *)
   - econstructor; mauto 3.
     assert  {{ ⊢ Γ, A0 ≈ Γ, A' }} by (econstructor; mauto 3).
     mauto 3.

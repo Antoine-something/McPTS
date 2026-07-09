@@ -65,6 +65,7 @@ with alg_type_infer {P} : ctx P -> nf P -> exp P -> Prop :=
                nbe_ty Γ {{{ A[Id,,N] }}} B ->
                {{ Γ ⊢a rec N return A | zero -> MZ | succ -> MS end ⟹ B }} )
 where "Γ '⊢a' M ⟹ A" := (alg_type_infer Γ A M) (in custom judg) : type_scope
+
 with alg_wf_type {P} : ctx P -> typ P -> Prop :=
 | awt_sort : `( {{ Γ ⊢aty Sort@s }} )
 | awt_sorted : `( {{ Γ ⊢a A ⟹ Sort@s }} ->
