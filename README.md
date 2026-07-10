@@ -51,7 +51,8 @@ find . -type f -exec touch {} +
 as file timestamps may be incorrect.
 
 Use the toplevel `make` to build the whole project, including the three examples of verified compilers (from the root directory):
-```
+
+```bash
 make
 ```
 Makefile will try to find out the number of your CPU cores and parallel as much as
@@ -60,6 +61,7 @@ possible.
 One `make` finishes, you can run any of the extracted compiler.
 The names of the executable are `mcpts_miniml`, `mcpts_lf`, and `mcpts_mlttcumul`.
 For example:
-```
-dune exec mcpts_mlttcumul theories/CaseStudies/MLTTCumul/examples/let_nary.mcpts
+
+```bash
+dune exec mcpts_mlttcumul theories/CaseStudies/MLTTCumul/examples/let-nary.mltt
 ```
