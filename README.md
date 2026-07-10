@@ -42,6 +42,14 @@ opam install -y --deps-only .
 
 ## Build from source
 
+If downloaded from [Anonymous GitHub](https://anonymous.4open.science/), run
+
+```bash
+find . -type f -exec touch {} +
+```
+
+as file timestamps may be incorrect.
+
 Use the toplevel `make` to build the whole project, including the three examples of verified compilers (from the root directory):
 ```
 make
