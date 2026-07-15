@@ -42,23 +42,22 @@ opam install -y --deps-only .
 
 ## Build from source
 
-If downloaded from [Anonymous GitHub](https://anonymous.4open.science/), run
-
-```bash
-find . -type f -exec touch {} +
-```
-
-as file timestamps may be incorrect.
-
 Use the toplevel `make` to build the whole project, including the three examples of verified compilers (from the root directory):
 
 ```bash
 make
 ```
+
 Makefile will try to find out the number of your CPU cores and parallel as much as
 possible.
 
-One `make` finishes, you can run any of the extracted compiler.
+In some rare cases, Rocq may complain about incorrect timestamps.  To resolve this issue, run the following command:
+
+```bash
+find . -type f -exec touch {} +
+```
+
+Once `make` finishes, you can run any of the extracted compiler.
 The names of the executable are `mcpts_miniml`, `mcpts_lf`, and `mcpts_mlttcumul`.
 For example:
 
