@@ -24,7 +24,7 @@ Section DecidableProperties.
   Context {P : PtsSig} (dec_P : DecidableSig P).
 
   Definition strong_ru_pi_eq (s1 s1' s2 s2' s3 s3' : P) (r : Ru_pi P s1 s2 s3) (r' : Ru_pi P s1' s2' s3') :=
-      (s1 = s1') /\ (s2 = s2') /\ (s3 = s3') /\ (r ~= r').
+      (s1 = s1') /\ (s2 = s2') /\ (s3 = s3') /\ (JMeq r r').
     
   Lemma strong_dec_pi : forall (s1 s1' s2 s2' s3 s3' : P) (r : Ru_pi P s1 s2 s3) (r' : Ru_pi P s1' s2' s3'),
       ({ strong_ru_pi_eq s1 s1' s2 s2' s3 s3' r r' } + {~ strong_ru_pi_eq s1 s1' s2 s2' s3 s3' r r'})%type.
