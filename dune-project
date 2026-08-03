@@ -1,4 +1,4 @@
-(lang dune 3.18)
+(lang dune 3.23)
 (using menhir 2.1)
 (name mcpts)
 
@@ -23,10 +23,11 @@ In particular several variants of Martin-Löf type theory are covered.  McPTS al
 The extracted code is guaranteed equivalent to the theoretical definition of the language, provided that the underlying
 PTS* signature satisfies three conditions: Predicativity, functionality, and decidability.")
  (depends
-  (ocaml (>= "4.14.2"))
-  (coq (= "8.20.0"))
-  (menhir (= "20240715"))
-  (coq-menhirlib (= "20240715"))
+  (ocaml (>= "5.4.0"))
+  (coq (= "8.20.1"))
+  (menhir (= "20260209"))
+  (coq-menhirlib (= "20260209"))
   (coq-equations (= "1.3.1+8.20"))
   (ppx_expect (>= "0.16.0"))
   (sherlodoc :with-doc)))
+

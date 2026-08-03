@@ -15,10 +15,10 @@ McPTS is a fork of McTT, a project with similar goals, but specialized to Martin
 
 ## Dependencies
 
-* [OCaml](https://ocaml.org/) 4.14.2
+* [OCaml](https://ocaml.org/) 5.4.0
 * [Menhir](http://cambium.inria.fr/~fpottier/menhir/)
 * [Coq-Menhirlib](https://gitlab.inria.fr/fpottier/menhir/-/tree/master/coq-menhirlib)
-* [Coq](https://coq.inria.fr/) 8.20.0
+* [Coq](https://coq.inria.fr/) 8.20.1
 * [Coq-Equations](https://github.com/mattam82/Coq-Equations) 1.3
 
 We recommend to install dependencies in the following way:
@@ -26,12 +26,12 @@ We recommend to install dependencies in the following way:
 ```bash
 # setup OPAM switch
 opam update
-opam switch create coq-8.20.0 4.14.2
-opam switch coq-8.20.0
+opam switch create coq-8.20.1 5.4.0
+opam switch coq-8.20.1
 eval $(opam env)
 
 # install Rocq
-opam pin -y add coq 8.20.0
+opam pin -y add coq 8.20.1
 opam repo add coq-released https://coq.inria.fr/opam/released
 
 # install dependencies
