@@ -1,5 +1,5 @@
-From Coq Require Import Program.Equality.
-From McPTS.PtsSignature Require Import Signatures.
+From Coq Require Import Program.Equality Logic.PropExtensionality.
+From McPTS.PtsSignature Require Import Signatures Adjoint.
 
 
 Record DecidableSig (P : PtsSig) : Type :=
@@ -46,3 +46,45 @@ Section DecidableProperties.
       reflexivity.
   Qed.    
 End DecidableProperties.
+
+
+Record DecidableAdjSig (P : AdjSig) : Type :=
+  mkDecidableAdjSig {
+      dec_mode_eq : forall m1 m2 : Modes P, ({m1 = m2} + {m1 <> m2})%type;
+      dec_mode_preorder : forall (m1 m2 : Modes P), ({Mode_preorder P m1 m2} + { ~Mode_preorder P m1 m2})%type;
+      dec_sigs : forall m, DecidableSig m;
+      dec_ru_upshift_eq : forall (l h : Modes P) (leq : Mode_preorder P l h) (sl : l) (sh : h) (r r' : Ru_upshift P l h leq sl sh),
+        ( { r = r'} + {r <> r'} )%type;
+    }.
+
+Arguments dec_mode_eq {_}.
+Arguments dec_mode_preorder {_}.
+Arguments dec_sigs {_}.
+Arguments dec_ru_upshift_eq {_}.
+
+Section AdjDecidableProperties.
+  Context {P : AdjSig} (dec_P : DecidableAdjSig P).
+
+  Definition strong_ru_upshift_eq (l l' h h' : Modes P) (leq : Mode_preorder P l h) (leq' : Mode_preorder P l' h') sl sl' sh sh' (r : Ru_upshift P l h leq sl sh) (r' : Ru_upshift P l' h' leq' sl' sh') :=
+      (l = l') /\ (h = h') /\ (JMeq sl sl') /\ (JMeq sh sh') /\ (JMeq leq leq') /\ (JMeq r r').
+
+  (** NOTE: This proof uses the 'proof_irrelevance' axiom for Prop *)
+  Lemma strong_dec_ru_upshift : forall (l l' h h' : Modes P) (leq : Mode_preorder P l h) (leq' : Mode_preorder P l' h') sl sl' sh sh' (r : Ru_upshift P l h leq sl sh) (r' : Ru_upshift P l' h' leq' sl' sh'),
+      ({ strong_ru_upshift_eq l l' h h' leq leq' sl sl' sh sh' r r' } + { ~ strong_ru_upshift_eq l l' h h' leq leq' sl sl' sh sh' r r' })%type.
+  Proof using dec_P.
+    intros.
+    unfold strong_ru_upshift_eq.
+    destruct (dec_mode_eq dec_P l l'); [| right; intuition].
+    destruct (dec_mode_eq dec_P h h'); [| right; intuition].
+    subst.
+    assert (leq = leq') as -> by (apply proof_irrelevance).
+    pose proof (dec_sigs dec_P l') as dec_l'.
+    destruct (dec_st_eq dec_l' sl sl'); [| right; intros [? [? [Hsl]]]; inversion Hsl; simpl_existTs; intuition].
+    pose proof (dec_sigs dec_P h') as dec_h'.
+    destruct (dec_st_eq dec_h' sh sh'); [| right; intros [? [? [? [Hsh]]]]; inversion Hsh; simpl_existTs; intuition].
+    subst.
+    destruct (dec_ru_upshift_eq dec_P l' h' leq' sl' sh' r r').
+    - subst; left; intuition.
+    - right; intros [? [? [? [? [? Hr]]]]]; inversion Hr; simpl_existTs; intuition.
+  Qed.  
+End AdjDecidableProperties.

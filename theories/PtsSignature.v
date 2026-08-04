@@ -1,1 +1,1 @@
-From McPTS.PtsSignature Require Export Signatures Predicativity Functionality Decidability.
+From McPTS.PtsSignature Require Export Signatures Predicativity Functionality Decidability Adjoint.

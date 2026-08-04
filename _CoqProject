@@ -10,11 +10,12 @@ theories/PtsSignature/Signatures.v
 theories/PtsSignature/Predicativity.v
 theories/PtsSignature/Functionality.v
 theories/PtsSignature/Decidability.v
+theories/PtsSignature/Adjoint.v
 theories/PtsSignature.v
 
 
-# ## Declarative definition of PTS* ##
-# theories/Core/Syntactic/Syntax.v
+## Declarative definition of PTS* ##
+theories/Core/Syntactic/Syntax.v
 # theories/Core/Syntactic/System/Definitions.v
 # theories/Core/Syntactic/System/Lemmas.v
 # theories/Core/Syntactic/System/Tactics.v
