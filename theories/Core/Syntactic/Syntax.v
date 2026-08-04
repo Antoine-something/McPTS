@@ -49,7 +49,7 @@ Arguments a_extend {_}.
 Notation typ := (fun P => exp P).
 Notation ctx := (fun (P : PtsSig) => list (typ P)).
 (* Optional exp so we can have actual definitions (i.e. a constant bound to a value) or declarations *)
-Notation gctx := (fun (P : PtsSig) => list (string * option exp * typ P)).
+Notation gctx := (fun (P : PtsSig) => list (string * option (exp P) * typ P)).
 
 Fixpoint nat_to_exp {P : PtsSig} (n : nat) : exp P :=
   match n with
@@ -235,8 +235,12 @@ Module Syntax_Notations.
   Notation "'q' σ" := (q σ) (in custom exp at level 30) : mcpts_scope.
 
   Notation "⋅" := nil (in custom exp at level 0) : mcpts_scope.
+  (* We need to define the extension of local contexts first, otherwise the notation engine always expects the := of global contexts *)
   Notation "Γ , A" := (cons A Γ) (in custom exp at level 50, left associativity, format "Γ ,  A") : mcpts_scope.
-
+  Notation "Δ , x := [ M ] : A" := (cons (x, M, A) Δ) (in custom exp at level 50, left associativity, format "Δ , x := [ M ] : A") : mcpts_scope.
+  Notation "Δ , x := ∅ : A" := (cons (x, None, A) Δ) (in custom exp at level 50, left associativity, format "Δ , x := ∅ : A") : mcpts_scope.
+  Notation "Δ , x := M : A" := (cons (x, Some M, A) Δ) (in custom exp at level 50, left associativity, format "Δ , x := M : A") : mcpts_scope.
+  
   Notation "n{{{ x }}}" := x (at level 0, x custom nf at level 99, format "'n{{{'  x  '}}}'") : mcpts_scope.
   Notation "( x )" := x (in custom nf at level 0, x custom nf at level 60) : mcpts_scope.
   Notation "'^' x" := x (in custom nf at level 0, x constr at level 0) : mcpts_scope.

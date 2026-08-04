@@ -1,487 +1,658 @@
-From Coq Require Import List Classes.RelationClasses Setoid Morphisms.
+From Coq Require Import List Classes.RelationClasses Setoid Morphisms String.
 
 From McPTS Require Import PtsSignature LibTactics.
 From McPTS.Core Require Import Base.
 From McPTS.Core.Syntactic Require Export Syntax.
 Import Syntax_Notations.
 
-
-Reserved Notation "⊢ Γ" (in custom judg at level 80, Γ custom exp).
-Reserved Notation "⊢ Γ ≈ Γ'" (in custom judg at level 80, Γ custom exp, Γ' custom exp).
-Reserved Notation "Γ ⊢ M : A" (in custom judg at level 80, Γ custom exp, M custom exp, A custom exp).
-Reserved Notation "Γ ⊢ M ≈ M' : A" (in custom judg at level 80, Γ custom exp, M custom exp, M' custom exp, A custom exp).
-Reserved Notation "Γ ⊢ A" (in custom judg at level 80, Γ custom exp, A custom exp).
-Reserved Notation "Γ ⊢ A ≈ A'" (in custom judg at level 80, Γ custom exp, A custom exp, A' custom exp).
-Reserved Notation "Γ ⊢s σ : Δ" (in custom judg at level 80, Γ custom exp, σ custom exp, Δ custom exp).
-Reserved Notation "Γ ⊢s σ ≈ σ' : Δ" (in custom judg at level 80, Γ custom exp, σ custom exp, σ' custom exp, Δ custom exp).
-Reserved Notation "⊢ Γ ⊆ Γ'" (in custom judg at level 80, Γ custom exp, Γ' custom exp).
-Reserved Notation "Γ ⊢ A ⊆ A'" (in custom judg at level 80, Γ custom exp, A custom exp, A' custom exp).
+(** Context lookups *)
+Reserved Notation "'`#' x ∉ Δ" (in custom judg at level 80, x constr at level 0, Δ custom exp at level 50).
+Reserved Notation "'`#' x := [ M ] : A ∈ Δ" (in custom judg at level 80, x constr at level 0, M custom exp, A custom exp, Δ custom exp at level 50).
 Reserved Notation "'#' x : A ∈ Γ" (in custom judg at level 80, x constr at level 0, A custom exp, Γ custom exp at level 50).
+(** Judgments for global contexts *)
+Reserved Notation "⊢ Δ" (in custom judg at level 80, Δ custom exp).
+Reserved Notation "⊢ Δ ≈ Δ'" (in custom judg at level 80, Δ custom exp, Δ' custom exp).
+Reserved Notation "⊢ Δ ⊆ Δ'" (in custom judg at level 80, Δ custom exp, Δ' custom exp).
+(** Judgments for local contexts *)
+Reserved Notation "Δ ⊢ Γ" (in custom judg at level 80, Δ custom exp, Γ custom exp).
+Reserved Notation "Δ ⊢ Γ ≈ Γ'" (in custom judg at level 80, Δ custom exp, Γ custom exp, Γ' custom exp).
+Reserved Notation "Δ ⊢ Γ ⊆ Γ'" (in custom judg at level 80, Δ custom exp, Γ custom exp, Γ' custom exp).
+(** Judgments for expressions *)
+Reserved Notation "Δ ; Γ ⊢ M : A" (in custom judg at level 80, Δ custom exp, Γ custom exp, M custom exp, A custom exp).
+Reserved Notation "Δ ; Γ ⊢ M ≈ M' : A" (in custom judg at level 80, Δ custom exp, Γ custom exp, M custom exp, M' custom exp, A custom exp).
+(** Judgments for types *)
+Reserved Notation "Δ ; Γ ⊢ A" (in custom judg at level 80, Δ custom exp, Γ custom exp, A custom exp).
+Reserved Notation "Δ ; Γ ⊢ A ≈ A'" (in custom judg at level 80, Δ custom exp, Γ custom exp, A custom exp, A' custom exp).
+Reserved Notation "Δ ; Γ ⊢ A ⊆ A'" (in custom judg at level 80, Δ custom exp, Γ custom exp, A custom exp, A' custom exp).
+(** Judgments for substitutions *)
+Reserved Notation "Δ ; Γ ⊢s σ : Γ'" (in custom judg at level 80, Δ custom exp, Γ custom exp, σ custom exp, Γ' custom exp).
+Reserved Notation "Δ ; Γ ⊢s σ ≈ σ' : Γ'" (in custom judg at level 80, Δ custom exp, Γ custom exp, σ custom exp, σ' custom exp, Γ' custom exp).
+
 
 Generalizable All Variables.
 
+(** * Judgments definition *)
+(** Fresh names *)
+Inductive gctx_fresh {P} : string -> gctx P -> Prop :=
+| fresh_nil : `( {{ `#x ∉ Δ }} )
+| fresh_extend : `( {{ `#x ∉ Δ }} -> x <> y ->
+                    {{ `#x ∉ Δ, y := [ M ] : A }} )
+where "'`#' x ∉ Δ" := (gctx_fresh x Δ) (in custom judg) : type_scope.
+
+#[export]
+Hint Constructors gctx_fresh : mcpts.
+
+(** Lookup in global contexts *)
+Inductive gctx_lookup {P} : string -> option (exp P) -> typ P -> gctx P -> Prop :=
+| ghere : `({{ `#x := [ M ] : A ∈ Δ, x := [ M ] : A }})
+| gthere : `({{ `#x := [ M ] : A ∈ Δ }} ->
+             {{ `#x := [ M ] : A ∈ Δ, y := [ N ] : B }})
+where "'`#' x := [ M ] : A ∈ Δ" := (gctx_lookup x M A Δ) (in custom judg) : type_scope.
+
+#[export]
+Hint Constructors gctx_lookup : mcpts.
+
+(** Lookup in local contexts *)
 Inductive ctx_lookup {P : PtsSig} : nat -> typ P -> ctx P -> Prop :=
-  | here : `({{ #0 : A[Wk] ∈ Γ, A }})
-  | there : `({{ #n : A ∈ Γ }} -> {{ #(S n) : A[Wk] ∈ Γ, B }})
+| here : `({{ #0 : A[Wk] ∈ Γ, A }})
+| there : `({{ #n : A ∈ Γ }} -> {{ #(S n) : A[Wk] ∈ Γ, B }})
 where "'#' x : A ∈ Γ" := (ctx_lookup x A Γ) (in custom judg) : type_scope.
 
-Inductive wf_ctx {P : PtsSig} : ctx P -> Prop :=
-| wf_ctx_empty : {{ ⊢ ⋅ }}
-| wf_ctx_extend :
-  `( {{ ⊢ Γ }} ->
-     {{ Γ ⊢ A }} ->
-     {{ ⊢ Γ, A }} )
-where "⊢ Γ" := (wf_ctx Γ) (in custom judg) : type_scope
+#[export]
+Hint Constructors ctx_lookup : mcpts.
 
-with wf_ctx_sub {P : PtsSig} : ctx P -> ctx P -> Prop :=
-| wf_ctx_sub_empty : {{ ⊢ ⋅ ⊆ ⋅ }}
+(** Well-formedness for global contexts *)
+Inductive wf_gctx {P : PtsSig} : gctx P -> Prop :=
+| wf_gctx_empty : {{ ⊢ ⋅ }}
+| wf_gctx_extend_none :
+  `( {{ ⊢ Δ }} ->
+     {{ Δ ; ⋅ ⊢ A }} ->
+     {{ `#x ∉ Δ }} ->
+     {{ ⊢ Δ, x := ∅ : A }} )
+| wf_gctx_extend_some :
+  `( {{ ⊢ Δ }} ->
+     {{ Δ ; ⋅ ⊢ A }} ->
+     {{ Δ ; ⋅ ⊢ M : A }} ->
+     {{ `#x ∉ Δ }} ->
+     {{ ⊢ Δ, x := M : A }} )
+where "⊢ Δ" := (wf_gctx Δ) (in custom judg) : type_scope
+
+
+(** Well-formedness for local contexts *)
+with wf_ctx {P : PtsSig} : gctx P -> ctx P -> Prop :=
+| wf_ctx_empty :
+  `( {{ ⊢ Δ }} ->
+     {{ Δ ⊢ ⋅ }} )
+| wf_ctx_extend :
+  `( {{ Δ ⊢ Γ }} ->
+     {{ Δ ; Γ ⊢ A }} ->
+     {{ Δ ⊢ Γ, A }} )
+where "Δ ⊢ Γ" := (wf_ctx Δ Γ) (in custom judg) : type_scope
+
+
+(** subtyping for local contexts *)                        
+with wf_ctx_subtyp {P : PtsSig} : gctx P -> ctx P -> ctx P -> Prop :=
+| wf_ctx_sub_empty :
+  `( {{ ⊢ Δ }} ->
+     {{ Δ ⊢ ⋅ ⊆ ⋅ }} )
 | wf_ctx_sub_extend :
-  `( {{ ⊢ Γ ⊆ Δ }} ->
-     {{ Γ ⊢ A }} ->
-     {{ Δ ⊢ A' }} ->
-     {{ Γ ⊢ A ⊆ A' }} ->
-     {{ ⊢ Γ, A ⊆ Δ, A' }} )
-where "⊢ Γ ⊆ Γ'" := (wf_ctx_sub Γ Γ') (in custom judg) : type_scope
-                                                           
-with wf_exp {P : PtsSig} : ctx P -> typ P -> exp P -> Prop :=
+  `( {{ Δ ⊢ Γ ⊆ Γ' }} ->
+     {{ Δ ; Γ ⊢ A }} ->
+     {{ Δ ; Γ' ⊢ A' }} ->
+     {{ Δ ; Γ ⊢ A ⊆ A' }} ->
+     {{ Δ ⊢ Γ, A ⊆ Γ', A' }} )
+where "Δ ⊢ Γ ⊆ Γ'" := (wf_ctx_subtyp Δ Γ Γ') (in custom judg) : type_scope
+
+(** Well-formedness for expressions (i.e. typing) *)
+with wf_exp {P : PtsSig} : gctx P -> ctx P -> typ P -> exp P -> Prop :=
 (** Sorts *)
 | wf_st :
-  `( Ax_typ P s1 s2 -> {{ ⊢ Γ }} ->
-     {{ Γ ⊢ Sort@s1 : Sort@s2 }} )
+  `( Ax_typ P s1 s2 ->
+     {{ Δ ⊢ Γ }} ->
+     {{ Δ ; Γ ⊢ Sort@s1 : Sort@s2 }} )
 
 (** Functions *)
 | wf_pi :
   `( forall (r : Ru_pi P s1 s2 s3),
-      {{ Γ ⊢ A : Sort@s1 }} ->
-      {{ Γ, A ⊢ B : Sort@s2 }} ->
-      {{ Γ ⊢ Π r A B : Sort@s3 }} )
+      {{ Δ ; Γ ⊢ A : Sort@s1 }} ->
+      {{ Δ ; Γ, A ⊢ B : Sort@s2 }} ->
+      {{ Δ ; Γ ⊢ Π r A B : Sort@s3 }} )
 | wf_fn :
   `( forall (r : Ru_pi P s1 s2 s3),
-        {{ Γ ⊢ A : Sort@s1 }} ->
-        {{ Γ, A ⊢ B : Sort@s2 }} ->
-        {{ Γ, A ⊢ M : B }} ->
-        {{ Γ ⊢ λ r A B M : Π r A B }} )
+        {{ Δ ; Γ ⊢ A : Sort@s1 }} ->
+        {{ Δ ; Γ, A ⊢ B : Sort@s2 }} ->
+        {{ Δ ; Γ, A ⊢ M : B }} ->
+        {{ Δ ; Γ ⊢ λ r A B M : Π r A B }} )
 | wf_app :
   `( forall (r : Ru_pi P s1 s2 s3),
-        {{ Γ ⊢ A : Sort@s1 }} ->
-        {{ Γ, A ⊢ B : Sort@s2 }} ->
-        {{ Γ ⊢ M : Π r A B }} ->
-        {{ Γ ⊢ N : A }} ->
-        {{ Γ ⊢ M N : B[Id,,N] }} )
+        {{ Δ ; Γ ⊢ A : Sort@s1 }} ->
+        {{ Δ ; Γ, A ⊢ B : Sort@s2 }} ->
+        {{ Δ ; Γ ⊢ M : Π r A B }} ->
+        {{ Δ ; Γ ⊢ N : A }} ->
+        {{ Δ ; Γ ⊢ M N : B[Id,,N] }} )
 
 | wf_vlookup :
-  `( {{ ⊢ Γ }} ->
+  `( {{ Δ ⊢ Γ }} ->
      (** This premise is redundant, but helpful for soundness *)
-     {{ Γ ⊢ A }} ->
+     (* {{ Γ ⊢ A }} -> *)
      {{ #x : A ∈ Γ }} ->
-     {{ Γ ⊢ #x : A }} )
-
+     {{ Δ ; Γ ⊢ #x : A }} )
+(* NOTE: This rule might very well be wrong (no substitution?) *)
+| wf_gvlookup :
+  `( {{ Δ ⊢ Γ }} ->
+     {{ `#x := [ M ] : A ∈ Δ }} ->
+     {{ Δ ; Γ ⊢ `#x : A }} )
+  
 (** Naturals **)
 | wf_nat :
   `( forall (r : Ru_nat P s),
-        {{ ⊢ Γ }} ->
-        {{ Γ ⊢ ℕ: Sort@s }} )
+        {{ Δ ⊢ Γ }} ->
+        {{ Δ ; Γ ⊢ ℕ: Sort@s }} )
 | wf_zero :
   `(forall (r : Ru_nat P s),
-        {{ ⊢ Γ }} ->
-        {{ Γ ⊢ zero : ℕ}} )
+        {{ Δ ⊢ Γ }} ->
+        {{ Δ ; Γ ⊢ zero : ℕ}} )
 | wf_succ :
   `( forall (r : Ru_nat P s),
-        {{ Γ ⊢ M : ℕ}} ->
-        {{ Γ ⊢ succ M : ℕ}} )
+        {{ Δ ; Γ ⊢ M : ℕ}} ->
+        {{ Δ ; Γ ⊢ succ M : ℕ}} )
 | wf_natrec :
   `( forall (r : Ru_nat P s),
-        {{ Γ, ℕ ⊢ A }} ->
-        {{ Γ ⊢ MZ : A[Id,,zero] }} ->
-        {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
-        {{ Γ ⊢ M : ℕ}} ->
-        {{ Γ ⊢ rec M return A | zero -> MZ | succ -> MS end : A[Id,,M] }} )
+        {{ Δ ; Γ, ℕ ⊢ A }} ->
+        {{ Δ ; Γ ⊢ MZ : A[Id,,zero] }} ->
+        {{ Δ ; Γ, ℕ, A ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
+        {{ Δ ; Γ ⊢ M : ℕ}} ->
+        {{ Δ ; Γ ⊢ rec M return A | zero -> MZ | succ -> MS end : A[Id,,M] }} )
 
-(** This rule needs to be duplicated to handle top sorts *)
 | wf_exp_sub_typ :
-  `( {{ Γ ⊢s σ : Δ }} ->
-     {{ Δ ⊢ M : A }} ->
-     {{ Δ ⊢ A }} ->
-     {{ Γ ⊢ M[σ] : A[σ] }} )
+  `( {{ Δ ; Γ ⊢s σ : Γ' }} ->
+     {{ Δ ; Γ' ⊢ M : A }} ->
+     {{ Δ ; Γ' ⊢ A }} ->
+     {{ Δ ; Γ ⊢ M[σ] : A[σ] }} )
 
 | wf_exp_conv :
-  `( {{ Γ ⊢ M : A }} ->
-     (** We have these extra argument for soundness. *)
-     {{ Γ ⊢ A }} ->
-     {{ Γ ⊢ A' }} ->
-     {{ Γ ⊢ A ⊆ A' }} ->
-     {{ Γ ⊢ M : A' }} )
-where "Γ ⊢ M : A" := (wf_exp Γ A M) (in custom judg) : type_scope
+  `( {{ Δ ; Γ ⊢ M : A }} ->
+     (* We have these extra argument for soundness. *)
+     {{ Δ ; Γ ⊢ A }} ->
+     {{ Δ ; Γ ⊢ A' }} ->
+     {{ Δ ; Γ ⊢ A ⊆ A' }} ->
+     {{ Δ ; Γ ⊢ M : A' }} )
+where "Δ ; Γ ⊢ M : A" := (wf_exp Δ Γ A M) (in custom judg) : type_scope
 
-with wf_sub {P : PtsSig} : ctx P -> ctx P -> sub P -> Prop :=
-| wf_sub_id :
-  `( {{ ⊢ Γ }} ->
-     {{ Γ ⊢s Id : Γ }} )
-| wf_sub_weaken :
-  `( {{ ⊢ Γ, A }} ->
-     {{ Γ, A ⊢s Wk : Γ }} )
-| wf_sub_compose :
-  `( {{ Γ1 ⊢s σ2 : Γ2 }} ->
-     {{ Γ2 ⊢s σ1 : Γ3 }} ->
-     {{ Γ1 ⊢s σ1∘σ2 : Γ3 }} )
-| wf_sub_extend :
-  `( {{ Γ ⊢s σ : Δ }} ->
-     {{ Δ ⊢ A }} ->
-     {{ Γ ⊢ M : A[σ] }} ->
-     {{ Γ ⊢s σ,,M : Δ, A }} )
-| wf_sub_conv :
-  `( {{ Γ ⊢s σ : Δ }} ->
-     (** As in [wf_exp_conv], we need this extra argument for soundness *)
-     {{ ⊢ Δ' }} ->
-     {{ ⊢ Δ ⊆ Δ' }} ->
-     {{ Γ ⊢s σ : Δ' }} )
-where "Γ ⊢s σ : Δ" := (wf_sub Γ Δ σ) (in custom judg) : type_scope
-
-with wf_ctx_eq {P : PtsSig} : ctx P -> ctx P -> Prop :=
-| wf_ctx_eq_empty : {{ ⊢ ⋅ ≈ ⋅ }}
-| wf_ctx_eq_extend :
-  `( {{ ⊢ Γ ≈ Δ }} ->
-     {{ Γ ⊢ A }} ->
-     {{ Γ ⊢ A' }} ->
-     {{ Δ ⊢ A }} ->
-     {{ Δ ⊢ A' }} ->
-     {{ Γ ⊢ A ≈ A' }} ->
-     {{ Δ ⊢ A ≈ A' }} ->
-     {{ ⊢ Γ, A ≈ Δ, A' }} )
-where "⊢ Γ ≈ Γ'" := (wf_ctx_eq Γ Γ') (in custom judg) : type_scope
-
-with wf_exp_eq {P : PtsSig} : ctx P -> typ P -> exp P -> exp P -> Prop :=
+(** Equality for expressions *)
+with wf_exp_eq {P : PtsSig} : gctx P -> ctx P -> typ P -> exp P -> exp P -> Prop :=
 | wf_exp_eq_typ_sub :
-  `( {{ Γ ⊢ Sort@s1 : Sort@s2 }} ->
-     {{ Δ ⊢ Sort@s1 : Sort@s2 }} ->
-     {{ Γ ⊢s σ : Δ }} ->
-     {{ Γ ⊢ Sort@s1[σ] ≈ Sort@s1 : Sort@s2 }} )
+  `( {{ Δ ; Γ ⊢ Sort@s1 : Sort@s2 }} ->
+     {{ Δ ; Γ' ⊢ Sort@s1 : Sort@s2 }} ->
+     {{ Δ ; Γ ⊢s σ : Γ' }} ->
+     {{ Δ ; Γ ⊢ Sort@s1[σ] ≈ Sort@s1 : Sort@s2 }} )
 
 | wf_exp_eq_pi_sub :
   `( forall (r : Ru_pi P s1 s2 s3),
-        {{ Γ ⊢s σ : Δ }} ->
-        {{ Δ ⊢ A : Sort@s1 }} ->
-        {{ Δ, A ⊢ B : Sort@s2 }} ->
-        {{ Γ ⊢ (Π r A B)[σ] ≈ Π r A[σ] B[q σ] : Sort@s3 }} )
+        {{ Δ ; Γ ⊢s σ : Γ' }} ->
+        {{ Δ ; Γ' ⊢ A : Sort@s1 }} ->
+        {{ Δ ; Γ', A ⊢ B : Sort@s2 }} ->
+        {{ Δ ; Γ ⊢ (Π r A B)[σ] ≈ Π r A[σ] B[q σ] : Sort@s3 }} )
 | wf_exp_eq_pi_cong :
   `( forall (r : Ru_pi P s1 s2 s3),
-        {{ Γ ⊢ A : Sort@s1 }} ->
-        {{ Γ ⊢ A ≈ A' : Sort@s1 }} ->
-        {{ Γ, A ⊢ B ≈ B' : Sort@s2 }} ->
-        {{ Γ ⊢ Π r A B ≈ Π r A' B' : Sort@s3 }} )
+        {{ Δ ; Γ ⊢ A : Sort@s1 }} ->
+        {{ Δ ; Γ ⊢ A ≈ A' : Sort@s1 }} ->
+        {{ Δ ; Γ, A ⊢ B ≈ B' : Sort@s2 }} ->
+        {{ Δ ; Γ ⊢ Π r A B ≈ Π r A' B' : Sort@s3 }} )
 | wf_exp_eq_fn_cong :
   `( forall (r : Ru_pi P s1 s2 s3),
-        {{ Γ ⊢ A : Sort@s1 }} ->
-        {{ Γ ⊢ A ≈ A' : Sort@s1 }} ->
-        {{ Γ, A ⊢ B : Sort@s2 }} ->
-        {{ Γ, A ⊢ B ≈ B' : Sort@s2 }} ->
-        {{ Γ, A ⊢ M ≈ M' : B }} ->
-        {{ Γ ⊢ λ r A B M ≈ λ r A' B' M' : Π r A B }} )
+        {{ Δ ; Γ ⊢ A : Sort@s1 }} ->
+        {{ Δ ; Γ ⊢ A ≈ A' : Sort@s1 }} ->
+        {{ Δ ; Γ, A ⊢ B : Sort@s2 }} ->
+        {{ Δ ; Γ, A ⊢ B ≈ B' : Sort@s2 }} ->
+        {{ Δ ; Γ, A ⊢ M ≈ M' : B }} ->
+        {{ Δ ; Γ ⊢ λ r A B M ≈ λ r A' B' M' : Π r A B }} )
 | wf_exp_eq_fn_sub :
   `( forall (r : Ru_pi P s1 s2 s3),
-        {{ Γ ⊢s σ : Δ }} ->
-        {{ Δ ⊢ A : Sort@s1 }} ->
-        {{ Δ, A ⊢ B : Sort@s2 }} ->
-        {{ Δ, A ⊢ M : B }} ->
-        {{ Γ ⊢ (λ r A B M)[σ] ≈ λ r A[σ] B[q σ] M[q σ] : (Π r A B)[σ] }} )
+        {{ Δ ; Γ ⊢s σ : Γ' }} ->
+        {{ Δ ; Γ' ⊢ A : Sort@s1 }} ->
+        {{ Δ ; Γ', A ⊢ B : Sort@s2 }} ->
+        {{ Δ ; Γ', A ⊢ M : B }} ->
+        {{ Δ ; Γ ⊢ (λ r A B M)[σ] ≈ λ r A[σ] B[q σ] M[q σ] : (Π r A B)[σ] }} )
 | wf_exp_eq_app_cong :
   `( forall (r : Ru_pi P s1 s2 s3),
-        {{ Γ ⊢ A : Sort@s1 }} ->
-        {{ Γ, A ⊢ B : Sort@s2 }} ->
-        {{ Γ ⊢ M ≈ M' : Π r A B }} ->
-        {{ Γ ⊢ N ≈ N' : A }} ->
-        {{ Γ ⊢ M N ≈ M' N' : B[Id,,N] }} )
+        {{ Δ ; Γ ⊢ A : Sort@s1 }} ->
+        {{ Δ ; Γ, A ⊢ B : Sort@s2 }} ->
+        {{ Δ ; Γ ⊢ M ≈ M' : Π r A B }} ->
+        {{ Δ ; Γ ⊢ N ≈ N' : A }} ->
+        {{ Δ ; Γ ⊢ M N ≈ M' N' : B[Id,,N] }} )
 | wf_exp_eq_app_sub :
   `( forall (r : Ru_pi P s1 s2 s3),
-        {{ Γ ⊢s σ : Δ }} ->
-        {{ Δ ⊢ A : Sort@s1 }} ->
-        {{ Δ, A ⊢ B : Sort@s2 }} ->
-        {{ Δ ⊢ M : Π r A B }} ->
-        {{ Δ ⊢ N : A }} ->
-        {{ Γ ⊢ (M N)[σ] ≈ M[σ] N[σ] : B[σ,,N[σ]] }} )
+        {{ Δ ; Γ ⊢s σ : Γ' }} ->
+        {{ Δ ; Γ' ⊢ A : Sort@s1 }} ->
+        {{ Δ ; Γ', A ⊢ B : Sort@s2 }} ->
+        {{ Δ ; Γ' ⊢ M : Π r A B }} ->
+        {{ Δ ; Γ' ⊢ N : A }} ->
+        {{ Δ ; Γ ⊢ (M N)[σ] ≈ M[σ] N[σ] : B[σ,,N[σ]] }} )
 | wf_exp_eq_pi_beta :
   `( forall (r : Ru_pi P s1 s2 s3),
-        {{ Γ ⊢ A : Sort@s1 }} ->
-        {{ Γ, A ⊢ B : Sort@s2 }} ->
-        {{ Γ, A ⊢ M : B }} ->
-        {{ Γ ⊢ N : A }} ->
-        {{ Γ ⊢ (λ r A B M) N ≈ M[Id,,N] : B[Id,,N] }} )
+        {{ Δ ; Γ ⊢ A : Sort@s1 }} ->
+        {{ Δ ; Γ, A ⊢ B : Sort@s2 }} ->
+        {{ Δ ; Γ, A ⊢ M : B }} ->
+        {{ Δ ; Γ ⊢ N : A }} ->
+        {{ Δ ; Γ ⊢ (λ r A B M) N ≈ M[Id,,N] : B[Id,,N] }} )
 | wf_exp_eq_pi_eta :
   `( forall (r : Ru_pi P s1 s2 s3),
-        {{ Γ ⊢ A : Sort@s1 }} ->
-        {{ Γ, A ⊢ B : Sort@s2 }} ->
-        {{ Γ ⊢ M : Π r A B }} ->
-        {{ Γ ⊢ M ≈ λ r A B (M[Wk] #0) : Π r A B }} )
+        {{ Δ ; Γ ⊢ A : Sort@s1 }} ->
+        {{ Δ ; Γ, A ⊢ B : Sort@s2 }} ->
+        {{ Δ ; Γ ⊢ M : Π r A B }} ->
+        {{ Δ ; Γ ⊢ M ≈ λ r A B (M[Wk] #0) : Π r A B }} )
 
 (** Naturals **)
 | wf_exp_eq_nat_sub :
   `( forall (r : Ru_nat P s),
-        {{ Γ ⊢s σ : Δ }} ->
-        {{ Γ ⊢ (ℕ)[σ] ≈ ℕ : Sort@s }} )
+        {{ Δ ; Γ ⊢s σ : Γ' }} ->
+        {{ Δ ; Γ ⊢ (ℕ)[σ] ≈ ℕ : Sort@s }} )
 | wf_exp_eq_zero_sub :
   `( forall (r : Ru_nat P s),
-        {{ Γ ⊢s σ : Δ }} ->
-        {{ Γ ⊢ zero[σ] ≈ zero : ℕ}} )
+        {{ Δ ; Γ ⊢s σ : Γ' }} ->
+        {{ Δ ; Γ ⊢ zero[σ] ≈ zero : ℕ}} )
 | wf_exp_eq_succ_sub :
   `( forall (r : Ru_nat P s),
-        {{ Γ ⊢s σ : Δ }} ->
-        {{ Δ ⊢ M : ℕ}} ->
-        {{ Γ ⊢ (succ M)[σ] ≈ succ (M[σ]) : ℕ}} )
+        {{ Δ ; Γ ⊢s σ : Γ' }} ->
+        {{ Δ ; Γ' ⊢ M : ℕ}} ->
+        {{ Δ ; Γ ⊢ (succ M)[σ] ≈ succ (M[σ]) : ℕ}} )
 | wf_exp_eq_succ_cong :
   `( forall (r : Ru_nat P s),
-        {{ Γ ⊢ M ≈ M' : ℕ}} ->
-        {{ Γ ⊢ succ M ≈ succ M' : ℕ}} )
+        {{ Δ ; Γ ⊢ M ≈ M' : ℕ}} ->
+        {{ Δ ; Γ ⊢ succ M ≈ succ M' : ℕ}} )
 | wf_exp_eq_natrec_cong :
   `( forall (r : Ru_nat P s),
-        {{ Γ, ℕ ⊢ A }} ->
-        {{ Γ, ℕ ⊢ A' }} ->
-        {{ Γ, ℕ ⊢ A ≈ A' }} ->
-        {{ Γ ⊢ MZ ≈ MZ' : A[Id,,zero] }} ->
-        {{ Γ, ℕ, A ⊢ MS ≈ MS' : A[Wk∘Wk,,succ #1] }} ->
-        {{ Γ ⊢ M ≈ M' : ℕ}} ->
-        {{ Γ ⊢ rec M return A | zero -> MZ | succ -> MS end ≈ rec M' return A' | zero -> MZ' | succ -> MS' end : A[Id,,M] }} )
+        {{ Δ ; Γ, ℕ ⊢ A }} ->
+        {{ Δ ; Γ, ℕ ⊢ A' }} ->
+        {{ Δ ; Γ, ℕ ⊢ A ≈ A' }} ->
+        {{ Δ ; Γ ⊢ MZ ≈ MZ' : A[Id,,zero] }} ->
+        {{ Δ ; Γ, ℕ, A ⊢ MS ≈ MS' : A[Wk∘Wk,,succ #1] }} ->
+        {{ Δ ; Γ ⊢ M ≈ M' : ℕ}} ->
+        {{ Δ ; Γ ⊢ rec M return A | zero -> MZ | succ -> MS end ≈ rec M' return A' | zero -> MZ' | succ -> MS' end : A[Id,,M] }} )
 | wf_exp_eq_natrec_sub :
   `( forall (r : Ru_nat P s),
-        {{ Γ ⊢s σ : Δ }} ->
-        {{ Δ, ℕ ⊢ A }} ->
-        {{ Δ ⊢ MZ : A[Id,,zero] }} ->
-        {{ Δ, ℕ, A ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
-        {{ Δ ⊢ M : ℕ}} ->
-        {{ Γ ⊢ rec M return A | zero -> MZ | succ -> MS end[σ] ≈ rec M[σ] return A[q σ] | zero -> MZ[σ] | succ -> MS[q (q σ)] end : A[σ,,M[σ]] }} )
+        {{ Δ ; Γ ⊢s σ : Γ' }} ->
+        {{ Δ ; Γ', ℕ ⊢ A }} ->
+        {{ Δ ; Γ' ⊢ MZ : A[Id,,zero] }} ->
+        {{ Δ ; Γ', ℕ, A ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
+        {{ Δ ; Γ' ⊢ M : ℕ}} ->
+        {{ Δ ; Γ ⊢ rec M return A | zero -> MZ | succ -> MS end[σ] ≈ rec M[σ] return A[q σ] | zero -> MZ[σ] | succ -> MS[q (q σ)] end : A[σ,,M[σ]] }} )
 | wf_exp_eq_nat_beta_zero :
   `( forall (r : Ru_nat P s),
-        {{ Γ, ℕ ⊢ A }} ->
-        {{ Γ ⊢ MZ : A[Id,,zero] }} ->
-        {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
-        {{ Γ ⊢ rec zero return A | zero -> MZ | succ -> MS end ≈ MZ : A[Id,,zero] }} )
+        {{ Δ ; Γ, ℕ ⊢ A }} ->
+        {{ Δ ; Γ ⊢ MZ : A[Id,,zero] }} ->
+        {{ Δ ; Γ, ℕ, A ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
+        {{ Δ ; Γ ⊢ rec zero return A | zero -> MZ | succ -> MS end ≈ MZ : A[Id,,zero] }} )
 | wf_exp_eq_nat_beta_succ :
   `( forall (r : Ru_nat P s),
-        {{ Γ, ℕ ⊢ A }} ->
-        {{ Γ ⊢ MZ : A[Id,,zero] }} ->
-        {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
-        {{ Γ ⊢ M : ℕ}} ->
-        {{ Γ ⊢ rec succ M return A | zero -> MZ | succ -> MS end ≈ MS[Id,,M,,rec M return A | zero -> MZ | succ -> MS end] : A[Id,,succ M] }} )
+        {{ Δ ; Γ, ℕ ⊢ A }} ->
+        {{ Δ ; Γ ⊢ MZ : A[Id,,zero] }} ->
+        {{ Δ ; Γ, ℕ, A ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
+        {{ Δ ; Γ ⊢ M : ℕ}} ->
+        {{ Δ ; Γ ⊢ rec succ M return A | zero -> MZ | succ -> MS end ≈ MS[Id,,M,,rec M return A | zero -> MZ | succ -> MS end] : A[Id,,succ M] }} )
 
 | wf_exp_eq_var :
-  `( {{ ⊢ Γ }} ->
+  `( {{ Δ ⊢ Γ }} ->
      {{ #x : A ∈ Γ }} ->
-     {{ Γ ⊢ #x ≈ #x : A }} )
+     {{ Δ ; Γ ⊢ #x ≈ #x : A }} )
 | wf_exp_eq_var_0_sub :
-  `( {{ Γ ⊢s σ : Δ }} ->
-     {{ Δ ⊢ A }} ->
-     {{ Γ ⊢ M : A[σ] }} ->
-     {{ Γ ⊢ #0[σ,,M] ≈ M : A[σ] }} )
+  `( {{ Δ ; Γ ⊢s σ : Γ' }} ->
+     {{ Δ ; Γ' ⊢ A }} ->
+     {{ Δ ; Γ ⊢ M : A[σ] }} ->
+     {{ Δ ; Γ ⊢ #0[σ,,M] ≈ M : A[σ] }} )
 | wf_exp_eq_var_S_sub :
-  `( {{ Γ ⊢s σ : Δ }} ->
-     {{ Δ ⊢ A }} ->
-     {{ Γ ⊢ M : A[σ] }} ->
-     {{ #x : B ∈ Δ }} ->
-     {{ Γ ⊢ #(S x)[σ,,M] ≈ #x[σ] : B[σ] }} )
+  `( {{ Δ ; Γ ⊢s σ : Γ' }} ->
+     {{ Δ ; Γ' ⊢ A }} ->
+     {{ Δ ; Γ ⊢ M : A[σ] }} ->
+     {{ #x : B ∈ Γ }} ->
+     {{ Δ ; Γ ⊢ #(S x)[σ,,M] ≈ #x[σ] : B[σ] }} )
 | wf_exp_eq_var_weaken :
-  `( {{ ⊢ Γ, B }} ->
+  `( {{ Δ ⊢ Γ, B }} ->
      {{ #x : A ∈ Γ }} ->
-     {{ Γ, B ⊢ #x[Wk] ≈ #(S x) : A[Wk] }} )
+     {{ Δ ; Γ, B ⊢ #x[Wk] ≈ #(S x) : A[Wk] }} )
+
+(* NOTE: First attempt at equality rules for gvar, may need adjustments *)
+| wf_exp_eq_gvar_refl :
+  `( {{ Δ ⊢ Γ }} ->
+     {{ `#x := [ M ] : A ∈ Δ }} ->
+     {{ Δ ; Γ ⊢ `#x ≈ `#x : A }} )
+| wf_exp_eq_gvar_sub :
+  `( {{ Δ ; Γ ⊢s σ : Γ' }} ->
+     {{ `#x := [ M ] : A ∈ Δ }} ->
+     {{ Δ ; Γ ⊢ `#x[σ] ≈ `#x : A }} )
+| wf_exp_eq_gvar_some :
+  `( {{ Δ ⊢ Γ }} ->
+     {{ `#x := [ ^(Some M) ] : A ∈ Δ }} ->
+     {{ Δ ; Γ ⊢ `#x ≈ M : A }} )
+              
 | wf_exp_eq_sub_cong_typ :
-  `( {{ Δ ⊢ A }} ->
-     {{ Δ ⊢ M ≈ M' : A }} ->
-     {{ Γ ⊢s σ ≈ σ' : Δ }} ->
-     {{ Γ ⊢ M[σ] ≈ M'[σ'] : A[σ] }} )
+  `( {{ Δ ; Γ' ⊢ A }} ->
+     {{ Δ ; Γ' ⊢ M ≈ M' : A }} ->
+     {{ Δ ; Γ ⊢s σ ≈ σ' : Γ' }} ->
+     {{ Δ ; Γ ⊢ M[σ] ≈ M'[σ'] : A[σ] }} )
 | wf_exp_eq_sub_id :
-  `( {{ Γ ⊢ M : A }} ->
-     {{ Γ ⊢ M[Id] ≈ M : A }} )
+  `( {{ Δ ; Γ ⊢ M : A }} ->
+     {{ Δ ; Γ ⊢ M[Id] ≈ M : A }} )
 | wf_exp_eq_sub_compose_typ :
-  `( {{ Γ ⊢s τ : Γ' }} ->
-     {{ Γ' ⊢s σ : Γ'' }} ->
-     {{ Γ'' ⊢ M : A }} ->
-     {{ Γ'' ⊢ A }} ->
-     {{ Γ ⊢ M[σ∘τ] ≈ M[σ][τ] : A[σ∘τ] }} )
+  `( {{ Δ ; Γ ⊢s τ : Γ' }} ->
+     {{ Δ ; Γ' ⊢s σ : Γ'' }} ->
+     {{ Δ ; Γ'' ⊢ M : A }} ->
+     {{ Δ ; Γ'' ⊢ A }} ->
+     {{ Δ ; Γ ⊢ M[σ∘τ] ≈ M[σ][τ] : A[σ∘τ] }} )
 | wf_exp_eq_conv :
-  `( {{ Γ ⊢ M ≈ M' : A }} ->
-     {{ Γ ⊢ A' }} ->
-     {{ Γ ⊢ A ⊆ A' }} ->
-     {{ Γ ⊢ M ≈ M' : A' }} )
+  `( {{ Δ ; Γ ⊢ M ≈ M' : A }} ->
+     {{ Δ ; Γ ⊢ A' }} ->
+     {{ Δ ; Γ ⊢ A ⊆ A' }} ->
+     {{ Δ ; Γ ⊢ M ≈ M' : A' }} )
 | wf_exp_eq_sym :
-  `( {{ Γ ⊢ M ≈ M' : A }} ->
-     {{ Γ ⊢ M' ≈ M : A }} )
+  `( {{ Δ ; Γ ⊢ M ≈ M' : A }} ->
+     {{ Δ ; Γ ⊢ M' ≈ M : A }} )
 | wf_exp_eq_trans :
-  `( {{ Γ ⊢ M ≈ M' : A }} ->
-     {{ Γ ⊢ M' ≈ M'' : A }} ->
-     {{ Γ ⊢ M ≈ M'' : A }} )
-where "Γ ⊢ M ≈ M' : A" := (wf_exp_eq Γ A M M') (in custom judg) : type_scope
+  `( {{ Δ ; Γ ⊢ M ≈ M' : A }} ->
+     {{ Δ ; Γ ⊢ M' ≈ M'' : A }} ->
+     {{ Δ ; Γ ⊢ M ≈ M'' : A }} )
+where "Δ ; Γ ⊢ M ≈ M' : A" := (wf_exp_eq Δ Γ A M M') (in custom judg) : type_scope
 
-with wf_sub_eq {P : PtsSig} : ctx P -> ctx P -> sub P -> sub P -> Prop :=
-| wf_sub_eq_id :
-  `( {{ ⊢ Γ }} ->
-     {{ Γ ⊢s Id ≈ Id : Γ }} )
-| wf_sub_eq_weaken :
-  `( {{ ⊢ Γ, A }} ->
-     {{ Γ, A ⊢s Wk ≈ Wk : Γ }} )
-| wf_sub_eq_compose_cong :
-  `( {{ Γ ⊢s τ ≈ τ' : Γ' }} ->
-     {{ Γ' ⊢s σ ≈ σ' : Γ'' }} ->
-     {{ Γ ⊢s σ∘τ ≈ σ'∘τ' : Γ'' }} )
-| wf_sub_eq_extend_cong :
-  `( {{ Γ ⊢s σ ≈ σ' : Δ }} ->
-     {{ Δ ⊢ A }} ->
-     {{ Γ ⊢ M ≈ M' : A[σ] }} ->
-     {{ Γ ⊢s σ,,M ≈ σ',,M' : Δ, A }} )
-| wf_sub_eq_id_compose_right :
-  `( {{ Γ ⊢s σ : Δ }} ->
-     {{ Γ ⊢s Id∘σ ≈ σ : Δ }} )
-| wf_sub_eq_id_compose_left :
-  `( {{ Γ ⊢s σ : Δ }} ->
-     {{ Γ ⊢s σ∘Id ≈ σ : Δ }} )
-| wf_sub_eq_compose_assoc :
-  `( {{ Γ' ⊢s σ : Γ }} ->
-     {{ Γ'' ⊢s σ' : Γ' }} ->
-     {{ Γ''' ⊢s σ'' : Γ'' }} ->
-     {{ Γ''' ⊢s (σ∘σ')∘σ'' ≈ σ∘(σ'∘σ'') : Γ }} )
-| wf_sub_eq_extend_compose :
-  `( {{ Γ' ⊢s σ : Γ'' }} ->
-     {{ Γ'' ⊢ A }} ->
-     {{ Γ' ⊢ M : A[σ] }} ->
-     {{ Γ ⊢s τ : Γ' }} ->
-     {{ Γ ⊢s (σ,,M)∘τ ≈ (σ∘τ),,M[τ] : Γ'', A }} )
-| wf_sub_eq_p_extend :
-  `( {{ Γ' ⊢s σ : Γ }} ->
-     {{ Γ ⊢ A }} ->
-     {{ Γ' ⊢ M : A[σ] }} ->
-     {{ Γ' ⊢s Wk∘(σ,,M) ≈ σ : Γ }} )
-| wf_sub_eq_extend :
-  `( {{ Γ' ⊢s σ : Γ, A }} ->
-     {{ Γ' ⊢s σ ≈ (Wk∘σ),,#0[σ] : Γ, A }} )
-| wf_sub_eq_sym :
-  `( {{ Γ ⊢s σ ≈ σ' : Δ }} ->
-     {{ Γ ⊢s σ' ≈ σ : Δ }} )
-| wf_sub_eq_trans :
-  `( {{ Γ ⊢s σ ≈ σ' : Δ }} ->
-     {{ Γ ⊢s σ' ≈ σ'' : Δ }} ->
-     {{ Γ ⊢s σ ≈ σ'' : Δ }} )
-| wf_sub_eq_conv :
-  `( {{ Γ ⊢s σ ≈ σ' : Δ }} ->
-     {{ ⊢ Δ' }} ->
-     {{ ⊢ Δ ⊆ Δ' }} ->
-     {{ Γ ⊢s σ ≈ σ' : Δ' }} )
-where "Γ ⊢s σ ≈ σ' : Δ" := (wf_sub_eq Γ Δ σ σ') (in custom judg) : type_scope
-
-with wf_subtyp {P : PtsSig} : ctx P -> typ P -> typ P -> Prop :=
-| wf_subtyp_refl :
-  `( {{ Γ ⊢ A ≈ B }} ->
-     {{ Γ ⊢ B }} ->
-     {{ Γ ⊢ A ⊆ B }} )
-| wf_subtyp_trans :
-  `( {{ Γ ⊢ A ⊆ B }} ->
-     {{ Γ ⊢ B ⊆ C }} ->
-     {{ Γ ⊢ A ⊆ C }} )
-(* This rule should use Ax_sub P s1 s2 instead, and we should prove the form with st_subtyp s1 s2 as a lemma early on *)
-| wf_subtyp_sort_sub :
-  `( {{ ⊢ Γ }} ->
-     st_subtyp s1 s2 ->
-     {{ Γ ⊢ Sort@s1 ⊆ Sort@s2 }} )
-| wf_subtyp_pi :
-  `( forall {r : Ru_pi P s1 s2 s3},
-        {{ Γ ⊢ A : Sort@s1 }} ->
-        {{ Γ ⊢ A' : Sort@s1 }} ->
-        {{ Γ ⊢ A ≈ A' : Sort@s1 }} ->
-        {{ Γ, A ⊢ B : Sort@s2 }} ->
-        {{ Γ, A' ⊢ B' : Sort@s2 }} ->
-        {{ Γ, A' ⊢ B ⊆ B' }} ->
-        {{ Γ ⊢ Π r A B ⊆ Π r A' B' }} )
-where "Γ ⊢ A ⊆ A'" := (wf_subtyp Γ A A') (in custom judg) : type_scope
-
-(** Unsorted judgments for types *)
-with wf_typ {P : PtsSig} : ctx P -> typ P -> Prop :=
+(** Well-formedness for types *)
+with wf_typ {P : PtsSig} : gctx P -> ctx P -> typ P -> Prop :=
 | wf_typ_st :
-  `( {{ ⊢ Γ }} ->
-     {{ Γ ⊢ Sort@s }})
+  `( {{ Δ ⊢ Γ }} ->
+     {{ Δ ; Γ ⊢ Sort@s }})
 | wf_typ_exp :
-  `( {{ Γ ⊢ A : Sort@s }} ->
-     {{ Γ ⊢ A }})
+  `( {{ Δ ; Γ ⊢ A : Sort@s }} ->
+     {{ Δ ; Γ ⊢ A }})
 | wf_typ_sub_sort :
-  `( {{ Γ ⊢s σ : Δ }} ->
-     {{ Δ ⊢ A }} ->
-     {{ Γ ⊢ A[σ] }} )
-where "Γ ⊢ A" := (wf_typ Γ A) (in custom judg) : type_scope
+  `( {{ Δ ; Γ ⊢s σ : Γ' }} ->
+     {{ Δ ; Γ' ⊢ A }} ->
+     {{ Δ ; Γ ⊢ A[σ] }} )
+where "Δ ; Γ ⊢ A" := (wf_typ Δ Γ A) (in custom judg) : type_scope
 
-with wf_typ_eq {P : PtsSig} : ctx P -> typ P -> typ P -> Prop :=
+(** Equality for types *)
+with wf_typ_eq {P : PtsSig} : gctx P -> ctx P -> typ P -> typ P -> Prop :=
 (* This rule should be admissible *)
-| wf_typ_eq_refl :
-  `( {{ Γ ⊢ A }} ->
-     {{ Γ ⊢ A ≈ A }} )
-| wf_typ_eq_sym :
-  `( {{ Γ ⊢ A ≈ B }} ->
-     {{ Γ ⊢ B ≈ A }} )
+(* | wf_typ_eq_refl : *)
+(*   `( {{ Γ ⊢ A }} -> *)
+(*      {{ Γ ⊢ A ≈ A }} ) *)
+
 | wf_typ_eq_sorted :
-  `( {{ Γ ⊢ A ≈ B : Sort@s }} ->
-     {{ Γ ⊢ A ≈ B }} )
-| wf_typ_eq_trans :
-  `( {{ Γ ⊢ A ≈ B }} ->
-     {{ Γ ⊢ B ≈ C }} ->
-     {{ Γ ⊢ A ≈ C }} )
+  `( {{ Δ ; Γ ⊢ A ≈ B : Sort@s }} ->
+     {{ Δ ; Γ ⊢ A ≈ B }} )
+
 (* This rules should be admissible *)
-| wf_typ_eq_sub_id :
-  `( {{ Γ ⊢ A }} ->
-     {{ Γ ⊢ A[Id] ≈ A }} )
+(* | wf_typ_eq_sub_id : *)
+(*   `( {{ Γ ⊢ A }} -> *)
+(*      {{ Γ ⊢ A[Id] ≈ A }} ) *)
+   
 | wf_typ_eq_sub_sort :
-  `( {{ Γ ⊢s σ : Δ }} ->
-     {{ Γ ⊢ Sort@s1[σ] ≈ Sort@s1 }} )
+  `( {{ Δ ; Γ ⊢s σ : Γ' }} ->
+     {{ Δ ; Γ ⊢ Sort@s1[σ] ≈ Sort@s1 }} )
 | wf_typ_eq_sub_cong :
-  `( {{ Δ ⊢ A ≈ A' }} ->
-     {{ Γ ⊢s σ ≈ σ' : Δ }} ->
-     {{ Γ ⊢ A[σ] ≈ A'[σ'] }} )
+  `( {{ Δ ; Γ' ⊢ A ≈ A' }} ->
+     {{ Δ ; Γ ⊢s σ ≈ σ' : Γ' }} ->
+     {{ Δ ; Γ ⊢ A[σ] ≈ A'[σ'] }} )
 | wf_typ_eq_sub_compose :
-  `( {{ Γ ⊢s τ : Γ' }} ->
-     {{ Γ' ⊢s σ : Γ'' }} ->
-     {{ Γ'' ⊢ A  }} ->
-     {{ Γ ⊢ A[σ∘τ] ≈ A[σ][τ] }} )
-where "Γ ⊢ A ≈ A'" := (wf_typ_eq Γ A A') (in custom judg) : type_scope.
+  `( {{ Δ ; Γ ⊢s τ : Γ' }} ->
+     {{ Δ ; Γ' ⊢s σ : Γ'' }} ->
+     {{ Δ ; Γ'' ⊢ A  }} ->
+     {{ Δ ; Γ ⊢ A[σ∘τ] ≈ A[σ][τ] }} )
+   
+| wf_typ_eq_sym :
+  `( {{ Δ ; Γ ⊢ A ≈ B }} ->
+     {{ Δ ; Γ ⊢ B ≈ A }} )
+| wf_typ_eq_trans :
+  `( {{ Δ ; Γ ⊢ A ≈ B }} ->
+     {{ Δ ; Γ ⊢ B ≈ C }} ->
+     {{ Δ ; Γ ⊢ A ≈ C }} )
+where "Δ ; Γ ⊢ A ≈ A'" := (wf_typ_eq Δ Γ A A') (in custom judg) : type_scope
+
+(** Subtyping for types *)
+with wf_typ_subtyp {P : PtsSig} : gctx P -> ctx P -> typ P -> typ P -> Prop :=
+| wf_typ_subtyp_refl :
+  `( {{ Δ ; Γ ⊢ A ≈ B }} ->
+     {{ Δ ; Γ ⊢ B }} ->
+     {{ Δ ; Γ ⊢ A ⊆ B }} )
+| wf_typ_subtyp_trans :
+  `( {{ Δ ; Γ ⊢ A ⊆ B }} ->
+     {{ Δ ; Γ ⊢ B ⊆ C }} ->
+     {{ Δ ; Γ ⊢ A ⊆ C }} )
+| wf_typ_subtyp_sort_ax_sub :
+  `( {{ Δ ⊢ Γ }} ->
+     Ax_sub P s1 s2 ->
+     {{ Δ ; Γ ⊢ Sort@s1 ⊆ Sort@s2 }} )   
+| wf_typ_subtyp_pi :
+  `( forall {r : Ru_pi P s1 s2 s3},
+        {{ Δ ; Γ ⊢ A : Sort@s1 }} ->
+        {{ Δ ; Γ ⊢ A' : Sort@s1 }} ->
+        {{ Δ ; Γ ⊢ A ≈ A' : Sort@s1 }} ->
+        {{ Δ ; Γ, A ⊢ B : Sort@s2 }} ->
+        {{ Δ ; Γ, A' ⊢ B' : Sort@s2 }} ->
+        {{ Δ ; Γ, A' ⊢ B ⊆ B' }} ->
+        {{ Δ ; Γ ⊢ Π r A B ⊆ Π r A' B' }} )
+where "Δ ; Γ ⊢ A ⊆ A'" := (wf_typ_subtyp Δ Γ A A') (in custom judg) : type_scope
+
+(** Well-formedness for substitutions *)                                                              
+with wf_sub {P : PtsSig} : gctx P -> ctx P -> ctx P -> sub P -> Prop :=
+| wf_sub_id :
+  `( {{ Δ ⊢ Γ }} ->
+     {{ Δ ; Γ ⊢s Id : Γ }} )
+| wf_sub_weaken :
+  `( {{ Δ ⊢ Γ, A }} ->
+     {{ Δ ; Γ, A ⊢s Wk : Γ }} )
+| wf_sub_compose :
+  `( {{ Δ ; Γ1 ⊢s σ2 : Γ2 }} ->
+     {{ Δ ; Γ2 ⊢s σ1 : Γ3 }} ->
+     {{ Δ ; Γ1 ⊢s σ1∘σ2 : Γ3 }} )
+| wf_sub_extend :
+  `( {{ Δ ; Γ ⊢s σ : Γ' }} ->
+     {{ Δ ; Γ' ⊢ A }} ->
+     {{ Δ ; Γ ⊢ M : A[σ] }} ->
+     {{ Δ ; Γ ⊢s σ,,M : Γ', A }} )
+| wf_sub_conv :
+  `( {{ Δ ; Γ ⊢s σ : Γ' }} ->
+     (** As in [wf_exp_conv], we need this extra argument for soundness *)
+     {{ Δ ⊢ Γ'' }} ->
+     {{ Δ ⊢ Γ' ⊆ Γ'' }} ->
+     {{ Δ ; Γ ⊢s σ : Γ'' }} )
+where "Δ ; Γ ⊢s σ : Γ'" := (wf_sub Δ Γ Γ' σ) (in custom judg) : type_scope
 
 
-Scheme wf_ctx_mut_ind := Induction for wf_ctx Sort Prop
-with wf_ctx_sub_mut_ind := Induction for wf_ctx_sub Sort Prop
-with wf_ctx_eq_mut_ind := Induction for wf_ctx_eq Sort Prop
+
+with wf_sub_eq {P : PtsSig} : gctx P -> ctx P -> ctx P -> sub P -> sub P -> Prop :=
+| wf_sub_eq_id :
+  `( {{ Δ ⊢ Γ }} ->
+     {{ Δ ; Γ ⊢s Id ≈ Id : Γ }} )
+| wf_sub_eq_weaken :
+  `( {{ Δ ⊢ Γ, A }} ->
+     {{ Δ ; Γ, A ⊢s Wk ≈ Wk : Γ }} )
+| wf_sub_eq_compose_cong :
+  `( {{ Δ ; Γ ⊢s τ ≈ τ' : Γ' }} ->
+     {{ Δ ; Γ' ⊢s σ ≈ σ' : Γ'' }} ->
+     {{ Δ ; Γ ⊢s σ∘τ ≈ σ'∘τ' : Γ'' }} )
+| wf_sub_eq_extend_cong :
+  `( {{ Δ ; Γ ⊢s σ ≈ σ' : Γ' }} ->
+     {{ Δ ; Γ' ⊢ A }} ->
+     {{ Δ ; Γ ⊢ M ≈ M' : A[σ] }} ->
+     {{ Δ ; Γ ⊢s σ,,M ≈ σ',,M' : Γ', A }} )
+| wf_sub_eq_id_compose_right :
+  `( {{ Δ ; Γ ⊢s σ : Γ' }} ->
+     {{ Δ ; Γ ⊢s Id∘σ ≈ σ : Γ' }} )
+| wf_sub_eq_id_compose_left :
+  `( {{ Δ ; Γ ⊢s σ : Γ' }} ->
+     {{ Δ ; Γ ⊢s σ∘Id ≈ σ : Γ' }} )
+| wf_sub_eq_compose_assoc :
+  `( {{ Δ ; Γ' ⊢s σ : Γ }} ->
+     {{ Δ ; Γ'' ⊢s σ' : Γ' }} ->
+     {{ Δ ; Γ''' ⊢s σ'' : Γ'' }} ->
+     {{ Δ ; Γ''' ⊢s (σ∘σ')∘σ'' ≈ σ∘(σ'∘σ'') : Γ }} )
+| wf_sub_eq_extend_compose :
+  `( {{ Δ ; Γ' ⊢s σ : Γ'' }} ->
+     {{ Δ ; Γ'' ⊢ A }} ->
+     {{ Δ ; Γ' ⊢ M : A[σ] }} ->
+     {{ Δ ; Γ ⊢s τ : Γ' }} ->
+     {{ Δ ; Γ ⊢s (σ,,M)∘τ ≈ (σ∘τ),,M[τ] : Γ'', A }} )
+| wf_sub_eq_p_extend :
+  `( {{ Δ ; Γ' ⊢s σ : Γ }} ->
+     {{ Δ ; Γ ⊢ A }} ->
+     {{ Δ ; Γ' ⊢ M : A[σ] }} ->
+     {{ Δ ; Γ' ⊢s Wk∘(σ,,M) ≈ σ : Γ }} )
+| wf_sub_eq_extend :
+  `( {{ Δ ; Γ' ⊢s σ : Γ, A }} ->
+     {{ Δ ; Γ' ⊢s σ ≈ (Wk∘σ),,#0[σ] : Γ, A }} )
+| wf_sub_eq_sym :
+  `( {{ Δ ; Γ ⊢s σ ≈ σ' : Γ' }} ->
+     {{ Δ ; Γ ⊢s σ' ≈ σ : Γ' }} )
+| wf_sub_eq_trans :
+  `( {{ Δ ; Γ ⊢s σ ≈ σ' : Γ' }} ->
+     {{ Δ ; Γ ⊢s σ' ≈ σ'' : Γ' }} ->
+     {{ Δ ; Γ ⊢s σ ≈ σ'' : Γ' }} )
+| wf_sub_eq_conv :
+  `( {{ Δ ; Γ ⊢s σ ≈ σ' : Γ' }} ->
+     {{ Δ ⊢ Γ'' }} ->
+     {{ Δ ⊢ Γ' ⊆ Γ'' }} ->
+     {{ Δ ; Γ ⊢s σ ≈ σ' : Γ'' }} )
+where "Δ ; Γ ⊢s σ ≈ σ' : Γ'" := (wf_sub_eq Δ Γ Γ' σ σ') (in custom judg) : type_scope.
+
+#[export]
+Hint Constructors wf_gctx wf_ctx wf_ctx_subtyp wf_exp wf_exp_eq wf_typ wf_typ_eq wf_typ_subtyp wf_sub wf_sub_eq : mcpts.
+
+Scheme wf_gctx_mut_ind := Induction for wf_gctx Sort Prop
+with wf_ctx_mut_ind := Induction for wf_ctx Sort Prop
+with wf_ctx_subtyp_mut_ind := Induction for wf_ctx_subtyp Sort Prop
 with wf_exp_mut_ind := Induction for wf_exp Sort Prop
 with wf_exp_eq_mut_ind := Induction for wf_exp_eq Sort Prop
-with wf_sub_mut_ind := Induction for wf_sub Sort Prop
-with wf_sub_eq_mut_ind := Induction for wf_sub_eq Sort Prop
-with wf_subtyp_mut_ind := Induction for wf_subtyp Sort Prop
 with wf_typ_mut_ind := Induction for wf_typ Sort Prop
-with wf_typ_eq_mut_ind := Induction for wf_typ_eq Sort Prop.
+with wf_typ_eq_mut_ind := Induction for wf_typ_eq Sort Prop
+with wf_typ_subtyp_mut_ind := Induction for wf_typ_subtyp Sort Prop     
+with wf_sub_mut_ind := Induction for wf_sub Sort Prop
+with wf_sub_eq_mut_ind := Induction for wf_sub_eq Sort Prop.
 Combined Scheme syntactic_wf_mut_ind from
+  wf_gctx_mut_ind,
   wf_ctx_mut_ind,
-  wf_ctx_sub_mut_ind,
-  wf_ctx_eq_mut_ind,
+  wf_ctx_subtyp_mut_ind,
   wf_exp_mut_ind,
   wf_exp_eq_mut_ind,
-  wf_sub_mut_ind,
-  wf_sub_eq_mut_ind,
-  wf_subtyp_mut_ind,
   wf_typ_mut_ind,
-  wf_typ_eq_mut_ind.
+  wf_typ_eq_mut_ind,
+  wf_typ_subtyp_mut_ind,
+  wf_sub_mut_ind,
+  wf_sub_eq_mut_ind.  
+  
 
-Scheme wf_ctx_mut_ind' := Induction for wf_ctx Sort Prop
+Scheme wf_gctx_mut_ind' := Induction for wf_gctx Sort Prop
+with wf_ctx_mut_ind' := Induction for wf_ctx Sort Prop
 with wf_exp_mut_ind' := Induction for wf_exp Sort Prop
+with wf_typ_mut_ind' := Induction for wf_typ Sort Prop
 with wf_sub_mut_ind' := Induction for wf_sub Sort Prop.
 Combined Scheme syntactic_wf_mut_ind' from
   wf_ctx_mut_ind',
   wf_exp_mut_ind',
+  wf_typ_mut_ind',
   wf_sub_mut_ind'.
 
 
-#[export]
-Hint Constructors wf_ctx wf_ctx_sub wf_ctx_eq wf_exp wf_typ wf_sub wf_exp_eq wf_typ_eq wf_sub_eq wf_subtyp ctx_lookup : mcpts.
+(** Equality for global contexts *)
+Inductive wf_gctx_eq {P : PtsSig} : gctx P -> gctx P -> Prop :=
+| wf_gctx_eq_empty : {{ ⊢ ⋅ ≈ ⋅ }}
+| wf_gctx_eq_extend_none :
+  `( {{ ⊢ Δ ≈ Δ' }} ->
+     {{ Δ ; ⋅ ⊢ A }} ->
+     {{ Δ ; ⋅ ⊢ A' }} ->
+     {{ Δ' ; ⋅ ⊢ A }} ->
+     {{ Δ' ; ⋅ ⊢ A' }} ->
+     {{ Δ ; ⋅ ⊢ A ≈ A' }} ->
+     {{ Δ' ; ⋅ ⊢ A ≈ A' }} ->
+     {{ `#x ∉ Δ }} ->
+     {{ `#x ∉ Δ' }} ->
+     {{ ⊢ Δ, x := ∅ : A ≈ Δ', x := ∅ : A' }} )
+| wf_gctx_eq_extend_some :
+  `( {{ ⊢ Δ ≈ Δ' }} ->
+     {{ Δ ; ⋅ ⊢ A }} ->
+     {{ Δ ; ⋅ ⊢ A' }} ->
+     {{ Δ' ; ⋅ ⊢ A }} ->
+     {{ Δ' ; ⋅ ⊢ A' }} ->
+     {{ Δ ; ⋅ ⊢ A ≈ A' }} ->
+     {{ Δ' ; ⋅ ⊢ A ≈ A' }} ->
+     {{ Δ ; ⋅ ⊢ M : A }} ->
+     {{ Δ' ; ⋅ ⊢ M : A }} ->
+     {{ Δ ; ⋅ ⊢ M' : A' }} ->
+     {{ Δ' ; ⋅ ⊢ M' : A' }} ->
+     {{ Δ ; ⋅ ⊢ M ≈ M' : A }} ->
+     {{ Δ' ; ⋅ ⊢ M ≈ M' : A }} ->
+     {{ Δ ; ⋅ ⊢ M ≈ M' : A' }} ->
+     {{ Δ' ; ⋅ ⊢ M ≈ M' : A' }} ->
+     {{ `#x ∉ Δ }} ->
+     {{ `#x ∉ Δ' }} ->
+     {{ ⊢ Δ, x := M : A ≈ Δ', x := M' : A' }} )
+where "⊢ Δ ≈ Δ'" := (wf_gctx_eq Δ Δ') (in custom judg) : type_scope.
 
 #[export]
-Instance wf_exp_eq_PER {P : PtsSig} (Γ : ctx P) A : PER (wf_exp_eq Γ A).
+Hint Constructors wf_gctx_eq : mcpts.
+
+(** Subtyping for global contexts *)
+Inductive wf_gctx_subtyp {P : PtsSig} :  gctx P -> gctx P -> Prop :=
+| wf_gctx_subtyp_empty : {{ ⊢ ⋅ ⊆ ⋅ }}
+| wf_gctx_subtyp_extend_none :
+  `( {{ ⊢ Δ ⊆ Δ' }} ->
+     {{ Δ ; ⋅ ⊢ A }} ->
+     {{ Δ' ; ⋅ ⊢ A' }} ->
+     {{ Δ ; ⋅ ⊢ A ⊆ A' }} ->
+     {{ `#x ∉ Δ }} ->
+     {{ `#x ∉ Δ' }} ->
+     {{ ⊢ Δ, x := ∅ : A ⊆ Δ', x := ∅ : A' }} )
+| wf_gctx_subtyp_extend_some :
+  `( {{ ⊢ Δ ⊆ Δ' }} ->
+     {{ Δ ; ⋅ ⊢ A }} ->
+     {{ Δ' ; ⋅ ⊢ A' }} ->
+     {{ Δ ; ⋅ ⊢ M : A }} ->
+     {{ Δ' ; ⋅ ⊢ M : A' }} ->
+     {{ Δ ; ⋅ ⊢ A ⊆ A' }} ->
+     {{ `#x ∉ Δ }} ->
+     {{ ⊢ Δ, x := M : A ⊆ Δ', x := M : A' }} )
+where "⊢ Δ ⊆ Δ'" := (wf_gctx_subtyp Δ Δ') (in custom judg) : type_scope.
+
+#[export]
+Hint Constructors wf_gctx_subtyp : mcpts.
+
+(** Equality for local contexts *)
+Inductive wf_ctx_eq {P : PtsSig} : gctx P -> ctx P -> ctx P -> Prop :=
+| wf_ctx_eq_empty :
+  `( {{ ⊢ Δ }} ->
+     {{ Δ ⊢ ⋅ ≈ ⋅ }} )
+| wf_ctx_eq_extend :
+  `( {{ Δ ⊢ Γ ≈ Γ' }} ->
+     {{ Δ ; Γ ⊢ A }} ->
+     {{ Δ ; Γ ⊢ A' }} ->
+     {{ Δ ; Γ' ⊢ A }} ->
+     {{ Δ ; Γ' ⊢ A' }} ->
+     {{ Δ ; Γ ⊢ A ≈ A' }} ->
+     {{ Δ ; Γ' ⊢ A ≈ A' }} ->
+     {{ Δ ⊢ Γ, A ≈ Γ', A' }} )
+where "Δ ⊢ Γ ≈ Γ'" := (wf_ctx_eq Δ Γ Γ') (in custom judg) : type_scope.
+
+#[export]
+Hint Constructors wf_ctx_eq : mcpts.
+
+
+(** * Equality judgments are equivalences *)
+(** For wf_exp_eq *)
+#[export]
+Instance wf_exp_eq_PER {P : PtsSig} (Δ : gctx P) (Γ : ctx P) (A : typ P) : PER (wf_exp_eq Δ Γ A).
 Proof.
   split.
   - eauto using wf_exp_eq_sym.
   - eauto using wf_exp_eq_trans.
 Qed.
 
-
 #[export]
-Instance wf_sub_eq_PER {P : PtsSig} (Γ : ctx P) Δ : PER (wf_sub_eq Γ Δ).
+Instance wf_exp_eq_per_elem {P : PtsSig} (Δ : gctx P) (Γ : ctx P) (A : typ P) : PERElem _ (wf_exp Δ Γ A) (wf_exp_eq Δ Γ A).
+Proof.
+  intros a Ha. mauto.
+Qed.
+
+(** For wf_sub_eq *)
+#[export]
+Instance wf_sub_eq_PER {P : PtsSig} (Δ : gctx P) (Γ Γ' : ctx P) : PER (wf_sub_eq Δ Γ Γ').
 Proof.
   split.
   - eauto using wf_sub_eq_sym.
@@ -489,155 +660,311 @@ Proof.
 Qed.
 
 #[export]
-Instance wf_typ_eq_PER {P : PtsSig} (Γ : ctx P) : PER (wf_typ_eq Γ).
+Instance wf_sub_eq_per_elem {P : PtsSig} (Δ : gctx P) (Γ Γ' : ctx P) : PERElem _ (wf_sub Δ Γ Γ') (wf_sub_eq Δ Γ Γ').
+Proof.
+  intros a Ha. mauto.
+Qed.
+
+(** For wf_typ_eq *) 
+#[export]
+Instance wf_typ_eq_PER {P : PtsSig} (Δ : gctx P) (Γ : ctx P) : PER (wf_typ_eq Δ Γ).
 Proof.
   split.
   - eauto using wf_typ_eq_sym.
   - eauto using wf_typ_eq_trans.
 Qed.
 
-Instance wf_ctx_eq_Symmetric {P : PtsSig} : Symmetric (@wf_ctx_eq P).
+#[export]
+Instance wf_typ_eq_per_elem {P : PtsSig} (Δ : gctx P) (Γ : ctx P) : PERElem _ (wf_typ Δ Γ) (wf_typ_eq Δ Γ).
+Proof.
+  induction 1.
+  - transitivity {{{ Sort@s[Id] }}}; mauto.
+  - enough {{ Δ; Γ ⊢ A ≈ A : Sort@s }}; mauto.
+  - enough {{ Δ; Γ ⊢s σ ≈ σ : Γ' }}; mauto.
+Qed.
+
+
+(** For global contexts *)
+(* NOTE:
+ * For contexts (global and local), we cannot establish transitivity at this point since it requires showing that rewrite rules using context equality are admissible in typing/type well-formedness judgments 
+* Instead, we show only reflexivity and symmetry now
+*)
+#[export]
+Instance wf_gctx_eq_Symmetric {P : PtsSig} : Symmetric (@wf_gctx_eq P).
+Proof.
+  induction 1; mauto.
+  symmetry in H4, H5, H10, H11, H12, H13.
+  mauto.
+Qed.
+
+#[export]
+Instance wf_gctx_eq_per_elem {P : PtsSig} : PERElem _ (@wf_gctx P) (@wf_gctx_eq P).
+Proof.
+  induction 1; mauto;
+    econstructor; mauto;
+      apply wf_typ_eq_per_elem;
+      eassumption.
+Qed.
+
+(** For local contexts *)
+#[export]
+Instance wf_ctx_eq_Symmetric {P : PtsSig} (Δ : gctx P) : Symmetric (wf_ctx_eq Δ).
 Proof.
   induction 1; mauto.
 Qed.
 
 #[export]
-Instance wf_subtyp_Transitive {P : PtsSig} Γ : Transitive (@wf_subtyp P Γ).
+Instance wf_ctx_eq_per_elem {P : PtsSig} (Δ : gctx P) : PERElem _ (wf_ctx Δ) (wf_ctx_eq Δ).
+Proof.
+  induction 1; mauto.
+  econstructor; mauto;
+      apply wf_typ_eq_per_elem;
+      eassumption.
+Qed.
+
+
+(** * Subtyping relations are orders *)
+(* NOTE:
+ * Ultimately, we would like to know that the subtyping judgments are partial orders, but it does not seem that antisymmetry can be established through stricly syntactic methods
+ * Instead, we settle for pre-orders
+ *)
+(** For types *)
+#[export]
+Instance wf_typ_subtyp_per_elem {P : PtsSig} (Δ : gctx P) (Γ : ctx P) : PERElem _ (wf_typ Δ Γ) (wf_typ_subtyp Δ Γ).
+Proof.
+  intros A HA.
+  enough {{ Δ; Γ ⊢ A ≈ A }} by mauto.
+  apply wf_typ_eq_per_elem; mauto.
+Qed.
+
+#[export]
+Instance wf_typ_subtyp_Transitive {P : PtsSig} (Δ : gctx P) (Γ : ctx P) : Transitive (wf_typ_subtyp Δ Γ).
 Proof.
   hnf; mauto.
+Qed.  
+
+(** For global contexts *)
+(* NOTE:
+ * For (local and global) contexts, we cannot establish transitivity at this point, for similar reason as in the equality case
+ *)
+#[export]
+Instance wf_gctx_subtyp_per_elem {P : PtsSig} : PERElem _ (@wf_gctx P) (@wf_gctx_subtyp P).
+Proof.
+  induction 1; mauto;
+    econstructor; mauto;
+    apply wf_typ_subtyp_per_elem; mauto.
+Qed.
+
+(** For local contexts *)
+#[export]
+Instance wf_ctx_subtyp_per_elem {P : PtsSig} (Δ : gctx P) : PERElem _ (wf_ctx Δ) (wf_ctx_subtyp Δ).
+Proof.
+  induction 1; mauto;
+    econstructor; mauto;
+    apply wf_typ_subtyp_per_elem; mauto.
 Qed.
 
 
-(** Immediate & Independent Presuppositions *)
-Lemma presup_ctx_sub {P} : forall {Γ Δ : ctx P}, {{ ⊢ Γ ⊆ Δ }} -> {{ ⊢ Γ }} /\ {{ ⊢ Δ }}.
+(** * Basic rewriting rules *)
+(** For wf_exp_eq *)
+Add Parametric Morphism {P : PtsSig} (Δ : gctx P) (Γ : ctx P) (A : typ P) : (wf_exp_eq Δ Γ A)
+    with signature wf_exp_eq Δ Γ A ==> eq ==> iff as wf_exp_eq_morphism_iff1.
+Proof.
+  split; mauto.
+Qed.
+
+Add Parametric Morphism {P : PtsSig} (Δ : gctx P) (Γ : ctx P) (A : typ P) : (wf_exp_eq Δ Γ A)
+    with signature eq ==> wf_exp_eq Δ Γ A ==> iff as wf_exp_eq_morphism_iff2.
+Proof.
+  split; mauto.
+Qed.
+
+(** For wf_typ_eq *)
+Add Parametric Morphism {P : PtsSig} (Δ : gctx P) (Γ : ctx P) : (wf_typ_eq Δ Γ)
+    with signature wf_typ_eq Δ Γ ==> eq ==> iff as wf_typ_eq_morphism_iff1.
+Proof.
+  split; mauto.
+Qed.
+
+Add Parametric Morphism {P : PtsSig} (Δ : gctx P) (Γ : ctx P) : (wf_typ_eq Δ Γ)
+    with signature eq ==> wf_typ_eq Δ Γ ==> iff as wf_typ_eq_morphism_iff2.
+Proof.
+  split; mauto.
+Qed.
+
+Add Parametric Morphism {P} (Δ : gctx P) (Γ : ctx P) (s : P) : (wf_typ_eq Δ Γ)
+  with signature eq ==> wf_exp_eq Δ Γ {{{ Sort@s }}} ==> iff as wf_typ_eq_morphism_iff3.
+Proof.
+  split; mauto.
+Qed.
+
+Add Parametric Morphism {P} (Δ : gctx P) (Γ : ctx P) (s : P) : (wf_typ_eq Δ Γ)
+  with signature wf_exp_eq Δ Γ {{{ Sort@s }}} ==> eq ==> iff as wf_typ_eq_morphism_iff4.
+Proof.
+  split; mauto.
+Qed.
+
+(** For wf_sub_eq *)
+Add Parametric Morphism {P : PtsSig} (Δ : gctx P) (Γ Γ' : ctx P) : (wf_sub_eq Δ Γ Γ')
+    with signature wf_sub_eq Δ Γ Γ' ==> eq ==> iff as wf_sub_eq_morphism_iff1.
+Proof.
+  split; mauto.
+Qed.
+
+Add Parametric Morphism {P : PtsSig} (Δ : gctx P) (Γ Γ' : ctx P) : (wf_sub_eq Δ Γ Γ')
+    with signature eq ==> wf_sub_eq Δ Γ Γ' ==> iff as wf_sub_eq_morphism_iff2.
+Proof.
+  split; mauto.
+Qed.
+
+(** Rewrite using specific constructors of equality judgments *)
+#[export]
+Hint Rewrite -> @wf_exp_eq_typ_sub using mauto 3 : mcpts.
+
+#[export]
+Hint Rewrite -> @wf_exp_eq_sub_id
+                 @wf_exp_eq_pi_sub using mauto 4 : mcpts.
+
+#[export]
+Hint Rewrite -> @wf_exp_eq_typ_sub using mauto 3 : mcpts.
+
+#[export]
+Hint Rewrite -> @wf_sub_eq_id_compose_right
+                 @wf_sub_eq_id_compose_left
+                 @wf_sub_eq_compose_assoc (* prefer right association *)
+                 @wf_sub_eq_p_extend using mauto 4 : mcpts.
+
+
+
+
+(** * Basic presupposition results *)
+(** For equality of global contexts *)
+Lemma presup_gctx_eq {P} : forall {Δ Δ' : gctx P}, {{ ⊢ Δ ≈ Δ' }} -> {{ ⊢ Δ }} /\ {{ ⊢ Δ' }}.
 Proof with mautosolve.
   induction 1; destruct_pairs...
 Qed.
 
-#[export]
-Hint Resolve presup_ctx_sub : mcpts.
-
-Lemma presup_ctx_sub_left {P} : forall {Γ Δ : ctx P}, {{ ⊢ Γ ⊆ Δ }} -> {{ ⊢ Γ }}.
+Lemma presup_gctx_eq_left {P} : forall {Δ Δ' : gctx P}, {{ ⊢ Δ ≈ Δ' }} -> {{ ⊢ Δ }}.
 Proof with easy.
-  intros * ?%presup_ctx_sub...
+  intros * ?%presup_gctx_eq...
+Qed.
+
+Lemma presup_gctx_eq_right {P} : forall {Δ Δ' : gctx P}, {{ ⊢ Δ ≈ Δ' }} -> {{ ⊢ Δ' }}.
+Proof with easy.
+  intros * ?%presup_gctx_eq...
 Qed.
 
 #[export]
-Hint Resolve presup_ctx_sub_left : mcpts.
+Hint Resolve presup_gctx_eq presup_gctx_eq_left presup_gctx_eq_right : mcpts.
 
-Lemma presup_ctx_sub_right {P} : forall {Γ Δ : ctx P}, {{ ⊢ Γ ⊆ Δ }} -> {{ ⊢ Δ }}.
-Proof with easy.
-  intros * ?%presup_ctx_sub...
-Qed.
-
-#[export]
-Hint Resolve presup_ctx_sub_right : mcpts.
-
-Lemma presup_wf_ctx_eq {P : PtsSig} : forall {Γ Δ : ctx P}, {{ ⊢ Γ ≈ Δ }} -> {{ ⊢ Γ }} /\ {{ ⊢ Δ }}.
+(** For subtyping of global contexts *)
+Lemma presup_gctx_subtyp {P} : forall {Δ Δ' : gctx P}, {{ ⊢ Δ ⊆ Δ' }} -> {{ ⊢ Δ }} /\ {{ ⊢ Δ' }}.
 Proof with mautosolve.
   induction 1; destruct_pairs...
 Qed.
 
-#[export]
-Hint Resolve presup_wf_ctx_eq : mcpts.
-
-Lemma presup_wf_ctx_eq_left {P : PtsSig} : forall {Γ Δ : ctx P}, {{ ⊢ Γ ≈ Δ }} -> {{ ⊢ Γ }}.
+Lemma presup_gctx_subtyp_left {P} : forall {Δ Δ' : gctx P}, {{ ⊢ Δ ⊆ Δ' }} -> {{ ⊢ Δ }}.
 Proof with easy.
-  intros * ?%presup_wf_ctx_eq...
+  intros * ?%presup_gctx_subtyp...
+Qed.
+
+Lemma presup_gctx_subtyp_right {P} : forall {Δ Δ' : gctx P}, {{ ⊢ Δ ⊆ Δ' }} -> {{ ⊢ Δ' }}.
+Proof with easy.
+  intros * ?%presup_gctx_subtyp...
 Qed.
 
 #[export]
-Hint Resolve presup_wf_ctx_eq_left : mcpts.
+Hint Resolve presup_gctx_subtyp presup_gctx_subtyp_left presup_gctx_subtyp_right : mcpts.
 
-Lemma presup_wf_ctx_eq_right {P : PtsSig} : forall {Γ Δ : ctx P}, {{ ⊢ Γ ≈ Δ }} -> {{ ⊢ Δ }}.
-Proof with easy.
-  intros * ?%presup_wf_ctx_eq...
-Qed.
-
-#[export]
-Hint Resolve presup_wf_ctx_eq_right : mcpts.
-
-Lemma presup_subtyp_right {P} : forall {Γ : ctx P} {A B}, {{ Γ ⊢ A ⊆ B }} -> {{ Γ ⊢ B }}.
+(** For well-formedness of local contexts *)
+Lemma presup_wf_ctx {P : PtsSig} : forall {Δ : gctx P} {Γ : ctx P}, {{ Δ ⊢ Γ }} -> {{ ⊢ Δ }}.
 Proof with mautosolve.
   induction 1...
 Qed.
 
 #[export]
-Hint Resolve presup_subtyp_right : mcpts.
-
-
-Add Parametric Morphism {P : PtsSig} (Γ : ctx P) T : (wf_exp_eq Γ T)
-    with signature wf_exp_eq Γ T ==> eq ==> iff as wf_exp_eq_morphism_iff1.
-Proof.
-  split; mauto.
+Hint Resolve presup_wf_ctx : mcpts.
+ 
+(** For equality of local contexts *)
+Lemma presup_wf_ctx_eq {P : PtsSig} : forall {Δ : gctx P} {Γ Γ' : ctx P}, {{ Δ ⊢ Γ ≈ Γ' }} -> {{ ⊢ Δ }} /\ {{ Δ ⊢ Γ }} /\ {{ Δ ⊢ Γ' }}.
+Proof with mautosolve.
+  induction 1; destruct_pairs...
 Qed.
 
-Add Parametric Morphism {P : PtsSig} (Γ : ctx P) T : (wf_exp_eq Γ T)
-    with signature eq ==> wf_exp_eq Γ T ==> iff as wf_exp_eq_morphism_iff2.
-Proof.
-  split; mauto.
+Lemma presup_wf_ctx_eq_gctx {P : PtsSig} : forall {Δ : gctx P} {Γ Γ' : ctx P}, {{ Δ ⊢ Γ ≈ Γ' }} -> {{ ⊢ Δ }}.
+Proof with easy.
+  intros * ?%presup_wf_ctx_eq...
 Qed.
 
-Add Parametric Morphism {P : PtsSig} (Γ : ctx P) : (wf_typ_eq Γ)
-    with signature wf_typ_eq Γ ==> eq ==> iff as wf_typ_eq_morphism_iff1.
-Proof.
-  split; mauto.
+Lemma presup_wf_ctx_eq_left {P : PtsSig} : forall {Δ : gctx P} {Γ Γ' : ctx P}, {{ Δ ⊢ Γ ≈ Γ' }} -> {{ Δ ⊢ Γ }}.
+Proof with easy.
+  intros * ?%presup_wf_ctx_eq...
 Qed.
 
-Add Parametric Morphism {P : PtsSig} (Γ : ctx P) : (wf_typ_eq Γ)
-    with signature eq ==> wf_typ_eq Γ ==> iff as wf_typ_eq_morphism_iff2.
-Proof.
-  split; mauto.
-Qed.
-
-Add Parametric Morphism {P} (Γ : ctx P) s : (wf_typ_eq Γ)
-  with signature eq ==> wf_exp_eq Γ {{{ Sort@s }}} ==> iff as wf_typ_eq_morphism_iff3.
-Proof.
-  split; mauto.
-Qed.
-
-Add Parametric Morphism {P} (Γ : ctx P) s : (wf_typ_eq Γ)
-  with signature wf_exp_eq Γ {{{ Sort@s }}} ==> eq ==> iff as wf_typ_eq_morphism_iff4.
-Proof.
-  split; mauto.
-Qed.
-
-Add Parametric Morphism {P : PtsSig} (Γ : ctx P) Δ : (wf_sub_eq Γ Δ)
-    with signature wf_sub_eq Γ Δ ==> eq ==> iff as wf_sub_eq_morphism_iff1.
-Proof.
-  split; mauto.
-Qed.
-
-Add Parametric Morphism {P : PtsSig} (Γ : ctx P) Δ : (wf_sub_eq Γ Δ)
-    with signature eq ==> wf_sub_eq Γ Δ ==> iff as wf_sub_eq_morphism_iff2.
-Proof.
-  split; mauto.
+Lemma presup_wf_ctx_eq_right {P : PtsSig} : forall {Δ : gctx P} {Γ Γ' : ctx P}, {{ Δ ⊢ Γ ≈ Γ' }} -> {{ Δ ⊢ Γ' }}.
+Proof with easy.
+  intros * ?%presup_wf_ctx_eq...
 Qed.
 
 #[export]
-Hint Rewrite -> @wf_exp_eq_typ_sub using mauto 3 : mcpts.
+Hint Resolve presup_wf_ctx_eq presup_wf_ctx_eq_gctx presup_wf_ctx_eq_left presup_wf_ctx_eq_right : mcpts.
 
-#[export]
-Hint Rewrite -> @wf_sub_eq_id_compose_right @wf_sub_eq_id_compose_left
-                  @wf_sub_eq_compose_assoc (* prefer right association *)
-                  @wf_sub_eq_p_extend using mauto 4 : mcpts.
-
-#[export]
-  Hint Rewrite -> @wf_exp_eq_sub_id @wf_exp_eq_pi_sub using mauto 4 : mcpts.
-
-#[export]
-Hint Rewrite -> @wf_exp_eq_typ_sub using mauto 3 : mcpts.
-
-
-#[export]
-Instance wf_exp_eq_per_elem {P : PtsSig} (Γ : ctx P) T : PERElem _ (wf_exp Γ T) (wf_exp_eq Γ T).
-Proof.
-  intros a Ha. mauto.
+(** For subtyping of contexts *)
+Lemma presup_ctx_subtyp {P} : forall {Δ : gctx P} {Γ Γ' : ctx P}, {{ Δ ⊢ Γ ⊆ Γ' }} -> {{ ⊢ Δ }} /\ {{ Δ ⊢ Γ }} /\ {{ Δ ⊢ Γ' }}.
+Proof with mautosolve.
+  induction 1; destruct_pairs...
 Qed.
 
+Lemma presup_ctx_subtyp_gctx {P} : forall {Δ : gctx P} {Γ Γ' : ctx P}, {{ Δ ⊢ Γ ⊆ Γ' }} -> {{ ⊢ Δ }}.
+Proof with easy.
+  intros * ?%presup_ctx_subtyp...
+Qed.
+
+Lemma presup_ctx_subtyp_left {P} : forall {Δ : gctx P} {Γ Γ' : ctx P}, {{ Δ ⊢ Γ ⊆ Γ' }} -> {{ Δ ⊢ Γ }}.
+Proof with easy.
+  intros * ?%presup_ctx_subtyp...
+Qed.
+
+Lemma presup_ctx_subtyp_right {P} : forall {Δ : gctx P} {Γ Γ' : ctx P}, {{ Δ ⊢ Γ ⊆ Γ' }} -> {{ Δ ⊢ Γ' }}.
+Proof with easy.
+  intros * ?%presup_ctx_subtyp...
+Qed.
 
 #[export]
-Instance wf_sub_eq_per_elem {P : PtsSig} (Γ : ctx P) Δ : PERElem _ (wf_sub Γ Δ) (wf_sub_eq Γ Δ).
-Proof.
-  intros a Ha. mauto.
+Hint Resolve presup_ctx_subtyp presup_ctx_subtyp_gctx presup_ctx_subtyp_left presup_ctx_subtyp_right : mcpts.
+
+(** For subtyping of types *)
+Lemma presup_typ_subtyp_right {P} : forall {Δ : gctx P} {Γ : ctx P} {A B}, {{ Δ ; Γ ⊢ A ⊆ B }} -> {{ Δ ; Γ ⊢ B }}.
+Proof with mautosolve.
+  induction 1...
 Qed.
+
+#[export]
+Hint Resolve presup_typ_subtyp_right : mcpts.
+
+(** * Immediately admissible rules *)
+Lemma wf_typ_eq_refl {P : PtsSig} : forall (Δ : gctx P) (Γ : ctx P) (A : typ P),
+    {{ Δ ; Γ ⊢ A }} ->
+    {{ Δ ; Γ ⊢ A ≈ A }}.
+Proof.
+  intros.
+  apply wf_typ_eq_per_elem; eassumption.
+Qed.
+
+#[export]
+Hint Resolve wf_typ_eq_refl : mcpts.
+
+Lemma wf_typ_subtyp_sort_st_subtyp {P : PtsSig} : forall (Δ : gctx P) (Γ : ctx P) (s1 s2 : P),
+    {{ Δ ⊢ Γ }} ->
+    st_subtyp s1 s2 ->
+    {{ Δ ; Γ ⊢ Sort@s1 ⊆ Sort@s2 }}.
+Proof.
+  intros.
+  induction H0.
+  - enough {{ Δ; Γ ⊢ Sort@s ≈ Sort@s }} by mauto 3.
+    enough {{ Δ; Γ ⊢ Sort@s }}; mauto 2.
+  - transitivity {{{ Sort@s2 }}}; mauto 2.
+Qed.
+
+#[export]
+Hint Resolve wf_typ_subtyp_sort_st_subtyp : mcpts.
