@@ -53,8 +53,10 @@ extract_LF:
 extract_MLTTCumul:
 	$(extract)
 
-post-all:: extract_MiniML extract_LF extract_MLTTCumul
-	dune build
+
+## Uncomment the next two lines to enable extraction
+# post-all:: extract_MiniML extract_LF extract_MLTTCumul
+# 	dune build
 
 .PHONY: update_parserMessages
 update_parserMessages:
