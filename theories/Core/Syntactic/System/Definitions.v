@@ -874,6 +874,16 @@ Qed.
 #[export]
 Hint Resolve ctx_eq_refl : mcpts.
 
+(** Equality of local and global contexts is symmetric (follows trivially from PER instances) *)
+Lemma wf_gctx_eq_sym {P : PtsSig} : forall {Δ Δ' : gctx P}, {{ ⊢ Δ ≈ Δ' }} -> {{ ⊢ Δ' ≈ Δ }}.
+Proof. intros; symmetry; eauto. Qed.
+
+Lemma wf_ctx_eq_sym {P : PtsSig} : forall {Δ : gctx P} {Γ Γ'}, {{ Δ ⊢ Γ ≈ Γ' }} -> {{ Δ ⊢ Γ' ≈ Γ }}.
+Proof. intros; symmetry; eauto. Qed.
+
+#[export]
+Hint Resolve wf_gctx_eq_sym wf_ctx_eq_sym : mcpts.
+ 
 (** Admissible subtyping rules *)
 Lemma wf_typ_subtyp_sort_st_subtyp {P : PtsSig} : forall (Δ : gctx P) (Γ : ctx P) (s1 s2 : P),
     {{ Δ ⊢ Γ }} ->

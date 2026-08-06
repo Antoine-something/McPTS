@@ -2200,21 +2200,21 @@ Qed.
 #[export]
 Hint Resolve wf_gctx_subtyp_gctx_lookup : mcpts.
 
-Lemma wf_exp_sort_implies_axiom {P} : forall {Δ : gctx P} {Γ s1 K},
-    {{ Δ ; Γ ⊢ Sort@s1 : K }} ->
-    exists s2,
-      Ax_typ P s1 s2 /\
-        {{ Δ ; Γ ⊢ Sort@s2 ⊆ K }}.
-Proof.
-  intros * H.
-  dependent induction H.
-  - eexists; split; mauto 2.
-  - specialize (IHwf_exp _ s1 A ltac:(reflexivity) ltac:(reflexivity) ltac:(reflexivity)) as [s2 []].
-    eexists; mauto.
-Qed.
+(* Lemma wf_exp_sort_implies_axiom {P} : forall {Δ : gctx P} {Γ s1 K}, *)
+(*     {{ Δ ; Γ ⊢ Sort@s1 : K }} -> *)
+(*     exists s2, *)
+(*       Ax_typ P s1 s2 /\ *)
+(*         {{ Δ ; Γ ⊢ Sort@s2 ⊆ K }}. *)
+(* Proof. *)
+(*   intros * H. *)
+(*   dependent induction H. *)
+(*   - eexists; split; mauto 2. *)
+(*   - specialize (IHwf_exp _ s1 A ltac:(reflexivity) ltac:(reflexivity) ltac:(reflexivity)) as [s2 []]. *)
+(*     eexists; mauto. *)
+(* Qed. *)
 
-#[export]
-Hint Resolve wf_exp_sort_implies_axiom : mcpts.
+(* #[export] *)
+(* Hint Resolve wf_exp_sort_implies_axiom : mcpts. *)
 
 
 (** *** Lemmas about variables *)
