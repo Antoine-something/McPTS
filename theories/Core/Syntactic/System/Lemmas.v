@@ -20,7 +20,7 @@ Qed.
 #[export]
 Hint Resolve functional_gctx_lookup : mcpts.
  
-Lemma gctx_decomp {P : PtsSig} : forall {Δ : gctx P} {x A}, {{ ⊢ Δ, x : A }} -> {{ ⊢ Δ }} /\ {{ Δ ; ⋅ ⊢ A }}.
+Lemma gctx_decomp {P : PtsSig} : forall {Δ : gctx P} {x A}, {{ ⊢ Δ, x : A }} -> {{ ⊢ Δ }} /\ {{ Δ ; ⋅ ⊢ A }} /\ {{ `#x ∉ Δ }}.
 Proof with now eauto.
   inversion 1; split; mauto 2.
 Qed.
@@ -38,8 +38,13 @@ Proof with easy.
   intros * ?%gctx_decomp...
 Qed.
 
+Corollary gctx_decomp_fresh {P : PtsSig} : forall {Δ : gctx P} {x A}, {{ ⊢ Δ, x:A }} -> {{ `#x ∉ Δ }}.
+Proof with easy.
+  intros * ?%gctx_decomp...
+Qed.
+
 #[export]
-Hint Resolve gctx_decomp_left gctx_decomp_right : mcpts.
+Hint Resolve gctx_decomp_left gctx_decomp_right gctx_decomp_fresh : mcpts.
 
 
 Lemma ctx_lookup_lt {P : PtsSig} : forall {Γ : ctx P} {A x},
@@ -88,42 +93,42 @@ Hint Resolve ctx_decomp_left ctx_decomp_right : mcpts.
 (** * Core presupposition results *)
 
 (** For equality of global contexts *)
-Lemma presup_gctx_eq {P} : forall {Δ Δ' : gctx P}, {{ ⊢ Δ ≈ Δ' }} -> {{ ⊢ Δ }} /\ {{ ⊢ Δ' }}.
+Lemma presup_wf_gctx_eq {P} : forall {Δ Δ' : gctx P}, {{ ⊢ Δ ≈ Δ' }} -> {{ ⊢ Δ }} /\ {{ ⊢ Δ' }}.
 Proof with mautosolve.
   induction 1; destruct_pairs...
 Qed.
 
-Corollary presup_gctx_eq_left {P} : forall {Δ Δ' : gctx P}, {{ ⊢ Δ ≈ Δ' }} -> {{ ⊢ Δ }}.
+Corollary presup_wf_gctx_eq_left {P} : forall {Δ Δ' : gctx P}, {{ ⊢ Δ ≈ Δ' }} -> {{ ⊢ Δ }}.
 Proof with easy.
-  intros * ?%presup_gctx_eq...
+  intros * ?%presup_wf_gctx_eq...
 Qed.
 
-Corollary presup_gctx_eq_right {P} : forall {Δ Δ' : gctx P}, {{ ⊢ Δ ≈ Δ' }} -> {{ ⊢ Δ' }}.
+Corollary presup_wf_gctx_eq_right {P} : forall {Δ Δ' : gctx P}, {{ ⊢ Δ ≈ Δ' }} -> {{ ⊢ Δ' }}.
 Proof with easy.
-  intros * ?%presup_gctx_eq...
+  intros * ?%presup_wf_gctx_eq...
 Qed.
 
 #[export]
-Hint Resolve presup_gctx_eq presup_gctx_eq_left presup_gctx_eq_right : mcpts.
+Hint Resolve presup_wf_gctx_eq presup_wf_gctx_eq_left presup_wf_gctx_eq_right : mcpts.
 
 (** For subtyping of global contexts *)
-Lemma presup_gctx_subtyp {P} : forall {Δ Δ' : gctx P}, {{ ⊢ Δ ⊆ Δ' }} -> {{ ⊢ Δ }} /\ {{ ⊢ Δ' }}.
+Lemma presup_wf_gctx_subtyp {P} : forall {Δ Δ' : gctx P}, {{ ⊢ Δ ⊆ Δ' }} -> {{ ⊢ Δ }} /\ {{ ⊢ Δ' }}.
 Proof with mautosolve.
   induction 1; destruct_pairs...
 Qed.
 
-Corollary presup_gctx_subtyp_left {P} : forall {Δ Δ' : gctx P}, {{ ⊢ Δ ⊆ Δ' }} -> {{ ⊢ Δ }}.
+Corollary presup_wf_gctx_subtyp_left {P} : forall {Δ Δ' : gctx P}, {{ ⊢ Δ ⊆ Δ' }} -> {{ ⊢ Δ }}.
 Proof with easy.
-  intros * ?%presup_gctx_subtyp...
+  intros * ?%presup_wf_gctx_subtyp...
 Qed.
 
-Corollary presup_gctx_subtyp_right {P} : forall {Δ Δ' : gctx P}, {{ ⊢ Δ ⊆ Δ' }} -> {{ ⊢ Δ' }}.
+Corollary presup_wf_gctx_subtyp_right {P} : forall {Δ Δ' : gctx P}, {{ ⊢ Δ ⊆ Δ' }} -> {{ ⊢ Δ' }}.
 Proof with easy.
-  intros * ?%presup_gctx_subtyp...
+  intros * ?%presup_wf_gctx_subtyp...
 Qed.
 
 #[export]
-Hint Resolve presup_gctx_subtyp presup_gctx_subtyp_left presup_gctx_subtyp_right : mcpts.
+Hint Resolve presup_wf_gctx_subtyp presup_wf_gctx_subtyp_left presup_wf_gctx_subtyp_right : mcpts.
 
 (** For well-formedness of local contexts *)
 Lemma presup_wf_ctx {P : PtsSig} : forall {Δ : gctx P} {Γ : ctx P}, {{ Δ ⊢ Γ }} -> {{ ⊢ Δ }}.
@@ -159,188 +164,181 @@ Qed.
 Hint Resolve presup_wf_ctx_eq presup_wf_ctx_eq_gctx presup_wf_ctx_eq_left presup_wf_ctx_eq_right : mcpts.
 
 (** For subtyping of local contexts *)
-Lemma presup_ctx_subtyp {P} : forall {Δ : gctx P} {Γ Γ' : ctx P}, {{ Δ ⊢ Γ ⊆ Γ' }} -> {{ ⊢ Δ }} /\ {{ Δ ⊢ Γ }} /\ {{ Δ ⊢ Γ' }}.
+Lemma presup_wf_ctx_subtyp {P} : forall {Δ : gctx P} {Γ Γ' : ctx P}, {{ Δ ⊢ Γ ⊆ Γ' }} -> {{ ⊢ Δ }} /\ {{ Δ ⊢ Γ }} /\ {{ Δ ⊢ Γ' }}.
 Proof with mautosolve.
   induction 1; destruct_pairs...
 Qed.
 
-Corollary presup_ctx_subtyp_gctx {P} : forall {Δ : gctx P} {Γ Γ' : ctx P}, {{ Δ ⊢ Γ ⊆ Γ' }} -> {{ ⊢ Δ }}.
+Corollary presup_wf_ctx_subtyp_gctx {P} : forall {Δ : gctx P} {Γ Γ' : ctx P}, {{ Δ ⊢ Γ ⊆ Γ' }} -> {{ ⊢ Δ }}.
 Proof with easy.
-  intros * ?%presup_ctx_subtyp...
+  intros * ?%presup_wf_ctx_subtyp...
 Qed.
 
-Corollary presup_ctx_subtyp_left {P} : forall {Δ : gctx P} {Γ Γ' : ctx P}, {{ Δ ⊢ Γ ⊆ Γ' }} -> {{ Δ ⊢ Γ }}.
+Corollary presup_wf_ctx_subtyp_left {P} : forall {Δ : gctx P} {Γ Γ' : ctx P}, {{ Δ ⊢ Γ ⊆ Γ' }} -> {{ Δ ⊢ Γ }}.
 Proof with easy.
-  intros * ?%presup_ctx_subtyp...
+  intros * ?%presup_wf_ctx_subtyp...
 Qed.
 
-Corollary presup_ctx_subtyp_right {P} : forall {Δ : gctx P} {Γ Γ' : ctx P}, {{ Δ ⊢ Γ ⊆ Γ' }} -> {{ Δ ⊢ Γ' }}.
+Corollary presup_wf_ctx_subtyp_right {P} : forall {Δ : gctx P} {Γ Γ' : ctx P}, {{ Δ ⊢ Γ ⊆ Γ' }} -> {{ Δ ⊢ Γ' }}.
 Proof with easy.
-  intros * ?%presup_ctx_subtyp...
+  intros * ?%presup_wf_ctx_subtyp...
 Qed.
 
 #[export]
-Hint Resolve presup_ctx_subtyp presup_ctx_subtyp_gctx presup_ctx_subtyp_left presup_ctx_subtyp_right : mcpts.
-
-
-
-(** For subtyping of types *)
-Lemma presup_typ_subtyp_right {P} : forall {Δ : gctx P} {Γ : ctx P} {A B}, {{ Δ ; Γ ⊢ A ⊆ B }} -> {{ Δ ; Γ ⊢ B }}.
-Proof with mautosolve.
-  induction 1...
-Qed.
-
-#[export]
-Hint Resolve presup_typ_subtyp_right : mcpts.
+Hint Resolve presup_wf_ctx_subtyp presup_wf_ctx_subtyp_gctx presup_wf_ctx_subtyp_left presup_wf_ctx_subtyp_right : mcpts.
 
 
 (** ** Context Presuppositions *)
 
 (** For well-formedness of substitutions *)
-Lemma presup_sub {P : PtsSig} : forall {Δ : gctx P} {Γ Γ' σ}, {{ Δ ; Γ ⊢s σ : Γ' }} -> {{ ⊢ Δ }} /\ {{ Δ ⊢ Γ }} /\ {{ Δ ⊢ Γ' }}.
+Lemma presup_wf_sub {P : PtsSig} : forall {Δ : gctx P} {Γ Γ' σ}, {{ Δ ; Γ ⊢s σ : Γ' }} -> {{ ⊢ Δ }} /\ {{ Δ ⊢ Γ }} /\ {{ Δ ⊢ Γ' }}.
 Proof with mautosolve.
   induction 1; destruct_pairs...
 Qed.
 
-Corollary presup_sub_gctx {P : PtsSig} : forall {Δ : gctx P} {Γ Γ' σ}, {{ Δ ; Γ ⊢s σ : Γ' }} -> {{ ⊢ Δ }}.
+Corollary presup_wf_sub_gctx {P : PtsSig} : forall {Δ : gctx P} {Γ Γ' σ}, {{ Δ ; Γ ⊢s σ : Γ' }} -> {{ ⊢ Δ }}.
 Proof with easy.
-  intros * ?%presup_sub...
+  intros * ?%presup_wf_sub...
 Qed.
   
-Corollary presup_sub_left {P : PtsSig} : forall {Δ : gctx P} {Γ Γ' σ}, {{ Δ ; Γ ⊢s σ : Γ' }} -> {{ Δ ⊢ Γ }}.
+Corollary presup_wf_sub_left {P : PtsSig} : forall {Δ : gctx P} {Γ Γ' σ}, {{ Δ ; Γ ⊢s σ : Γ' }} -> {{ Δ ⊢ Γ }}.
 Proof with easy.
-  intros * ?%presup_sub...
+  intros * ?%presup_wf_sub...
 Qed.
 
-Corollary presup_sub_right {P : PtsSig} : forall {Δ : gctx P} {Γ Γ' σ}, {{ Δ ; Γ ⊢s σ : Γ' }} -> {{ Δ ⊢ Γ' }}.
+Corollary presup_wf_sub_right {P : PtsSig} : forall {Δ : gctx P} {Γ Γ' σ}, {{ Δ ; Γ ⊢s σ : Γ' }} -> {{ Δ ⊢ Γ' }}.
 Proof with easy.
-  intros * ?%presup_sub...
+  intros * ?%presup_wf_sub...
 Qed.
 
 #[export]
-Hint Resolve presup_sub presup_sub_gctx presup_sub_left presup_sub_right : mcpts.
+Hint Resolve presup_wf_sub presup_wf_sub_gctx presup_wf_sub_left presup_wf_sub_right : mcpts.
 
 
 (** For well-formedness of expressions *)
-Lemma presup_exp_gctx_ctx {P : PtsSig} : forall {Δ : gctx P} {Γ M A}, {{ Δ ; Γ ⊢ M : A }} -> {{ ⊢ Δ }} /\ {{ Δ ⊢ Γ }}.
+Lemma presup_wf_exp_gctx_ctx {P : PtsSig} : forall {Δ : gctx P} {Γ M A}, {{ Δ ; Γ ⊢ M : A }} -> {{ ⊢ Δ }} /\ {{ Δ ⊢ Γ }}.
 Proof with mautosolve.
   induction 1...
 Qed.
 
-Corollary presup_exp_gctx {P : PtsSig} : forall {Δ : gctx P} {Γ M A}, {{ Δ ; Γ ⊢ M : A }} -> {{ ⊢ Δ }}.
+Corollary presup_wf_exp_gctx {P : PtsSig} : forall {Δ : gctx P} {Γ M A}, {{ Δ ; Γ ⊢ M : A }} -> {{ ⊢ Δ }}.
 Proof with easy.
-  intros * ?%presup_exp_gctx_ctx...
+  intros * ?%presup_wf_exp_gctx_ctx...
 Qed.
 
-Corollary presup_exp_ctx {P : PtsSig} : forall {Δ : gctx P} {Γ M A}, {{ Δ ; Γ ⊢ M : A }} -> {{ Δ ⊢ Γ }}.
+Corollary presup_wf_exp_ctx {P : PtsSig} : forall {Δ : gctx P} {Γ M A}, {{ Δ ; Γ ⊢ M : A }} -> {{ Δ ⊢ Γ }}.
 Proof with easy.
-  intros * ?%presup_exp_gctx_ctx...
+  intros * ?%presup_wf_exp_gctx_ctx...
 Qed.
 
 #[export]
-Hint Resolve presup_exp_gctx_ctx presup_exp_gctx presup_exp_ctx : mcpts.
+Hint Resolve presup_wf_exp_gctx_ctx presup_wf_exp_gctx presup_wf_exp_ctx : mcpts.
 
 (** For well-formedness of types *)
-Lemma presup_typ {P} : forall {Δ : gctx P} {Γ A}, {{ Δ ; Γ ⊢ A }} -> {{ ⊢ Δ }} /\ {{ Δ ⊢ Γ }}.
+Lemma presup_wf_typ {P} : forall {Δ : gctx P} {Γ A}, {{ Δ ; Γ ⊢ A }} -> {{ ⊢ Δ }} /\ {{ Δ ⊢ Γ }}.
 Proof with mautosolve.
   induction 1...
 Qed.
 
-Corollary presup_typ_gctx {P} : forall {Δ : gctx P} {Γ A}, {{ Δ ; Γ ⊢ A }} -> {{ ⊢ Δ }}.
+Corollary presup_wf_typ_gctx {P} : forall {Δ : gctx P} {Γ A}, {{ Δ ; Γ ⊢ A }} -> {{ ⊢ Δ }}.
 Proof with easy.
-  intros * ?%presup_typ...
+  intros * ?%presup_wf_typ...
 Qed.
 
-Corollary presup_typ_ctx {P} : forall {Δ : gctx P} {Γ A}, {{ Δ ; Γ ⊢ A }} -> {{ Δ ⊢ Γ }}.
+Corollary presup_wf_typ_ctx {P} : forall {Δ : gctx P} {Γ A}, {{ Δ ; Γ ⊢ A }} -> {{ Δ ⊢ Γ }}.
 Proof with easy.
-  intros * ?%presup_typ...
+  intros * ?%presup_wf_typ...
 Qed.
 
 #[export]
-Hint Resolve presup_typ presup_typ_gctx presup_typ_ctx : mcpts.
+Hint Resolve presup_wf_typ presup_wf_typ_gctx presup_wf_typ_ctx : mcpts.
 
 
 (** For equality of substitutions *)
-Lemma presup_sub_eq_gctx_ctx {P : PtsSig} : forall {Δ : gctx P} {Γ Γ' σ σ'}, {{ Δ ; Γ ⊢s σ ≈ σ' : Γ' }} -> {{ ⊢ Δ }} /\ {{ Δ ⊢ Γ }} /\ {{ Δ ⊢ Γ' }}.
+Lemma presup_wf_sub_eq_gctx_ctx {P : PtsSig} : forall {Δ : gctx P} {Γ Γ' σ σ'}, {{ Δ ; Γ ⊢s σ ≈ σ' : Γ' }} -> {{ ⊢ Δ }} /\ {{ Δ ⊢ Γ }} /\ {{ Δ ⊢ Γ' }}.
 Proof with mautosolve.
   induction 1; destruct_pairs...
 Qed.
 
-Corollary presup_sub_eq_gctx {P : PtsSig} : forall {Δ : gctx P} {Γ Γ' σ σ'}, {{ Δ ; Γ ⊢s σ ≈ σ' : Γ' }} -> {{ ⊢ Δ }}.
+Corollary presup_wf_sub_eq_gctx {P : PtsSig} : forall {Δ : gctx P} {Γ Γ' σ σ'}, {{ Δ ; Γ ⊢s σ ≈ σ' : Γ' }} -> {{ ⊢ Δ }}.
 Proof with easy.
-  intros * ?%presup_sub_eq_gctx_ctx...
+  intros * ?%presup_wf_sub_eq_gctx_ctx...
 Qed.
 
-Corollary presup_sub_eq_ctx_left {P : PtsSig} : forall {Δ : gctx P} {Γ Γ' σ σ'}, {{ Δ ; Γ ⊢s σ ≈ σ' : Γ' }} -> {{ Δ ⊢ Γ }}.
+Corollary presup_wf_sub_eq_ctx_left {P : PtsSig} : forall {Δ : gctx P} {Γ Γ' σ σ'}, {{ Δ ; Γ ⊢s σ ≈ σ' : Γ' }} -> {{ Δ ⊢ Γ }}.
 Proof with easy.
-  intros * ?%presup_sub_eq_gctx_ctx...
+  intros * ?%presup_wf_sub_eq_gctx_ctx...
 Qed.
 
-Corollary presup_sub_eq_ctx_right {P : PtsSig} : forall {Δ : gctx P} {Γ Γ' σ σ'}, {{ Δ ; Γ ⊢s σ ≈ σ' : Γ' }} -> {{ Δ ⊢ Γ' }}.
+Corollary presup_wf_sub_eq_ctx_right {P : PtsSig} : forall {Δ : gctx P} {Γ Γ' σ σ'}, {{ Δ ; Γ ⊢s σ ≈ σ' : Γ' }} -> {{ Δ ⊢ Γ' }}.
 Proof with easy.
-  intros * ?%presup_sub_eq_gctx_ctx...
+  intros * ?%presup_wf_sub_eq_gctx_ctx...
 Qed.
 
 #[export]
-Hint Resolve presup_sub_eq_gctx_ctx presup_sub_eq_gctx presup_sub_eq_ctx_left presup_sub_eq_ctx_right : mcpts.
+Hint Resolve presup_wf_sub_eq_gctx_ctx presup_wf_sub_eq_gctx presup_wf_sub_eq_ctx_left presup_wf_sub_eq_ctx_right : mcpts.
 
 (** For equality of expressions *)
-Lemma presup_exp_eq_gctx_ctx {P : PtsSig} : forall {Δ : gctx P} {Γ M M' A}, {{ Δ ; Γ ⊢ M ≈ M' : A }} -> {{ ⊢ Δ }} /\ {{ Δ ⊢ Γ }}.
+Lemma presup_wf_exp_eq_gctx_ctx {P : PtsSig} : forall {Δ : gctx P} {Γ M M' A}, {{ Δ ; Γ ⊢ M ≈ M' : A }} -> {{ ⊢ Δ }} /\ {{ Δ ⊢ Γ }}.
 Proof with mautosolve 2.
   induction 1; destruct_pairs; split...
 Qed.
 
-Corollary presup_exp_eq_gctx {P : PtsSig} : forall {Δ : gctx P} {Γ M M' A}, {{ Δ ; Γ ⊢ M ≈ M' : A }} -> {{ ⊢ Δ }}.
+Corollary presup_wf_exp_eq_gctx {P : PtsSig} : forall {Δ : gctx P} {Γ M M' A}, {{ Δ ; Γ ⊢ M ≈ M' : A }} -> {{ ⊢ Δ }}.
 Proof with easy.
-  intros * ?%presup_exp_eq_gctx_ctx...
+  intros * ?%presup_wf_exp_eq_gctx_ctx...
 Qed.
 
-Corollary presup_exp_eq_ctx {P : PtsSig} : forall {Δ : gctx P} {Γ M M' A}, {{ Δ ; Γ ⊢ M ≈ M' : A }} -> {{ Δ ⊢ Γ }}.
+Corollary presup_wf_exp_eq_ctx {P : PtsSig} : forall {Δ : gctx P} {Γ M M' A}, {{ Δ ; Γ ⊢ M ≈ M' : A }} -> {{ Δ ⊢ Γ }}.
 Proof with easy.
-  intros * ?%presup_exp_eq_gctx_ctx...
+  intros * ?%presup_wf_exp_eq_gctx_ctx...
 Qed.
 
 #[export]
-Hint Resolve presup_exp_eq_gctx_ctx presup_exp_eq_gctx presup_exp_eq_ctx : mcpts.
+Hint Resolve presup_wf_exp_eq_gctx_ctx presup_wf_exp_eq_gctx presup_wf_exp_eq_ctx : mcpts.
 
 (** For equality of types *)
-Lemma presup_typ_eq_gctx_ctx {P : PtsSig} : forall {Δ : gctx P} {Γ A A'}, {{ Δ ; Γ ⊢ A ≈ A' }} -> {{ ⊢ Δ }} /\ {{ Δ ⊢ Γ }}.
+Lemma presup_wf_typ_eq_gctx_ctx {P : PtsSig} : forall {Δ : gctx P} {Γ A A'}, {{ Δ ; Γ ⊢ A ≈ A' }} -> {{ ⊢ Δ }} /\ {{ Δ ⊢ Γ }}.
 Proof with mautosolve 2.
   induction 1; destruct_pairs; split...
 Qed.
 
-Corollary presup_typ_eq_gctx {P : PtsSig} : forall {Δ : gctx P} {Γ A A'}, {{ Δ ; Γ ⊢ A ≈ A' }} -> {{ ⊢ Δ }}.
+Corollary presup_wf_typ_eq_gctx {P : PtsSig} : forall {Δ : gctx P} {Γ A A'}, {{ Δ ; Γ ⊢ A ≈ A' }} -> {{ ⊢ Δ }}.
 Proof with easy.
-  intros * ?%presup_typ_eq_gctx_ctx...
+  intros * ?%presup_wf_typ_eq_gctx_ctx...
 Qed.
 
-Corollary presup_typ_eq_ctx {P : PtsSig} : forall {Δ : gctx P} {Γ A A'}, {{ Δ ; Γ ⊢ A ≈ A' }} -> {{ Δ ⊢ Γ }}.
+Corollary presup_wf_typ_eq_ctx {P : PtsSig} : forall {Δ : gctx P} {Γ A A'}, {{ Δ ; Γ ⊢ A ≈ A' }} -> {{ Δ ⊢ Γ }}.
 Proof with easy.
-  intros * ?%presup_typ_eq_gctx_ctx...
+  intros * ?%presup_wf_typ_eq_gctx_ctx...
 Qed.
 
 #[export]
-Hint Resolve presup_exp_eq_gctx_ctx presup_exp_eq_gctx presup_exp_eq_ctx : mcpts.
+Hint Resolve presup_wf_exp_eq_gctx_ctx presup_wf_exp_eq_gctx presup_wf_exp_eq_ctx : mcpts.
 
 (** For subtyping of types *)
-Lemma presup_typ_subtyp_gctx_ctx {P} : forall {Δ : gctx P} {Γ A A'}, {{ Δ ; Γ ⊢ A ⊆ A' }} -> {{ ⊢ Δ }} /\ {{ Δ ⊢ Γ }}.
+Lemma presup_wf_typ_subtyp_core {P} : forall {Δ : gctx P} {Γ A A'}, {{ Δ ; Γ ⊢ A ⊆ A' }} -> {{ ⊢ Δ }} /\ {{ Δ ⊢ Γ }} /\ {{ Δ ; Γ ⊢ A' }}.
 Proof with mautosolve 2.
-  induction 1; destruct_pairs; mauto 2.
-  split; mauto 2.
+  induction 1; destruct_conjs; repeat split; mauto 3.
 Qed.
 
-Corollary presup_typ_subtyp_gctx {P} : forall {Δ : gctx P} {Γ A A'}, {{ Δ ; Γ ⊢ A ⊆ A' }} -> {{ ⊢ Δ }}.
+Corollary presup_wf_typ_subtyp_gctx {P} : forall {Δ : gctx P} {Γ A A'}, {{ Δ ; Γ ⊢ A ⊆ A' }} -> {{ ⊢ Δ }}.
 Proof with easy.
-  intros * ?%presup_typ_subtyp_gctx_ctx...
+  intros * ?%presup_wf_typ_subtyp_core...
 Qed.
 
-Corollary presup_typ_subtyp_ctx {P} : forall {Δ : gctx P} {Γ A A'}, {{ Δ ; Γ ⊢ A ⊆ A' }} -> {{ Δ ⊢ Γ }}.
+Corollary presup_wf_typ_subtyp_ctx {P} : forall {Δ : gctx P} {Γ A A'}, {{ Δ ; Γ ⊢ A ⊆ A' }} -> {{ Δ ⊢ Γ }}.
 Proof with easy.
-  intros * ?%presup_typ_subtyp_gctx_ctx...
+  intros * ?%presup_wf_typ_subtyp_core...
+Qed.
+
+Corollary presup_wf_typ_subtyp_right {P} : forall {Δ : gctx P} {Γ : ctx P} {A B}, {{ Δ ; Γ ⊢ A ⊆ B }} -> {{ Δ ; Γ ⊢ B }}.
+Proof with easy.
+  intros * ?%presup_wf_typ_subtyp_core...
 Qed.
 
 #[export]
-Hint Resolve presup_typ_subtyp_gctx_ctx presup_typ_subtyp_gctx presup_typ_subtyp_ctx : mcpts.
+Hint Resolve presup_wf_typ_subtyp_core presup_wf_typ_subtyp_gctx presup_wf_typ_subtyp_ctx presup_wf_typ_subtyp_right : mcpts.
 
 (** Presupposition for context lookups *)    
 Lemma presup_ctx_lookup_typ {P : PtsSig} : forall {Δ : gctx P} {Γ A x},
@@ -372,7 +370,6 @@ Qed.
 Hint Resolve gctx_lookup_var_not_eq_fresh_var : mcpts.
 
 Lemma gctx_weakening {P : PtsSig} :
-  (forall (Δ : gctx P), {{ ⊢ Δ }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ ⊢ Δ, x:B }}) /\
     (forall (Δ : gctx P) Γ, {{ Δ ⊢ Γ }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ⊢ Γ }}) /\
     (forall (Δ : gctx P) Γ Γ', {{ Δ ⊢ Γ ⊆ Γ' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ⊢ Γ ⊆ Γ' }}) /\
     (forall (Δ : gctx P) Γ A M, {{ Δ ; Γ ⊢ M : A }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢ M : A }}) /\
@@ -383,7 +380,7 @@ Lemma gctx_weakening {P : PtsSig} :
     (forall (Δ : gctx P) Γ Γ' σ, {{ Δ ; Γ ⊢s σ : Γ' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢s σ : Γ' }}) /\
     (forall (Δ : gctx P) Γ Γ' σ σ', {{ Δ ; Γ ⊢s σ ≈ σ' : Γ' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢s σ ≈ σ' : Γ' }}).
 Proof.
-  apply syntactic_wf_mut_ind;
+  apply syntactic_wf_local_mut_ind;
     intros;
     try mauto 2;
     try solve [econstructor; mauto 3].
@@ -393,9 +390,36 @@ Proof.
   - mautosolve.
   - inversion_clear H0.
     econstructor; mauto 3.
-  - inversion_clear H0.
-    econstructor; mauto 3.
+  (* - inversion_clear H0. *)
+  (*   econstructor; mauto 3. *)
 Qed.      
+
+
+(* Lemma gctx_weakening {P : PtsSig} : *)
+(*   (forall (Δ : gctx P), {{ ⊢ Δ }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ ⊢ Δ, x:B }}) /\ *)
+(*     (forall (Δ : gctx P) Γ, {{ Δ ⊢ Γ }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ⊢ Γ }}) /\ *)
+(*     (forall (Δ : gctx P) Γ Γ', {{ Δ ⊢ Γ ⊆ Γ' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ⊢ Γ ⊆ Γ' }}) /\ *)
+(*     (forall (Δ : gctx P) Γ A M, {{ Δ ; Γ ⊢ M : A }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢ M : A }}) /\ *)
+(*     (forall (Δ : gctx P) Γ A M M', {{ Δ ; Γ ⊢ M ≈ M' : A }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢ M ≈ M' : A }}) /\ *)
+(*     (forall (Δ : gctx P) Γ A, {{ Δ ; Γ ⊢ A }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢ A }}) /\ *)
+(*     (forall (Δ : gctx P) Γ A A', {{ Δ ; Γ ⊢ A ≈ A' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢ A ≈ A' }}) /\ *)
+(*     (forall (Δ : gctx P) Γ A A', {{ Δ ; Γ ⊢ A ⊆ A' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢ A ⊆ A' }}) /\ *)
+(*     (forall (Δ : gctx P) Γ Γ' σ, {{ Δ ; Γ ⊢s σ : Γ' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢s σ : Γ' }}) /\ *)
+(*     (forall (Δ : gctx P) Γ Γ' σ σ', {{ Δ ; Γ ⊢s σ ≈ σ' : Γ' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢s σ ≈ σ' : Γ' }}). *)
+(* Proof. *)
+(*   apply syntactic_wf_mut_ind; *)
+(*     intros; *)
+(*     try mauto 2; *)
+(*     try solve [econstructor; mauto 3]. *)
+
+(*   - inversion_clear H0. *)
+(*     econstructor; mauto 3. *)
+(*   - mautosolve. *)
+(*   - inversion_clear H0. *)
+(*     econstructor; mauto 3. *)
+(*   (* - inversion_clear H0. *) *)
+(*   (*   econstructor; mauto 3. *) *)
+(* Qed.       *)
 
 Corollary wf_ctx_gctx_weakening {P : PtsSig} : forall {Δ : gctx P} {Γ},
     {{ Δ ⊢ Γ }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ⊢ Γ }}.
@@ -2322,17 +2346,17 @@ Qed.
 #[export]
 Hint Resolve wf_exp_eq_var_1_sub_q_sigma : mcpts.
 
+    
 (** *** Type Presuppositions *)
 Lemma presup_wf_exp_typ {P : PtsSig} : forall {Δ : gctx P} {Γ M A},
     {{ Δ ; Γ ⊢ M : A }} ->
     {{ Δ ; Γ ⊢ A }}.
 Proof with mautosolve 3.
-  induction 1; assert {{ Δ ⊢ Γ }} by mauto 3; destruct_conjs; mauto 3.
+  induction 1; assert {{ Δ ⊢ Γ }} by mauto 2; destruct_conjs; mauto 3.
   - enough {{ Δ ; Γ ⊢s Id,,N : Γ, A }}...
   - assert {{ Δ ; ⋅ ⊢ A }} by mauto 3.
-    (* For this case, we need to weaken a closed type with applying a substitution, which is not obvious *)
-    admit.
-Admitted.
+    mauto 3.
+Qed.
 
 Lemma presup_wf_exp {P : PtsSig} : forall {Δ : gctx P} {Γ M A},
     {{ Δ ; Γ ⊢ M : A }} ->
@@ -2343,7 +2367,6 @@ Qed.
 
   
 (** *** Consistency Helper *)
-
 Lemma no_closed_neutral {P : PtsSig} : forall {A : exp P} {W : ne P},
     ~ {{ ⋅ ; ⋅ ⊢ W : A }}.
 Proof.
@@ -2357,10 +2380,3 @@ Proof.
 Qed.
 #[export]
 Hint Resolve no_closed_neutral : mcpts.
-
-
-
-
-
-
-

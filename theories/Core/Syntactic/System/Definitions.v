@@ -126,6 +126,7 @@ with wf_exp {P : PtsSig} : gctx P -> ctx P -> typ P -> exp P -> Prop :=
         {{ Δ ; Γ ⊢ N : A }} ->
         {{ Δ ; Γ ⊢ M N : B[Id,,N] }} )
 
+(** Variables *)
 | wf_vlookup :
   `( {{ Δ ⊢ Γ }} ->
      (** This premise is redundant, but helpful for soundness *)
@@ -134,9 +135,9 @@ with wf_exp {P : PtsSig} : gctx P -> ctx P -> typ P -> exp P -> Prop :=
      {{ Δ ; Γ ⊢ #x : A }} )
 (* NOTE: This rule might very well be wrong (no substitution?) *)
 | wf_gvlookup :
-  `( {{ Δ ⊢ Γ }} ->
+  `( {{ Δ ; Γ ⊢s σ : ⋅ }} ->
      {{ `#x : A ∈ Δ }} ->
-     {{ Δ ; Γ ⊢ `#x : A }} )
+     {{ Δ ; Γ ⊢ `#x : A[σ] }} )
   
 (** Naturals **)
 | wf_nat :
@@ -310,14 +311,14 @@ with wf_exp_eq {P : PtsSig} : gctx P -> ctx P -> typ P -> exp P -> exp P -> Prop
 
 (** Global variables *)
 (* NOTE: First attempt at equality rules for gvar, may need adjustments *)
-| wf_exp_eq_gvar_refl :
-  `( {{ Δ ⊢ Γ }} ->
-     {{ `#x : A ∈ Δ }} ->
-     {{ Δ ; Γ ⊢ `#x ≈ `#x : A }} )
+(* | wf_exp_eq_gvar_refl : *)
+(*   `( {{ Δ ; Γ ⊢s σ : ⋅ }} -> *)
+(*      {{ `#x : A ∈ Δ }} -> *)
+(*      {{ Δ ; Γ ⊢ `#x ≈ `#x : A }} ) *)
 | wf_exp_eq_gvar_sub :
-  `( {{ Δ ; Γ ⊢s σ : Γ' }} ->
+  `( {{ Δ ; Γ ⊢s σ : ⋅ }} ->
      {{ `#x : A ∈ Δ }} ->
-     {{ Δ ; Γ ⊢ `#x[σ] ≈ `#x : A }} )
+     {{ Δ ; Γ ⊢ `#x[σ] ≈ `#x : A[σ] }} )
 
 (** Substitution propagation *)
 | wf_exp_eq_sub_cong :
@@ -401,8 +402,8 @@ with wf_typ_subtyp {P : PtsSig} : gctx P -> ctx P -> typ P -> typ P -> Prop :=
      {{ Δ ; Γ ⊢ B ⊆ C }} ->
      {{ Δ ; Γ ⊢ A ⊆ C }} )
 | wf_typ_subtyp_sort_ax_sub :
-  `( {{ Δ ⊢ Γ }} ->
-     Ax_sub P s1 s2 ->
+  `( Ax_sub P s1 s2 ->
+     {{ Δ ⊢ Γ }} ->
      {{ Δ ; Γ ⊢ Sort@s1 ⊆ Sort@s2 }} )   
 | wf_typ_subtyp_pi :
   `( forall {r : Ru_pi P s1 s2 s3},
@@ -520,7 +521,42 @@ Combined Scheme syntactic_wf_mut_ind from
   wf_typ_subtyp_mut_ind,
   wf_sub_mut_ind,
   wf_sub_eq_mut_ind.  
-  
+
+Scheme wf_ctx_local_mut_ind := Induction for wf_ctx Sort Prop
+with wf_ctx_subtyp_local_mut_ind := Induction for wf_ctx_subtyp Sort Prop
+with wf_exp_local_mut_ind := Induction for wf_exp Sort Prop
+with wf_exp_eq_local_mut_ind := Induction for wf_exp_eq Sort Prop
+with wf_typ_local_mut_ind := Induction for wf_typ Sort Prop
+with wf_typ_eq_local_mut_ind := Induction for wf_typ_eq Sort Prop
+with wf_typ_subtyp_local_mut_ind := Induction for wf_typ_subtyp Sort Prop     
+with wf_sub_local_mut_ind := Induction for wf_sub Sort Prop
+with wf_sub_eq_local_mut_ind := Induction for wf_sub_eq Sort Prop.
+Combined Scheme syntactic_wf_local_mut_ind from
+  wf_ctx_local_mut_ind,
+  wf_ctx_subtyp_local_mut_ind,
+  wf_exp_local_mut_ind,
+  wf_exp_eq_local_mut_ind,
+  wf_typ_local_mut_ind,
+  wf_typ_eq_local_mut_ind,
+  wf_typ_subtyp_local_mut_ind,
+  wf_sub_local_mut_ind,
+  wf_sub_eq_local_mut_ind.  
+
+Scheme wf_exp_no_ctx_mut_ind := Induction for wf_exp Sort Prop
+with wf_exp_eq_no_ctx_mut_ind := Induction for wf_exp_eq Sort Prop
+with wf_typ_no_ctx_mut_ind := Induction for wf_typ Sort Prop
+with wf_typ_eq_no_ctx_mut_ind := Induction for wf_typ_eq Sort Prop
+with wf_typ_subtyp_no_ctx_mut_ind := Induction for wf_typ_subtyp Sort Prop     
+with wf_sub_no_ctx_mut_ind := Induction for wf_sub Sort Prop
+with wf_sub_eq_no_ctx_mut_ind := Induction for wf_sub_eq Sort Prop.
+Combined Scheme syntactic_wf_no_ctx_mut_ind from
+  wf_exp_no_ctx_mut_ind,
+  wf_exp_eq_no_ctx_mut_ind,
+  wf_typ_no_ctx_mut_ind,
+  wf_typ_eq_no_ctx_mut_ind,
+  wf_typ_subtyp_no_ctx_mut_ind,
+  wf_sub_no_ctx_mut_ind,
+  wf_sub_eq_no_ctx_mut_ind.  
 
 Scheme wf_gctx_mut_ind' := Induction for wf_gctx Sort Prop
 with wf_ctx_mut_ind' := Induction for wf_ctx Sort Prop

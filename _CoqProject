@@ -16,10 +16,10 @@ theories/PtsSignature.v
 ## Declarative definition of PTS* ##
 theories/Core/Syntactic/Syntax.v
 theories/Core/Syntactic/System/Definitions.v
-# theories/Core/Syntactic/System/Lemmas.v
-# theories/Core/Syntactic/System/Tactics.v
-# theories/Core/Syntactic/System.v
-# theories/Core/Syntactic/CtxSub.v
+theories/Core/Syntactic/System/Lemmas.v
+theories/Core/Syntactic/System/Tactics.v
+theories/Core/Syntactic/System.v
+theories/Core/Syntactic/CtxSub.v
 # theories/Core/Syntactic/CtxEq.v
 # theories/Core/Syntactic/CoreInversions.v
 # theories/Core/Syntactic/Presup.v
