@@ -7,7 +7,7 @@ Import Syntax_Notations.
 
 (** Context lookups *)
 Reserved Notation "'`#' x ∉ Δ" (in custom judg at level 80, x constr at level 0, Δ custom exp at level 50).
-Reserved Notation "'`#' x := [ M ] : A ∈ Δ" (in custom judg at level 80, x constr at level 0, M custom exp, A custom exp, Δ custom exp at level 50).
+Reserved Notation "'`#' x : A ∈ Δ" (in custom judg at level 80, x constr at level 0, A custom exp, Δ custom exp at level 50).
 Reserved Notation "'#' x : A ∈ Γ" (in custom judg at level 80, x constr at level 0, A custom exp, Γ custom exp at level 50).
 (** Judgments for global contexts *)
 Reserved Notation "⊢ Δ" (in custom judg at level 80, Δ custom exp).
@@ -34,20 +34,21 @@ Generalizable All Variables.
 (** * Judgments definition *)
 (** Fresh names *)
 Inductive gctx_fresh {P} : string -> gctx P -> Prop :=
-| fresh_nil : `( {{ `#x ∉ Δ }} )
+| fresh_nil : `( {{ `#x ∉ ⋅ }} )
 | fresh_extend : `( {{ `#x ∉ Δ }} -> x <> y ->
-                    {{ `#x ∉ Δ, y := [ M ] : A }} )
+                    {{ `#x ∉ Δ, y : A }} )
 where "'`#' x ∉ Δ" := (gctx_fresh x Δ) (in custom judg) : type_scope.
 
 #[export]
 Hint Constructors gctx_fresh : mcpts.
 
 (** Lookup in global contexts *)
-Inductive gctx_lookup {P} : string -> option (exp P) -> typ P -> gctx P -> Prop :=
-| ghere : `({{ `#x := [ M ] : A ∈ Δ, x := [ M ] : A }})
-| gthere : `({{ `#x := [ M ] : A ∈ Δ }} ->
-             {{ `#x := [ M ] : A ∈ Δ, y := [ N ] : B }})
-where "'`#' x := [ M ] : A ∈ Δ" := (gctx_lookup x M A Δ) (in custom judg) : type_scope.
+Inductive gctx_lookup {P} : string -> typ P -> gctx P -> Prop :=
+| ghere : `({{ `#x : A ∈ Δ, x : A }})
+| gthere : `({{ `#x : A ∈ Δ }} ->
+             x <> y ->
+             {{ `#x : A ∈ Δ, y : B }})
+where "'`#' x : A ∈ Δ" := (gctx_lookup x A Δ) (in custom judg) : type_scope.
 
 #[export]
 Hint Constructors gctx_lookup : mcpts.
@@ -64,17 +65,11 @@ Hint Constructors ctx_lookup : mcpts.
 (** Well-formedness for global contexts *)
 Inductive wf_gctx {P : PtsSig} : gctx P -> Prop :=
 | wf_gctx_empty : {{ ⊢ ⋅ }}
-| wf_gctx_extend_none :
+| wf_gctx_extend :
   `( {{ ⊢ Δ }} ->
      {{ Δ ; ⋅ ⊢ A }} ->
      {{ `#x ∉ Δ }} ->
-     {{ ⊢ Δ, x := ∅ : A }} )
-| wf_gctx_extend_some :
-  `( {{ ⊢ Δ }} ->
-     {{ Δ ; ⋅ ⊢ A }} ->
-     {{ Δ ; ⋅ ⊢ M : A }} ->
-     {{ `#x ∉ Δ }} ->
-     {{ ⊢ Δ, x := M : A }} )
+     {{ ⊢ Δ, x : A }} )
 where "⊢ Δ" := (wf_gctx Δ) (in custom judg) : type_scope
 
 
@@ -140,7 +135,7 @@ with wf_exp {P : PtsSig} : gctx P -> ctx P -> typ P -> exp P -> Prop :=
 (* NOTE: This rule might very well be wrong (no substitution?) *)
 | wf_gvlookup :
   `( {{ Δ ⊢ Γ }} ->
-     {{ `#x := [ M ] : A ∈ Δ }} ->
+     {{ `#x : A ∈ Δ }} ->
      {{ Δ ; Γ ⊢ `#x : A }} )
   
 (** Naturals **)
@@ -164,7 +159,7 @@ with wf_exp {P : PtsSig} : gctx P -> ctx P -> typ P -> exp P -> Prop :=
         {{ Δ ; Γ ⊢ M : ℕ}} ->
         {{ Δ ; Γ ⊢ rec M return A | zero -> MZ | succ -> MS end : A[Id,,M] }} )
 
-| wf_exp_sub_typ :
+| wf_exp_sub :
   `( {{ Δ ; Γ ⊢s σ : Γ' }} ->
      {{ Δ ; Γ' ⊢ M : A }} ->
      {{ Δ ; Γ' ⊢ A }} ->
@@ -292,6 +287,7 @@ with wf_exp_eq {P : PtsSig} : gctx P -> ctx P -> typ P -> exp P -> exp P -> Prop
         {{ Δ ; Γ ⊢ M : ℕ}} ->
         {{ Δ ; Γ ⊢ rec succ M return A | zero -> MZ | succ -> MS end ≈ MS[Id,,M,,rec M return A | zero -> MZ | succ -> MS end] : A[Id,,succ M] }} )
 
+(** Local variables *)
 | wf_exp_eq_var :
   `( {{ Δ ⊢ Γ }} ->
      {{ #x : A ∈ Γ }} ->
@@ -305,28 +301,26 @@ with wf_exp_eq {P : PtsSig} : gctx P -> ctx P -> typ P -> exp P -> exp P -> Prop
   `( {{ Δ ; Γ ⊢s σ : Γ' }} ->
      {{ Δ ; Γ' ⊢ A }} ->
      {{ Δ ; Γ ⊢ M : A[σ] }} ->
-     {{ #x : B ∈ Γ }} ->
+     {{ #x : B ∈ Γ' }} ->
      {{ Δ ; Γ ⊢ #(S x)[σ,,M] ≈ #x[σ] : B[σ] }} )
 | wf_exp_eq_var_weaken :
   `( {{ Δ ⊢ Γ, B }} ->
      {{ #x : A ∈ Γ }} ->
      {{ Δ ; Γ, B ⊢ #x[Wk] ≈ #(S x) : A[Wk] }} )
 
+(** Global variables *)
 (* NOTE: First attempt at equality rules for gvar, may need adjustments *)
 | wf_exp_eq_gvar_refl :
   `( {{ Δ ⊢ Γ }} ->
-     {{ `#x := [ M ] : A ∈ Δ }} ->
+     {{ `#x : A ∈ Δ }} ->
      {{ Δ ; Γ ⊢ `#x ≈ `#x : A }} )
 | wf_exp_eq_gvar_sub :
   `( {{ Δ ; Γ ⊢s σ : Γ' }} ->
-     {{ `#x := [ M ] : A ∈ Δ }} ->
+     {{ `#x : A ∈ Δ }} ->
      {{ Δ ; Γ ⊢ `#x[σ] ≈ `#x : A }} )
-| wf_exp_eq_gvar_some :
-  `( {{ Δ ⊢ Γ }} ->
-     {{ `#x := [ ^(Some M) ] : A ∈ Δ }} ->
-     {{ Δ ; Γ ⊢ `#x ≈ M : A }} )
-              
-| wf_exp_eq_sub_cong_typ :
+
+(** Substitution propagation *)
+| wf_exp_eq_sub_cong :
   `( {{ Δ ; Γ' ⊢ A }} ->
      {{ Δ ; Γ' ⊢ M ≈ M' : A }} ->
      {{ Δ ; Γ ⊢s σ ≈ σ' : Γ' }} ->
@@ -334,12 +328,14 @@ with wf_exp_eq {P : PtsSig} : gctx P -> ctx P -> typ P -> exp P -> exp P -> Prop
 | wf_exp_eq_sub_id :
   `( {{ Δ ; Γ ⊢ M : A }} ->
      {{ Δ ; Γ ⊢ M[Id] ≈ M : A }} )
-| wf_exp_eq_sub_compose_typ :
+| wf_exp_eq_sub_compose :
   `( {{ Δ ; Γ ⊢s τ : Γ' }} ->
      {{ Δ ; Γ' ⊢s σ : Γ'' }} ->
      {{ Δ ; Γ'' ⊢ M : A }} ->
      {{ Δ ; Γ'' ⊢ A }} ->
      {{ Δ ; Γ ⊢ M[σ∘τ] ≈ M[σ][τ] : A[σ∘τ] }} )
+
+   
 | wf_exp_eq_conv :
   `( {{ Δ ; Γ ⊢ M ≈ M' : A }} ->
      {{ Δ ; Γ ⊢ A' }} ->
@@ -370,20 +366,9 @@ where "Δ ; Γ ⊢ A" := (wf_typ Δ Γ A) (in custom judg) : type_scope
 
 (** Equality for types *)
 with wf_typ_eq {P : PtsSig} : gctx P -> ctx P -> typ P -> typ P -> Prop :=
-(* This rule should be admissible *)
-(* | wf_typ_eq_refl : *)
-(*   `( {{ Γ ⊢ A }} -> *)
-(*      {{ Γ ⊢ A ≈ A }} ) *)
-
 | wf_typ_eq_sorted :
   `( {{ Δ ; Γ ⊢ A ≈ B : Sort@s }} ->
      {{ Δ ; Γ ⊢ A ≈ B }} )
-
-(* This rules should be admissible *)
-(* | wf_typ_eq_sub_id : *)
-(*   `( {{ Γ ⊢ A }} -> *)
-(*      {{ Γ ⊢ A[Id] ≈ A }} ) *)
-   
 | wf_typ_eq_sub_sort :
   `( {{ Δ ; Γ ⊢s σ : Γ' }} ->
      {{ Δ ; Γ ⊢ Sort@s1[σ] ≈ Sort@s1 }} )
@@ -395,8 +380,7 @@ with wf_typ_eq {P : PtsSig} : gctx P -> ctx P -> typ P -> typ P -> Prop :=
   `( {{ Δ ; Γ ⊢s τ : Γ' }} ->
      {{ Δ ; Γ' ⊢s σ : Γ'' }} ->
      {{ Δ ; Γ'' ⊢ A  }} ->
-     {{ Δ ; Γ ⊢ A[σ∘τ] ≈ A[σ][τ] }} )
-   
+     {{ Δ ; Γ ⊢ A[σ∘τ] ≈ A[σ][τ] }} )   
 | wf_typ_eq_sym :
   `( {{ Δ ; Γ ⊢ A ≈ B }} ->
      {{ Δ ; Γ ⊢ B ≈ A }} )
@@ -456,8 +440,7 @@ with wf_sub {P : PtsSig} : gctx P -> ctx P -> ctx P -> sub P -> Prop :=
      {{ Δ ; Γ ⊢s σ : Γ'' }} )
 where "Δ ; Γ ⊢s σ : Γ'" := (wf_sub Δ Γ Γ' σ) (in custom judg) : type_scope
 
-
-
+(** Equality of substitutions *)
 with wf_sub_eq {P : PtsSig} : gctx P -> ctx P -> ctx P -> sub P -> sub P -> Prop :=
 | wf_sub_eq_id :
   `( {{ Δ ⊢ Γ }} ->
@@ -554,7 +537,7 @@ Combined Scheme syntactic_wf_mut_ind' from
 (** Equality for global contexts *)
 Inductive wf_gctx_eq {P : PtsSig} : gctx P -> gctx P -> Prop :=
 | wf_gctx_eq_empty : {{ ⊢ ⋅ ≈ ⋅ }}
-| wf_gctx_eq_extend_none :
+| wf_gctx_eq_extend :
   `( {{ ⊢ Δ ≈ Δ' }} ->
      {{ Δ ; ⋅ ⊢ A }} ->
      {{ Δ ; ⋅ ⊢ A' }} ->
@@ -564,26 +547,7 @@ Inductive wf_gctx_eq {P : PtsSig} : gctx P -> gctx P -> Prop :=
      {{ Δ' ; ⋅ ⊢ A ≈ A' }} ->
      {{ `#x ∉ Δ }} ->
      {{ `#x ∉ Δ' }} ->
-     {{ ⊢ Δ, x := ∅ : A ≈ Δ', x := ∅ : A' }} )
-| wf_gctx_eq_extend_some :
-  `( {{ ⊢ Δ ≈ Δ' }} ->
-     {{ Δ ; ⋅ ⊢ A }} ->
-     {{ Δ ; ⋅ ⊢ A' }} ->
-     {{ Δ' ; ⋅ ⊢ A }} ->
-     {{ Δ' ; ⋅ ⊢ A' }} ->
-     {{ Δ ; ⋅ ⊢ A ≈ A' }} ->
-     {{ Δ' ; ⋅ ⊢ A ≈ A' }} ->
-     {{ Δ ; ⋅ ⊢ M : A }} ->
-     {{ Δ' ; ⋅ ⊢ M : A }} ->
-     {{ Δ ; ⋅ ⊢ M' : A' }} ->
-     {{ Δ' ; ⋅ ⊢ M' : A' }} ->
-     {{ Δ ; ⋅ ⊢ M ≈ M' : A }} ->
-     {{ Δ' ; ⋅ ⊢ M ≈ M' : A }} ->
-     {{ Δ ; ⋅ ⊢ M ≈ M' : A' }} ->
-     {{ Δ' ; ⋅ ⊢ M ≈ M' : A' }} ->
-     {{ `#x ∉ Δ }} ->
-     {{ `#x ∉ Δ' }} ->
-     {{ ⊢ Δ, x := M : A ≈ Δ', x := M' : A' }} )
+     {{ ⊢ Δ, x : A ≈ Δ', x : A' }} )
 where "⊢ Δ ≈ Δ'" := (wf_gctx_eq Δ Δ') (in custom judg) : type_scope.
 
 #[export]
@@ -592,23 +556,14 @@ Hint Constructors wf_gctx_eq : mcpts.
 (** Subtyping for global contexts *)
 Inductive wf_gctx_subtyp {P : PtsSig} :  gctx P -> gctx P -> Prop :=
 | wf_gctx_subtyp_empty : {{ ⊢ ⋅ ⊆ ⋅ }}
-| wf_gctx_subtyp_extend_none :
+| wf_gctx_subtyp_extend :
   `( {{ ⊢ Δ ⊆ Δ' }} ->
      {{ Δ ; ⋅ ⊢ A }} ->
      {{ Δ' ; ⋅ ⊢ A' }} ->
      {{ Δ ; ⋅ ⊢ A ⊆ A' }} ->
      {{ `#x ∉ Δ }} ->
      {{ `#x ∉ Δ' }} ->
-     {{ ⊢ Δ, x := ∅ : A ⊆ Δ', x := ∅ : A' }} )
-| wf_gctx_subtyp_extend_some :
-  `( {{ ⊢ Δ ⊆ Δ' }} ->
-     {{ Δ ; ⋅ ⊢ A }} ->
-     {{ Δ' ; ⋅ ⊢ A' }} ->
-     {{ Δ ; ⋅ ⊢ M : A }} ->
-     {{ Δ' ; ⋅ ⊢ M : A' }} ->
-     {{ Δ ; ⋅ ⊢ A ⊆ A' }} ->
-     {{ `#x ∉ Δ }} ->
-     {{ ⊢ Δ, x := M : A ⊆ Δ', x := M : A' }} )
+     {{ ⊢ Δ, x : A ⊆ Δ', x : A' }} )
 where "⊢ Δ ⊆ Δ'" := (wf_gctx_subtyp Δ Δ') (in custom judg) : type_scope.
 
 #[export]
@@ -693,8 +648,6 @@ Qed.
 Instance wf_gctx_eq_Symmetric {P : PtsSig} : Symmetric (@wf_gctx_eq P).
 Proof.
   induction 1; mauto.
-  symmetry in H4, H5, H10, H11, H12, H13.
-  mauto.
 Qed.
 
 #[export]
@@ -765,7 +718,7 @@ Proof.
 Qed.
 
 
-(** * Basic rewriting rules *)
+(** ** Basic rewriting rules *)
 (** For wf_exp_eq *)
 Add Parametric Morphism {P : PtsSig} (Δ : gctx P) (Γ : ctx P) (A : typ P) : (wf_exp_eq Δ Γ A)
     with signature wf_exp_eq Δ Γ A ==> eq ==> iff as wf_exp_eq_morphism_iff1.
@@ -835,114 +788,16 @@ Hint Rewrite -> @wf_sub_eq_id_compose_right
                  @wf_sub_eq_p_extend using mauto 4 : mcpts.
 
 
-
-
-(** * Basic presupposition results *)
-(** For equality of global contexts *)
-Lemma presup_gctx_eq {P} : forall {Δ Δ' : gctx P}, {{ ⊢ Δ ≈ Δ' }} -> {{ ⊢ Δ }} /\ {{ ⊢ Δ' }}.
-Proof with mautosolve.
-  induction 1; destruct_pairs...
-Qed.
-
-Lemma presup_gctx_eq_left {P} : forall {Δ Δ' : gctx P}, {{ ⊢ Δ ≈ Δ' }} -> {{ ⊢ Δ }}.
-Proof with easy.
-  intros * ?%presup_gctx_eq...
-Qed.
-
-Lemma presup_gctx_eq_right {P} : forall {Δ Δ' : gctx P}, {{ ⊢ Δ ≈ Δ' }} -> {{ ⊢ Δ' }}.
-Proof with easy.
-  intros * ?%presup_gctx_eq...
-Qed.
-
-#[export]
-Hint Resolve presup_gctx_eq presup_gctx_eq_left presup_gctx_eq_right : mcpts.
-
-(** For subtyping of global contexts *)
-Lemma presup_gctx_subtyp {P} : forall {Δ Δ' : gctx P}, {{ ⊢ Δ ⊆ Δ' }} -> {{ ⊢ Δ }} /\ {{ ⊢ Δ' }}.
-Proof with mautosolve.
-  induction 1; destruct_pairs...
-Qed.
-
-Lemma presup_gctx_subtyp_left {P} : forall {Δ Δ' : gctx P}, {{ ⊢ Δ ⊆ Δ' }} -> {{ ⊢ Δ }}.
-Proof with easy.
-  intros * ?%presup_gctx_subtyp...
-Qed.
-
-Lemma presup_gctx_subtyp_right {P} : forall {Δ Δ' : gctx P}, {{ ⊢ Δ ⊆ Δ' }} -> {{ ⊢ Δ' }}.
-Proof with easy.
-  intros * ?%presup_gctx_subtyp...
-Qed.
-
-#[export]
-Hint Resolve presup_gctx_subtyp presup_gctx_subtyp_left presup_gctx_subtyp_right : mcpts.
-
-(** For well-formedness of local contexts *)
-Lemma presup_wf_ctx {P : PtsSig} : forall {Δ : gctx P} {Γ : ctx P}, {{ Δ ⊢ Γ }} -> {{ ⊢ Δ }}.
-Proof with mautosolve.
-  induction 1...
-Qed.
-
-#[export]
-Hint Resolve presup_wf_ctx : mcpts.
- 
-(** For equality of local contexts *)
-Lemma presup_wf_ctx_eq {P : PtsSig} : forall {Δ : gctx P} {Γ Γ' : ctx P}, {{ Δ ⊢ Γ ≈ Γ' }} -> {{ ⊢ Δ }} /\ {{ Δ ⊢ Γ }} /\ {{ Δ ⊢ Γ' }}.
-Proof with mautosolve.
-  induction 1; destruct_pairs...
-Qed.
-
-Lemma presup_wf_ctx_eq_gctx {P : PtsSig} : forall {Δ : gctx P} {Γ Γ' : ctx P}, {{ Δ ⊢ Γ ≈ Γ' }} -> {{ ⊢ Δ }}.
-Proof with easy.
-  intros * ?%presup_wf_ctx_eq...
-Qed.
-
-Lemma presup_wf_ctx_eq_left {P : PtsSig} : forall {Δ : gctx P} {Γ Γ' : ctx P}, {{ Δ ⊢ Γ ≈ Γ' }} -> {{ Δ ⊢ Γ }}.
-Proof with easy.
-  intros * ?%presup_wf_ctx_eq...
-Qed.
-
-Lemma presup_wf_ctx_eq_right {P : PtsSig} : forall {Δ : gctx P} {Γ Γ' : ctx P}, {{ Δ ⊢ Γ ≈ Γ' }} -> {{ Δ ⊢ Γ' }}.
-Proof with easy.
-  intros * ?%presup_wf_ctx_eq...
-Qed.
-
-#[export]
-Hint Resolve presup_wf_ctx_eq presup_wf_ctx_eq_gctx presup_wf_ctx_eq_left presup_wf_ctx_eq_right : mcpts.
-
-(** For subtyping of contexts *)
-Lemma presup_ctx_subtyp {P} : forall {Δ : gctx P} {Γ Γ' : ctx P}, {{ Δ ⊢ Γ ⊆ Γ' }} -> {{ ⊢ Δ }} /\ {{ Δ ⊢ Γ }} /\ {{ Δ ⊢ Γ' }}.
-Proof with mautosolve.
-  induction 1; destruct_pairs...
-Qed.
-
-Lemma presup_ctx_subtyp_gctx {P} : forall {Δ : gctx P} {Γ Γ' : ctx P}, {{ Δ ⊢ Γ ⊆ Γ' }} -> {{ ⊢ Δ }}.
-Proof with easy.
-  intros * ?%presup_ctx_subtyp...
-Qed.
-
-Lemma presup_ctx_subtyp_left {P} : forall {Δ : gctx P} {Γ Γ' : ctx P}, {{ Δ ⊢ Γ ⊆ Γ' }} -> {{ Δ ⊢ Γ }}.
-Proof with easy.
-  intros * ?%presup_ctx_subtyp...
-Qed.
-
-Lemma presup_ctx_subtyp_right {P} : forall {Δ : gctx P} {Γ Γ' : ctx P}, {{ Δ ⊢ Γ ⊆ Γ' }} -> {{ Δ ⊢ Γ' }}.
-Proof with easy.
-  intros * ?%presup_ctx_subtyp...
-Qed.
-
-#[export]
-Hint Resolve presup_ctx_subtyp presup_ctx_subtyp_gctx presup_ctx_subtyp_left presup_ctx_subtyp_right : mcpts.
-
-(** For subtyping of types *)
-Lemma presup_typ_subtyp_right {P} : forall {Δ : gctx P} {Γ : ctx P} {A B}, {{ Δ ; Γ ⊢ A ⊆ B }} -> {{ Δ ; Γ ⊢ B }}.
-Proof with mautosolve.
-  induction 1...
-Qed.
-
-#[export]
-Hint Resolve presup_typ_subtyp_right : mcpts.
-
 (** * Immediately admissible rules *)
+(** All equality judgments are reflexive on well-formed objects *)
+Lemma exp_eq_refl {P : PtsSig} : forall {Δ : gctx P} {Γ M A},
+    {{ Δ ; Γ ⊢ M : A }} ->
+    {{ Δ ; Γ ⊢ M ≈ M : A }}.
+Proof. mauto. Qed.
+
+#[export]
+Hint Resolve exp_eq_refl : mcpts.
+
 Lemma wf_typ_eq_refl {P : PtsSig} : forall (Δ : gctx P) (Γ : ctx P) (A : typ P),
     {{ Δ ; Γ ⊢ A }} ->
     {{ Δ ; Γ ⊢ A ≈ A }}.
@@ -954,6 +809,36 @@ Qed.
 #[export]
 Hint Resolve wf_typ_eq_refl : mcpts.
 
+Lemma sub_eq_refl {P : PtsSig} : forall {Δ : gctx P} {σ Γ Γ'},
+    {{ Δ ; Γ ⊢s σ : Γ' }} ->
+    {{ Δ ; Γ ⊢s σ ≈ σ : Γ' }}.
+Proof. mauto. Qed.
+
+#[export]
+Hint Resolve sub_eq_refl : mcpts.
+
+Lemma gctx_eq_refl {P : PtsSig} : forall {Δ : gctx P},
+    {{ ⊢ Δ }} ->
+    {{ ⊢ Δ ≈ Δ }}.
+Proof.
+  induction 1; mauto 2.
+  econstructor; mauto 3.
+Qed.
+
+#[export]
+Hint Resolve gctx_eq_refl : mcpts.
+
+Lemma ctx_eq_refl {P : PtsSig} : forall {Δ : gctx P} {Γ},
+    {{ Δ ⊢ Γ }} ->
+    {{ Δ ⊢ Γ ≈ Γ }}.
+Proof.
+  induction 1; mauto 4.
+Qed.
+
+#[export]
+Hint Resolve ctx_eq_refl : mcpts.
+
+(** Admissible subtyping rules *)
 Lemma wf_typ_subtyp_sort_st_subtyp {P : PtsSig} : forall (Δ : gctx P) (Γ : ctx P) (s1 s2 : P),
     {{ Δ ⊢ Γ }} ->
     st_subtyp s1 s2 ->
@@ -968,3 +853,16 @@ Qed.
 
 #[export]
 Hint Resolve wf_typ_subtyp_sort_st_subtyp : mcpts.
+
+Lemma wf_exp_eq_sort_subtyp {P : PtsSig} : forall {Δ : gctx P} {Γ A B s},
+    {{ Δ ; Γ ⊢ A ≈ B : Sort@s }} ->
+    {{ Δ ; Γ ⊢ B }} ->
+    {{ Δ ; Γ ⊢ A ⊆ B }}.
+Proof.
+  intros.
+  assert {{ Δ ; Γ ⊢ A ≈ B }} by mauto 2.
+  mauto 2.
+Qed.
+
+#[export]
+Hint Resolve wf_exp_eq_sort_subtyp : mcpts.
