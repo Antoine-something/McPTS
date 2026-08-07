@@ -291,7 +291,7 @@ Lemma wf_ctx_subtyp_trans {P} : forall (Δ : gctx P) Γ0 Γ1,
     {{ Δ ⊢ Γ0 ⊆ Γ2 }}.
 Proof.
   induction 1; intros; progressive_inversion; [constructor; mauto 2 |].
-  eapply wf_ctx_sub_extend; mauto 3.
+  eapply wf_ctx_subtyp_extend; mauto 3.
 Qed.
 
 #[export]

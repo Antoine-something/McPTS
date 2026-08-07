@@ -87,10 +87,10 @@ where "Δ ⊢ Γ" := (wf_ctx Δ Γ) (in custom judg) : type_scope
 
 (** subtyping for local contexts *)                        
 with wf_ctx_subtyp {P : PtsSig} : gctx P -> ctx P -> ctx P -> Prop :=
-| wf_ctx_sub_empty :
+| wf_ctx_subtyp_empty :
   `( {{ ⊢ Δ }} ->
      {{ Δ ⊢ ⋅ ⊆ ⋅ }} )
-| wf_ctx_sub_extend :
+| wf_ctx_subtyp_extend :
   `( {{ Δ ⊢ Γ ⊆ Γ' }} ->
      {{ Δ ; Γ ⊢ A }} ->
      {{ Δ ; Γ' ⊢ A' }} ->
@@ -101,24 +101,24 @@ where "Δ ⊢ Γ ⊆ Γ'" := (wf_ctx_subtyp Δ Γ Γ') (in custom judg) : type_s
 (** Well-formedness for expressions (i.e. typing) *)
 with wf_exp {P : PtsSig} : gctx P -> ctx P -> typ P -> exp P -> Prop :=
 (** Sorts *)
-| wf_st :
+| wf_exp_st :
   `( Ax_typ P s1 s2 ->
      {{ Δ ⊢ Γ }} ->
      {{ Δ ; Γ ⊢ Sort@s1 : Sort@s2 }} )
 
 (** Functions *)
-| wf_pi :
+| wf_exp_pi :
   `( forall (r : Ru_pi P s1 s2 s3),
       {{ Δ ; Γ ⊢ A : Sort@s1 }} ->
       {{ Δ ; Γ, A ⊢ B : Sort@s2 }} ->
       {{ Δ ; Γ ⊢ Π r A B : Sort@s3 }} )
-| wf_fn :
+| wf_exp_fn :
   `( forall (r : Ru_pi P s1 s2 s3),
         {{ Δ ; Γ ⊢ A : Sort@s1 }} ->
         {{ Δ ; Γ, A ⊢ B : Sort@s2 }} ->
         {{ Δ ; Γ, A ⊢ M : B }} ->
         {{ Δ ; Γ ⊢ λ r A B M : Π r A B }} )
-| wf_app :
+| wf_exp_app :
   `( forall (r : Ru_pi P s1 s2 s3),
         {{ Δ ; Γ ⊢ A : Sort@s1 }} ->
         {{ Δ ; Γ, A ⊢ B : Sort@s2 }} ->
@@ -127,32 +127,31 @@ with wf_exp {P : PtsSig} : gctx P -> ctx P -> typ P -> exp P -> Prop :=
         {{ Δ ; Γ ⊢ M N : B[Id,,N] }} )
 
 (** Variables *)
-| wf_vlookup :
+| wf_exp_vlookup :
   `( {{ Δ ⊢ Γ }} ->
      (** This premise is redundant, but helpful for soundness *)
      (* {{ Γ ⊢ A }} -> *)
      {{ #x : A ∈ Γ }} ->
      {{ Δ ; Γ ⊢ #x : A }} )
-(* NOTE: This rule might very well be wrong (no substitution?) *)
-| wf_gvlookup :
+| wf_exp_gvlookup :
   `( {{ Δ ; Γ ⊢s σ : ⋅ }} ->
      {{ `#x : A ∈ Δ }} ->
      {{ Δ ; Γ ⊢ `#x : A[σ] }} )
   
 (** Naturals **)
-| wf_nat :
+| wf_exp_nat :
   `( forall (r : Ru_nat P s),
         {{ Δ ⊢ Γ }} ->
         {{ Δ ; Γ ⊢ ℕ: Sort@s }} )
-| wf_zero :
+| wf_exp_zero :
   `(forall (r : Ru_nat P s),
         {{ Δ ⊢ Γ }} ->
         {{ Δ ; Γ ⊢ zero : ℕ}} )
-| wf_succ :
+| wf_exp_succ :
   `( forall (r : Ru_nat P s),
         {{ Δ ; Γ ⊢ M : ℕ}} ->
         {{ Δ ; Γ ⊢ succ M : ℕ}} )
-| wf_natrec :
+| wf_exp_natrec :
   `( forall (r : Ru_nat P s),
         {{ Δ ; Γ, ℕ ⊢ A }} ->
         {{ Δ ; Γ ⊢ MZ : A[Id,,zero] }} ->
@@ -311,10 +310,6 @@ with wf_exp_eq {P : PtsSig} : gctx P -> ctx P -> typ P -> exp P -> exp P -> Prop
 
 (** Global variables *)
 (* NOTE: First attempt at equality rules for gvar, may need adjustments *)
-(* | wf_exp_eq_gvar_refl : *)
-(*   `( {{ Δ ; Γ ⊢s σ : ⋅ }} -> *)
-(*      {{ `#x : A ∈ Δ }} -> *)
-(*      {{ Δ ; Γ ⊢ `#x ≈ `#x : A }} ) *)
 | wf_exp_eq_gvar_sub :
   `( {{ Δ ; Γ ⊢s σ : ⋅ }} ->
      {{ `#x : A ∈ Δ }} ->

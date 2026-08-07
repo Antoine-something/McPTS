@@ -4,8 +4,45 @@ From McPTS.Core.Syntactic.System Require Import Definitions.
 Import Syntax_Notations.
 
 
-(** ** Basic Context Properties *)
-    
+(** * Basic Context Properties *)
+
+(** ** Lemmas about fresh variables *)
+Lemma gctx_lookup_var_not_eq_fresh_var {P : PtsSig} : forall {Δ : gctx P} {x x' A},
+    {{ `#x : A ∈ Δ }} ->
+    {{ `#x' ∉ Δ }} ->
+    x <> x'.
+Proof.
+  induction 1; inversion_clear 1; intuition.
+Qed.
+
+#[export]
+Hint Resolve gctx_lookup_var_not_eq_fresh_var : mcpts.
+
+Lemma wf_gctx_eq_fresh_iff {P} : forall {Δ Δ' : gctx P} {x},
+    {{ ⊢ Δ ≈ Δ' }} ->
+    {{ `#x ∉ Δ }} -> {{ `#x ∉ Δ' }}.
+Proof.
+  induction 1; mauto 2;
+    inversion_clear 1; mauto 2;
+    destruct IHwf_gctx_eq;
+    mauto 3.
+Qed.
+
+
+Lemma wf_gctx_subtyp_fresh_iff {P} : forall {Δ Δ' : gctx P} {x},
+    {{ ⊢ Δ ⊆ Δ' }} ->
+    {{ `#x ∉ Δ }} -> {{ `#x ∉ Δ' }}.
+Proof.
+  induction 1; mauto 2;
+    inversion_clear 1; mauto 2;
+    destruct IHwf_gctx_subtyp;
+    mauto 3.
+Qed.
+
+#[export]
+Hint Resolve wf_gctx_eq_fresh_iff wf_gctx_subtyp_fresh_iff : mcpts.
+
+(** ** Properties of context lookups *)
 Lemma functional_gctx_lookup {P} : forall {Δ : gctx P} {A A' x},
     {{ `#x : A ∈ Δ }} ->
     {{ `#x : A' ∈ Δ }} ->
@@ -19,7 +56,31 @@ Qed.
 
 #[export]
 Hint Resolve functional_gctx_lookup : mcpts.
- 
+
+Lemma ctx_lookup_lt {P : PtsSig} : forall {Γ : ctx P} {A x},
+    {{ #x : A ∈ Γ }} ->
+    x < length Γ.
+Proof.
+  induction 1; simpl; lia.
+Qed.
+#[export]
+Hint Resolve ctx_lookup_lt : mcpts.
+
+Lemma functional_ctx_lookup {P : PtsSig} : forall {Γ : ctx P} {A A' x},
+    {{ #x : A ∈ Γ }} ->
+    {{ #x : A' ∈ Γ }} ->
+    A = A'.
+Proof with mautosolve.
+  intros * Hx Hx'; gen A'.
+  dependent induction Hx; intros; inversion_clear Hx'; 
+    f_equal;
+    intuition.
+Qed.
+
+#[export]
+Hint Resolve functional_ctx_lookup : mcpts. 
+
+(** ** Basic inversion principles *)
 Lemma gctx_decomp {P : PtsSig} : forall {Δ : gctx P} {x A}, {{ ⊢ Δ, x : A }} -> {{ ⊢ Δ }} /\ {{ Δ ; ⋅ ⊢ A }} /\ {{ `#x ∉ Δ }}.
 Proof with now eauto.
   inversion 1; split; mauto 2.
@@ -47,26 +108,6 @@ Qed.
 Hint Resolve gctx_decomp_left gctx_decomp_right gctx_decomp_fresh : mcpts.
 
 
-Lemma ctx_lookup_lt {P : PtsSig} : forall {Γ : ctx P} {A x},
-    {{ #x : A ∈ Γ }} ->
-    x < length Γ.
-Proof.
-  induction 1; simpl; lia.
-Qed.
-#[export]
-Hint Resolve ctx_lookup_lt : mcpts.
-
-Lemma functional_ctx_lookup {P : PtsSig} : forall {Γ : ctx P} {A A' x},
-    {{ #x : A ∈ Γ }} ->
-    {{ #x : A' ∈ Γ }} ->
-    A = A'.
-Proof with mautosolve.
-  intros * Hx Hx'; gen A'.
-  dependent induction Hx; intros; inversion_clear Hx'; 
-    f_equal;
-    intuition.
-Qed.
-
 Lemma ctx_decomp {P : PtsSig} : forall {Δ : gctx P} {Γ A}, {{ Δ ⊢ Γ, A }} -> {{ Δ ⊢ Γ }} /\ {{ Δ ; Γ ⊢ A }}.
 Proof with now eauto.
   inversion 1; split; mauto 2.
@@ -87,6 +128,61 @@ Qed.
 
 #[export]
 Hint Resolve ctx_decomp_left ctx_decomp_right : mcpts.
+
+(** ** Weakening principle for global contexts *)
+Lemma gctx_weakening {P : PtsSig} :
+    (forall (Δ : gctx P) Γ, {{ Δ ⊢ Γ }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ⊢ Γ }}) /\
+    (forall (Δ : gctx P) Γ Γ', {{ Δ ⊢ Γ ⊆ Γ' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ⊢ Γ ⊆ Γ' }}) /\
+    (forall (Δ : gctx P) Γ A M, {{ Δ ; Γ ⊢ M : A }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢ M : A }}) /\
+    (forall (Δ : gctx P) Γ A M M', {{ Δ ; Γ ⊢ M ≈ M' : A }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢ M ≈ M' : A }}) /\
+    (forall (Δ : gctx P) Γ A, {{ Δ ; Γ ⊢ A }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢ A }}) /\
+    (forall (Δ : gctx P) Γ A A', {{ Δ ; Γ ⊢ A ≈ A' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢ A ≈ A' }}) /\
+    (forall (Δ : gctx P) Γ A A', {{ Δ ; Γ ⊢ A ⊆ A' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢ A ⊆ A' }}) /\
+    (forall (Δ : gctx P) Γ Γ' σ, {{ Δ ; Γ ⊢s σ : Γ' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢s σ : Γ' }}) /\
+    (forall (Δ : gctx P) Γ Γ' σ σ', {{ Δ ; Γ ⊢s σ ≈ σ' : Γ' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢s σ ≈ σ' : Γ' }}).
+Proof.
+  apply syntactic_wf_local_mut_ind;
+    intros;
+    try mauto 2;
+    try solve [econstructor; mauto 3].
+
+  - inversion_clear H0.
+    econstructor; mauto 3.
+  - mautosolve.
+  - inversion_clear H0.
+    econstructor; mauto 3.
+Qed.      
+
+Corollary wf_ctx_gctx_weakening {P : PtsSig} : forall {Δ : gctx P} {Γ},
+    {{ Δ ⊢ Γ }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ⊢ Γ }}.
+Proof. intros; eapply gctx_weakening; mauto 2. Qed.
+
+Corollary wf_ctx_subtyp_gctx_weakening {P : PtsSig} : forall {Δ : gctx P} {Γ Γ'}, {{ Δ ⊢ Γ ⊆ Γ' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ⊢ Γ ⊆ Γ' }}.
+Proof. intros; eapply gctx_weakening; mauto 2. Qed.
+
+Corollary wf_exp_gctx_weakening {P : PtsSig} : forall {Δ : gctx P} {Γ A M}, {{ Δ ; Γ ⊢ M : A }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢ M : A }}.
+Proof. intros; eapply gctx_weakening; mauto 2. Qed.
+
+Corollary wf_exp_eq_gctx_weakening {P : PtsSig} : forall {Δ : gctx P} {Γ A M M'}, {{ Δ ; Γ ⊢ M ≈ M' : A }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢ M ≈ M' : A }}.
+Proof. intros; eapply gctx_weakening; mauto 2. Qed.
+
+Corollary wf_typ_gctx_weakening {P : PtsSig} : forall {Δ : gctx P} {Γ A}, {{ Δ ; Γ ⊢ A }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢ A }}.
+Proof. intros; eapply gctx_weakening; mauto 2. Qed.
+  
+Corollary wf_typ_eq_gctx_weakening {P : PtsSig} : forall {Δ : gctx P} {Γ A A'}, {{ Δ ; Γ ⊢ A ≈ A' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢ A ≈ A' }}.
+Proof. intros; eapply gctx_weakening; mauto 2. Qed.
+
+Corollary wf_typ_subtyp_gctx_weakening {P : PtsSig} :  forall {Δ : gctx P} {Γ A A'}, {{ Δ ; Γ ⊢ A ⊆ A' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢ A ⊆ A' }}.
+Proof. intros; eapply gctx_weakening; mauto 2. Qed.
+
+Corollary wf_sub_gctx_weakening {P : PtsSig} : forall {Δ : gctx P} {Γ Γ' σ}, {{ Δ ; Γ ⊢s σ : Γ' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢s σ : Γ' }}.
+Proof. intros; eapply gctx_weakening; mauto 2. Qed.
+
+Corollary wf_sub_eq_gctx_weakening {P : PtsSig} : forall {Δ : gctx P} {Γ Γ' σ σ'}, {{ Δ ; Γ ⊢s σ ≈ σ' : Γ' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢s σ ≈ σ' : Γ' }}.
+Proof. intros; eapply gctx_weakening; mauto 2. Qed.
+
+#[export]  
+Hint Resolve wf_ctx_gctx_weakening wf_ctx_subtyp_gctx_weakening wf_exp_gctx_weakening wf_exp_eq_gctx_weakening wf_typ_gctx_weakening wf_typ_eq_gctx_weakening wf_typ_subtyp_gctx_weakening wf_sub_gctx_weakening wf_sub_eq_gctx_weakening : mcpts.
 
 
 
@@ -358,100 +454,6 @@ Qed.
 #[export]
 Hint Resolve presup_ctx_lookup_typ : mcpts.
 
-Lemma gctx_lookup_var_not_eq_fresh_var {P : PtsSig} : forall {Δ : gctx P} {x x' A},
-    {{ `#x : A ∈ Δ }} ->
-    {{ `#x' ∉ Δ }} ->
-    x <> x'.
-Proof.
-  induction 1; inversion_clear 1; intuition.
-Qed.
-
-#[export]
-Hint Resolve gctx_lookup_var_not_eq_fresh_var : mcpts.
-
-Lemma gctx_weakening {P : PtsSig} :
-    (forall (Δ : gctx P) Γ, {{ Δ ⊢ Γ }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ⊢ Γ }}) /\
-    (forall (Δ : gctx P) Γ Γ', {{ Δ ⊢ Γ ⊆ Γ' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ⊢ Γ ⊆ Γ' }}) /\
-    (forall (Δ : gctx P) Γ A M, {{ Δ ; Γ ⊢ M : A }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢ M : A }}) /\
-    (forall (Δ : gctx P) Γ A M M', {{ Δ ; Γ ⊢ M ≈ M' : A }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢ M ≈ M' : A }}) /\
-    (forall (Δ : gctx P) Γ A, {{ Δ ; Γ ⊢ A }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢ A }}) /\
-    (forall (Δ : gctx P) Γ A A', {{ Δ ; Γ ⊢ A ≈ A' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢ A ≈ A' }}) /\
-    (forall (Δ : gctx P) Γ A A', {{ Δ ; Γ ⊢ A ⊆ A' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢ A ⊆ A' }}) /\
-    (forall (Δ : gctx P) Γ Γ' σ, {{ Δ ; Γ ⊢s σ : Γ' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢s σ : Γ' }}) /\
-    (forall (Δ : gctx P) Γ Γ' σ σ', {{ Δ ; Γ ⊢s σ ≈ σ' : Γ' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢s σ ≈ σ' : Γ' }}).
-Proof.
-  apply syntactic_wf_local_mut_ind;
-    intros;
-    try mauto 2;
-    try solve [econstructor; mauto 3].
-
-  - inversion_clear H0.
-    econstructor; mauto 3.
-  - mautosolve.
-  - inversion_clear H0.
-    econstructor; mauto 3.
-  (* - inversion_clear H0. *)
-  (*   econstructor; mauto 3. *)
-Qed.      
-
-
-(* Lemma gctx_weakening {P : PtsSig} : *)
-(*   (forall (Δ : gctx P), {{ ⊢ Δ }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ ⊢ Δ, x:B }}) /\ *)
-(*     (forall (Δ : gctx P) Γ, {{ Δ ⊢ Γ }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ⊢ Γ }}) /\ *)
-(*     (forall (Δ : gctx P) Γ Γ', {{ Δ ⊢ Γ ⊆ Γ' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ⊢ Γ ⊆ Γ' }}) /\ *)
-(*     (forall (Δ : gctx P) Γ A M, {{ Δ ; Γ ⊢ M : A }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢ M : A }}) /\ *)
-(*     (forall (Δ : gctx P) Γ A M M', {{ Δ ; Γ ⊢ M ≈ M' : A }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢ M ≈ M' : A }}) /\ *)
-(*     (forall (Δ : gctx P) Γ A, {{ Δ ; Γ ⊢ A }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢ A }}) /\ *)
-(*     (forall (Δ : gctx P) Γ A A', {{ Δ ; Γ ⊢ A ≈ A' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢ A ≈ A' }}) /\ *)
-(*     (forall (Δ : gctx P) Γ A A', {{ Δ ; Γ ⊢ A ⊆ A' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢ A ⊆ A' }}) /\ *)
-(*     (forall (Δ : gctx P) Γ Γ' σ, {{ Δ ; Γ ⊢s σ : Γ' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢s σ : Γ' }}) /\ *)
-(*     (forall (Δ : gctx P) Γ Γ' σ σ', {{ Δ ; Γ ⊢s σ ≈ σ' : Γ' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢s σ ≈ σ' : Γ' }}). *)
-(* Proof. *)
-(*   apply syntactic_wf_mut_ind; *)
-(*     intros; *)
-(*     try mauto 2; *)
-(*     try solve [econstructor; mauto 3]. *)
-
-(*   - inversion_clear H0. *)
-(*     econstructor; mauto 3. *)
-(*   - mautosolve. *)
-(*   - inversion_clear H0. *)
-(*     econstructor; mauto 3. *)
-(*   (* - inversion_clear H0. *) *)
-(*   (*   econstructor; mauto 3. *) *)
-(* Qed.       *)
-
-Corollary wf_ctx_gctx_weakening {P : PtsSig} : forall {Δ : gctx P} {Γ},
-    {{ Δ ⊢ Γ }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ⊢ Γ }}.
-Proof. intros; eapply gctx_weakening; mauto 2. Qed.
-
-Corollary wf_ctx_subtyp_gctx_weakening {P : PtsSig} : forall {Δ : gctx P} {Γ Γ'}, {{ Δ ⊢ Γ ⊆ Γ' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ⊢ Γ ⊆ Γ' }}.
-Proof. intros; eapply gctx_weakening; mauto 2. Qed.
-
-Corollary wf_exp_gctx_weakening {P : PtsSig} : forall {Δ : gctx P} {Γ A M}, {{ Δ ; Γ ⊢ M : A }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢ M : A }}.
-Proof. intros; eapply gctx_weakening; mauto 2. Qed.
-
-Corollary wf_exp_eq_gctx_weakening {P : PtsSig} : forall {Δ : gctx P} {Γ A M M'}, {{ Δ ; Γ ⊢ M ≈ M' : A }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢ M ≈ M' : A }}.
-Proof. intros; eapply gctx_weakening; mauto 2. Qed.
-
-Corollary wf_typ_gctx_weakening {P : PtsSig} : forall {Δ : gctx P} {Γ A}, {{ Δ ; Γ ⊢ A }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢ A }}.
-Proof. intros; eapply gctx_weakening; mauto 2. Qed.
-  
-Corollary wf_typ_eq_gctx_weakening {P : PtsSig} : forall {Δ : gctx P} {Γ A A'}, {{ Δ ; Γ ⊢ A ≈ A' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢ A ≈ A' }}.
-Proof. intros; eapply gctx_weakening; mauto 2. Qed.
-
-Corollary wf_typ_subtyp_gctx_weakening {P : PtsSig} :  forall {Δ : gctx P} {Γ A A'}, {{ Δ ; Γ ⊢ A ⊆ A' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢ A ⊆ A' }}.
-Proof. intros; eapply gctx_weakening; mauto 2. Qed.
-
-Corollary wf_sub_gctx_weakening {P : PtsSig} : forall {Δ : gctx P} {Γ Γ' σ}, {{ Δ ; Γ ⊢s σ : Γ' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢s σ : Γ' }}.
-Proof. intros; eapply gctx_weakening; mauto 2. Qed.
-
-Corollary wf_sub_eq_gctx_weakening {P : PtsSig} : forall {Δ : gctx P} {Γ Γ' σ σ'}, {{ Δ ; Γ ⊢s σ ≈ σ' : Γ' }} -> forall x B, {{ ⊢ Δ, x:B }} -> {{ Δ, x:B ; Γ ⊢s σ ≈ σ' : Γ' }}.
-Proof. intros; eapply gctx_weakening; mauto 2. Qed.
-
-#[export]  
-Hint Resolve wf_ctx_gctx_weakening wf_ctx_subtyp_gctx_weakening wf_exp_gctx_weakening wf_exp_eq_gctx_weakening wf_typ_gctx_weakening wf_typ_eq_gctx_weakening wf_typ_subtyp_gctx_weakening wf_sub_gctx_weakening wf_sub_eq_gctx_weakening : mcpts.
-  
 Lemma presup_gctx_lookup_typ {P : PtsSig} : forall {Δ : gctx P} {A x},
     {{ ⊢ Δ }} ->
     {{ `#x : A ∈ Δ }} ->
