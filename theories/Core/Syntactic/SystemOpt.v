@@ -12,7 +12,6 @@ Ltac impl_opt_constructor :=
 
 (** * Optimized rules related to context *)
 
-
 (** ** For global contexts *)
 Corollary wf_gctx_eq_extend' {P} : forall {Δ Δ' : gctx P} {A A' x},
     {{ ⊢ Δ ≈ Δ' }} ->
