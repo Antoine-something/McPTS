@@ -354,7 +354,7 @@ with wf_typ {P : PtsSig} : gctx P -> ctx P -> typ P -> Prop :=
 | wf_typ_exp :
   `( {{ Δ ; Γ ⊢ A : Sort@s }} ->
      {{ Δ ; Γ ⊢ A }})
-| wf_typ_sub_sort :
+| wf_typ_sub :
   `( {{ Δ ; Γ ⊢s σ : Γ' }} ->
      {{ Δ ; Γ' ⊢ A }} ->
      {{ Δ ; Γ ⊢ A[σ] }} )
@@ -559,6 +559,7 @@ with wf_exp_mut_ind' := Induction for wf_exp Sort Prop
 with wf_typ_mut_ind' := Induction for wf_typ Sort Prop
 with wf_sub_mut_ind' := Induction for wf_sub Sort Prop.
 Combined Scheme syntactic_wf_mut_ind' from
+  wf_gctx_mut_ind',
   wf_ctx_mut_ind',
   wf_exp_mut_ind',
   wf_typ_mut_ind',

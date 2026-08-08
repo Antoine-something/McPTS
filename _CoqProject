@@ -25,7 +25,7 @@ theories/Core/Syntactic/CoreInversions.v
 theories/Core/Syntactic/Presup.v
 theories/Core/Syntactic/SystemOpt.v
 theories/Core/Syntactic/Corollaries.v
-# theories/Core/Syntactic/SystemAnnotated/Definitions.v
+theories/Core/Syntactic/SystemAnnotated/Definitions.v
 # theories/Core/Syntactic/SystemAnnotated/Lemmas.v
 # theories/Core/Syntactic/SystemAnnotated.v
 

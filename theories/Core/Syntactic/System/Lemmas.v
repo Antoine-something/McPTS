@@ -445,10 +445,10 @@ Proof with mautosolve 4.
   intros * HΓ.
   induction 1; inversion_clear HΓ.
   - assert {{ Δ ; Γ, A ⊢s Wk : Γ }} by mauto 3.
-    eapply wf_typ_sub_sort; mauto 2.
+    eapply wf_typ_sub; mauto 2.
   - assert {{ Δ ; Γ, B ⊢s Wk : Γ }} by mauto 3.
     assert {{ Δ ; Γ ⊢ A  }} by mauto 2.
-    eapply wf_typ_sub_sort; mauto 2.
+    eapply wf_typ_sub; mauto 2.
 Qed.
 
 #[export]

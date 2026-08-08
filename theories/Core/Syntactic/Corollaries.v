@@ -4,6 +4,7 @@ From McPTS.Core Require Import Base.
 From McPTS.Core.Syntactic Require Export SystemOpt.
 Import Syntax_Notations.
 
+(** ** Lemmas related to identity substitutions *)
 Corollary wf_exp_sub_id_on_typ' {P : PtsSig} : forall (Δ : gctx P) Γ M A,
     {{ Δ ; Γ ⊢ M : A }} ->
     {{ Δ ; Γ ⊢ M : A[Id] }}.
@@ -76,6 +77,7 @@ Qed.
 #[export]
 Hint Resolve wf_sub_invert_compose_id : mcpts.
 
+(** ** Rewrite rules for applying substitutions *)
 Add Parametric Morphism {P : PtsSig} (Δ : gctx P) Γ Γ' : a_sub
     with signature wf_typ_subtyp Δ Γ' ==> wf_sub_eq Δ Γ Γ' ==> wf_typ_subtyp Δ Γ as wf_typ_subtyp_cong.
 Proof.
@@ -128,35 +130,25 @@ Proof. induction 1; simpl; auto. Qed.
 
 Open Scope list_scope.
 
-Lemma app_ctx_lookup {P : PtsSig} : forall (Γ' : ctx P) T Γ n,
+(** ** Deep variable lookups in local contexts *)
+Lemma app_ctx_lookup {P : PtsSig} : forall (Γ' : ctx P) A Γ n,
     length Γ' = n ->
-    {{ #n : ^(iter (S n) (fun T => {{{ T[Wk] }}}) T) ∈ ^(Γ' ++ T :: Γ) }}.
+    {{ #n : ^(iter (S n) (fun A' => {{{ A'[Wk] }}}) A) ∈ ^(Γ' ++ A :: Γ) }}.
 Proof.
   induction Γ'; intros; simpl in *; subst; mauto.
 Qed.
 
-(* Lemma ctx_lookup_functional {P : PtsSig} : forall n (T : exp P) Γ, *)
-(*     {{ #n : T ∈ Γ }} -> *)
-(*     forall T', *)
-(*       {{ #n : T' ∈ Γ }} -> *)
-(*       T = T'. *)
-(* Proof. *)
-(*   induction 1; intros; progressive_inversion; eauto. *)
-(*   assert (A = A0) by mauto. *)
-(*   subst. *)
-(*   mauto. *)
-(* Qed. *)
-
-Lemma app_ctx_vlookup {P : PtsSig} : forall (Δ : gctx P) Γ' T Γ n,
-    {{ Δ ⊢ ^(Γ' ++ T :: Γ) }} ->
+Lemma app_ctx_vlookup {P : PtsSig} : forall (Δ : gctx P) Γ' A Γ n,
+    {{ Δ ⊢ ^(Γ' ++ A :: Γ) }} ->
     length Γ' = n ->
-    {{ Δ ; ^(Γ' ++ T :: Γ) ⊢ #n : ^(iter (S n) (fun T => {{{ T[Wk] }}}) T) }}.
+    {{ Δ ; ^(Γ' ++ A :: Γ) ⊢ #n : ^(iter (S n) (fun A' => {{{ A'[Wk] }}}) A) }}.
 Proof.
   intros.
-  assert {{ #n : ^(iter (S n) (fun T' => {{{ T'[Wk] }}}) T) ∈ ^(Γ' ++ T :: Γ) }} by (eapply app_ctx_lookup; mauto).
+  assert {{ #n : ^(iter (S n) (fun A' => {{{ A'[Wk] }}}) A) ∈ ^(Γ' ++ A :: Γ) }} by (eapply app_ctx_lookup; mauto).
   subst.
   mauto 2.
 Qed.
+
 
 Lemma wf_sub_eq_q_cong {P : PtsSig} : forall (Δ : gctx P) Γ' A Γ σ σ',
     {{ Δ ; Γ' ⊢ A }} ->
