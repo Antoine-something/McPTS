@@ -119,8 +119,8 @@ with wf_exp_ann {P : PtsSig} : gctx P -> gctx_anns P -> ctx P -> ctx_anns P -> t
 | wf_exp_rec_ann :
   `( forall (r : Ru_nat P sn),
         {{ Δ @ annsΔ ; Γ, ℕ @ annsΓ, ^(so_Some sn) ⊫ A @ so }} ->
-        {{ Δ @ annsΔ ; Γ @ annsΓ ⊫ MZ : A[Id,,zero] @ so }} ->
-        {{ Δ @ annsΔ ; Γ, ℕ, A @ annsΓ, ^(so_Some sn), so ⊫ MS : A[Wk∘Wk,,succ #1] @ so  }} ->
+        {{ Δ @ annsΔ ; Γ @ annsΓ ⊫ MZ : A[Id,,zero] @ so' }} ->
+        {{ Δ @ annsΔ ; Γ, ℕ, A @ annsΓ, ^(so_Some sn), so ⊫ MS : A[Wk∘Wk,,succ #1] @ so''  }} ->
         {{ Δ @ annsΔ ; Γ @ annsΓ ⊫ M : ℕ @ ^(so_Some sn) }} ->
         {{ Δ @ annsΔ ; Γ @ annsΓ ⊫ rec M return A | zero -> MZ | succ -> MS end : A[Id,,M] @ so }} )
 
@@ -141,7 +141,6 @@ with wf_exp_ann {P : PtsSig} : gctx P -> gctx_anns P -> ctx P -> ctx_anns P -> t
   `( {{ Δ @ annsΔ ; Γ @ annsΓ ⊫ M : A @ so }} ->
      {{ Δ @ annsΔ ; Γ @ annsΓ ⊫ A @ so' }} ->
      {{ Δ @ annsΔ ; Γ @ annsΓ ⊫ M : A @ so' }} )
-
 where "Δ @ annsΔ ; Γ @ annsΓ ⊫ M : A @ so" := (wf_exp_ann Δ annsΔ Γ annsΓ A so M) (in custom judg)
 
 with wf_typ_ann {P : PtsSig} : gctx P -> gctx_anns P -> ctx P -> ctx_anns P -> typ P -> typ_ann P -> Prop :=
