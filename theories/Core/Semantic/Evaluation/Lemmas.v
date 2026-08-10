@@ -2,6 +2,7 @@ From Coq Require Import Lia PeanoNat Relations Logic.
 
 From McPTS Require Import PtsSignature LibTactics.
 From McPTS.Core Require Import Base.
+From McPTS.Core.Syntactic Require Import System.
 From McPTS.Core.Semantic.Evaluation Require Import Definitions.
 Import Domain_Notations.
 
@@ -18,36 +19,43 @@ Section functional_eval.
   Qed.
 
   Lemma functional_eval {P : PtsSig} :
-    (forall (M : exp P) ρ m1,
-        {{ ⟦ M ⟧ ρ ↘ m1 }} ->
+    (forall (Δ : gctx P) M ρ m1,
+        {{ ⟦ M ⟧ (Δ ; ρ) ↘ m1 }} ->
         forall m2,
-          {{ ⟦ M ⟧ ρ ↘ m2 }} ->
+          {{ ⟦ M ⟧ (Δ ; ρ) ↘ m2 }} ->
           m1 = m2) /\
       (forall (m : domain P) n e1,
           {{ $| m & n |↘ e1 }} ->
           forall e2,
             {{ $| m & n |↘ e2 }} ->
             e1 = e2) /\
-      (forall (A : exp P) MZ MS m ρ e1,
-          {{ rec m ⟦return A | zero -> MZ | succ -> MS end⟧ ρ ↘ e1 }} ->
+      (forall (A : exp P) MZ MS m Δ ρ e1,
+          {{ rec m ⟦return A | zero -> MZ | succ -> MS end⟧ (Δ ; ρ) ↘ e1 }} ->
           forall e2,
-            {{ rec m ⟦return A | zero -> MZ | succ -> MS end⟧ ρ ↘ e2 }} ->
+            {{ rec m ⟦return A | zero -> MZ | succ -> MS end⟧ (Δ ; ρ) ↘ e2 }} ->
             e1 = e2) /\
-      (forall (σ : sub P) ρ ρσ1,
-          {{ ⟦ σ ⟧s ρ ↘ ρσ1 }} ->
+      (forall (Δ : gctx P) σ ρ ρσ1,
+          {{ ⟦ σ ⟧s (Δ ; ρ) ↘ ρσ1 }} ->
           forall ρσ2,
-            {{ ⟦ σ ⟧s ρ ↘ ρσ2 }} ->
+            {{ ⟦ σ ⟧s (Δ ; ρ) ↘ ρσ2 }} ->
             ρσ1 = ρσ2).
   Proof with ((on_all_hyp: fun H => erewrite H in *; eauto); solve [eauto]) using.
     apply eval_mut_ind; intros.
 
-    1,5-9,10,13-19: progressive_inversion; do 2 f_equal; try reflexivity...
+    1,6-10,11,14-20: progressive_inversion; do 2 f_equal; try reflexivity...
+    
+    (* 1,5-9,10,13-19: progressive_inversion; do 2 f_equal; try reflexivity... *)
 
     - progressive_inversion.
       eapply env_lookup_functional; mauto 2.
-
+    - progressive_inversion.
+      assert (A = A0) by (eapply functional_gctx_lookup; mauto 2).
+      subst.
+      assert (a = a0) by mauto 2.
+      congruence.
+      
     (** 'progressive_inversion' does not work well with functions because of the rule annotations
-        use 'progressive_invert' on the relevant assumption instead *)
+        use 'progressive_invert' on the relevant assumption instead *)      
     - progressive_invert H0.
       assert (a = a0) by mauto.
       congruence.
@@ -61,9 +69,9 @@ Section functional_eval.
       mauto.
   Qed.
 
-  Corollary functional_eval_exp {P : PtsSig} : forall (M : exp P) ρ m1 m2,
-      {{ ⟦ M ⟧ ρ ↘ m1 }} ->
-      {{ ⟦ M ⟧ ρ ↘ m2 }} ->
+  Corollary functional_eval_exp {P : PtsSig} : forall (M : exp P) Δ ρ m1 m2,
+      {{ ⟦ M ⟧ (Δ ; ρ) ↘ m1 }} ->
+      {{ ⟦ M ⟧ (Δ ; ρ) ↘ m2 }} ->
       m1 = m2.
   Proof.
     pose proof @functional_eval P; firstorder.
@@ -78,17 +86,17 @@ Section functional_eval.
     eapply H; mauto 2.
   Qed.
 
-  Corollary functional_eval_natrec {P : PtsSig} : forall (A : exp P) MZ MS m ρ e1 e2,
-      {{ rec m ⟦return A | zero -> MZ | succ -> MS end⟧ ρ ↘ e1 }} ->
-      {{ rec m ⟦return A | zero -> MZ | succ -> MS end⟧ ρ ↘ e2 }} ->
+  Corollary functional_eval_natrec {P : PtsSig} : forall (A : exp P) MZ MS m Δ ρ e1 e2,
+      {{ rec m ⟦return A | zero -> MZ | succ -> MS end⟧ (Δ ; ρ) ↘ e1 }} ->
+      {{ rec m ⟦return A | zero -> MZ | succ -> MS end⟧ (Δ ; ρ) ↘ e2 }} ->
       e1 = e2.
   Proof.
     pose proof @functional_eval P; intuition.
   Qed.
 
-  Corollary functional_eval_sub {P : PtsSig} : forall (σ : sub P) ρ ρσ1 ρσ2,
-      {{ ⟦ σ ⟧s ρ ↘ ρσ1 }} ->
-      {{ ⟦ σ ⟧s ρ ↘ ρσ2 }} ->
+  Corollary functional_eval_sub {P : PtsSig} : forall (σ : sub P) Δ ρ ρσ1 ρσ2,
+      {{ ⟦ σ ⟧s (Δ ; ρ) ↘ ρσ1 }} ->
+      {{ ⟦ σ ⟧s (Δ ; ρ) ↘ ρσ2 }} ->
       ρσ1 = ρσ2.
   Proof.
     pose proof @functional_eval P; firstorder.
@@ -104,17 +112,17 @@ Ltac functional_eval_rewrite_clear1 :=
   | H1 : {{ #| ^?ρ[?n] |↘ ^?m1 }},
       H2 : {{ #| ^?ρ[?n] |↘ ^?m2 }} |- _ =>
       clean replace m2 with m1 by first [solve [mauto 2] | tactic_error m2 m1]; clear H2
-  | H1 : {{ ⟦ ^?M ⟧ ^?ρ ↘ ^?m1 }},
-      H2 : {{ ⟦ ^?M ⟧ ^?ρ ↘ ^?m2 }} |- _ =>
+  | H1 : {{ ⟦ ^?M ⟧ (^?Δ ; ^?ρ) ↘ ^?m1 }},
+      H2 : {{ ⟦ ^?M ⟧ (^?Δ ; ^?ρ) ↘ ^?m2 }} |- _ =>
       clean replace m2 with m1 by first [solve [mauto 2] | tactic_error m2 m1]; clear H2
   | H1 : {{ $| ^?m & ^?n |↘ ^?e1 }},
       H2 : {{ $| ^?m & ^?n |↘ ^?e2 }} |- _ =>
       clean replace e2 with e1 by first [solve [mauto 2] | tactic_error e2 e1]; clear H2
-  | H1 : {{ rec ^?m ⟦return ^?A | zero -> ^?MZ | succ -> ^?MS end⟧ ^?ρ ↘ ^?e1 }},
-      H2 : {{ rec ^?m ⟦return ^?A | zero -> ^?MZ | succ -> ^?MS end⟧ ^?ρ ↘ ^?e2 }} |- _ =>
+  | H1 : {{ rec ^?m ⟦return ^?A | zero -> ^?MZ | succ -> ^?MS end⟧ (^?Δ ; ^?ρ) ↘ ^?e1 }},
+      H2 : {{ rec ^?m ⟦return ^?A | zero -> ^?MZ | succ -> ^?MS end⟧ (^?Δ ; ^?ρ) ↘ ^?e2 }} |- _ =>
       clean replace e2 with e1 by first [solve [mauto 2] | tactic_error e2 e1]; clear H2
-  | H1 : {{ ⟦ ^?σ ⟧s ^?ρ ↘ ^?ρσ1 }},
-      H2 : {{ ⟦ ^?σ ⟧s ^?ρ ↘ ^?ρσ2 }} |- _ =>
+  | H1 : {{ ⟦ ^?σ ⟧s (^?Δ ; ^?ρ) ↘ ^?ρσ1 }},
+      H2 : {{ ⟦ ^?σ ⟧s (^?Δ ; ^?ρ) ↘ ^?ρσ2 }} |- _ =>
       clean replace ρσ2 with ρσ1 by first [solve [mauto 2] | tactic_error ρσ2 ρσ1]; clear H2
   end.
 Ltac functional_eval_rewrite_clear := repeat functional_eval_rewrite_clear1.

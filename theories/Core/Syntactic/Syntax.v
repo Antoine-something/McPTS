@@ -256,6 +256,6 @@ Module Syntax_Notations.
   Notation "'λ' r A B e" := (nf_fn r A B e) (in custom nf at level 2, r constr at level 0, A custom nf at level 1, B custom nf at level 1, e custom nf at level 60) : mcpts_scope.
   Notation "f x .. y" := (ne_app .. (ne_app f x) .. y) (in custom nf at level 40, f custom nf, x custom nf at next level, y custom nf at next level) : mcpts_scope.
   Notation "'#' n" := (ne_var n) (in custom nf at level 0, n constr at level 0, format "'#' n") : mcpts_scope.
-  Notation "'`#' x" := (ne_gvar x) (in custom exp at level 0, x constr at level 0, format "'`#' x") : mcpts_scope.
+  Notation "'`#' x" := (ne_gvar x) (in custom nf at level 0, x constr at level 0, format "'`#' x") : mcpts_scope.
   Notation "'⇑' M" := (nf_neut M) (in custom nf at level 0, M custom nf at level 99, format "'⇑'  M") : mcpts_scope.
 End Syntax_Notations.

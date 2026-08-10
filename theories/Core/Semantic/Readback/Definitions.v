@@ -20,11 +20,11 @@ Inductive read_nf {P : PtsSig} : nat -> domain_nf P -> nf P -> Prop :=
         {{ Rtyp a in i ↘ A }} ->
         (** Normal form of eta-expanded body *)
         {{ $| m & ⇑! a i |↘ m' }} ->
-        {{ ⟦ B ⟧ ρ ↦ ⇑! a i ↘ b }} ->
+        {{ ⟦ B ⟧ (Δ ; ρ ↦ ⇑! a i) ↘ b }} ->
         {{ Rtyp b in S i ↘ B' }} ->
         {{ Rnf ⇓ b m' in S i ↘ M }} ->
         (** Normal form of the whole function *)
-        {{ Rnf ⇓ (Π r a ρ B) m in i ↘ λ r A B' M }} )
+        {{ Rnf ⇓ (Π r a (Δ ; ρ) B) m in i ↘ λ r A B' M }} )
 | read_nf_zero :
   `( {{ Rnf ⇓ ℕ zero in i ↘ zero }} )
 | read_nf_succ :
@@ -40,24 +40,26 @@ where "'Rnf' m 'in' i ↘ M" := (read_nf i m M) (in custom judg) : type_scope
 with read_ne {P : PtsSig} : nat -> domain_ne P -> ne P -> Prop :=
 | read_ne_var :
   `( {{ Rne !x in i ↘ #(i - x - 1) }} )
+| read_ne_gvar :
+  `( {{ Rne `!x in i ↘ `#x }} )
 | read_ne_app :
   `( {{ Rne m in i ↘ M }} ->
      {{ Rnf n in i ↘ N }} ->
      {{ Rne m n in i ↘ M N }} )
 | read_ne_natrec :
   `( (** Normal form of motive *)
-     {{ ⟦ B ⟧ ρ ↦ ⇑! ℕ i ↘ b }} ->
+     {{ ⟦ B ⟧ (Δ ; ρ ↦ ⇑! ℕ i) ↘ b }} ->
      {{ Rtyp b in S i ↘ B' }} ->
      (** Normal form of mz *)
-     {{ ⟦ B ⟧ ρ ↦ zero ↘ bz }} ->
+     {{ ⟦ B ⟧ (Δ ; ρ ↦ zero) ↘ bz }} ->
      {{ Rnf ⇓ bz mz in i ↘ MZ }} ->
      (** Normal form of MS *)
-     {{ ⟦ B ⟧ ρ ↦ succ (⇑! ℕ i) ↘ bs }} ->
-     {{ ⟦ MS ⟧ (ρ ↦ ⇑! ℕ i) ↦ ⇑! b (S i) ↘ ms }} ->
+     {{ ⟦ B ⟧ (Δ ; ρ ↦ succ (⇑! ℕ i)) ↘ bs }} ->
+     {{ ⟦ MS ⟧ (Δ ; (ρ ↦ ⇑! ℕ i) ↦ ⇑! b (S i)) ↘ ms }} ->
      {{ Rnf ⇓ bs ms in S (S i) ↘ MS' }} ->
      (** Neutral form of m *)
      {{ Rne m in i ↘ M }} ->
-     {{ Rne rec m under ρ return B | zero -> mz | succ -> MS end in i ↘ rec M return B' | zero -> MZ | succ -> MS' end }} )
+     {{ Rne rec m under (Δ ; ρ) return B | zero -> mz | succ -> MS end in i ↘ rec M return B' | zero -> MZ | succ -> MS' end }} )
 where "'Rne' m 'in' i ↘ M" := (read_ne i m M) (in custom judg) : type_scope
 with read_typ {P : PtsSig} : nat -> domain P -> nf P -> Prop :=
 | read_typ_univ :
@@ -67,10 +69,10 @@ with read_typ {P : PtsSig} : nat -> domain P -> nf P -> Prop :=
         (** Normal form of arg type *)
         {{ Rtyp a in i ↘ A }} ->
         (** Normal form of ret type *)
-        {{ ⟦ B ⟧ ρ ↦ ⇑! a i ↘ b }} ->
+        {{ ⟦ B ⟧ (Δ ; ρ ↦ ⇑! a i) ↘ b }} ->
         {{ Rtyp b in S i ↘ B' }} ->
         (** Normal form of the whole function space *)
-        {{ Rtyp Π r a ρ B in i ↘ Π r A B' }})
+        {{ Rtyp Π r a (Δ ; ρ) B in i ↘ Π r A B' }})
 | read_typ_nat :
   `( {{ Rtyp ℕ in i ↘ ℕ }} )
 | read_typ_neut :
