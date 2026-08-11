@@ -10,6 +10,9 @@ Record DecidableSig (P : PtsSig) : Type :=
       dec_ru_pi : forall (s1 s2 : P), ({s3 & Ru_pi P s1 s2 s3} + {forall s3, Ru_pi P s1 s2 s3 -> False})%type;
       dec_ru_pi_eq : forall (s1 s2 s3 : P) (r : Ru_pi P s1 s2 s3) (r' : Ru_pi P s1 s2 s3),
         ( { r = r'} + {r <> r'} )%type;
+      dec_ru_sigma : forall (s1 s2 : P), ({s3 & Ru_sigma P s1 s2 s3} + {forall s3, Ru_sigma P s1 s2 s3 -> False})%type;
+      dec_ru_sigma_eq : forall (s1 s2 s3 : P) (r : Ru_sigma P s1 s2 s3) (r' : Ru_sigma P s1 s2 s3),
+        ( { r = r'} + {r <> r'} )%type;
       dec_ru_nat : ({s & Ru_nat P s} + {forall s, Ru_nat P s -> False})%type;
     }.
 Arguments dec_st_eq {_}.
@@ -17,6 +20,8 @@ Arguments dec_ax_typ {_}.
 Arguments dec_st_sub {_}.
 Arguments dec_ru_pi {_}.
 Arguments dec_ru_pi_eq {_}.
+Arguments dec_ru_sigma {_}.
+Arguments dec_ru_sigma_eq {_}.
 Arguments dec_ru_nat {_}.
 
 
@@ -44,5 +49,28 @@ Section DecidableProperties.
       subst.
       eapply n.
       reflexivity.
-  Qed.    
+  Qed.
+
+  Definition strong_ru_sigma_eq (s1 s1' s2 s2' s3 s3' : P) (r : Ru_sigma P s1 s2 s3) (r' : Ru_sigma P s1' s2' s3') :=
+      (s1 = s1') /\ (s2 = s2') /\ (s3 = s3') /\ (r ~= r').
+    
+  Lemma strong_dec_sigma : forall (s1 s1' s2 s2' s3 s3' : P) (r : Ru_sigma P s1 s2 s3) (r' : Ru_sigma P s1' s2' s3'),
+      ({ strong_ru_sigma_eq s1 s1' s2 s2' s3 s3' r r' } + {~ strong_ru_sigma_eq s1 s1' s2 s2' s3 s3' r r'})%type.
+    intros.
+    unfold strong_ru_sigma_eq.
+    destruct (dec_st_eq dec_P s1 s1'); [| right; intuition].
+    destruct (dec_st_eq dec_P s2 s2'); [| right; intuition].
+    destruct (dec_st_eq dec_P s3 s3'); [| right; intuition].
+    subst.
+    destruct (dec_ru_sigma_eq dec_P s1' s2' s3' r r').
+    - left.
+      repeat split.
+      subst.
+      reflexivity.
+    - right.
+      intros [? [? []]].
+      subst.
+      eapply n.
+      reflexivity.
+  Qed. 
 End DecidableProperties.

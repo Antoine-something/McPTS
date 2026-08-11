@@ -69,6 +69,32 @@ with wf_exp {P : PtsSig} : ctx P -> typ P -> exp P -> Prop :=
         {{ Γ ⊢ N : A }} ->
         {{ Γ ⊢ M N : B[Id,,N] }} )
 
+(** Sigmas *)
+| wf_sigma :
+  `( forall (r : Ru_sigma P s1 s2 s3),
+      {{ Γ ⊢ A : Sort@s1 }} ->
+      {{ Γ, A ⊢ B : Sort@s2 }} ->
+      {{ Γ ⊢ Σ r A B : Sort@s3 }} )
+| wf_pair :
+  `( forall (r : Ru_sigma P s1 s2 s3),
+        {{ Γ ⊢ A : Sort@s1 }} ->
+        {{ Γ, A ⊢ B : Sort@s2 }} ->
+        {{ Γ ⊢ M : A }} ->
+        {{ Γ ⊢ N : B[Id,,M] }} ->
+        {{ Γ ⊢ ⟨r; M : A; N : B ⟩ : Σ r A B }} )
+| wf_fst :
+  `(  forall (r : Ru_sigma P s1 s2 s3),
+        {{ Γ ⊢ A : Sort@s1 }} ->
+        {{ Γ, A ⊢ B : Sort@s2 }} ->
+        {{ Γ ⊢ M : Σ r A B }} ->
+        {{ Γ ⊢ fst M : A }} )
+| wf_snd :
+  `(  forall (r : Ru_sigma P s1 s2 s3),
+        {{ Γ ⊢ A : Sort@s1 }} ->
+        {{ Γ, A ⊢ B : Sort@s2 }} ->
+        {{ Γ ⊢ M : Σ r A B }} ->
+        {{ Γ ⊢ snd M : B[Id,,fst M] }} )
+
 | wf_vlookup :
   `( {{ ⊢ Γ }} ->
      (** This premise is redundant, but helpful for soundness *)
@@ -212,6 +238,83 @@ with wf_exp_eq {P : PtsSig} : ctx P -> typ P -> exp P -> exp P -> Prop :=
         {{ Γ, A ⊢ B : Sort@s2 }} ->
         {{ Γ ⊢ M : Π r A B }} ->
         {{ Γ ⊢ M ≈ λ r A B (M[Wk] #0) : Π r A B }} )
+
+(** Sigmas *)
+| wf_exp_eq_sigma_sub :
+  `( forall (r : Ru_sigma P s1 s2 s3),
+        {{ Γ ⊢s σ : Δ }} ->
+        {{ Δ ⊢ A : Sort@s1 }} ->
+        {{ Δ, A ⊢ B : Sort@s2 }} ->
+        {{ Γ ⊢ (Σ r A B)[σ] ≈ Σ r A[σ] B[q σ] : Sort@s3 }} )
+| wf_exp_eq_sigma_cong :
+  `( forall (r : Ru_sigma P s1 s2 s3),
+        {{ Γ ⊢ A : Sort@s1 }} ->
+        {{ Γ ⊢ A ≈ A' : Sort@s1 }} ->
+        {{ Γ, A ⊢ B ≈ B' : Sort@s2 }} ->
+        {{ Γ ⊢ Σ r A B ≈ Σ r A' B' : Sort@s3 }} )
+| wf_exp_eq_pair_cong :
+  `( forall (r : Ru_sigma P s1 s2 s3),
+        {{ Γ ⊢ A : Sort@s1 }} ->
+        {{ Γ ⊢ A ≈ A' : Sort@s1 }} ->
+        {{ Γ, A ⊢ B : Sort@s2 }} ->
+        {{ Γ, A ⊢ B ≈ B' : Sort@s2 }} ->
+        {{ Γ ⊢ M ≈ M' : A }} ->
+        {{ Γ ⊢ N ≈ N' : B[Id,,M] }} ->
+        {{ Γ ⊢  ⟨r; M : A; N : B ⟩ ≈ ⟨r; M' : A'; N' : B' ⟩ : Σ r A B }} ) 
+| wf_exp_eq_pair_sub :
+  `( forall (r : Ru_sigma P s1 s2 s3),
+        {{ Γ ⊢s σ : Δ }} ->
+        {{ Δ ⊢ A : Sort@s1 }} ->
+        {{ Δ, A ⊢ B : Sort@s2 }} ->
+        {{ Δ ⊢ M : A }} ->
+        {{ Δ ⊢ N : B[Id,,M] }} ->
+        {{ Γ ⊢ (⟨r; M : A; N : B ⟩)[σ] ≈ ⟨r; M[σ] : A[σ]; N[σ] : B[q σ] ⟩ : (Σ r A B)[σ] }} )
+| wf_exp_eq_fst_cong :
+  `( forall (r : Ru_sigma P s1 s2 s3),
+        {{ Γ ⊢ A : Sort@s1 }} ->
+        {{ Γ, A ⊢ B : Sort@s2 }} ->
+        {{ Γ ⊢ M ≈ M' : Σ r A B }} ->
+        {{ Γ ⊢ fst M ≈ fst M' : A }} )
+| wf_exp_eq_fst_sub :
+  `( forall (r : Ru_sigma P s1 s2 s3),
+        {{ Γ ⊢s σ : Δ }} ->
+        {{ Δ ⊢ A : Sort@s1 }} ->
+        {{ Δ, A ⊢ B : Sort@s2 }} ->
+        {{ Δ ⊢ M : Σ r A B }} ->
+        {{ Γ ⊢ (fst M)[σ] ≈ fst M[σ] : A[σ] }} )
+| wf_exp_eq_snd_cong :
+  `( forall (r : Ru_sigma P s1 s2 s3),
+        {{ Γ ⊢ A : Sort@s1 }} ->
+        {{ Γ, A ⊢ B : Sort@s2 }} ->
+        {{ Γ ⊢ M ≈ M' : Σ r A B }} ->
+        {{ Γ ⊢ snd M ≈ snd M' : B[Id,,fst M] }} )
+| wf_exp_eq_snd_sub :
+  `( forall (r : Ru_sigma P s1 s2 s3),
+        {{ Γ ⊢s σ : Δ }} ->
+        {{ Δ ⊢ A : Sort@s1 }} ->
+        {{ Δ, A ⊢ B : Sort@s2 }} ->
+        {{ Δ ⊢ M : Σ r A B }} ->
+        {{ Γ ⊢ (snd M)[σ] ≈ snd M[σ] : B[σ,,fst M[σ]] }} )
+| wf_exp_eq_sigma_beta_fst :
+  `( forall (r : Ru_sigma P s1 s2 s3),
+        {{ Γ ⊢ A : Sort@s1 }} ->
+        {{ Γ, A ⊢ B : Sort@s2 }} ->
+        {{ Γ ⊢ M : A }} ->
+        {{ Γ ⊢ N : B[Id,,M] }} ->
+        {{ Γ ⊢ fst ⟨r; M : A; N : B ⟩ ≈ M : A }} )
+| wf_exp_eq_sigma_beta_snd :
+  `( forall (r : Ru_sigma P s1 s2 s3),
+        {{ Γ ⊢ A : Sort@s1 }} ->
+        {{ Γ, A ⊢ B : Sort@s2 }} ->
+        {{ Γ ⊢ M : A }} ->
+        {{ Γ ⊢ N : B[Id,,M] }} ->
+        {{ Γ ⊢ snd ⟨r; M : A; N : B ⟩ ≈ N : B[Id,,M] }} )         
+| wf_exp_eq_sigma_eta :
+  `( forall (r : Ru_sigma P s1 s2 s3),
+        {{ Γ ⊢ A : Sort@s1 }} ->
+        {{ Γ, A ⊢ B : Sort@s2 }} ->
+        {{ Γ ⊢ M : Σ r A B }} ->
+        {{ Γ ⊢ M ≈ ⟨r; fst M : A; snd M : B ⟩ : Σ r A B }} )
 
 (** Naturals **)
 | wf_exp_eq_nat_sub :
@@ -387,6 +490,15 @@ with wf_subtyp {P : PtsSig} : ctx P -> typ P -> typ P -> Prop :=
         {{ Γ, A' ⊢ B' : Sort@s2 }} ->
         {{ Γ, A' ⊢ B ⊆ B' }} ->
         {{ Γ ⊢ Π r A B ⊆ Π r A' B' }} )
+| wf_subtyp_sigma :
+  `( forall {r : Ru_sigma P s1 s2 s3},
+        {{ Γ ⊢ A : Sort@s1 }} ->
+        {{ Γ ⊢ A' : Sort@s1 }} ->
+        {{ Γ ⊢ A ≈ A' : Sort@s1 }} ->
+        {{ Γ, A ⊢ B : Sort@s2 }} ->
+        {{ Γ, A' ⊢ B' : Sort@s2 }} ->
+        {{ Γ, A' ⊢ B ⊆ B' }} ->
+        {{ Γ ⊢ Σ r A B ⊆ Σ r A' B' }} )
 where "Γ ⊢ A ⊆ A'" := (wf_subtyp Γ A A') (in custom judg) : type_scope
 
 (** Unsorted judgments for types *)

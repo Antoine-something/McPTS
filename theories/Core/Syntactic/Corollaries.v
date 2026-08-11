@@ -45,6 +45,8 @@ Proof.
   intros.
   inversion_clear H;
     gen_presups.
+  - assert {{ Γ ⊢ A[Id] ≈ A }} by mauto 4.
+    mauto 3.
   - inversion H2.
   - assert {{ Γ ⊢ A }} by mauto 3.
     assert {{ Γ ⊢ A[Id] ≈ A }} by mauto 3.
@@ -149,6 +151,12 @@ Proof.
     transitivity {{{ Π r (A[σ]) (B[q σ]) }}}; mauto 4.
     transitivity {{{ Π r (A'[σ']) (B'[q σ']) }}}; [| econstructor; mauto 4].
     eapply wf_subtyp_pi; mauto 4.
+  - assert {{ Γ0 ⊢ A'[σ] ≈ A'[σ'] : Sort@s1 }} by mauto 2.
+    assert {{ Γ0, A[σ] ⊢s q σ : Γ, A }} by mauto 3.
+    assert {{ Γ0, A'[σ'] ⊢s q σ ≈ q σ' : Γ, A' }} by mauto 5.
+    transitivity {{{ Σ r (A[σ]) (B[q σ]) }}}; mauto 4.
+    transitivity {{{ Σ r (A'[σ']) (B'[q σ']) }}}; [| econstructor; mauto 4].
+    eapply wf_subtyp_sigma; mauto 4.
 Qed.
 
 Lemma wf_subtyp_subst {P : PtsSig} : forall (Δ : ctx P) A B,
@@ -450,6 +458,32 @@ Proof.
 Qed.
 #[export]
 Hint Resolve exp_pi_eta_rhs_body : mcpts.
+
+Lemma exp_sigma_sub_lhs {P : PtsSig} : forall {Γ : ctx P} {σ Δ A B s1 s2 s3} {r : Ru_sigma P s1 s2 s3},
+    {{ Γ ⊢s σ : Δ }} ->
+    {{ Δ ⊢ A : Sort@s1 }} ->
+    {{ Δ, A ⊢ B : Sort@s2 }} ->
+    {{ Γ ⊢ (Σ r A B)[σ] : Sort@s3 }}.
+Proof.
+  intros.
+  mauto 4.
+Qed.
+
+#[export]
+Hint Resolve exp_sigma_sub_lhs : mcpts.
+
+Lemma exp_sigma_sub_rhs {P : PtsSig} : forall {Γ : ctx P} {σ Δ A B s1 s2 s3} {r : Ru_sigma P s1 s2 s3},
+    {{ Γ ⊢s σ : Δ }} ->
+    {{ Δ ⊢ A : Sort@s1 }} ->
+    {{ Δ, A ⊢ B : Sort@s2 }} ->
+    {{ Γ ⊢ Σ r A[σ] B[q σ] : Sort@s3 }}.
+Proof.
+  intros.
+  econstructor; mauto 4.
+Qed.
+
+#[export]
+Hint Resolve exp_sigma_sub_rhs : mcpts.
 
 (** This works for both var_0 and var_S cases *)
 Lemma exp_eq_var_sub_rhs_typ_gen {P : PtsSig} : forall {Γ : ctx P} {σ Δ A M},

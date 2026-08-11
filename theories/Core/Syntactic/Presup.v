@@ -167,7 +167,217 @@ Proof.
   eapply wf_conv; mauto 4.
 Qed.
 #[local]
-Hint Resolve presup_exp_eq_pi_eta_right : mcpts.
+  Hint Resolve presup_exp_eq_pi_eta_right : mcpts.
+
+Lemma presup_exp_eq_pair_cong_right {P : PtsSig} : forall {Γ : ctx P} {s1 A A' s2 B B' M M' N' s3} (r : Ru_sigma P s1 s2 s3),
+    {{ ⊢ Γ }} ->
+    {{ Γ ⊢ A : Sort@s1 }} ->
+    {{ Γ ⊢ A' : Sort@s1 }} ->
+    {{ Γ ⊢ A ≈ A' : Sort@s1 }} ->
+    {{ ⊢ Γ, A }} ->
+    {{ Γ, A ⊢ B : Sort@s2 }} ->
+    {{ Γ, A ⊢ B' : Sort@s2 }} ->
+    {{ Γ, A ⊢ B ≈ B' : Sort@s2 }} ->
+    {{ Γ ⊢ M : A }} ->
+    {{ Γ ⊢ M' : A }} ->
+    {{ Γ ⊢ M ≈ M' : A }} ->
+    {{ Γ ⊢ N' : B[Id,,M] }} ->
+    {{ Γ ⊢ ⟨r; M' : A'; N' : B'⟩ : Σ r A B }}.
+Proof.
+  intros.
+  assert {{ Γ ⊢ Σ r A B ≈ Σ r A' B' : Sort@s3 }} by mauto 3.
+  assert {{ ⊢ Γ, A ≈ Γ, A' }} by (econstructor; mauto 3).
+  assert {{ Γ, A' ⊢ B' : Sort@s2 }} by mauto 3.
+  assert {{ Γ ⊢s Id,,M : Γ, A }} by mauto 3.
+  assert {{ Γ ⊢s Id,,M' : Γ, A }} by mauto 3.
+  assert {{ Γ ⊢s Id,,M ≈ Id,,M' : Γ, A }} by mauto 3.
+  assert {{ Γ ⊢ B[Id,,M] }} by mauto 3.
+  assert {{ Γ ⊢ B[Id,,M] ≈ B[Id,,M'] }} by mauto 3.
+  assert {{ Γ ⊢ N' : B[Id,,M'] }} by mauto 4.
+  assert {{ Γ ⊢ B'[Id,,M'] }} by mauto 3.
+  assert {{ Γ ⊢ B[Id,,M'] ≈ B'[Id,,M'] }} by mauto 3.
+  assert {{ Γ ⊢ N' : B'[Id,,M'] }} by mauto 3.
+  assert {{ Γ ⊢ Σ r A B : Sort@s3 }} by mauto 2.
+  assert {{ Γ ⊢ Σ r A' B' : Sort@s3 }} by mauto 2.
+  enough {{ Γ ⊢ ⟨r; M' : A'; N' : B'⟩ : Σ r A' B' }}; mauto 3.
+Qed.
+#[local]
+Hint Resolve presup_exp_eq_pair_cong_right : mcpts.
+
+Lemma presup_exp_eq_pair_sub_right {P : PtsSig} : forall {Γ : ctx P} {σ Δ s1 A s2 B M N s3} {r : Ru_sigma P s1 s2 s3},
+    {{ ⊢ Γ }} ->
+    {{ ⊢ Δ }} ->
+    {{ Γ ⊢s σ : Δ }} ->
+    {{ Δ ⊢ A : Sort@s1 }} ->
+    {{ ⊢ Δ, A }} ->
+    {{ Δ, A ⊢ B : Sort@s2 }} ->
+    {{ Δ ⊢ M : A }} ->
+    {{ Δ ⊢ N : B[Id,,M] }} ->
+    {{ Γ ⊢ ⟨r; M[σ] : A[σ]; N[σ] : B[q σ]⟩ : (Σ r A B)[σ] }}.
+Proof.
+  intros.
+  assert {{ Γ ⊢ A[σ] : Sort@s1 }} by mauto 2.
+  assert {{ Γ, A[σ] ⊢ B[q σ] : Sort@s2 }} by mauto 4.
+  assert {{ Γ ⊢ Σ r A[σ] B[q σ] : Sort@s3 }} by mauto 2.
+  assert {{ Γ ⊢ Σ r A[σ] B[q σ] ≈ Σ r A[σ] B[q σ] : Sort@s3 }} by mauto 2.
+  assert {{ Γ ⊢ M[σ] : A[σ] }} by mauto 5.
+  assert {{ Δ ⊢ B[Id,,M] : Sort@s2 }} by mauto 4.
+  assert {{ Γ ⊢ N[σ] : B[Id,,M][σ] }} by mauto 4.
+  assert {{ Γ ⊢ B[Id,,M][σ] : Sort@s2 }} by mauto 2.
+  assert {{ Γ ⊢ B[Id,,M][σ] ≈ B[(Id,,M)∘σ]: Sort@s2 }} by mauto 4.
+  assert {{ Γ ⊢s (Id,,M)∘σ ≈ σ,,M[σ] : Δ, A }} by mauto 3.
+  assert {{ Γ ⊢ N[σ] : B[(Id,,M)∘σ] }} by (eapply wf_conv_sorted; mauto 5).
+  assert {{ Γ ⊢ N[σ] : B[σ,,M[σ]] }} by (eapply wf_conv_sorted; mauto 5).
+  assert {{ Γ ⊢s q σ∘(Id,,M[σ]) ≈ σ,,M[σ] : Δ, A }} by mauto 3.
+  assert {{ Γ ⊢s Id,,M[σ] : Γ, A[σ] }} by mauto 3.
+  assert {{ Γ ⊢s q σ∘(Id,,M[σ]) : Δ, A }} by mauto 4.
+  assert {{ Γ ⊢ B[q σ∘(Id,,M[σ])] ≈ B[σ,,M[σ]] : Sort@s2 }} by mauto 3.
+  assert {{ Γ ⊢ B[q σ][Id,,M[σ]] : Sort@s2 }} by mauto 2.
+  assert {{ Γ ⊢ B[q σ][Id,,M[σ]] ≈ B[q σ∘(Id,,M[σ])] : Sort@s2 }} by (symmetry; mauto).
+  assert {{ Γ ⊢ B[q σ][Id,,M[σ]] ≈ B[σ,,M[σ]] : Sort@s2 }} by mauto 3.
+  assert {{ Γ ⊢ N[σ] : B[q σ][Id,,M[σ]] }} by (eapply wf_conv_sorted; mauto 4).
+  assert {{ Γ ⊢ ⟨r; M[σ] : A[σ]; N[σ] : B[q σ]⟩ : Σ r A[σ] B[q σ] }} by mauto 3.
+  eapply wf_conv_sorted; mauto 3.
+Qed.
+
+#[local]
+  Hint Resolve presup_exp_eq_pair_sub_right : mcpts.
+
+Lemma presup_exp_eq_fst_sub_right {P : PtsSig} : forall {Γ : ctx P} {σ Δ s1 A B M s2 s3} {r : Ru_sigma P s1 s2 s3},
+    {{ ⊢ Γ }} ->
+    {{ ⊢ Δ }} ->
+    {{ Γ ⊢s σ : Δ }} ->
+    {{ Δ ⊢ A : Sort@s1 }} ->
+    {{ ⊢ Δ, A }} ->
+    {{ Δ, A ⊢ B : Sort@s2 }} ->
+    {{ Δ ⊢ M : Σ r A B }} ->
+    {{ Γ ⊢ fst M[σ] : A[σ] }}.
+Proof.
+  intros.
+  assert {{ Γ ⊢ A[σ] : Sort@s1 }} by mauto 2.
+  assert {{ Γ, A[σ] ⊢s q σ : Δ, A }} by mauto 3.
+  assert {{ Γ, A[σ] ⊢ B[q σ] : Sort@s2 }} by mauto 2.
+  assert {{ Γ ⊢ M[σ] : Σ r A[σ] B[q σ] }} by (eapply wf_conv; mauto 4).
+  enough {{ Δ ⊢ fst M : A }} by mauto 2.
+  econstructor; mauto 2.
+Qed.
+#[local]
+  Hint Resolve presup_exp_eq_fst_sub_right : mcpts.
+
+Lemma presup_exp_eq_snd_cong_right {P : PtsSig} : forall {Γ : ctx P} {s1 A B M M' s2 s3} {r : Ru_sigma P s1 s2 s3},
+    {{ ⊢ Γ }} ->
+    {{ Γ ⊢ A : Sort@s1 }} ->
+    {{ ⊢ Γ, A }} ->
+    {{ Γ, A ⊢ B : Sort@s2 }} ->
+    {{ Γ ⊢ M : Σ r A B }} ->
+    {{ Γ ⊢ M' : Σ r A B }} ->
+    {{ Γ ⊢ M ≈ M' : Σ r A B }} ->
+    {{ Γ ⊢ snd M' : B[Id,,fst M] }}.
+Proof.
+  intros.
+  assert {{ Γ ⊢ fst M : A }} by mauto 3.
+  assert {{ Γ ⊢ fst M' : A }} by mauto 3.
+  assert {{ Γ ⊢s Id ≈ Id : Γ }} by mauto 2.
+  assert {{ Γ ⊢ A ≈ A[Id] : Sort@s1 }} by mauto 3.
+  assert {{ Γ ⊢ fst M ≈ fst M' : A[Id] }} by mauto 3.
+  assert {{ Γ ⊢s Id,,fst M ≈ Id,,fst M' : Γ, A }} by mauto 3.
+  assert {{ Γ ⊢ B[Id,,fst M] : Sort@s2 }} by mauto 4.
+  assert {{ Γ ⊢ B[Id,,fst M] ≈ B[Id,,fst M'] : Sort@s2 }} by mauto 4.
+  assert {{ Γ ⊢ B[Id,,fst M] : Sort@s2 }} by mauto 4.
+  eapply wf_conv_sorted; mauto 4.
+Qed.
+
+#[local]
+Hint Resolve presup_exp_eq_snd_cong_right : mcpts.
+
+Lemma presup_exp_eq_snd_sub_left {P : PtsSig} : forall {Γ : ctx P} {σ Δ s1 A B M s2 s3} {r : Ru_sigma P s1 s2 s3},
+    {{ ⊢ Γ }} ->
+    {{ ⊢ Δ }} ->
+    {{ Γ ⊢s σ : Δ }} ->
+    {{ Δ ⊢ A : Sort@s1 }} ->
+    {{ ⊢ Δ, A }} ->
+    {{ Δ, A ⊢ B : Sort@s2 }} ->
+    {{ Δ ⊢ M : Σ r A B }} ->
+    {{ Γ ⊢ (snd M)[σ] : B[σ,,fst M[σ]] }}.
+Proof.
+  intros.
+  assert {{ Δ ⊢ fst M : A }} by mauto 2.
+  assert {{ Γ ⊢ fst M[σ] : A[σ] }} by mauto 3.
+  assert {{ Γ ⊢ (fst M)[σ] ≈ fst M[σ] : A[σ] }} by mauto 3.
+  assert {{ Δ ⊢ snd M : B[Id,,fst M] }} by mauto 2.
+  assert {{ Δ ⊢ B[Id,,fst M] : Sort@s2 }} by mauto 4.
+  assert {{ Γ ⊢ (snd M)[σ] : B[Id,, fst M][σ] }} by mauto 3.
+  
+  assert {{ Δ ⊢ fst M : A[Id] }} by mauto 3.
+  assert {{ Γ ⊢s (Id,,fst M)∘σ ≈ Id∘σ,,(fst M)[σ] : Δ, A }} by mauto 4.
+  assert {{ Γ ⊢s (Id,,fst M)∘σ ≈ σ,,(fst M)[σ] : Δ, A }} by mauto 4.
+  assert {{ Γ ⊢s σ,,fst M[σ] : Δ, A }} by mauto 3. 
+  assert {{ Γ ⊢s σ,,(fst M)[σ] ≈ σ,,fst M[σ] : Δ, A }} by mauto 4.
+  assert {{ Γ ⊢s (Id,,fst M)∘σ ≈ σ,,fst M[σ] : Δ, A }} by mauto 3.
+  assert {{ Δ ⊢s Id,,fst M : Δ, A }} by mauto 4.
+  assert {{ Γ ⊢s (Id,,fst M)∘σ : Δ, A }} by mauto 3.
+  assert {{ Γ ⊢ B[(Id,,fst M)∘σ] ≈ B[σ,,fst M[σ]] : Sort@s2 }} by mauto 3.
+  assert {{ Γ ⊢ B[Id,,fst M][σ] ≈ B[σ,,fst M[σ]] : Sort@s2 }} by mauto 3.
+  assert {{ Γ ⊢ (snd M)[σ] : B[Id,,fst M][σ] }} by mauto 3.
+  eapply wf_conv; mauto 3.
+Qed.
+#[local]
+  Hint Resolve presup_exp_eq_snd_sub_left : mcpts.
+
+Lemma presup_exp_eq_snd_sub_right {P : PtsSig} : forall {Γ : ctx P} {σ Δ s1 A B M s2 s3} {r : Ru_sigma P s1 s2 s3},
+    {{ ⊢ Γ }} ->
+    {{ ⊢ Δ }} ->
+    {{ Γ ⊢s σ : Δ }} ->
+    {{ Δ ⊢ A : Sort@s1 }} ->
+    {{ ⊢ Δ, A }} ->
+    {{ Δ, A ⊢ B : Sort@s2 }} ->
+    {{ Δ ⊢ M : Σ r A B }} ->
+    {{ Γ ⊢ snd M[σ] : B[σ,,fst M[σ]] }}.
+Proof.
+  intros.
+  assert {{ Γ ⊢ A[σ] : Sort@s1 }} by mauto 2.
+  assert {{ Γ, A[σ] ⊢s q σ : Δ, A }} by mauto 3.
+  assert {{ Γ, A[σ] ⊢ B[q σ] : Sort@s2 }} by mauto 2.
+  assert {{ Γ ⊢ M[σ] : Σ r A[σ] B[q σ] }} by (eapply wf_conv; mauto 4).
+  assert {{ Γ ⊢ fst M[σ] : A[σ] }} by mauto 3.
+  assert {{ Γ ⊢ snd M[σ] : B[q σ][Id,,fst M[σ]] }} by mauto 3.
+  
+  assert {{ Γ ⊢s q σ∘(Id,,fst M[σ]) ≈ σ,,fst M[σ] : Δ, A }} by mauto 3.
+  assert {{ Γ ⊢s Id,,fst M[σ] : Γ, A[σ] }} by mauto 3.
+  assert {{ Γ ⊢s q σ∘(Id,,fst M[σ]) : Δ, A }} by mauto 2.
+  assert {{ Γ ⊢ B[q σ∘(Id,,fst M[σ])] ≈ B[σ,,fst M[σ]] : Sort@s2 }} by mauto 3.
+  assert {{ Γ ⊢ B[q σ][Id,,fst M[σ]] : Sort@s2 }} by mauto 2.
+  assert {{ Γ ⊢ B[q σ][Id,,fst M[σ]] ≈ B[q σ∘(Id,,fst M[σ])] : Sort@s2 }} by mauto 3.
+  assert {{ Γ ⊢ B[q σ][Id,,fst M[σ]] ≈ B[σ,,fst M[σ]] : Sort@s2 }} by mauto 3.
+  eapply wf_conv_sorted; mauto 4.
+Qed.
+#[local]
+ Hint Resolve presup_exp_eq_snd_sub_right : mcpts.
+  
+Lemma presup_exp_eq_sigma_beta_snd_left {P : PtsSig} : forall {Γ : ctx P} {s1 A B M N s2 s3} {r : Ru_sigma P s1 s2 s3},
+    {{ ⊢ Γ }} ->
+    {{ Γ ⊢ A : Sort@s1 }} ->
+    {{ ⊢ Γ, A }} ->
+    {{ Γ, A ⊢ B : Sort@s2 }} ->
+    {{ Γ ⊢ M : A }} ->
+    {{ Γ ⊢ N : B[Id,,M] }} ->
+    {{ Γ ⊢ snd ⟨r; M : A; N : B⟩ : B[Id,,M] }}.
+Proof.
+  intros.
+  assert {{ Γ ⊢ ⟨r; M : A; N : B⟩ : Σ r A B }} by mauto 2.
+  assert {{ Γ ⊢ snd ⟨r; M : A; N : B⟩ : B[Id,,fst ⟨r; M : A; N : B⟩] }} by mauto 2.
+  assert {{ Γ ⊢ fst ⟨r; M : A; N : B⟩ : A }} by mauto 2.
+  assert {{ Γ ⊢ fst ⟨r; M : A; N : B⟩ ≈ M : A }} by mauto 2.
+  assert {{ Γ ⊢ ⟨ r; M : A; N : B ⟩ ≈ ⟨ r; M : A; N : B ⟩[Id] : Σ r A B }} by mauto 3.
+  assert {{ Γ ⊢s Id,,fst ⟨ r; M : A; N : B ⟩ : Γ, A }} by mauto 3.
+  assert {{ Γ ⊢s Id,,M : Γ, A }} by mauto 3.
+  assert {{ Γ ⊢s Id,,fst ⟨ r; M : A; N : B ⟩ ≈ Id,,M : Γ, A }} by mauto 3.
+  assert {{ Γ ⊢ B[Id,,M] : Sort@s2 }} by mauto 3.
+  assert {{ Γ ⊢ B[Id,,M] ≈ B[Id,,fst ⟨r; M : A; N : B⟩] }} by mauto 4.  
+  eapply wf_conv; mauto 3.
+Qed.
+#[local]
+Hint Resolve presup_exp_eq_sigma_beta_snd_left : mcpts.
 
 Lemma presup_exp_eq_var_0_sub_left {P : PtsSig} : forall {Γ : ctx P} {σ Δ A M},
     {{ ⊢ Γ }} ->
@@ -257,6 +467,15 @@ Proof.
   - assert {{ Γ ⊢s Id,,N : Γ, A }} by mauto 3.
     assert {{ Γ ⊢ B[Id,,N] : Sort@s2 }} by mauto 2.
     eapply wf_conv with (A := {{{ B[Id,,N][Id] }}}); mauto 4.
+  - assert {{ Γ ⊢ Σ r A B : Sort@s3 }} by mauto 2.
+    mauto 2.
+  - eapply wf_conv with (A := {{{ (Σ r A B)[Id] }}}); mauto 4.
+    econstructor; mauto 3.
+  - econstructor; mauto 4.
+  - assert {{ Γ ⊢ fst M : A }} by mauto 2.
+    assert {{ Γ ⊢s Id,,fst M : Γ, A }} by mauto 3.
+    assert {{ Γ ⊢ B[Id,,fst M] : Sort@s2 }} by mauto 2.
+    eapply wf_conv with (A := {{{ B[Id,,fst M][Id] }}}); mauto 4.
   - eapply wf_conv with (A := {{{ A[Id] }}}); mauto 4.
   - mauto 3.
   - mauto 3.
@@ -481,6 +700,9 @@ Proof with mautosolve 5.
     try (eexists; unshelve solve [mauto 4]; constructor).
 
   all: try (econstructor; mautosolve 4).
+  - econstructor; mauto 3.
+    assert  {{ ⊢ Γ, A0 ≈ Γ, A' }} by (econstructor; mauto 3).
+    mauto 3.
   - econstructor; mauto 3.
     assert  {{ ⊢ Γ, A0 ≈ Γ, A' }} by (econstructor; mauto 3).
     mauto 3.

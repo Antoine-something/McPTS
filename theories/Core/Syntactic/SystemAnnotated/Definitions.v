@@ -54,6 +54,31 @@ with wf_exp_ann {P} : ctx_anns P -> ctx P -> typ P -> SortOption P -> exp P -> P
         {{ Γ with anns ⊫ N : A @ ^(so_Some s1) }} ->
         {{ Γ with anns ⊫ M N : B[Id,,N] @ ^(so_Some s2) }} )
 
+(** Sigmas *)
+| wfa_sigma :
+  `( forall (r : Ru_sigma P s1 s2 s3),
+        {{ Γ with anns ⊫ A : Sort@s1 @ so1 }} ->
+        {{ Γ, A with (so_Some s1)::anns ⊫ B : Sort@s2 @ so2 }} ->
+        {{ Γ with anns ⊫ Σ r A B : Sort@s3 @ ^so_None }} )
+| wfa_pair :
+  `( forall (r : Ru_sigma P s1 s2 s3),
+        {{ Γ with anns ⊫ A : Sort@s1 @ so1 }} ->
+        {{ Γ, A with (so_Some s1)::anns ⊫ B : Sort@s2 @ so2 }} ->
+        {{ Γ with anns ⊫ M : A @ ^(so_Some s1) }} ->
+        {{ Γ with anns ⊫ N : B[Id,,M] @ ^(so_Some s2) }} ->
+        {{ Γ with anns ⊫ ⟨r; M : A; N : B⟩ : Σ r A B @ ^(so_Some s3) }} )
+| wfa_fst :
+  `( forall (r : Ru_sigma P s1 s2 s3),
+        {{ Γ with anns ⊫ A : Sort@s1 @ so1 }} ->
+        {{ Γ, A with (so_Some s1)::anns ⊫ B : Sort@s2 @ so2 }} ->
+        {{ Γ with anns ⊫ M : Σ r A B @ ^(so_Some s3) }} ->
+        {{ Γ with anns ⊫ fst M : A @ ^(so_Some s1) }} )
+| wfa_snd :
+  `( forall (r : Ru_sigma P s1 s2 s3),
+        {{ Γ with anns ⊫ A : Sort@s1 @ so1 }} ->
+        {{ Γ, A with (so_Some s1)::anns ⊫ B : Sort@s2 @ so2 }} ->
+        {{ Γ with anns ⊫ M : Σ r A B @ ^(so_Some s3) }} ->
+        {{ Γ with anns ⊫ snd M : B[Id,,fst M] @ ^(so_Some s2) }} )
 (** Variables *)
 | wfa_vlookup :
   `( {{ ⊫ Γ with anns }} ->

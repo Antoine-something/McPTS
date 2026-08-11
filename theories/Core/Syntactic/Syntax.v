@@ -12,6 +12,11 @@ Inductive exp (P : PtsSig) : Set :=
 | a_pi : forall (s1 s2 s3 : P), Ru_pi P s1 s2 s3 -> exp P -> exp P -> exp P
 | a_fn : forall (s1 s2 s3 : P), Ru_pi P s1 s2 s3 -> exp P -> exp P -> exp P -> exp P
 | a_app : exp P -> exp P -> exp P
+(** Sigma *)
+| a_sigma : forall (s1 s2 s3 : P), Ru_sigma P s1 s2 s3 -> exp P -> exp P -> exp P
+| a_pair : forall (s1 s2 s3 : P), Ru_sigma P s1 s2 s3 -> exp P -> exp P ->  exp P -> exp P -> exp P
+| a_fst : exp P -> exp P
+| a_snd : exp P -> exp P
 (** Variable *)
 | a_var : nat -> exp P
 (** Substitution Application *)
@@ -32,6 +37,10 @@ Arguments a_st {_}.
 Arguments a_pi {_ _ _ _}.
 Arguments a_fn {_ _ _ _}.
 Arguments a_app {_}.
+Arguments a_sigma {_ _ _ _}.
+Arguments a_pair {_ _ _ _}.
+Arguments a_fst {_}.
+Arguments a_snd {_}.
 Arguments a_var {_}.
 Arguments a_sub {_}.
 Arguments a_nat {_}.
@@ -85,12 +94,16 @@ Inductive nf (P : PtsSig) : Set :=
 | nf_st : P -> nf P
 | nf_pi : forall (s1 s2 s3 : P), Ru_pi P s1 s2 s3 -> nf P -> nf P -> nf P
 | nf_fn : forall (s1 s2 s3 : P), Ru_pi P s1 s2 s3 -> nf P -> nf P -> nf P -> nf P
+| nf_sigma : forall (s1 s2 s3 : P), Ru_sigma P s1 s2 s3 -> nf P -> nf P -> nf P
+| nf_pair : forall (s1 s2 s3 : P), Ru_sigma P s1 s2 s3 -> nf P -> nf P -> nf P -> nf P -> nf P
 | nf_nat : nf P
 | nf_zero : nf P
 | nf_succ : nf P -> nf P
 | nf_neut : ne P -> nf P
 with ne (P : PtsSig) : Set :=
 | ne_app : ne P -> nf P -> ne P
+| ne_fst : ne P -> ne P
+| ne_snd : ne P -> ne P
 | ne_var : nat -> ne P
 | ne_natrec : nf P -> nf P -> nf P -> ne P -> ne P
 .
@@ -98,12 +111,16 @@ with ne (P : PtsSig) : Set :=
 Arguments nf_st {_}.
 Arguments nf_pi {_ _ _ _}.
 Arguments nf_fn {_ _ _ _}.
+Arguments nf_sigma {_ _ _ _}.
+Arguments nf_pair {_ _ _ _}.
 Arguments nf_nat {_}.
 Arguments nf_zero {_}.
 Arguments nf_succ {_}.
 Arguments nf_neut {_}.
 
 Arguments ne_app {_}.
+Arguments ne_fst {_}.
+Arguments ne_snd {_}.
 Arguments ne_var {_}.
 Arguments ne_natrec {_}.
 
@@ -112,6 +129,8 @@ Fixpoint nf_to_exp {P : PtsSig} (M : nf P) : exp P :=
   | nf_st s => a_st s
   | nf_pi r A B => a_pi r (nf_to_exp A) (nf_to_exp B)
   | nf_fn r A B M => a_fn r (nf_to_exp A) (nf_to_exp B) (nf_to_exp M)
+  | nf_sigma r A B => a_sigma r (nf_to_exp A) (nf_to_exp B)
+  | nf_pair r M A N B => a_pair r (nf_to_exp M) (nf_to_exp A) (nf_to_exp N) (nf_to_exp B)
   | nf_nat => a_nat
   | nf_zero => a_zero
   | nf_succ M => a_succ (nf_to_exp M)
@@ -120,6 +139,8 @@ Fixpoint nf_to_exp {P : PtsSig} (M : nf P) : exp P :=
 with ne_to_exp {P : PtsSig} (M : ne P) : exp P :=
   match M with
   | ne_app M N => a_app (ne_to_exp M) (nf_to_exp N)
+  | ne_fst M => a_fst (ne_to_exp M)
+  | ne_snd M => a_snd (ne_to_exp M)                     
   | ne_var x => a_var x
   | ne_natrec A MZ MS M => a_natrec (nf_to_exp A) (nf_to_exp MZ) (nf_to_exp MS) (ne_to_exp M)
   end
@@ -169,6 +190,32 @@ Proof.
       subst.
       left.
       reflexivity.
+    + destruct (dec_st_eq dec_P s1 s0); [| right; injection; intros; auto].
+      destruct (dec_st_eq dec_P s2 s4); [| right; injection; intros; auto].
+      destruct (dec_st_eq dec_P s3 s5); [| right; injection; intros; auto].
+      subst.
+      pose proof (dec_ru_sigma_eq dec_P _ _ _ r r0).
+      destruct H; [| right; injection; intros; simpl_existTs; auto].
+      subst.
+      destruct (nf_eq_dec P dec_P M1 M'1); [| right; injection; auto].
+      destruct (nf_eq_dec P dec_P M2 M'2); [| right; injection; auto].
+      subst.
+      left.
+      reflexivity.
+    + destruct (dec_st_eq dec_P s1 s0); [| right; injection; intros; auto].
+      destruct (dec_st_eq dec_P s2 s4); [| right; injection; intros; auto].
+      destruct (dec_st_eq dec_P s3 s5); [| right; injection; intros; auto].
+      subst.
+      pose proof (dec_ru_sigma_eq dec_P _ _ _ r r0).
+      destruct H; [| right; injection; intros; simpl_existTs; auto].
+      subst.
+      destruct (nf_eq_dec P dec_P M1 M'1); [| right; injection; auto].
+      destruct (nf_eq_dec P dec_P M2 M'2); [| right; injection; auto].
+      destruct (nf_eq_dec P dec_P M3 M'3); [| right; injection; auto].
+      destruct (nf_eq_dec P dec_P M4 M'4); [| right; injection; auto].
+      subst.
+      left.
+      reflexivity.
     + destruct (nf_eq_dec P dec_P M M').
       * subst.
         left.
@@ -215,9 +262,12 @@ Module Syntax_Notations.
   Notation "'succ' e" := (a_succ e) (in custom exp at level 1, e custom exp at level 0) : mcpts_scope.
   Notation "'rec' e 'return' A | 'zero' -> ez | 'succ' -> es 'end'" := (a_natrec A ez es e) (in custom exp at level 0, A custom exp at level 60, ez custom exp at level 60, es custom exp at level 60, e custom exp at level 60) : mcpts_scope.
   Notation "'Π' r A B" := (a_pi r A B) (in custom exp at level 1, r constr at level 0, A custom exp at level 0, B custom exp at level 60) : mcpts_scope.
-  Notation "'Π' r A B" := (a_pi r A B) (in custom exp at level 1, r constr at level 0, A custom exp at level 0, B custom exp at level 60) : mcpts_scope.
   Notation "'λ' r A B e" := (a_fn r A B e) (in custom exp at level 1, r constr at level 0, A custom exp at level 0, B custom exp at level 0, e custom exp at level 60) : mcpts_scope.
   Notation "f x .. y" := (a_app .. (a_app f x) .. y) (in custom exp at level 40, f custom exp, x custom exp at next level, y custom exp at next level) : mcpts_scope.
+  Notation "'Σ' r A B" := (a_sigma r A B) (in custom exp at level 1, r constr at level 0, A custom exp at level 0, B custom exp at level 60) : mcpts_scope.
+  Notation "⟨ r ; M : A ; N : B ⟩" := (a_pair r M A N B) (in custom exp at level 1, r constr at level 0, M custom exp at level 0, A custom exp at level 0, N custom exp at level 0, B custom exp at level 0) : mcpts_scope.
+  Notation "'fst' M" := (a_fst M) (in custom exp at level 1, M custom exp at level 0) : mcpts_scope.
+  Notation "'snd' M" := (a_snd M) (in custom exp at level 1, M custom exp at level 0) : mcpts_scope.
   Notation "'#' n" := (a_var n) (in custom exp at level 0, n constr at level 0, format "'#' n") : mcpts_scope.
 
   Notation "'Id'" := a_id (in custom exp at level 0) : mcpts_scope.
@@ -242,6 +292,10 @@ Module Syntax_Notations.
   Notation "'Π' r A B" := (nf_pi r A B) (in custom nf at level 2, r constr at level 0, A custom nf at level 1, B custom nf at level 60) : mcpts_scope.
   Notation "'λ' r A B e" := (nf_fn r A B e) (in custom nf at level 2, r constr at level 0, A custom nf at level 1, B custom nf at level 1, e custom nf at level 60) : mcpts_scope.
   Notation "f x .. y" := (ne_app .. (ne_app f x) .. y) (in custom nf at level 40, f custom nf, x custom nf at next level, y custom nf at next level) : mcpts_scope.
+  Notation "'Σ' r A B" := (nf_sigma r A B) (in custom nf at level 2, r constr at level 0, A custom nf at level 1, B custom nf at level 60) : mcpts_scope.
+  Notation "⟨ r ; M : A ; N : B ⟩" := (nf_pair r M A N B) (in custom nf at level 2, r constr at level 0, M custom nf at level 1, A custom nf at level 1, N custom nf at level 1, B custom nf at level 1) : mcpts_scope.
+  Notation "'fst' M" := (ne_fst M) (in custom nf at level 2, M custom nf at level 1) : mcpts_scope.
+  Notation "'snd' M" := (ne_snd M) (in custom nf at level 2, M custom nf at level 1) : mcpts_scope.
   Notation "'#' n" := (ne_var n) (in custom nf at level 0, n constr at level 0, format "'#' n") : mcpts_scope.
   Notation "'⇑' M" := (nf_neut M) (in custom nf at level 0, M custom nf at level 99, format "'⇑'  M") : mcpts_scope.
 End Syntax_Notations.

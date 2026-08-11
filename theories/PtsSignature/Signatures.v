@@ -8,6 +8,7 @@ Record PtsSig : Type :=
       Ax_sub : St -> St -> Prop;
       (** Rules for type constructors *)
       Ru_pi : St -> St -> St -> Set;
+      Ru_sigma : St -> St -> St -> Set;
       Ru_nat : St -> Set;
     }.
 

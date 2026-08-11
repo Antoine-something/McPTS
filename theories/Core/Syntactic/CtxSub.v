@@ -47,10 +47,11 @@ Module ctxsub_judg.
       intros * HΓΔ; destruct (presup_ctx_sub HΓΔ); mauto 4;
       try (rename B into C); try (rename B' into C'); try (rename A0 into B); try (rename A' into B').
     
-    (** Function cases *)
-    1-3,7-11: assert {{ Δ ⊢ B : Sort@s1 }} by eauto; assert {{ ⊢ Δ, B ⊆ Γ, B }} by mauto;
+    (** Function and Sigma cases *)
+    6,18,20: rename A into B.
+    1-9,13-22: assert {{ Δ ⊢ B : Sort@s1 }} by eauto; assert {{ ⊢ Δ, B ⊆ Γ, B }} by mauto;
     econstructor...
-
+    
     (** Recursor cases *)
     2,4-6: assert {{ ⊢ Δ, ℕ ⊆ Γ, ℕ }} by (econstructor; mauto 3); assert {{ ⊢ Δ, ℕ, B ⊆ Γ, ℕ, B }} by (econstructor; mauto 5); econstructor...
 
@@ -74,6 +75,15 @@ Module ctxsub_judg.
       assert {{ ⊢ Γ0, A0 }} by mauto 3.
       eapply wf_sub_eq_conv; mauto 3.
 
+    - assert {{ Δ ⊢ B' }} by mauto 3.
+      assert {{ ⊢ Δ, B' ⊆ Γ, B' }} by mauto 5.
+      assert {{ Δ ⊢ A }} by mauto 3.
+      assert {{ ⊢ Δ, A ⊆ Γ, A }} by mauto 5.
+      assert {{ Δ, B' ⊢ C ⊆ C' }} by mauto 2.
+      assert {{ Δ, B' ⊢ C' }} by mauto 2.
+      assert {{ Δ, A ⊢ C }} by mauto 3.
+      assert {{ Δ ⊢ A ≈ B' }} by mauto 3.
+      econstructor...
     - assert {{ Δ ⊢ B' }} by mauto 3.
       assert {{ ⊢ Δ, B' ⊆ Γ, B' }} by mauto 5.
       assert {{ Δ ⊢ A }} by mauto 3.

@@ -99,6 +99,117 @@ Qed.
 #[export]
 Hint Resolve wf_app_inversion : mcpts.
 
+Lemma wf_sigma_inversion {P : PtsSig} : forall {Γ : ctx P} {A B C s1 s2 s3} {r : Ru_sigma P s1 s2 s3},
+    {{ Γ ⊢ Σ r A B : C }} ->
+    {{ Γ ⊢ A : Sort@s1 }} /\ {{ Γ, A ⊢ B : Sort@s2 }} /\ {{ Γ ⊢ Sort@s3 ⊆ C }}.
+Proof with mautosolve 4.
+  intros * H.
+  dependent induction H;
+    gen_core_presups.
+  - assert {{ ⊢ Γ }} by mauto 2.
+    assert {{ Γ ⊢ Sort@s3 }} by mauto 3.
+    repeat split; mauto 3.
+  - split; [|split];
+      [| | transitivity A0; mauto 2];
+      eapply IHwf_exp; mauto 2.
+Qed.
+
+#[export]
+Hint Resolve wf_sigma_inversion : mcpts.
+
+Corollary wf_sigma_inversion' {P : PtsSig} : forall {Γ : ctx P} {A B C s1 s2 s3} {r : Ru_sigma P s1 s2 s3},
+    {{ Γ ⊢ Σ r A B : C }} ->
+    {{ Γ ⊢ A : Sort@s1 }} /\ {{ Γ, A ⊢ B : Sort@s2 }}.
+Proof with mautosolve 4.
+  intros * ?%wf_sigma_inversion.
+  destruct_conjs; mauto 2.
+Qed.
+
+Corollary wf_sigma_inversion_typ {P} : forall {Γ : ctx P} {A B C s1 s2 s3} {r : Ru_sigma P s1 s2 s3},
+    {{ Γ ⊢ Σ r A B : C }} ->
+    {{ Γ ⊢ Sort@s3 ⊆ C }}.
+Proof.
+  intros * ?%wf_sigma_inversion.
+  destruct_conjs; mauto 2.
+Qed.
+
+#[export]
+Hint Resolve wf_sigma_inversion' wf_sigma_inversion_typ : mcpts.
+
+Corollary wf_typ_sigma_inversion {P : PtsSig} : forall {Γ : ctx P} {A B s1 s2 s3} {r : Ru_sigma P s1 s2 s3},
+    {{ Γ ⊢ Σ r A B }} ->
+    {{ Γ ⊢ A : Sort@s1 }} /\ {{ Γ, A ⊢ B : Sort@s2 }}.
+Proof.
+  inversion 1; mauto 2.
+Qed.
+
+#[export]
+Hint Resolve wf_typ_sigma_inversion : mcpts.
+
+Corollary wf_typ_sigma_inversion' {P : PtsSig} : forall {Γ : ctx P} {A B s1 s2 s3} {r : Ru_sigma P s1 s2 s3},
+    {{ Γ ⊢ Σ r A B }} ->
+    {{ Γ ⊢ Σ r A B : Sort@s3 }}.
+Proof.
+  intros.
+  assert ({{ Γ ⊢ A : Sort@s1 }} /\ {{ Γ, A ⊢ B : Sort@s2 }}) by mauto 2.
+  destruct_conjs.
+  econstructor; mauto 2.
+Qed.
+
+#[export]
+Hint Resolve wf_typ_sigma_inversion' : mcpts.
+
+Corollary wf_pair_inversion {P : PtsSig} : forall {Γ : ctx P} {A B M N C s1 s2 s3} {r : Ru_sigma P s1 s2 s3},
+    {{ Γ ⊢ ⟨r; M : A; N : B⟩ : C }} ->
+    {{ Γ ⊢ M : A }} /\ {{ Γ ⊢ N : B[Id,,M] }} /\ {{ Γ ⊢ Σ r A B ⊆ C }}.
+Proof with solve [mauto].
+  intros * H.
+  dependent induction H;
+    gen_core_presups.
+  - split; mauto.
+  - specialize (IHwf_exp A B M N A0 s1 s2 s3 r ltac:(reflexivity) ltac:(reflexivity)).
+    destruct_conjs.
+    repeat (split; mauto 2).
+Qed.
+
+#[export]
+Hint Resolve wf_pair_inversion : mcpts.
+
+Lemma wf_fst_inversion {P : PtsSig} : forall {Γ : ctx P} {M C},
+    {{ Γ ⊢ fst M : C }} ->
+    exists A B s1 s2 s3 (r : Ru_sigma P s1 s2 s3), {{ Γ ⊢ M : Σ r A B }} /\ {{ Γ ⊢ A ⊆ C }}.
+Proof with mautosolve 4.
+  intros * H.
+  dependent induction H;
+    gen_core_presups.
+  - do 6 eexists; repeat split; eauto.
+    eapply wf_subtyp_refl; mauto 3.
+  - specialize (IHwf_exp M A ltac:(reflexivity) ltac:(reflexivity)).
+    destruct_conjs.
+    do 6 eexists; repeat split; mauto.
+Qed.
+
+#[export]
+Hint Resolve wf_fst_inversion : mcpts.
+
+Lemma wf_snd_inversion {P : PtsSig} : forall {Γ : ctx P} {M C},
+    {{ Γ ⊢ snd M : C }} ->
+    exists A B s1 s2 s3 (r : Ru_sigma P s1 s2 s3), {{ Γ ⊢ M : Σ r A B }} /\ {{ Γ ⊢ B[Id,,fst M] ⊆ C }}.
+Proof with mautosolve 4.
+  intros * H.
+  dependent induction H;
+    gen_core_presups.
+  - do 6 eexists; repeat split; eauto.
+    assert {{ Γ ⊢ fst M : A }} by mauto 2.
+    assert {{ Γ ⊢s Id,,fst M : Γ, A }} by mauto 3.
+    eapply wf_subtyp_refl; mauto 4.
+  - specialize (IHwf_exp M A ltac:(reflexivity) ltac:(reflexivity)).
+    destruct_conjs.
+    do 6 eexists; repeat split; mauto.
+Qed.
+
+#[export]
+Hint Resolve wf_snd_inversion : mcpts.
 
 Lemma wf_vlookup_inversion {P : PtsSig} : forall {Γ : ctx P} {A : exp P} {x},
     {{ Γ ⊢ #x : A }} ->

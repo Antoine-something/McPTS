@@ -144,6 +144,15 @@ Qed.
 #[export]
   Hint Resolve lookup_implies_ann_lookup : mcpts.
 
+Lemma t1 {P} : forall {Γ : ctx P} {anns M0 A},
+  exists so : SortOption P, {{ Γ with anns ⊫ fst M0 : A @ so }}.
+Admitted.
+Lemma t2 {P} : forall {Γ : ctx P} {anns M0 B},
+  exists so : SortOption P, {{ Γ with anns ⊫ snd M0 : B[Id,,fst M0] @ so }}.
+Admitted.
+Lemma t3 {P} : forall {Γ : ctx P} {anns M0 A0 N B s1 s2 s3} {r : Ru_sigma P s1 s2 s3},
+  exists so : SortOption P, {{ Γ with anns ⊫ ⟨ r; M0 : A0; N : B ⟩ : Σ r A0 B @ so }}.
+Admitted.
 
 Lemma wf_ctx_implies_wf_ctx_ann {P} : forall {Γ : ctx P},
     {{ ⊢ Γ }} -> exists anns, {{ ⊫ Γ with anns }}
@@ -169,30 +178,51 @@ Proof.
   inversion_clear H.
   - eexists.
     econstructor.
-  - epose proof (wf_ctx_implies_wf_ctx_ann _ _ H0) as [anns].
-    epose proof (wf_typ_implies_wf_typ_ann _ _ _ _ H H1) as [so].
+  - destruct (wf_ctx_implies_wf_ctx_ann _ _ H0) as [anns].
+    destruct (wf_typ_implies_wf_typ_ann _ _ _ _ H H1) as [so].
     eexists; econstructor; eassumption.
-    
-
-    
-  
   - eexists.
-    epose proof wf_exp_implies_wf_exp_ann P ((so_Some s1)::anns) {{{ Γ, A0 }}} B {{{ Sort@s2 }}} H4 H1.
+    destruct (wf_exp_implies_wf_exp_ann P ((so_Some s1)::anns) {{{ Γ, A0 }}} B {{{ Sort@s2 }}} H4 H1).
     clear wf_ctx_implies_wf_ctx_ann wf_exp_implies_wf_exp_ann wf_typ_implies_wf_typ_ann wf_sub_implies_wf_sub_ann.
-    destruct_conjs.
     econstructor; mauto.
-    
-
   - clear HM0 HM1 H H5.
-    epose proof wf_exp_implies_wf_exp_ann P anns Γ A0 {{{ Sort@s1 }}} Hanns H0 as [so].
+    destruct (wf_exp_implies_wf_exp_ann P anns Γ A0 {{{ Sort@s1 }}} Hanns H0) as [so].
     assert {{ ⊫ Γ, A0 with {{{ anns, ^ (so_Some s1) }}} }} by mauto 3.
-    epose proof wf_exp_implies_wf_exp_ann P ((so_Some s1)::anns) {{{ Γ, A0 }}} B {{{ Sort@s2 }}} H5 H1 as [so'].
-    epose proof wf_exp_implies_wf_exp_ann P anns Γ _ _ Hanns H2 as [soΠ].
+    destruct (wf_exp_implies_wf_exp_ann P ((so_Some s1)::anns) {{{ Γ, A0 }}} B {{{ Sort@s2 }}} H5 H1) as [so'].
+    destruct (wf_exp_implies_wf_exp_ann P anns Γ _ _ Hanns H2) as [soΠ].
     eexists.
     clear wf_ctx_implies_wf_ctx_ann wf_exp_implies_wf_exp_ann wf_typ_implies_wf_typ_ann wf_sub_implies_wf_sub_ann.
-    destruct_conjs.
-    econstructor; mauto.
-
+    econstructor; mauto 4.
+  - clear HM0 HM1 H H5.
+    destruct (wf_exp_implies_wf_exp_ann P anns Γ A0 {{{ Sort@s1 }}} Hanns H0) as [so].
+    assert {{ ⊫ Γ, A0 with (so_Some s1)::anns }} by mauto 3.
+    destruct (wf_exp_implies_wf_exp_ann P ((so_Some s1)::anns) {{{ Γ, A0 }}} B {{{ Sort@s2 }}} H5 H1) as [so'].
+    destruct (wf_exp_implies_wf_exp_ann P anns Γ M0 A0 Hanns H2) as [soM].
+    clear wf_ctx_implies_wf_ctx_ann wf_exp_implies_wf_exp_ann wf_typ_implies_wf_typ_ann wf_sub_implies_wf_sub_ann.
+    assert {{ Γ ⊢ A0 ≈ A0[Id] : Sort@s1 }} by mauto 3.
+    assert {{ Γ ⊢ A0 ⊆ A0[Id] }} by mauto 3.
+    assert {{ Γ with anns ⊫ M0 : A0[Id] @ ^ (so_Some s1) }} by (econstructor; mauto 4).
+    assert {{ Γ with anns ⊫s Id,,M0 : Γ, A0 with (so_Some s1)::anns }} by mauto 4.
+    eexists.
+    econstructor; mauto 4.
+  - destruct (wf_exp_implies_wf_exp_ann P anns Γ A {{{ Sort@s1 }}} Hanns H0) as [so].
+    assert {{ ⊫ Γ, A with {{{ anns, ^ (so_Some s1) }}} }} by mauto 3.
+    destruct (wf_exp_implies_wf_exp_ann P ((so_Some s1)::anns) {{{ Γ, A }}} B {{{ Sort@s2 }}} H6 H1) as [so'].
+    destruct (wf_exp_implies_wf_exp_ann P anns Γ M0 {{{ Σ r A B }}} Hanns H2) as [soM].
+    clear wf_ctx_implies_wf_ctx_ann wf_exp_implies_wf_exp_ann wf_typ_implies_wf_typ_ann wf_sub_implies_wf_sub_ann.
+    assert {{ Γ with anns ⊫ Σ r A B : Sort@s3 @ ^(so_None) }} by mauto 3.
+    assert {{ Γ with anns ⊫ Σ r A B @ ^(so_Some s3) }} by mauto 2.
+    assert {{ Γ with anns ⊫ M0 : Σ r A B @ ^(so_Some s3) }} by mauto 2.
+    econstructor; mauto 3.
+  - destruct (wf_exp_implies_wf_exp_ann P anns Γ A0 {{{ Sort@s1 }}} Hanns H0) as [so].
+    assert {{ ⊫ Γ, A0 with {{{ anns, ^ (so_Some s1) }}} }} by mauto 3.
+    destruct (wf_exp_implies_wf_exp_ann P ((so_Some s1)::anns) {{{ Γ, A0 }}} B {{{ Sort@s2 }}} H6 H1) as [so'].
+    destruct (wf_exp_implies_wf_exp_ann P anns Γ M0 {{{ Σ r A0 B }}} Hanns H2) as [soM].
+    clear wf_ctx_implies_wf_ctx_ann wf_exp_implies_wf_exp_ann wf_typ_implies_wf_typ_ann wf_sub_implies_wf_sub_ann.
+    assert {{ Γ with anns ⊫ Σ r A0 B : Sort@s3 @ ^(so_None) }} by mauto 3.
+    assert {{ Γ with anns ⊫ Σ r A0 B @ ^(so_Some s3) }} by mauto 2.
+    assert {{ Γ with anns ⊫ M0 : Σ r A0 B @ ^(so_Some s3) }} by mauto 2.
+    econstructor; mauto 3.
   - assert {{ ⊢ Γ, A }} by mauto 2.
     assert (exists so : SortOption P, {{ # x : A @ so ∈ Γ with anns }}) as [so'] by mauto 2.
     clear wf_ctx_implies_wf_ctx_ann wf_exp_implies_wf_exp_ann wf_typ_implies_wf_typ_ann wf_sub_implies_wf_sub_ann.

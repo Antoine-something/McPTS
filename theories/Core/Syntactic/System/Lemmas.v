@@ -1546,10 +1546,16 @@ Proof.
     mauto 4.
   - assert {{ Γ0 ⊢ A[σ] : Sort@s1 }} by mauto 3.
     assert {{ Γ0, A[σ] ⊢ B[q σ] : Sort@s2 }} by mauto 4.
-    assert {{ Γ0 ⊢ Π r A[σ] B[q σ] }} by mauto.
+    assert {{ Γ0 ⊢ Π r A[σ] B[q σ] }} by mauto 3.
     transitivity {{{ Π r (A[σ]) (B[q σ]) }}}; [econstructor; mauto 3|].
     transitivity {{{ Π r (A'[σ]) (B'[q σ]) }}}; [ | econstructor; mauto 4].
     eapply wf_subtyp_pi; mauto 4.
+  - assert {{ Γ0 ⊢ A[σ] : Sort@s1 }} by mauto 3.
+    assert {{ Γ0, A[σ] ⊢ B[q σ] : Sort@s2 }} by mauto 4.
+    assert {{ Γ0 ⊢ Σ r A[σ] B[q σ] }} by mauto 3.
+    transitivity {{{ Σ r (A[σ]) (B[q σ]) }}}; [econstructor; mauto 3|].
+    transitivity {{{ Σ r (A'[σ]) (B'[q σ]) }}}; [ | econstructor; mauto 4].
+    eapply wf_subtyp_sigma; mauto 4. 
 Qed.
 
 
@@ -1893,9 +1899,10 @@ Qed.
 Lemma presup_exp_typ {P : PtsSig} : forall {Γ : ctx P} {M A},
     {{ Γ ⊢ M : A }} ->
     {{ Γ ⊢ A }}.
-Proof with mautosolve 3.
+Proof with mautosolve 4.
   induction 1; assert {{ ⊢ Γ }} by mauto 3; destruct_conjs; mauto 3.
   - enough {{ Γ ⊢s Id,,N : Γ, A }}...
+  - enough {{ Γ ⊢s Id,,fst M : Γ, A }}...
 Qed.
 
 Lemma presup_exp {P : PtsSig} : forall {Γ : ctx P} {M A},
