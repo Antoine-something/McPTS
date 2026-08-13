@@ -4,81 +4,81 @@ From McPTS.Core.Semantic Require Import Evaluation.
 From McPTS.Core.Semantic Require Export Domain.
 Import Domain_Notations.
 
-Reserved Notation "'Rnf' m 'in' i ↘ M" (in custom judg at level 80, m custom domain, i constr, M custom nf).
-Reserved Notation "'Rne' m 'in' i ↘ M" (in custom judg at level 80, m custom domain, i constr, M custom nf).
-Reserved Notation "'Rtyp' a 'in' i ↘ A" (in custom judg at level 80, a custom domain, i constr, A custom nf).
+Reserved Notation "Δ ▶ 'Rnf' m 'in' i ↘ M" (in custom judg at level 80, Δ custom exp, m custom domain, i constr, M custom nf).
+Reserved Notation "Δ ▶ 'Rne' m 'in' i ↘ M" (in custom judg at level 80, Δ custom exp, m custom domain, i constr, M custom nf).
+Reserved Notation "Δ ▶ 'Rtyp' a 'in' i ↘ A" (in custom judg at level 80, Δ custom exp, a custom domain, i constr, A custom nf).
 
 Generalizable All Variables.
 
-Inductive read_nf {P : PtsSig} : nat -> domain_nf P -> nf P -> Prop :=
+Inductive read_nf {P : PtsSig} : gctx P -> nat -> domain_nf P -> nf P -> Prop :=
 | read_nf_type :
-  `( {{ Rtyp a in i ↘ A }} ->
-     {{ Rnf ⇓ Sort@s a in i ↘ A }} )
+  `( {{ Δ ▶ Rtyp a in i ↘ A }} ->
+     {{ Δ ▶ Rnf ⇓ Sort@s a in i ↘ A }} )
 | read_nf_fn :
   `( forall r : Ru_pi P s1 s2 s3,
         (** Normal form of arg type *)
-        {{ Rtyp a in i ↘ A }} ->
+        {{ Δ ▶ Rtyp a in i ↘ A }} ->
         (** Normal form of eta-expanded body *)
-        {{ $| m & ⇑! a i |↘ m' }} ->
-        {{ ⟦ B ⟧ (Δ ; ρ ↦ ⇑! a i) ↘ b }} ->
-        {{ Rtyp b in S i ↘ B' }} ->
-        {{ Rnf ⇓ b m' in S i ↘ M }} ->
+        {{ Δ ▶ $| m & ⇑! a i |↘ m' }} ->
+        {{ Δ ▶ ⟦ B ⟧ ρ ↦ ⇑! a i ↘ b }} ->
+        {{ Δ ▶ Rtyp b in S i ↘ B' }} ->
+        {{ Δ ▶ Rnf ⇓ b m' in S i ↘ M }} ->
         (** Normal form of the whole function *)
-        {{ Rnf ⇓ (Π r a (Δ ; ρ) B) m in i ↘ λ r A B' M }} )
+        {{ Δ ▶ Rnf ⇓ (Π r a ρ B) m in i ↘ λ r A B' M }} )
 | read_nf_zero :
-  `( {{ Rnf ⇓ ℕ zero in i ↘ zero }} )
+  `( {{ Δ ▶ Rnf ⇓ ℕ zero in i ↘ zero }} )
 | read_nf_succ :
-  `( {{ Rnf ⇓ ℕ m in i ↘ M }} ->
-     {{ Rnf ⇓ ℕ (succ m) in i ↘ succ M }} )
+  `( {{ Δ ▶ Rnf ⇓ ℕ m in i ↘ M }} ->
+     {{ Δ ▶ Rnf ⇓ ℕ (succ m) in i ↘ succ M }} )
 | read_nf_nat_neut :
-  `( {{ Rne m in i ↘ M }} ->
-     {{ Rnf ⇓ ℕ (⇑ a m) in i ↘ ⇑ M }} )
+  `( {{ Δ ▶ Rne m in i ↘ M }} ->
+     {{ Δ ▶ Rnf ⇓ ℕ (⇑ a m) in i ↘ ⇑ M }} )
 | read_nf_neut :
-  `( {{ Rne m in i ↘ M }} ->
-     {{ Rnf ⇓ (⇑ a b) (⇑ c m) in i ↘ ⇑ M }} )
-where "'Rnf' m 'in' i ↘ M" := (read_nf i m M) (in custom judg) : type_scope
-with read_ne {P : PtsSig} : nat -> domain_ne P -> ne P -> Prop :=
+  `( {{ Δ ▶ Rne m in i ↘ M }} ->
+     {{ Δ ▶ Rnf ⇓ (⇑ a b) (⇑ c m) in i ↘ ⇑ M }} )
+where "Δ ▶ 'Rnf' m 'in' i ↘ M" := (read_nf Δ i m M) (in custom judg) : type_scope
+with read_ne {P : PtsSig} : gctx P -> nat -> domain_ne P -> ne P -> Prop :=
 | read_ne_var :
-  `( {{ Rne !x in i ↘ #(i - x - 1) }} )
+  `( {{ Δ ▶ Rne !x in i ↘ #(i - x - 1) }} )
 | read_ne_gvar :
-  `( {{ Rne `!x in i ↘ `#x }} )
+  `( {{ Δ ▶ Rne `!x in i ↘ `#x }} )
 | read_ne_app :
-  `( {{ Rne m in i ↘ M }} ->
-     {{ Rnf n in i ↘ N }} ->
-     {{ Rne m n in i ↘ M N }} )
+  `( {{ Δ ▶ Rne m in i ↘ M }} ->
+     {{ Δ ▶ Rnf n in i ↘ N }} ->
+     {{ Δ ▶ Rne m n in i ↘ M N }} )
 | read_ne_natrec :
   `( (** Normal form of motive *)
-     {{ ⟦ B ⟧ (Δ ; ρ ↦ ⇑! ℕ i) ↘ b }} ->
-     {{ Rtyp b in S i ↘ B' }} ->
+     {{ Δ ▶ ⟦ B ⟧ ρ ↦ ⇑! ℕ i ↘ b }} ->
+     {{ Δ ▶ Rtyp b in S i ↘ B' }} ->
      (** Normal form of mz *)
-     {{ ⟦ B ⟧ (Δ ; ρ ↦ zero) ↘ bz }} ->
-     {{ Rnf ⇓ bz mz in i ↘ MZ }} ->
+     {{ Δ ▶ ⟦ B ⟧ ρ ↦ zero ↘ bz }} ->
+     {{ Δ ▶ Rnf ⇓ bz mz in i ↘ MZ }} ->
      (** Normal form of MS *)
-     {{ ⟦ B ⟧ (Δ ; ρ ↦ succ (⇑! ℕ i)) ↘ bs }} ->
-     {{ ⟦ MS ⟧ (Δ ; (ρ ↦ ⇑! ℕ i) ↦ ⇑! b (S i)) ↘ ms }} ->
-     {{ Rnf ⇓ bs ms in S (S i) ↘ MS' }} ->
+     {{ Δ ▶ ⟦ B ⟧ ρ ↦ succ (⇑! ℕ i) ↘ bs }} ->
+     {{ Δ ▶ ⟦ MS ⟧ (ρ ↦ ⇑! ℕ i) ↦ ⇑! b (S i) ↘ ms }} ->
+     {{ Δ ▶ Rnf ⇓ bs ms in S (S i) ↘ MS' }} ->
      (** Neutral form of m *)
-     {{ Rne m in i ↘ M }} ->
-     {{ Rne rec m under (Δ ; ρ) return B | zero -> mz | succ -> MS end in i ↘ rec M return B' | zero -> MZ | succ -> MS' end }} )
-where "'Rne' m 'in' i ↘ M" := (read_ne i m M) (in custom judg) : type_scope
-with read_typ {P : PtsSig} : nat -> domain P -> nf P -> Prop :=
+     {{ Δ ▶ Rne m in i ↘ M }} ->
+     {{ Δ ▶ Rne rec m under ρ return B | zero -> mz | succ -> MS end in i ↘ rec M return B' | zero -> MZ | succ -> MS' end }} )
+where "Δ ▶ 'Rne' m 'in' i ↘ M" := (read_ne Δ i m M) (in custom judg) : type_scope
+with read_typ {P : PtsSig} : gctx P -> nat -> domain P -> nf P -> Prop :=
 | read_typ_univ :
-  `( {{ Rtyp Sort@s in i ↘ Sort@s }} )
+  `( {{ Δ ▶ Rtyp Sort@s in i ↘ Sort@s }} )
 | read_typ_pi :
   `( forall r : Ru_pi P s1 s2 s3,
         (** Normal form of arg type *)
-        {{ Rtyp a in i ↘ A }} ->
+        {{ Δ ▶ Rtyp a in i ↘ A }} ->
         (** Normal form of ret type *)
-        {{ ⟦ B ⟧ (Δ ; ρ ↦ ⇑! a i) ↘ b }} ->
-        {{ Rtyp b in S i ↘ B' }} ->
+        {{ Δ ▶ ⟦ B ⟧ ρ ↦ ⇑! a i ↘ b }} ->
+        {{ Δ ▶ Rtyp b in S i ↘ B' }} ->
         (** Normal form of the whole function space *)
-        {{ Rtyp Π r a (Δ ; ρ) B in i ↘ Π r A B' }})
+        {{ Δ ▶ Rtyp Π r a ρ B in i ↘ Π r A B' }})
 | read_typ_nat :
-  `( {{ Rtyp ℕ in i ↘ ℕ }} )
+  `( {{ Δ ▶ Rtyp ℕ in i ↘ ℕ }} )
 | read_typ_neut :
-  `( {{ Rne b in i ↘ B }} ->
-     {{ Rtyp ⇑ a b in i ↘ ⇑ B }})
-where "'Rtyp' m 'in' i ↘ M" := (read_typ i m M) (in custom judg) : type_scope
+  `( {{ Δ ▶ Rne b in i ↘ B }} ->
+     {{ Δ ▶ Rtyp ⇑ a b in i ↘ ⇑ B }})
+where "Δ ▶ 'Rtyp' m 'in' i ↘ M" := (read_typ Δ i m M) (in custom judg) : type_scope
 .
 
 Scheme read_nf_mut_ind := Induction for read_nf Sort Prop

@@ -10,7 +10,7 @@ Inductive initial_env {P : PtsSig} : gctx P -> ctx P -> env P -> Prop :=
 | initial_env_nil : initial_env nil nil empty_env
 | initial_env_cons :
   `( initial_env Δ Γ ρ ->
-     {{ ⟦ A ⟧ (Δ ; ρ) ↘ a }} ->
+     {{ Δ ▶ ⟦ A ⟧ ρ ↘ a }} ->
      initial_env Δ ({{{ Γ, A }}}) d{{{ ρ ↦ ⇑! a (length Γ) }}}).
 
 #[export]
@@ -84,9 +84,9 @@ Ltac functional_initial_env_rewrite_clear := repeat functional_initial_env_rewri
 Inductive nbe {P : PtsSig} : gctx P -> ctx P -> exp P -> typ P -> nf P -> Prop :=
 | nbe_run :
   `( initial_env Δ Γ ρ ->
-     {{ ⟦ A ⟧ (Δ ; ρ) ↘ a }} ->
-     {{ ⟦ M ⟧ (Δ ; ρ) ↘ m }} ->
-     {{ Rnf ⇓ a m in (length Γ) ↘ W }} ->
+     {{ Δ ▶ ⟦ A ⟧ ρ ↘ a }} ->
+     {{ Δ ▶ ⟦ M ⟧ ρ ↘ m }} ->
+     {{ Δ ▶ Rnf ⇓ a m in (length Γ) ↘ W }} ->
      nbe Δ Γ M A W ).
 
 #[export]
@@ -111,8 +111,8 @@ Hint Resolve functional_nbe : mcpts.
 Inductive nbe_ty {P : PtsSig} : gctx P -> ctx P -> typ P -> nf P -> Prop :=
 | nbe_ty_run :
   `( initial_env Δ Γ ρ ->
-     {{ ⟦ M ⟧ (Δ ; ρ) ↘ m }} ->
-     {{ Rtyp m in (length Γ) ↘ W }} ->
+     {{ Δ ▶ ⟦ M ⟧ ρ ↘ m }} ->
+     {{ Δ ▶ Rtyp m in (length Γ) ↘ W }} ->
      nbe_ty Δ Γ M W ).
 
 #[export]
