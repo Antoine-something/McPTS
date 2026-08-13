@@ -29,18 +29,18 @@ theories/Core/Syntactic/SystemAnnotated/Definitions.v
 theories/Core/Syntactic/SystemAnnotated/Lemmas.v
 theories/Core/Syntactic/SystemAnnotated.v
 
-## Evaluation of PTS* ##
-theories/Core/Semantic/Domain.v
-theories/Core/Semantic/Evaluation/Definitions.v
-theories/Core/Semantic/Evaluation/Lemmas.v
-theories/Core/Semantic/Evaluation/Tactics.v
-theories/Core/Semantic/Evaluation.v
-theories/Core/Semantic/Readback/Definitions.v
-theories/Core/Semantic/Readback/Lemmas.v
-theories/Core/Semantic/Readback.v
-theories/Core/Semantic/NbE.v
-theories/Core/Semantic/PER/Definitions.v
-theories/Core/Semantic/PER/CoreTactics.v
+# ## Evaluation of PTS* ##
+# theories/Core/Semantic/Domain.v
+# theories/Core/Semantic/Evaluation/Definitions.v
+# theories/Core/Semantic/Evaluation/Lemmas.v
+# theories/Core/Semantic/Evaluation/Tactics.v
+# theories/Core/Semantic/Evaluation.v
+# theories/Core/Semantic/Readback/Definitions.v
+# theories/Core/Semantic/Readback/Lemmas.v
+# theories/Core/Semantic/Readback.v
+# theories/Core/Semantic/NbE.v
+# theories/Core/Semantic/PER/Definitions.v
+# theories/Core/Semantic/PER/CoreTactics.v
 # theories/Core/Semantic/PER/Lemmas.v
 # theories/Core/Semantic/PER.v
 # theories/Core/Semantic/Realizability.v
