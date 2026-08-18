@@ -472,13 +472,8 @@ Section PER_gctx_def.
     {{ GC ⋅ ≈ ⋅ ∈ per_gctx }}
   | per_gctx_env_cons :
     `{ {{ GC Δ ≈ Δ' ∈ per_gctx }} ->
-       (env_rel <~> (fun ρ ρ' => True)) ->
        rel_typ_unsorted pred_P Δ A d{{{ ⋅ }}} A' d{{{ ⋅ }}} env_rel ->
-       rel_typ_unsorted pred_P Δ' A d{{{ ⋅ }}} A' d{{{ ⋅ }}} env_rel ->
-       (* {{ Δ ▶ ⟦ A ⟧ ⋅ ↘ a }} -> *)
-       (* {{ Δ' ▶ ⟦ A' ⟧ ⋅ ↘ a' }} -> *)
-       (* {{ Dom a ≈ a' ∈ per_typ pred_P Δ }} -> *)
-       (* {{ Dom a ≈ a' ∈ per_typ pred_P Δ' }} -> *)
+       rel_typ_unsorted pred_P Δ' A d{{{ ⋅ }}} A' d{{{ ⋅ }}} env_rel' ->
        {{ `#x ∉ Δ }} ->
        {{ GC Δ, x:A ≈ Δ', x:A' ∈ per_gctx }} }.
 End PER_gctx_def.                          

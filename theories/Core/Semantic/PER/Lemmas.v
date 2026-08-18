@@ -1270,8 +1270,8 @@ Lemma per_gctx_sym {P} {pred_P : PredicativeSig P} : forall Δ Δ',
 Proof.
   induction 1; mauto 2.
   destruct_rel_typ_unsorted.
-  symmetry in H3.
-  symmetry in H6.
+  symmetry in H2.
+  symmetry in H5.
   econstructor; mauto 2;
     econstructor; mauto 2.
 Qed.
@@ -1596,7 +1596,7 @@ Ltac invert_per_ctx_env H :=
 
 Ltac invert_per_ctx_envs := match_by_head per_ctx_env ltac:(fun H => directed invert_per_ctx_env H).
 
-Ltac invert_per_ctx_envs_of pred_P rel := match_by_head (per_ctx_env pred_P rel) ltac:(fun H => directed invert_per_ctx_env H).
+Ltac invert_per_ctx_envs_of pred_P Δ rel := match_by_head (per_ctx_env pred_P Δ rel) ltac:(fun H => directed invert_per_ctx_env H).
 
 Lemma per_ctx_respects_length {P : PtsSig} {pred_P : PredicativeSig P} : forall {Δ Γ Γ'},
     {{ GC Γ ≈ Γ' ∈ per_ctx pred_P Δ }} ->
