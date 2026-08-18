@@ -112,17 +112,17 @@ Ltac functional_eval_rewrite_clear1 :=
   | H1 : {{ #| ^?ρ[?n] |↘ ^?m1 }},
       H2 : {{ #| ^?ρ[?n] |↘ ^?m2 }} |- _ =>
       clean replace m2 with m1 by first [solve [mauto 2] | tactic_error m2 m1]; clear H2
-  | H1 : {{ Δ ▶ ⟦ ^?M ⟧ ^?ρ ↘ ^?m1 }},
-      H2 : {{ Δ ▶ ⟦ ^?M ⟧ ^?ρ ↘ ^?m2 }} |- _ =>
+  | H1 : {{ ^?Δ ▶ ⟦ ^?M ⟧ ^?ρ ↘ ^?m1 }},
+      H2 : {{ ^?Δ ▶ ⟦ ^?M ⟧ ^?ρ ↘ ^?m2 }} |- _ =>
       clean replace m2 with m1 by first [solve [mauto 2] | tactic_error m2 m1]; clear H2
-  | H1 : {{ Δ ▶ $| ^?m & ^?n |↘ ^?e1 }},
-      H2 : {{ Δ ▶ $| ^?m & ^?n |↘ ^?e2 }} |- _ =>
+  | H1 : {{ ^?Δ ▶ $| ^?m & ^?n |↘ ^?e1 }},
+      H2 : {{ ^?Δ ▶ $| ^?m & ^?n |↘ ^?e2 }} |- _ =>
       clean replace e2 with e1 by first [solve [mauto 2] | tactic_error e2 e1]; clear H2
-  | H1 : {{ Δ ▶ rec ^?m ⟦return ^?A | zero -> ^?MZ | succ -> ^?MS end⟧ ^?ρ ↘ ^?e1 }},
-      H2 : {{ Δ ▶ rec ^?m ⟦return ^?A | zero -> ^?MZ | succ -> ^?MS end⟧ ^?ρ ↘ ^?e2 }} |- _ =>
+  | H1 : {{ ^?Δ ▶ rec ^?m ⟦return ^?A | zero -> ^?MZ | succ -> ^?MS end⟧ ^?ρ ↘ ^?e1 }},
+      H2 : {{ ^?Δ ▶ rec ^?m ⟦return ^?A | zero -> ^?MZ | succ -> ^?MS end⟧ ^?ρ ↘ ^?e2 }} |- _ =>
       clean replace e2 with e1 by first [solve [mauto 2] | tactic_error e2 e1]; clear H2
-  | H1 : {{ Δ ▶ ⟦ ^?σ ⟧s ^?ρ ↘ ^?ρσ1 }},
-      H2 : {{ Δ ▶ ⟦ ^?σ ⟧s ^?ρ ↘ ^?ρσ2 }} |- _ =>
+  | H1 : {{ ^?Δ ▶ ⟦ ^?σ ⟧s ^?ρ ↘ ^?ρσ1 }},
+      H2 : {{ ^?Δ ▶ ⟦ ^?σ ⟧s ^?ρ ↘ ^?ρσ2 }} |- _ =>
       clean replace ρσ2 with ρσ1 by first [solve [mauto 2] | tactic_error ρσ2 ρσ1]; clear H2
   end.
 Ltac functional_eval_rewrite_clear := repeat functional_eval_rewrite_clear1.

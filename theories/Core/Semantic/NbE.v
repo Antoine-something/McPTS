@@ -7,7 +7,8 @@ Import Domain_Notations.
 Generalizable All Variables.
 
 Inductive initial_env {P : PtsSig} : gctx P -> ctx P -> env P -> Prop :=
-| initial_env_nil : initial_env nil nil empty_env
+| initial_env_nil :
+  `( initial_env Δ nil empty_env )
 | initial_env_cons :
   `( initial_env Δ Γ ρ ->
      {{ Δ ▶ ⟦ A ⟧ ρ ↘ a }} ->

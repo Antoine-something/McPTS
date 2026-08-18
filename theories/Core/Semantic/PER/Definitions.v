@@ -7,16 +7,19 @@ From McPTS.Core.Syntactic Require Import System.
 From McPTS.Core.Semantic Require Export Domain Evaluation Readback.
 Import Domain_Notations.
 
-Notation "'Dom' a ≈ b ∈ R" := ((R a b : Prop) : Prop) (in custom judg at level 90, a custom domain, b custom domain, R constr).
-Notation "'DF' a ≈ b ∈ R ↘ R'" := ((R R' a b : Prop) : Prop) (in custom judg at level 90, a custom domain, b custom domain, R constr, R' constr).
-(* Notation "'Exp' a ≈ b ∈ R" := (R a b : (Prop : Type)) (in custom judg at level 90, a custom exp, b custom exp, R constr). *)
-Notation "'GC' Δ ≈ Δ' ∈ R" := ((R Δ Δ' : Prop) : Prop) (in custom judg at level 90, Δ custom exp, Δ' custom exp, R constr).
-Notation "'EF' Δ ; Γ ≈ Γ' ∈ R ↘ R'" := (R Δ R' Γ Γ': (Prop : Type)) (in custom judg at level 90, Δ custom exp, Γ custom exp, Γ' custom exp, R constr, R' constr).
+Notation "'Dom' a ≈ b ∈ R" := ((R a b : Prop) : Prop) (in custom judg at level 80, a custom domain, b custom domain, R constr).
+Notation "'DF' a ≈ b ∈ R ↘ R'" := ((R R' a b : Prop) : Prop) (in custom judg at level 80, a custom domain, b custom domain, R constr, R' constr).
+Notation "'GC' Δ ≈ Δ' ∈ R" := ((R Δ Δ' : Prop) : Prop) (in custom judg at level 80, Δ custom exp, Δ' custom exp, R constr).
+Notation "'EF' Γ ≈ Γ' ∈ R ↘ R'" := (R R' Γ Γ': (Prop : Type)) (in custom judg at level 80, Γ custom exp, Γ' custom exp, R constr, R' constr).
 
-Reserved Notation "⟪ pred_P ⟫ 'Subs' a <: b 'at' s" (in custom judg at level 80, pred_P constr, a custom domain, b custom domain, s constr).
-Reserved Notation "⟪ pred_P ⟫ 'Sub' a <: b" (in custom judg at level 80, pred_P constr, a custom domain, b custom domain).
-Reserved Notation "⟪ pred_P ⟫ 'SubG' Γ <: Γ'" (in custom judg at level 80, pred_P constr, Γ custom exp, Γ' custom exp).
-Reserved Notation "⟪ pred_P ⟫ 'SubC' Δ <: Δ'" (in custom judg at level 80, pred_P constr, Δ custom exp, Δ' custom exp).
+Notation "'SubT' a <: b ∈ R" := ((R a b : Prop) : Prop) (in custom judg at level 80, a custom domain, b custom domain, R constr).
+Notation "'SubG' Δ <: Δ' ∈ R" := ((R Δ Δ' : Prop) : Prop) (in custom judg at level 80, Δ custom exp, Δ' custom exp, R constr).
+Notation "'SubC' Γ <: Γ' ∈ R" := ((R Γ Γ' : Prop) : Prop) (in custom judg at level 80, Γ custom exp, Γ' custom exp, R constr).
+
+(* Reserved Notation "⟪ pred_P ⟫ 'Subs' a <: b 'at' s" (in custom judg at level 80, pred_P constr, a custom domain, b custom domain, s constr). *)
+(* Reserved Notation "⟪ pred_P ⟫ 'Sub' a <: b" (in custom judg at level 80, pred_P constr, a custom domain, b custom domain). *)
+(* Reserved Notation "⟪ pred_P ⟫ 'SubG' Γ <: Γ'" (in custom judg at level 80, pred_P constr, Γ custom exp, Γ' custom exp). *)
+(* Reserved Notation "⟪ pred_P ⟫ 'SubC' Δ <: Δ'" (in custom judg at level 80, pred_P constr, Δ custom exp, Δ' custom exp). *)
 
 
 (** Precedences of the next notations follow the ones in the standard library.
@@ -29,22 +32,32 @@ Generalizable All Variables.
 
 (** *** Helper Bundles *)
 (** Related modulo evaluation *)
-Variant rel_mod_eval `(R : relation (domain P) -> domain P -> domain P -> Prop) A Δ ρ A' Δ' ρ' R' : Prop := mk_rel_mod_eval : forall a a', {{ ⟦ A ⟧ (Δ ; ρ) ↘ a }} -> {{ ⟦ A' ⟧ (Δ' ; ρ') ↘ a' }} -> {{ DF a ≈ a' ∈ R ↘ R' }} -> rel_mod_eval R A Δ ρ A' Δ' ρ' R'.
+Variant rel_mod_eval `(R : relation (domain P) -> domain P -> domain P -> Prop) Δ A ρ A' ρ' R' : Prop :=
+  mk_rel_mod_eval : forall a a',
+      {{ Δ ▶ ⟦ A ⟧ ρ ↘ a }} ->
+      {{ Δ ▶ ⟦ A' ⟧ ρ' ↘ a' }} ->
+      {{ DF a ≈ a' ∈ R ↘ R' }} ->
+      rel_mod_eval R Δ A ρ A' ρ' R'.
 #[global]
-Arguments mk_rel_mod_eval {_ _ _ _ _ _ _ _ _}.
+Arguments mk_rel_mod_eval {_ _ _ _ _ _ _ _}.
 #[export]
 Hint Constructors rel_mod_eval : mcpts.
 
 (** Related modulo application *)
-Variant rel_mod_app {P : PtsSig} f a f' a' (R : relation (domain P)) : Prop := mk_rel_mod_app : forall fa f'a', {{ $| f & a |↘ fa }} -> {{ $| f' & a' |↘ f'a' }} -> {{ Dom fa ≈ f'a' ∈ R }} -> rel_mod_app f a f' a' R.
+Variant rel_mod_app {P : PtsSig} Δ f a f' a' (R : relation (domain P)) : Prop :=
+  mk_rel_mod_app : forall fa f'a',
+      {{ Δ ▶ $| f & a |↘ fa }} ->
+      {{ Δ ▶ $| f' & a' |↘ f'a' }} ->
+      {{ Dom fa ≈ f'a' ∈ R }} ->
+      rel_mod_app Δ f a f' a' R.
 #[global]
-Arguments mk_rel_mod_app {_ _ _ _ _ _}.
+Arguments mk_rel_mod_app {_ _ _ _ _ _ _}.
 #[export]
 Hint Constructors rel_mod_app : mcpts.
 
 (** *** (Some Elements of) PER Lattice *)
 
-Definition per_bot {P : PtsSig} : relation (domain_ne P) := fun m m' => (forall s, exists L, {{ Rne m in s ↘ L }} /\ {{ Rne m' in s ↘ L }}).
+Definition per_bot {P : PtsSig} (Δ : gctx P) : relation (domain_ne P) := fun m m' => (forall i, exists L, {{ Δ ▶ Rne m in i ↘ L }} /\ {{ Δ ▶ Rne m' in i ↘ L }}).
 #[global]
 Arguments per_bot /.
 #[export]
@@ -52,7 +65,7 @@ Hint Transparent per_bot : mcpts.
 #[export]
 Hint Unfold per_bot : mcpts.
 
-Definition per_top {P : PtsSig} : relation (domain_nf P) := fun m m' => (forall s, exists L, {{ Rnf m in s ↘ L }} /\ {{ Rnf m' in s ↘ L }}).
+Definition per_top {P : PtsSig} (Δ : gctx P) : relation (domain_nf P) := fun m m' => (forall i, exists L, {{ Δ ▶ Rnf m in i ↘ L }} /\ {{ Δ ▶ Rnf m' in i ↘ L }}).
 #[global]
 Arguments per_top /.
 #[export]
@@ -60,7 +73,7 @@ Hint Transparent per_top : mcpts.
 #[export]
 Hint Unfold per_top : mcpts.
 
-Definition per_top_typ {P : PtsSig} : relation (domain P) := fun a a' => (forall s, exists C, {{ Rtyp a in s ↘ C }} /\ {{ Rtyp a' in s ↘ C }}).
+Definition per_top_typ {P : PtsSig} (Δ : gctx P) : relation (domain P) := fun a a' => (forall i, exists C, {{ Δ ▶ Rtyp a in i ↘ C }} /\ {{ Δ ▶ Rtyp a' in i ↘ C }}).
 #[global]
 Arguments per_top_typ /.
 #[export]
@@ -68,22 +81,22 @@ Hint Transparent per_top_typ : mcpts.
 #[export]
 Hint Unfold per_top_typ : mcpts.
 
-Inductive per_nat {P : PtsSig} : relation (domain P):=
-| per_nat_zero : {{ Dom zero ≈ zero ∈ per_nat }}
+Inductive per_nat {P : PtsSig} (Δ : gctx P) : relation (domain P):=
+| per_nat_zero : {{ Dom zero ≈ zero ∈ per_nat Δ }}
 | per_nat_succ :
-  `{ {{ Dom m ≈ m' ∈ per_nat }} ->
-     {{ Dom succ m ≈ succ m' ∈ per_nat }} }
+  `{ {{ Dom m ≈ m' ∈ per_nat Δ }} ->
+     {{ Dom succ m ≈ succ m' ∈ per_nat Δ }} }
 | per_nat_neut :
-  `{ {{ Dom m ≈ m' ∈ per_bot }} ->
-     {{ Dom ⇑ a m ≈ ⇑ a' m' ∈ per_nat }} }
+  `{ {{ Dom m ≈ m' ∈ per_bot Δ }} ->
+     {{ Dom ⇑ a m ≈ ⇑ a' m' ∈ per_nat Δ }} }
 .
 #[export]
 Hint Constructors per_nat : mcpts.
 
-Variant per_ne {P : PtsSig} : relation (domain P) :=
+Variant per_ne {P : PtsSig} (Δ : gctx P): relation (domain P) :=
 | per_ne_neut :
-  `{ {{ Dom m ≈ m' ∈ @per_bot P }} ->
-     {{ Dom ⇑ a m ≈ ⇑ a' m' ∈ per_ne }} }
+  `{ {{ Dom m ≈ m' ∈ per_bot Δ }} ->
+     {{ Dom ⇑ a m ≈ ⇑ a' m' ∈ per_ne Δ }} }
 .
 #[export]
 Hint Constructors per_ne : mcpts.
@@ -93,7 +106,8 @@ Hint Constructors per_ne : mcpts.
 Section Per_sort_elem_core_def.
   Context
     `(pred_P : PredicativeSig P)
-      (s_elem : P).
+      (Δ : gctx P)
+      (s_elem : P).  
 
   Let dom := domain P.
 
@@ -121,19 +135,19 @@ Section Per_sort_elem_core_def.
          (equiv_a_a' : (s_in = s_elem -> {{ DF a ≈ a' ∈ per_sort_elem_core ↘ in_rel }}) /\ (forall (lt_in_elem : pred_rel pred_P s_in s_elem), {{ DF a ≈ a' ∈ per_sort_elem_rec lt_in_elem ↘ in_rel }})),
           PER in_rel ->
           (forall {n n'} (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}),
-              rel_mod_eval (fun R b b' => (s_out = s_elem -> {{ DF b ≈ b' ∈ per_sort_elem_core ↘ R }}) /\ (forall (lt_out_elem : pred_rel pred_P s_out s_elem), {{ DF b ≈ b' ∈ per_sort_elem_rec lt_out_elem ↘ R }})) B Δ d{{{ ρ ↦ n }}} B' Δ' d{{{ ρ' ↦ n' }}} (out_rel equiv_n_n')) ->
-          (elem_rel <~> fun f f' => forall n n' (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}), rel_mod_app f n f' n' (out_rel equiv_n_n')) ->
-          {{ DF Π r a (Δ ; ρ) B ≈ Π r a' (Δ' ; ρ') B' ∈ per_sort_elem_core ↘ elem_rel }} }
+              rel_mod_eval (fun R b b' => (s_out = s_elem -> {{ DF b ≈ b' ∈ per_sort_elem_core ↘ R }}) /\ (forall (lt_out_elem : pred_rel pred_P s_out s_elem), {{ DF b ≈ b' ∈ per_sort_elem_rec lt_out_elem ↘ R }})) Δ B d{{{ ρ ↦ n }}} B' d{{{ ρ' ↦ n' }}} (out_rel equiv_n_n')) ->
+          (elem_rel <~> fun f f' => forall n n' (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}), rel_mod_app Δ f n f' n' (out_rel equiv_n_n')) ->
+          {{ DF Π r a ρ B ≈ Π r a' ρ' B' ∈ per_sort_elem_core ↘ elem_rel }} }
   | per_sort_elem_core_nat :
     `{ forall (r : Ru_nat P s)
          (sub : st_subtyp s s_elem)
          (elem_rel : relation dom),
-          (elem_rel <~> per_nat) ->
+          (elem_rel <~> per_nat Δ) ->
           {{ DF ℕ ≈ ℕ ∈ per_sort_elem_core ↘ elem_rel }} }
   | per_sort_elem_core_neut :
     `{ forall (elem_rel : relation dom),
-          {{ Dom e ≈ e' ∈ per_bot }} ->
-          (elem_rel <~> per_ne) ->
+          {{ Dom e ≈ e' ∈ per_bot Δ }} ->
+          (elem_rel <~> per_ne Δ) ->
           {{ DF ⇑ a e ≈ ⇑ a' e' ∈ per_sort_elem_core ↘ elem_rel }} }
   .
 
@@ -150,26 +164,26 @@ Section Per_sort_elem_core_def.
       (case_Pi :
         forall {s_in s_out s_pi : P} (r : Ru_pi P s_in s_out s_pi)
           (sub : st_subtyp s_pi s_elem)
-          {a Δ ρ B a' Δ' ρ' B' in_rel}
+          {a ρ B a' ρ' B' in_rel}
           (out_rel : forall {n n'} (equiv_n_n' : (in_rel n n')), relation dom)
           {elem_rel : relation dom},
           (s_in = s_elem -> {{ DF a ≈ a' ∈ per_sort_elem_core ↘ in_rel }} /\ motive in_rel a a') /\ (forall (lt_in_elem : pred_rel pred_P s_in s_elem), {{ DF a ≈ a' ∈ per_sort_elem_rec lt_in_elem ↘ in_rel }}) ->
           PER in_rel ->
           (forall {n n'} (equiv_n_n' : (in_rel n n')),
-              rel_mod_eval (fun R b b' => (s_out = s_elem -> {{ DF b ≈ b' ∈ per_sort_elem_core ↘ R }} /\ motive R b b') /\ (forall (lt_out_elem : pred_rel pred_P s_out s_elem), {{ DF b ≈ b' ∈ per_sort_elem_rec lt_out_elem ↘ R }})) B Δ d{{{ ρ ↦ n }}} B' Δ' d{{{ ρ' ↦ n' }}} (out_rel equiv_n_n')) ->
-          (elem_rel <~> fun f f' => forall n n' (equiv_n_n' : (in_rel n n')), rel_mod_app f n f' n' (out_rel equiv_n_n')) ->
-          motive elem_rel d{{{ Π r a (Δ ; ρ) B }}} d{{{ Π r a' (Δ' ; ρ') B' }}})
+              rel_mod_eval (fun R b b' => (s_out = s_elem -> {{ DF b ≈ b' ∈ per_sort_elem_core ↘ R }} /\ motive R b b') /\ (forall (lt_out_elem : pred_rel pred_P s_out s_elem), {{ DF b ≈ b' ∈ per_sort_elem_rec lt_out_elem ↘ R }})) Δ B d{{{ ρ ↦ n }}} B' d{{{ ρ' ↦ n' }}} (out_rel equiv_n_n')) ->
+          (elem_rel <~> fun f f' => forall n n' (equiv_n_n' : (in_rel n n')), rel_mod_app Δ f n f' n' (out_rel equiv_n_n')) ->
+          motive elem_rel d{{{ Π r a ρ B }}} d{{{ Π r a' ρ' B' }}})
       (case_nat :
         forall {s} (r : Ru_nat P s)
           (sub : st_subtyp s s_elem)
           {elem_rel : relation dom},
-          (elem_rel <~> per_nat) ->
+          (elem_rel <~> per_nat Δ) ->
           motive elem_rel d{{{ ℕ }}} d{{{ ℕ }}})
       (case_ne :
         forall {a a' b b'}
           {elem_rel : relation dom},
-          (per_bot b b') ->
-          (elem_rel <~> per_ne) ->
+          {{ Dom b ≈ b' ∈ per_bot Δ }} ->
+          (elem_rel <~> per_ne Δ) ->
           motive elem_rel (d_neut a b) (d_neut a' b'))
   .
 
@@ -195,33 +209,34 @@ End Per_sort_elem_core_def.
 Hint Constructors per_sort_elem_core : mcpts.
 
 Section Per_sort_elem_def.
-  Context `(pred_P : PredicativeSig P).
+  Context `(pred_P : PredicativeSig P)
+           (Δ : gctx P).
 
   Let dom := domain P.
 
   Instance Per_sort_elem_def_wf : WellFounded (pred_rel pred_P) := (wf_rel pred_P).
 
   Equations per_sort_elem (s : P) : relation dom -> dom -> dom -> Prop by wf s :=
-  | s => per_sort_elem_core pred_P s (fun s' lt_s'_s R' a a' => {{ DF a ≈ a' ∈ per_sort_elem s' ↘ R' }}).
+  | s => per_sort_elem_core pred_P Δ s (fun s' lt_s'_s R' a a' => {{ DF a ≈ a' ∈ per_sort_elem s' ↘ R' }}).
 End Per_sort_elem_def.
 
 Arguments per_sort_elem {_} _.
 
-Definition per_sort `(pred_P : PredicativeSig P) (s : P) : relation (domain P) :=
-  fun a a' => exists R', {{ DF a ≈ a' ∈ per_sort_elem pred_P s ↘ R' }}.
+Definition per_sort `(pred_P : PredicativeSig P) (Δ : gctx P) (s : P) : relation (domain P) :=
+  fun a a' => exists R', {{ DF a ≈ a' ∈ per_sort_elem pred_P Δ s ↘ R' }}.
 
 #[global]
-Arguments per_sort _ _ _ _ _ /.
+Arguments per_sort _ _ _ _ _ _ /.
 #[export]
 Hint Transparent per_sort : mcpts.
 #[export]
 Hint Unfold per_sort : mcpts.
 
-Lemma per_sort_elem_core_sort' `{pred_P : PredicativeSig P} : forall s1 s2 s_elem elem_rel,
+Lemma per_sort_elem_core_sort' `{pred_P : PredicativeSig P} : forall Δ s1 s2 s_elem elem_rel,
     Ax_typ P s1 s2 ->
     st_subtyp s2 s_elem ->
-    (elem_rel <~> per_sort pred_P s1) ->
-    {{ DF Sort@s1 ≈ Sort@s1 ∈ per_sort_elem pred_P s_elem ↘ elem_rel }}.
+    (elem_rel <~> per_sort pred_P Δ s1) ->
+    {{ DF Sort@s1 ≈ Sort@s1 ∈ per_sort_elem pred_P Δ s_elem ↘ elem_rel }}.
 Proof.
   intros.
   simp per_sort_elem.
@@ -236,7 +251,8 @@ Hint Resolve per_sort_elem_core_sort' : mcpts.
 Section Per_sort_elem_ind_def.
   Context
     (P : PtsSig)
-      (pred_P : PredicativeSig P).
+      (pred_P : PredicativeSig P)
+      (Δ : gctx P).
 
   Let dom := domain P.
 
@@ -247,29 +263,29 @@ Section Per_sort_elem_ind_def.
           (ax : Ax_typ P s1 s2)
           (sub : st_subtyp s2 s_elem),
           s1 = s1' ->
-          (elem_rel <~> per_sort pred_P s1) ->
-          (forall a b R, {{ DF a ≈ b ∈ per_sort_elem pred_P s1 ↘ R }} -> motive s1 R a b) ->
+          (elem_rel <~> per_sort pred_P Δ s1) ->
+          (forall a b R, {{ DF a ≈ b ∈ per_sort_elem pred_P Δ s1 ↘ R }} -> motive s1 R a b) ->
           motive s_elem elem_rel d{{{ Sort@s1 }}} d{{{ Sort@s1' }}})
       (case_Pi :
         forall s_elem {s_in s_out s_pi} (r : Ru_pi P s_in s_out s_pi)
           (sub : st_subtyp s_pi s_elem)
-          {a Δ ρ B a' Δ' ρ' B' in_rel}
+          {a ρ B a' ρ' B' in_rel}
           (out_rel : forall {n n'} (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}), relation dom)
           {elem_rel},
-          {{ DF a ≈ a' ∈ per_sort_elem pred_P s_in ↘ in_rel }} ->
+          {{ DF a ≈ a' ∈ per_sort_elem pred_P Δ s_in ↘ in_rel }} ->
           motive s_in in_rel a a' ->
           PER in_rel ->
           (forall {n n'} (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}),
-              rel_mod_eval (fun R x y => {{ DF x ≈ y ∈ per_sort_elem pred_P s_out ↘ R }} /\ motive s_out R x y) B Δ d{{{ ρ ↦ n }}} B' Δ' d{{{ ρ' ↦ n' }}} (out_rel equiv_n_n')) ->
-          (elem_rel <~> fun f f' => forall n n' (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}), rel_mod_app f n f' n' (out_rel equiv_n_n')) ->
-          motive s_elem elem_rel d{{{ Π r a (Δ ; ρ) B }}} d{{{ Π r a' (Δ' ; ρ') B' }}})
+              rel_mod_eval (fun R x y => {{ DF x ≈ y ∈ per_sort_elem pred_P Δ s_out ↘ R }} /\ motive s_out R x y) Δ B d{{{ ρ ↦ n }}} B' d{{{ ρ' ↦ n' }}} (out_rel equiv_n_n')) ->
+          (elem_rel <~> fun f f' => forall n n' (equiv_n_n' : {{ Dom n ≈ n' ∈ in_rel }}), rel_mod_app Δ f n f' n' (out_rel equiv_n_n')) ->
+          motive s_elem elem_rel d{{{ Π r a ρ B }}} d{{{ Π r a' ρ' B' }}})
       (case_N : forall s s_elem (r : Ru_nat P s) (sub : st_subtyp s s_elem) {elem_rel},
-          (elem_rel <~> per_nat) ->
+          (elem_rel <~> per_nat Δ) ->
           motive s_elem elem_rel d{{{ ℕ }}} d{{{ ℕ }}})
       (case_ne :
         forall s_elem {a a' b b' elem_rel},
-          {{ Dom b ≈ b' ∈ per_bot }} ->
-          (elem_rel <~> per_ne) ->
+          {{ Dom b ≈ b' ∈ per_bot Δ }} ->
+          (elem_rel <~> per_ne Δ) ->
           motive s_elem elem_rel d{{{ ⇑ a b }}} d{{{ ⇑ a' b' }}}).
 
   #[local]
@@ -282,11 +298,11 @@ Section Per_sort_elem_ind_def.
 
   #[derive(equations=no, eliminator=no), tactic="impl_tac"]
   Equations per_sort_elem_ind' (s : P) (R : relation dom) (a b : dom)
-  (H : {{ DF a ≈ b ∈ per_sort_elem_core pred_P s (fun s' lt_s'_s R' a a' => {{ DF a ≈ a' ∈ per_sort_elem pred_P s' ↘ R' }}) ↘ R }}) : {{ DF a ≈ b ∈ motive s ↘ R }} by wf s :=
+  (H : {{ DF a ≈ b ∈ per_sort_elem_core pred_P Δ s (fun s' lt_s'_s R' a a' => {{ DF a ≈ a' ∈ per_sort_elem pred_P Δ s' ↘ R' }}) ↘ R }}) : {{ DF a ≈ b ∈ motive s ↘ R }} by wf s :=
   | s, R, a, b =>
-      per_sort_elem_core_strong_ind pred_P s _ (motive s)
+      per_sort_elem_core_strong_ind pred_P Δ s _ (motive s)
         (fun _ _ _ ax_typ sub _ eq HE => case_sort  _ ax_typ sub eq HE (fun a' b' R' H' => per_sort_elem_ind' _ R' a' b' _))
-        (fun _ _ _ r sub _ _ _ _ _ _ _ _ _ out_rel _ HA per HB =>
+        (fun _ _ _ r sub _ _ _ _ _ _ _ out_rel _ HA per HB =>
            let 'conj Heq Hlt := HA in
            case_Pi _ r sub out_rel
              (match proj1 (ord_ru_pi_sub pred_P r sub) with
@@ -312,106 +328,137 @@ Section Per_sort_elem_ind_def.
   Qed.
   Next Obligation.
     unfold pointwise_lifting.
-    rewrite -> r0.
-    reflexivity.
+    apply r0.
   Qed.
 
   #[derive(equations=no, eliminator=no), tactic="def_simp"]
-  Equations per_sort_elem_ind s a b R (H : per_sort_elem pred_P s a b R) : motive s a b R :=
+  Equations per_sort_elem_ind s a b R (H : per_sort_elem pred_P Δ s a b R) : motive s a b R :=
   | s, a, b, R, _ := per_sort_elem_ind' s a b R _.
 End Per_sort_elem_ind_def.
-
-(** Subtyping PER *)
-
-
-(** Sorted version of subtyping, helps recover per_sort relations in some lemmas *)
-Inductive per_subtyp_sorted `(pred_P : PredicativeSig P) : P -> domain P -> domain P -> Prop :=
-| per_subtyp_sorted_sort :
-  `( st_subtyp s1 s2 ->
-     {{ Dom Sort@s1 ≈ Sort@s1 ∈ per_sort pred_P s }} ->
-     {{ Dom Sort@s2 ≈ Sort@s2 ∈ per_sort pred_P s }} ->
-     {{ ⟪ pred_P ⟫ Subs Sort@s1 <: Sort@s2 at s }} )
-| per_subtyp_sorted_nat :
-  `( {{ Dom ℕ ≈ ℕ ∈ per_sort pred_P s }} ->
-     {{ ⟪ pred_P ⟫ Subs ℕ <: ℕ at s }} )
-| per_subtyp_sorted_pi :
-  `( forall {r : Ru_pi P s1 s2 s3}
-       {sub : st_subtyp s3 s}
-       (in_rel : relation (domain P)) elem_rel elem_rel',
-        {{ DF a ≈ a' ∈ per_sort_elem pred_P s1 ↘ in_rel }} ->
-        (forall c c' b b',
-            {{ Dom c ≈ c' ∈ in_rel }} ->
-            {{ ⟦ B ⟧ (Δ ; ρ ↦ c) ↘ b }} ->
-            {{ ⟦ B' ⟧ (Δ' ; ρ' ↦ c') ↘ b' }} ->
-            {{ ⟪ pred_P ⟫ Subs b <: b' at s2 }}) ->
-        {{ DF Π r a (Δ ; ρ) B ≈ Π r a (Δ ; ρ) B ∈ per_sort_elem pred_P s ↘ elem_rel }} ->
-        {{ DF Π r a' (Δ' ; ρ') B' ≈ Π r a' (Δ' ; ρ') B' ∈ per_sort_elem pred_P s ↘ elem_rel' }} ->
-        {{ ⟪ pred_P ⟫ Subs Π r a (Δ ; ρ) B <: Π r a' (Δ' ; ρ') B' at s }})
-| per_subtyp_sorted_neut :
-  `( {{ Dom e ≈ e' ∈ per_bot }} ->
-     {{ ⟪ pred_P ⟫ Subs ⇑ a e <: ⇑ a' e' at s }} )
-where "⟪ pred_P ⟫ 'Subs' a <: b 'at' s" := (per_subtyp_sorted pred_P s a b) (in custom judg) : type_scope.
-
-Inductive per_subtyp `(pred_P : PredicativeSig P) : domain P -> domain P -> Prop :=
-| per_subtyp_sort :
-  `( st_subtyp s1 s2 ->
-     {{ ⟪ pred_P ⟫ Sub Sort@s1 <: Sort@s2 }} )
-| per_subtyp_from_sorted :
-  `( {{ ⟪ pred_P ⟫ Subs a <: b at s }} ->
-     {{ ⟪ pred_P ⟫ Sub a <: b }} )
-where "⟪ pred_P ⟫ 'Sub' a <: b" := (per_subtyp pred_P a b) (in custom judg) : type_scope.
-
-#[export]
-Hint Constructors per_subtyp_sorted per_subtyp : mcpts.
-
-
-Definition rel_typ `(pred_P : PredicativeSig P) s A Δ ρ A' Δ' ρ' R' := rel_mod_eval (per_sort_elem pred_P s) A Δ ρ A' Δ' ρ' R'.
-Arguments rel_typ _ _ _ _ _ _ _ _ _ _ /.
-#[export]
-Hint Transparent rel_typ : mcpts.
-#[export]
-Hint Unfold rel_typ : mcpts.
 
 
 (** * Unsorted type PER *)
 Section Per_typ_def.
   Context
-    `(pred_P : PredicativeSig P).
+    `(pred_P : PredicativeSig P)
+      (Δ : gctx P).
 
   Let dom := domain P.
 
   Inductive per_typ_elem : relation dom -> dom -> dom -> Prop :=
   | per_typ_sort :
-    `{ R <~> per_sort pred_P s ->
+    `{ R <~> per_sort pred_P Δ s ->
        {{ DF Sort@s ≈ Sort@s ∈ per_typ_elem ↘ R }} }
   | per_typ_type :
-    `{ {{ DF a ≈ b ∈ per_sort_elem pred_P s ↘ R }} ->
+    `{ {{ DF a ≈ b ∈ per_sort_elem pred_P Δ s ↘ R }} ->
        {{ DF a ≈ b ∈ per_typ_elem ↘ R }} }.
-
 End Per_typ_def.
 
 #[export]
 Hint Constructors per_typ_elem : mcpts.
 
-
-Definition per_typ `(pred_P : PredicativeSig P) : relation (domain P) :=
-  fun a a' => exists R', {{ DF a ≈ a' ∈ per_typ_elem pred_P ↘ R' }}.
+Definition per_typ `(pred_P : PredicativeSig P) (Δ : gctx P) : relation (domain P) :=
+  fun a a' => exists R', {{ DF a ≈ a' ∈ per_typ_elem pred_P Δ ↘ R' }}.
 #[global]
-Arguments per_typ _ _ _ _ /.
+Arguments per_typ _ _ _ _ _ /.
 #[export]
 Hint Transparent per_typ : mcpts.
 #[export]
 Hint Unfold per_typ : mcpts.
 
 
-
-
-Definition rel_typ_unsorted `(pred_P : PredicativeSig P) A ρ A' ρ' R' := rel_mod_eval (per_typ_elem pred_P) A ρ A' ρ' R'.
-Arguments rel_typ_unsorted _ _ _ _ _ _ _ /.
+Definition rel_typ_unsorted `(pred_P : PredicativeSig P) Δ A ρ A' ρ' R' := rel_mod_eval (per_typ_elem pred_P Δ) Δ A ρ A' ρ' R'.
+Arguments rel_typ_unsorted _ _ _ _ _ _ _ _ /.
 #[export]
 Hint Transparent rel_typ_unsorted : mcpts.
 #[export]
 Hint Unfold rel_typ_unsorted : mcpts.
+
+
+(** Subtyping PER *)
+(** Sorted version of subtyping, helps recover per_sort relations in some lemmas *)
+Section Per_Subtyp_Def.
+  Context `(pred_P : PredicativeSig P)
+    (Δ : gctx P).
+
+  Let dom := domain P.
+  
+  Inductive per_subtyp : dom -> dom -> Prop :=
+  | per_subtyp_sort :
+    `( st_subtyp s1 s2 ->
+       {{ SubT Sort@s1 <: Sort@s2 ∈ per_subtyp }} )
+  | per_subtyp_nat :
+    `( Ru_nat P s ->
+       {{ SubT ℕ <: ℕ ∈ per_subtyp }} )
+  | per_subtyp_pi :
+    `( forall {r : Ru_pi P s1 s2 s3}
+         {sub : st_subtyp s3 s}
+         (in_rel : relation dom) elem_rel elem_rel',
+          {{ DF a ≈ a' ∈ per_sort_elem pred_P Δ s1 ↘ in_rel }} ->
+          (forall c c' b b',
+              {{ Dom c ≈ c' ∈ in_rel }} ->
+              {{ Δ ▶ ⟦ B ⟧ ρ ↦ c ↘ b }} ->
+              {{ Δ ▶ ⟦ B' ⟧ ρ' ↦ c' ↘ b' }} ->
+              {{ SubT b <: b' ∈ per_subtyp }}) ->
+          {{ DF Π r a ρ B ≈ Π r a ρ B ∈ per_sort_elem pred_P Δ s ↘ elem_rel }} ->
+          {{ DF Π r a' ρ' B' ≈ Π r a' ρ' B' ∈ per_sort_elem pred_P Δ s ↘ elem_rel' }} ->
+          {{ SubT Π r a ρ B <: Π r a' ρ' B' ∈ per_subtyp }} )
+  | per_subtyp_neut :
+    `( {{ Dom e ≈ e' ∈ per_bot Δ }} ->
+       {{ SubT ⇑ a e <: ⇑ a' e' ∈ per_subtyp }} ).
+End Per_Subtyp_Def.
+
+#[export]
+Hint Constructors per_subtyp : mcpts.
+
+
+(* Inductive per_subtyp_sorted `(pred_P : PredicativeSig P) (Δ : gctx P) : P -> domain P -> domain P -> Prop := *)
+(* | per_subtyp_sorted_sort : *)
+(*   `( st_subtyp s1 s2 -> *)
+(*      {{ Dom Sort@s1 ≈ Sort@s1 ∈ per_sort pred_P Δ s }} -> *)
+(*      {{ Dom Sort@s2 ≈ Sort@s2 ∈ per_sort pred_P Δ s }} -> *)
+(*      {{ SubT Sort@s1 <: Sort@s2 ∈ per_subtyp_sorted pred_P Δ s }} ) *)
+(* | per_subtyp_sorted_nat : *)
+(*   `( {{ Dom ℕ ≈ ℕ ∈ per_sort pred_P Δ s }} -> *)
+(*      {{ SubT ℕ <: ℕ ∈ per_subtyp_sorted pred_P Δ s }} ) *)
+(* | per_subtyp_sorted_pi : *)
+(*   `( forall {r : Ru_pi P s1 s2 s3} *)
+(*        {sub : st_subtyp s3 s} *)
+(*        (in_rel : relation (domain P)) elem_rel elem_rel', *)
+(*         {{ DF a ≈ a' ∈ per_sort_elem pred_P Δ s1 ↘ in_rel }} -> *)
+(*         (forall c c' b b', *)
+(*             {{ Dom c ≈ c' ∈ in_rel }} -> *)
+(*             {{ Δ ▶ ⟦ B ⟧ ρ ↦ c ↘ b }} -> *)
+(*             {{ Δ ▶ ⟦ B' ⟧ ρ' ↦ c' ↘ b' }} -> *)
+(*             {{ SubT b <: b' ∈ per_subtyp_sorted pred_P Δ s2 }}) -> *)
+(*         {{ DF Π r a ρ B ≈ Π r a ρ B ∈ per_sort_elem pred_P Δ s ↘ elem_rel }} -> *)
+(*         {{ DF Π r a' ρ' B' ≈ Π r a' ρ' B' ∈ per_sort_elem pred_P Δ s ↘ elem_rel' }} -> *)
+(*         {{ SubT Π r a ρ B <: Π r a' ρ' B' ∈ per_subtyp_sorted pred_P Δ s }}) *)
+(* | per_subtyp_sorted_neut : *)
+(*   `( {{ Dom e ≈ e' ∈ per_bot }} -> *)
+(*      {{ ⟪ pred_P ⟫ Subs ⇑ a e <: ⇑ a' e' at s }} ) *)
+(* where "⟪ pred_P ⟫ 'Subs' a <: b 'at' s" := (per_subtyp_sorted pred_P s a b) (in custom judg) : type_scope. *)
+
+(* Inductive per_subtyp `(pred_P : PredicativeSig P) : domain P -> domain P -> Prop := *)
+(* | per_subtyp_sort : *)
+(*   `( st_subtyp s1 s2 -> *)
+(*      {{ ⟪ pred_P ⟫ Sub Sort@s1 <: Sort@s2 }} ) *)
+(* | per_subtyp_from_sorted : *)
+(*   `( {{ ⟪ pred_P ⟫ Subs a <: b at s }} -> *)
+(*      {{ ⟪ pred_P ⟫ Sub a <: b }} ) *)
+(* where "⟪ pred_P ⟫ 'Sub' a <: b" := (per_subtyp pred_P a b) (in custom judg) : type_scope. *)
+
+(* #[export] *)
+(* Hint Constructors per_subtyp_sorted per_subtyp : mcpts. *)
+
+
+(* Definition rel_typ `(pred_P : PredicativeSig P) s A Δ ρ A' Δ' ρ' R' := rel_mod_eval (per_sort_elem pred_P s) A Δ ρ A' Δ' ρ' R'. *)
+(* Arguments rel_typ _ _ _ _ _ _ _ _ _ _ /. *)
+(* #[export] *)
+(* Hint Transparent rel_typ : mcpts. *)
+(* #[export] *)
+(* Hint Unfold rel_typ : mcpts. *)
+
 
 
 (** * Context/Environment PERs *)
@@ -425,9 +472,13 @@ Section PER_gctx_def.
     {{ GC ⋅ ≈ ⋅ ∈ per_gctx }}
   | per_gctx_env_cons :
     `{ {{ GC Δ ≈ Δ' ∈ per_gctx }} ->
-       {{ ⟦ A ⟧ (Δ ; ⋅) ↘ a }} ->
-       {{ ⟦ A' ⟧ (Δ' ; ⋅) ↘ a' }} ->
-       {{ Dom a ≈ a' ∈ per_typ pred_P }} ->
+       (env_rel <~> (fun ρ ρ' => True)) ->
+       rel_typ_unsorted pred_P Δ A d{{{ ⋅ }}} A' d{{{ ⋅ }}} env_rel ->
+       rel_typ_unsorted pred_P Δ' A d{{{ ⋅ }}} A' d{{{ ⋅ }}} env_rel ->
+       (* {{ Δ ▶ ⟦ A ⟧ ⋅ ↘ a }} -> *)
+       (* {{ Δ' ▶ ⟦ A' ⟧ ⋅ ↘ a' }} -> *)
+       (* {{ Dom a ≈ a' ∈ per_typ pred_P Δ }} -> *)
+       (* {{ Dom a ≈ a' ∈ per_typ pred_P Δ' }} -> *)
        {{ `#x ∉ Δ }} ->
        {{ GC Δ, x:A ≈ Δ', x:A' ∈ per_gctx }} }.
 End PER_gctx_def.                          
@@ -436,7 +487,8 @@ End PER_gctx_def.
 Hint Constructors per_gctx : mcpts. 
 
 Section Per_ctx_env_def.
-  Context `(pred_P : PredicativeSig P).
+  Context `(pred_P : PredicativeSig P)
+    (Δ : gctx P).
 
   Let dom := domain P.
 
@@ -447,22 +499,22 @@ Section Per_ctx_env_def.
             {{ Dom n ≈ n' ∈ head_rel equiv_ρ_drop_ρ'_drop }} ->
             {{ Dom ρ ≈ ρ' ∈ cons_per_ctx_env tail_rel (@head_rel) }} }.
 
-  Inductive per_ctx_env : gctx P -> relation (env P) -> ctx P -> ctx P -> Prop :=
+  Inductive per_ctx_env : relation (env P) -> ctx P -> ctx P -> Prop :=
   | per_ctx_env_nil :
     `{ forall env_rel,
           {{ GC Δ ≈ Δ ∈ per_gctx pred_P }} ->
           (env_rel <~> fun ρ ρ' => True) ->
-          {{ EF Δ ; ⋅ ≈  ⋅ ∈ per_ctx_env ↘ env_rel }} }
+          {{ EF ⋅ ≈  ⋅ ∈ per_ctx_env ↘ env_rel }} }
   | per_ctx_env_cons :
     `{ forall tail_rel
          (head_rel : forall {ρ ρ'} (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ tail_rel }}), relation dom)
          env_rel
-         (equiv_Γ_Γ' : {{ EF Δ ; Γ ≈ Γ' ∈ per_ctx_env ↘ tail_rel }}),
+         (equiv_Γ_Γ' : {{ EF Γ ≈ Γ' ∈ per_ctx_env ↘ tail_rel }}),
           PER tail_rel ->
           (forall {ρ ρ'} (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ tail_rel }}),
-              rel_typ_unsorted pred_P A Δ ρ A' Δ ρ' (head_rel equiv_ρ_ρ')) ->
+              rel_typ_unsorted pred_P Δ A ρ A' ρ' (head_rel equiv_ρ_ρ')) ->
           (env_rel <~> cons_per_ctx_env tail_rel (@head_rel)) ->
-          {{ EF Δ ; Γ, A ≈ Γ', A' ∈ per_ctx_env ↘ env_rel }} }
+          {{ EF Γ, A ≈ Γ', A' ∈ per_ctx_env ↘ env_rel }} }
   .
 End Per_ctx_env_def.
 
@@ -480,33 +532,31 @@ Hint Unfold valid_ctx : mcpts.
 (** Context Subtyping relations *)
 Inductive per_gctx_subtyp `(pred_P : PredicativeSig P) : gctx P -> gctx P -> Prop :=
 | per_gctx_subtyp_nil :
-  {{ ⟪ pred_P ⟫ SubG ⋅ <: ⋅ }}
+  {{ SubG ⋅ <: ⋅ ∈ per_gctx_subtyp pred_P }}
 | per_gctx_subtyp_cons :
-  `{ {{ ⟪ pred_P ⟫ SubG Δ <: Δ' }} ->
-     {{ ⟦ A ⟧ (Δ ; ⋅) ↘ a }} ->
-     {{ ⟦ A' ⟧ (Δ' ; ⋅) ↘ a' }} ->
-     {{ ⟪ pred_P ⟫ Sub a <: a' }} ->
+  `{ {{ SubG Δ <: Δ' ∈ pred_gctx_subtyp pred_P }} ->
+     {{ Δ ▶ ⟦ A ⟧ ⋅ ↘ a }} ->
+     {{ Δ ▶ ⟦ A' ⟧ ⋅ ↘ a' }} ->
+     {{ SubT a <: a' ∈ per_subtyp pred_P Δ }} ->
      {{ `#x ∉ Δ }} ->
-     {{ ⟪ pred_P ⟫ SubG Δ, x:A <: Δ', x:A' }} }
-where "⟪ pred_P ⟫ 'SubG' Δ <: Δ'" := (per_gctx_subtyp pred_P Δ Δ') (in custom judg) : type_scope.
+     {{ SubG Δ, x:A <: Δ', x:A' ∈ per_gctx_subtyp pred_P }} }.
 
-Inductive per_ctx_subtyp `(pred_P : PredicativeSig P) : ctx P -> ctx P -> Prop :=
+Inductive per_ctx_subtyp `(pred_P : PredicativeSig P) (Δ : gctx P) : ctx P -> ctx P -> Prop :=
 | per_ctx_subtyp_nil :
-  {{ ⟪ pred_P ⟫ SubC ⋅ <: ⋅ }}
+  `{ {{ GC Δ ≈ Δ ∈ per_gctx pred_P }} ->
+     {{ SubC ⋅ <: ⋅ ∈ per_ctx_subtyp pred_P Δ }} }
 | per_ctx_subtyp_cons :
   `{ forall tail_rel env_rel env_rel',
-        (* {{ GC Δ ≈ Δ' ∈ per_gctx_env pred_P }} -> *)
-        {{ ⟪ pred_P ⟫ SubC Γ <: Γ' }} ->
-        {{ EF Δ ; Γ ≈ Γ ∈ per_ctx_env pred_P ↘ tail_rel }} ->
+        {{ SubC Γ <: Γ' ∈ per_ctx_subtyp pred_P Δ }} ->
+        {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P Δ ↘ tail_rel }} ->
         (forall ρ ρ' a a'
            (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ tail_rel }}),
-            {{ ⟦ A ⟧ (Δ ; ρ) ↘ a }} ->
-            {{ ⟦ A' ⟧ (Δ' ; ρ') ↘ a' }} ->
-            {{ ⟪ pred_P ⟫ Sub a <: a' }}) ->
-        {{ EF Δ ; Γ, A ≈ Γ, A ∈ per_ctx_env pred_P ↘ env_rel }} ->
-        {{ EF Δ ; Γ', A' ≈ Γ', A' ∈ per_ctx_env pred_P ↘ env_rel' }} ->
-        {{ ⟪ pred_P ⟫ SubC Γ, A <: Γ', A' }} }
-where "⟪ pred_P ⟫ 'SubC' Γ <: Γ'" := (per_ctx_subtyp pred_P Γ Γ') (in custom judg) : type_scope.
+            {{ Δ ▶ ⟦ A ⟧ ρ ↘ a }} ->
+            {{ Δ ▶ ⟦ A' ⟧ ρ' ↘ a' }} ->
+            {{ SubT a <: a' ∈ per_subtyp pred_P Δ }}) ->
+        {{ EF Γ, A ≈ Γ, A ∈ per_ctx_env pred_P Δ ↘ env_rel }} ->
+        {{ EF Γ', A' ≈ Γ', A' ∈ per_ctx_env pred_P Δ ↘ env_rel' }} ->
+        {{ SubC Γ, A <: Γ', A' ∈ per_ctx_subtyp pred_P Δ }} }.
 
 #[export]
 Hint Constructors per_ctx_subtyp : mcpts.
