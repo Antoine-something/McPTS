@@ -885,6 +885,35 @@ Proof.
     eapply per_typ_trans; mauto.
 Qed.
 
+Corollary per_typ_elem_output_sym {P} {pred_P : PredicativeSig P} : forall {Δ a b R} m1 m2,
+    {{ DF a ≈ b ∈ per_typ_elem pred_P Δ ↘ R }} ->
+    R m1 m2 ->
+    R m2 m1.
+Proof.
+  intros * Hper H.
+  pose proof (per_typ_elem_sym Hper) as [].
+  mauto 2.
+Qed.
+  
+Corollary per_typ_elem_output_trans {P} {pred_P : PredicativeSig P} : forall {Δ a b R} m1 m2 m3,
+    {{ DF a ≈ b ∈ per_typ_elem pred_P Δ ↘ R }} ->
+    R m1 m2 ->
+    R m2 m3 ->
+    R m1 m3.
+Proof.
+  intros * Hper H12 H23.
+  pose proof (per_typ_elem_trans _ _ _ _ Hper) as [].
+  mauto 2.
+Qed.
+
+#[export]
+Instance per_typ_elem_output_PER {P : PtsSig} {pred_P : PredicativeSig P} {Δ R a b} (H : per_typ_elem pred_P Δ R a b) : PER R.
+Proof.
+  split.
+  - pose proof (fun m m' => per_typ_elem_output_sym m m' H); eauto.
+  - pose proof (fun m1 m2 m3 => per_typ_elem_output_trans m1 m2 m3 H); eauto.
+Qed.
+
 
 Lemma per_typ_elem_and_per_sort_elem_implies_per_sort_elem {P} (pred_P : PredicativeSig P) : forall {Δ a b c R R' s},
     {{ DF a ≈ b ∈ per_typ_elem pred_P Δ ↘ R }} ->
