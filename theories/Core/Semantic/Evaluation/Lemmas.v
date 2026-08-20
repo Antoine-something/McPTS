@@ -128,3 +128,43 @@ Ltac functional_eval_rewrite_clear1 :=
 Ltac functional_eval_rewrite_clear := repeat functional_eval_rewrite_clear1.
 
 
+Section gctx_weakening_eval.
+  Lemma gctx_weakening_eval {P} : 
+    (forall (Δ : gctx P) M ρ m, {{ Δ ▶ ⟦ M ⟧ ρ ↘ m }} -> forall x B, {{ `#x ∉ Δ }} -> {{ Δ, x:B ▶ ⟦ M ⟧ ρ ↘ m }}) /\
+      (forall (Δ : gctx P) f n m, {{ Δ ▶ $| f & n |↘ m }} -> forall x B, {{ `#x ∉ Δ }} -> {{ Δ, x:B ▶ $| f & n |↘ m }}) /\
+      (forall (Δ : gctx P) A MZ MS n ρ m, {{ Δ ▶ rec n ⟦return A | zero -> MZ | succ -> MS end⟧ ρ ↘ m }} -> forall x B, {{ `#x ∉ Δ }} -> {{ Δ, x:B ▶ rec n ⟦return A | zero -> MZ | succ -> MS end⟧ ρ ↘ m }} ) /\
+      (forall (Δ : gctx P) σ ρ ρσ, {{ Δ ▶ ⟦ σ ⟧s ρ ↘ ρσ }} -> forall x B, {{ `#x ∉ Δ }} -> {{ Δ, x:B ▶ ⟦ σ ⟧s ρ ↘ ρσ }}).
+  Proof.      
+    apply eval_mut_ind; intros; mauto.
+  Qed.
+
+  #[local]
+  Ltac solve_gctx_weakening_eval P := pose proof @gctx_weakening_eval P; destruct_conjs; mauto 2.
+
+  Corollary gctx_weakening_eval_exp {P} : forall {Δ : gctx P} {M ρ m x B},
+      {{ Δ ▶ ⟦ M ⟧ ρ ↘ m }} ->
+      {{ `#x ∉ Δ }} ->
+      {{ Δ, x:B ▶ ⟦ M ⟧ ρ ↘ m }}.
+  Proof. solve_gctx_weakening_eval P. Qed.
+
+  Corollary gctx_weakening_eval_app {P} : forall {Δ : gctx P} {f n m x B},
+      {{ Δ ▶ $| f & n |↘ m }} ->
+      {{ `#x ∉ Δ }} ->
+      {{ Δ, x:B ▶ $| f & n |↘ m }}.
+  Proof. solve_gctx_weakening_eval P. Qed.
+
+  Corollary gctx_weakening_eval_natrec {P} : forall {Δ : gctx P} {A MZ MS n ρ m x B},
+      {{ Δ ▶ rec n ⟦return A | zero -> MZ | succ -> MS end⟧ ρ ↘ m }} ->
+      {{ `#x ∉ Δ }} ->
+      {{ Δ, x:B ▶ rec n ⟦return A | zero -> MZ | succ -> MS end⟧ ρ ↘ m }}.
+  Proof. solve_gctx_weakening_eval P. Qed.
+
+  Corollary gctx_weakening_eval_sub {P} : forall {Δ : gctx P} {σ ρ ρσ x B},
+      {{ Δ ▶ ⟦ σ ⟧s ρ ↘ ρσ }} ->
+      {{ `#x ∉ Δ }} ->
+      {{ Δ, x:B ▶ ⟦ σ ⟧s ρ ↘ ρσ }}.
+  Proof. solve_gctx_weakening_eval P. Qed.
+End gctx_weakening_eval.
+
+#[export]
+Hint Resolve gctx_weakening_eval_exp gctx_weakening_eval_app gctx_weakening_eval_natrec gctx_weakening_eval_sub : mcpts.

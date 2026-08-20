@@ -57,7 +57,7 @@ Hint Constructors rel_mod_app : mcpts.
 
 (** *** (Some Elements of) PER Lattice *)
 
-Definition per_bot {P : PtsSig} (Δ : gctx P) : relation (domain_ne P) := fun m m' => (forall i, exists L, {{ Δ ▶ Rne m in i ↘ L }} /\ {{ Δ ▶ Rne m' in i ↘ L }}).
+Definition per_bot {P : PtsSig} : relation (domain_ne P) := fun m m' => (forall Δ i, exists L, {{ Δ ▶ Rne m in i ↘ L }} /\ {{ Δ ▶ Rne m' in i ↘ L }}).
 #[global]
 Arguments per_bot /.
 #[export]
@@ -65,7 +65,7 @@ Hint Transparent per_bot : mcpts.
 #[export]
 Hint Unfold per_bot : mcpts.
 
-Definition per_top {P : PtsSig} (Δ : gctx P) : relation (domain_nf P) := fun m m' => (forall i, exists L, {{ Δ ▶ Rnf m in i ↘ L }} /\ {{ Δ ▶ Rnf m' in i ↘ L }}).
+Definition per_top {P : PtsSig} : relation (domain_nf P) := fun m m' => (forall Δ i, exists L, {{ Δ ▶ Rnf m in i ↘ L }} /\ {{ Δ ▶ Rnf m' in i ↘ L }}).
 #[global]
 Arguments per_top /.
 #[export]
@@ -73,7 +73,7 @@ Hint Transparent per_top : mcpts.
 #[export]
 Hint Unfold per_top : mcpts.
 
-Definition per_top_typ {P : PtsSig} (Δ : gctx P) : relation (domain P) := fun a a' => (forall i, exists C, {{ Δ ▶ Rtyp a in i ↘ C }} /\ {{ Δ ▶ Rtyp a' in i ↘ C }}).
+Definition per_top_typ {P : PtsSig} : relation (domain P) := fun a a' => (forall Δ i, exists C, {{ Δ ▶ Rtyp a in i ↘ C }} /\ {{ Δ ▶ Rtyp a' in i ↘ C }}).
 #[global]
 Arguments per_top_typ /.
 #[export]
@@ -81,22 +81,22 @@ Hint Transparent per_top_typ : mcpts.
 #[export]
 Hint Unfold per_top_typ : mcpts.
 
-Inductive per_nat {P : PtsSig} (Δ : gctx P) : relation (domain P):=
-| per_nat_zero : {{ Dom zero ≈ zero ∈ per_nat Δ }}
+Inductive per_nat {P : PtsSig} : relation (domain P):=
+| per_nat_zero : {{ Dom zero ≈ zero ∈ per_nat }}
 | per_nat_succ :
-  `{ {{ Dom m ≈ m' ∈ per_nat Δ }} ->
-     {{ Dom succ m ≈ succ m' ∈ per_nat Δ }} }
+  `{ {{ Dom m ≈ m' ∈ per_nat }} ->
+     {{ Dom succ m ≈ succ m' ∈ per_nat }} }
 | per_nat_neut :
-  `{ {{ Dom m ≈ m' ∈ per_bot Δ }} ->
-     {{ Dom ⇑ a m ≈ ⇑ a' m' ∈ per_nat Δ }} }
+  `{ {{ Dom m ≈ m' ∈ per_bot }} ->
+     {{ Dom ⇑ a m ≈ ⇑ a' m' ∈ per_nat }} }
 .
 #[export]
 Hint Constructors per_nat : mcpts.
 
-Variant per_ne {P : PtsSig} (Δ : gctx P): relation (domain P) :=
+Variant per_ne {P : PtsSig} : relation (domain P) :=
 | per_ne_neut :
-  `{ {{ Dom m ≈ m' ∈ per_bot Δ }} ->
-     {{ Dom ⇑ a m ≈ ⇑ a' m' ∈ per_ne Δ }} }
+  `{ {{ Dom m ≈ m' ∈ per_bot }} ->
+     {{ Dom ⇑ a m ≈ ⇑ a' m' ∈ per_ne }} }
 .
 #[export]
 Hint Constructors per_ne : mcpts.
@@ -106,7 +106,7 @@ Hint Constructors per_ne : mcpts.
 Section Per_sort_elem_core_def.
   Context
     `(pred_P : PredicativeSig P)
-      (Δ : gctx P)
+      (* (Δ : gctx P) *)
       (s_elem : P).  
 
   Let dom := domain P.

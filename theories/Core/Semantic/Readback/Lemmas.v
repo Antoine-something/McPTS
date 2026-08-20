@@ -2,6 +2,7 @@ From Coq Require Import Lia PeanoNat Relations.
 
 From McPTS Require Import PtsSignature LibTactics.
 From McPTS.Core Require Import Base.
+From McPTS.Core.Syntactic Require Import System.
 From McPTS.Core.Semantic Require Import Evaluation.
 From McPTS.Core.Semantic.Readback Require Import Definitions.
 Import Domain_Notations.
@@ -86,3 +87,40 @@ Ltac functional_read_rewrite_clear1 :=
       clean replace M2 with M1 by first [solve [mauto 2] | tactic_error M2 M1]; clear H2
   end.
 Ltac functional_read_rewrite_clear := repeat functional_read_rewrite_clear1.
+
+Section gctx_weakening_readback.
+  Lemma gctx_weakening_readback {P} :
+    (forall (Δ : gctx P) i w W, {{ Δ ▶ Rnf w in i ↘ W }} -> forall x B, {{ `#x ∉ Δ }} -> {{ Δ, x:B ▶ Rnf w in i ↘ W }}) /\
+      (forall (Δ : gctx P) i e E, {{ Δ ▶ Rne e in i ↘ E }} -> forall x B, {{ `#x ∉ Δ }} -> {{ Δ, x:B ▶ Rne e in i ↘ E }}) /\
+      (forall (Δ : gctx P) i a A, {{ Δ ▶ Rtyp a in i ↘ A }} -> forall x B, {{ `#x ∉ Δ }} -> {{ Δ, x:B ▶ Rtyp a in i ↘ A }}).
+  Proof.
+    apply read_mut_ind;
+      intros; mauto;
+      econstructor; mauto 3.
+  Qed.
+
+  #[local]
+  Ltac solve_gctx_weakening_readback P := pose proof (@gctx_weakening_readback P); destruct_conjs; intros; mauto 3.
+  
+  Corollary gctx_weakening_readback_nf {P} : forall {Δ : gctx P} {i w W x B},
+      {{ Δ ▶ Rnf w in i ↘ W }} ->
+      {{ `#x ∉ Δ }} ->
+      {{ Δ, x:B ▶ Rnf w in i ↘ W }}.
+  Proof. solve_gctx_weakening_readback P. Qed.
+
+  Corollary gctx_weakening_readback_ne {P} : forall {Δ : gctx P} {i e E x B},
+      {{ Δ ▶ Rne e in i ↘ E }} ->
+      {{ `#x ∉ Δ }} ->
+      {{ Δ, x:B ▶ Rne e in i ↘ E }}.
+  Proof. solve_gctx_weakening_readback P. Qed.
+
+  Corollary gctx_weakening_readback_typ {P} : forall {Δ : gctx P} {i a A x B},
+      {{ Δ ▶ Rtyp a in i ↘ A }} ->
+      {{ `#x ∉ Δ }} ->
+      {{ Δ, x:B ▶ Rtyp a in i ↘ A }}.
+  Proof. solve_gctx_weakening_readback P. Qed.
+End gctx_weakening_readback.
+
+#[export]
+Hint Resolve gctx_weakening_readback_nf gctx_weakening_readback_ne gctx_weakening_readback_typ : mcpts.
+ 
