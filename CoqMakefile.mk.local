@@ -1,0 +1,3 @@
+COQPARSERCOMPFILE := $(patsubst %.vy,%.vo,$(shell find ./ -name '*.vy'))
+
+$(COQPARSERCOMPFILE): COQFLAGS += -w -deprecated-from-Coq
