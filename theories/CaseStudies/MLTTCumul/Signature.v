@@ -1,4 +1,4 @@
-From Coq Require Import Orders Relation_Definitions RelationClasses Program.Equality Arith.
+From Stdlib Require Import Orders Relation_Definitions RelationClasses Program.Equality Arith.
 From Equations Require Import Equations.
 
 From McPTS Require Import LibTactics PtsSignature.

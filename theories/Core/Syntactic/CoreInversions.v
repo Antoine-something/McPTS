@@ -1,4 +1,4 @@
-From Coq Require Import Setoid.
+From Stdlib Require Import Setoid.
 From McPTS Require Import PtsSignature LibTactics.
 From McPTS.Core Require Import Base.
 From McPTS.Core.Syntactic Require Export CtxEq.

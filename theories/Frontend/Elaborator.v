@@ -1,4 +1,4 @@
-From Coq Require Import Lia List MSets PeanoNat String FunInd.
+From Stdlib Require Import Lia List MSets PeanoNat String FunInd.
 
 From McPTS Require Import PtsSignature LibTactics.
 From McPTS.Core Require Import Base.

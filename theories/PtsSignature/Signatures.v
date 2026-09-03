@@ -1,4 +1,5 @@
-From Coq Require Import RelationClasses.
+From Stdlib Require Import RelationClasses.
+From McPTS Require Import LibTactics.
 
 Record PtsSig : Type :=
   mkPtsSig {

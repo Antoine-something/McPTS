@@ -1,5 +1,5 @@
-From Coq Require Import List String.
-From Coq Require Import Program.Equality.
+From Stdlib Require Import List String.
+From Stdlib Require Import Program.Equality.
 From McPTS Require Import PtsSignature.
 From McPTS.Core Require Import Base.
 

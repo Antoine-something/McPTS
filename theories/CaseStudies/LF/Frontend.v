@@ -1,4 +1,4 @@
-From Coq Require Import List String PeanoNat MSets FunInd.
+From Stdlib Require Import List String PeanoNat MSets FunInd.
 
 From McPTS Require Import LibTactics PtsSignature.
 From McPTS.Core Require Import Base.

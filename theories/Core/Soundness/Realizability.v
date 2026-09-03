@@ -1,4 +1,4 @@
-From Coq Require Import Nat.
+From Stdlib Require Import Nat.
 
 From McPTS Require Import PtsSignature LibTactics.
 From McPTS.Core Require Import Base.

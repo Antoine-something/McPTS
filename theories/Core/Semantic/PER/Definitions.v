@@ -1,4 +1,4 @@
-From Coq Require Import Lia Orders PeanoNat Relation_Definitions RelationClasses.
+From Stdlib Require Import Lia Orders PeanoNat Relation_Definitions RelationClasses.
 From Equations Require Import Equations.
 
 From McPTS Require Import PtsSignature LibTactics.

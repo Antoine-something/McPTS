@@ -1,4 +1,4 @@
-From Coq Require Import RelationClasses.
+From Stdlib Require Import RelationClasses.
 From McPTS Require Import PtsSignature LibTactics.
 From McPTS.Core Require Import Base.
 From McPTS.Core Require Export Completeness.

@@ -1,4 +1,4 @@
-From Coq Require Import Lia PeanoNat Relations.
+From Stdlib Require Import Lia PeanoNat Relations.
 
 From McPTS Require Import PtsSignature LibTactics.
 From McPTS.Core Require Import Base.

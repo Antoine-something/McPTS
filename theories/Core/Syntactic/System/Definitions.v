@@ -1,4 +1,4 @@
-From Coq Require Import List Classes.RelationClasses Setoid Morphisms.
+From Stdlib Require Import List Classes.RelationClasses Setoid Morphisms.
 
 From McPTS Require Import PtsSignature LibTactics.
 From McPTS.Core Require Import Base.

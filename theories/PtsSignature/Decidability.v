@@ -1,4 +1,4 @@
-From Coq Require Import Program.Equality.
+From Stdlib Require Import Program.Equality.
 From McPTS.PtsSignature Require Import Signatures.
 
 

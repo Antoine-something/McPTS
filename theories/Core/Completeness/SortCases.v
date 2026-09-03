@@ -1,4 +1,4 @@
-From Coq Require Import Morphisms_Relations RelationClasses.
+From Stdlib Require Import Morphisms_Relations RelationClasses.
 
 From McPTS Require Import PtsSignature LibTactics.
 From McPTS.Core Require Import Base.

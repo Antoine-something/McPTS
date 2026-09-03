@@ -1,3 +1,5 @@
+From McPTS Require Import LibTactics.
+
 #[global] Declare Scope mcpts_scope.
 #[global] Delimit Scope mcpts_scope with mcpts.
 #[global] Bind Scope mcpts_scope with Sortclass.

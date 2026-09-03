@@ -29,12 +29,12 @@ DOC_BASE ?= ""
 
 define extract
 	@echo "MENHIR $(COQPARSERORIGFILE)"
-	@$(MENHIR) --coq "$(COQPARSERORIGFILE)"
+	@$(MENHIR) --rocq "$(COQPARSERORIGFILE)"
 	@echo "MENHIR $(COQPARSERORIGFILE) PARSER MESSAGE"
-	@$(MENHIR) --coq "$(COQPARSERORIGFILE)" --compile-errors "$(PARSERMESSAGEFILE)" > "$(PARSERMESSAGEEXTRACTIONFILE)"
+	@$(MENHIR) --rocq "$(COQPARSERORIGFILE)" --compile-errors "$(PARSERMESSAGEFILE)" > "$(PARSERMESSAGEEXTRACTIONFILE)"
 	@echo "MENHIR $(COQPARSERORIGFILE) CHECK PARSER MESSAGE"
-	@$(MENHIR) --coq "$(COQPARSERORIGFILE)" --list-errors > "$(PARSERMESSAGETEMPFILE)"
-	@$(MENHIR) --coq "$(COQPARSERORIGFILE)" --compare-errors "$(PARSERMESSAGETEMPFILE)" --compare-errors "$(PARSERMESSAGEFILE)"
+	@$(MENHIR) --rocq "$(COQPARSERORIGFILE)" --list-errors > "$(PARSERMESSAGETEMPFILE)"
+	@$(MENHIR) --rocq "$(COQPARSERORIGFILE)" --compare-errors "$(PARSERMESSAGETEMPFILE)" --compare-errors "$(PARSERMESSAGEFILE)"
 	@rm "$(PARSERMESSAGETEMPFILE)"
 	@echo "Separate Extraction main." | $(COQTOP) $(COQFLAGS) $(COQLIBS) -topfile $(CASESTUDYDIRECTORY)/Entrypoint.v -l $(CASESTUDYDIRECTORY)/Entrypoint.v
 endef
@@ -59,14 +59,14 @@ post-all:: extract_MiniML extract_LF extract_MLTTCumul
 .PHONY: update_parserMessages
 update_parserMessages:
 	@echo "MENHIR $? UPDATE PARSER MESSAGE"
-	@$(MENHIR) --coq "$(COQPARSERORIGFILE)" --list-errors > "$(PARSERMESSAGETEMPFILE)"
-	@$(MENHIR) --coq "$(COQPARSERORIGFILE)" --merge-errors "$(PARSERMESSAGETEMPFILE)" --merge-errors "$(PARSERMESSAGEFILE)" > "$(PARSERMESSAGEMERGEFILE)"
+	@$(MENHIR) --rocq "$(COQPARSERORIGFILE)" --list-errors > "$(PARSERMESSAGETEMPFILE)"
+	@$(MENHIR) --rocq "$(COQPARSERORIGFILE)" --merge-errors "$(PARSERMESSAGETEMPFILE)" --merge-errors "$(PARSERMESSAGEFILE)" > "$(PARSERMESSAGEMERGEFILE)"
 	@rm "$(PARSERMESSAGETEMPFILE)"
 	@mv "$(PARSERMESSAGEMERGEFILE)" "$(PARSERMESSAGEFILE)"
 
 %.v : %.vy
 	@echo "MENHIR $?"
-	@$(MENHIR) --coq "$?"
+	@$(MENHIR) --rocq "$?"
 
 .PHONY: coqdoc
 coqdoc: html

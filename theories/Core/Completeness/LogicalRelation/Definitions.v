@@ -1,4 +1,4 @@
-From Coq Require Import Relations.
+From Stdlib Require Import Relations.
 From McPTS Require Import PtsSignature.
 From McPTS.Core Require Import Base.
 From McPTS.Core.Semantic Require Export PER.

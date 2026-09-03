@@ -24,9 +24,9 @@ The extracted code is guaranteed equivalent to the theoretical definition of the
 PTS* signature satisfies three conditions: Predicativity, functionality, and decidability.")
  (depends
   (ocaml (>= "4.14.2"))
-  (coq (= "8.20.0"))
-  (menhir (= "20240715"))
-  (coq-menhirlib (= "20240715"))
-  (coq-equations (= "1.3.1+8.20"))
+  (rocq-core (= "9.1.1"))
+  (menhir (= "20260209"))
+  (coq-menhirlib (= "20260209"))
+  (rocq-equations (= "1.3.1+9.1"))
   (ppx_expect (>= "0.16.0"))
   (sherlodoc :with-doc)))
