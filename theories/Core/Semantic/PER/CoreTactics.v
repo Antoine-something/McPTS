@@ -1,7 +1,7 @@
 From Coq Require Import Lia PeanoNat Relation_Definitions RelationClasses.
 From Equations Require Import Equations.
 
-From McPTS Require Import LibTactics.
+From McPTS Require Import LibTactics PtsSignature.
 From McPTS.Core Require Import Base.
 From McPTS.Core.Semantic Require Import PER.Definitions.
 Import Domain_Notations.
@@ -71,3 +71,73 @@ Ltac basic_per_sort_elem_econstructor :=
   progress simp per_sort_elem;
   econstructor;
   try rewrite <- per_sort_elem_equation_1 in *.
+
+
+
+(** Tactics to apply relation equivalences *)
+(* The tactics should do a deep rewrite (i.e. all occurences in all premises) and keep only one relation *)
+(* Right now, it only works in some cases, but I don't know why *)
+Ltac rewrite_relation_equivalence_left :=
+  repeat match goal with
+    | H : ?R1 <~> ?R2 |- _ =>
+        try setoid_rewrite H;
+        (on_all_hyp: fun H' => assert_fails (unify H H'); unmark H; setoid_rewrite H in H');
+        let T := type of H in
+        fold (id T) in H
+    end; unfold id in *.
+
+Ltac rewrite_relation_equivalence_right :=
+  repeat match goal with
+    | H : ?R1 <~> ?R2 |- _ =>
+        try setoid_rewrite <- H;
+        (on_all_hyp: fun H' => assert_fails (unify H H'); unmark H; setoid_rewrite <- H in H');
+        let T := type of H in
+        fold (id T) in H
+    end; unfold id in *.
+
+Ltac clear_relation_equivalence :=
+  repeat match goal with
+    | H : ?R1 <~> ?R2 |- _ =>
+        (unify R1 R2; clear H) + (is_var R1; clear R1 H) + (is_var R2; clear R2 H)
+    end.
+
+Ltac apply_relation_equivalence :=
+  clear_relation_equivalence;
+  rewrite_relation_equivalence_right;
+  clear_relation_equivalence;
+  rewrite_relation_equivalence_left;
+  clear_relation_equivalence.
+
+
+(** This tactic applies the predicativity condition on function spaces to get rid of the two possible cases *)
+#[global]
+Ltac clear_pi_sort_eq_and_pred_rel1 :=
+  match goal with
+  | [r : Ru_pi ?P ?s1 _ ?s3,
+     sub : st_subtyp ?s3 ?s,
+     H1 : ?s1 = ?s -> ?Ps,
+     H2 : pred_rel ?pred_P ?s1 ?s -> ?Ps1 |- _] => 
+      assert Ps1 by (pose proof ord_ru_pi_sub pred_P r sub as [[] ?]; subst; mauto 2);
+      clear H1 H2
+  | [r : Ru_pi ?P ?s1 _ ?s3,
+     sub : st_subtyp ?s3 ?s,
+     H : (?s1 = ?s -> ?Ps) /\ (pred_rel ?pred_P ?s1 ?s -> ?Ps1) |- _] => 
+      destruct H;
+      assert Ps1 by (pose proof ord_ru_pi_sub pred_P r sub as [[] ?]; subst; mauto 2);
+      clear H
+  | [r : Ru_pi ?P _ ?s2 ?s3,
+     sub : st_subtyp ?s3 ?s,
+     H1 : ?s2 = ?s -> ?Ps,
+     H2 : pred_rel ?pred_P ?s2 ?s -> ?Ps2 |- _] => 
+      assert Ps2 by (pose proof ord_ru_pi_sub pred_P r sub as [? []]; subst; mauto 2);
+      clear H1 H2
+  | [r : Ru_pi ?P _ ?s2 ?s3,
+     sub : st_subtyp ?s3 ?s,
+     H : (?s2 = ?s -> ?Ps) /\ (pred_rel ?pred_P ?s2 ?s -> ?Ps2) |- _] => 
+      destruct H;
+      assert Ps2 by (pose proof ord_ru_pi_sub pred_P r sub as [? []]; subst; mauto 2);
+      clear H
+  end.
+
+#[global]
+Ltac clear_pi_sort_eq_and_pred_rel := repeat clear_pi_sort_eq_and_pred_rel1.
