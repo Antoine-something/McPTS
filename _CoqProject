@@ -46,7 +46,6 @@ theories/Core/Semantic/PER/SortLemmas.v
 theories/Core/Semantic/PER/TypeLemmas.v
 theories/Core/Semantic/PER/SubtypingLemmas.v
 theories/Core/Semantic/PER/CtxLemmas.v
-theories/Core/Semantic/PER/Lemmas.v
 theories/Core/Semantic/PER.v
 theories/Core/Semantic/Realizability.v
 
