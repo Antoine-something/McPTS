@@ -218,7 +218,7 @@ Qed.
 Hint Resolve per_bot_then_per_top : mcpts.
 
 (** Applying related neutrals to related normals gives a related neutral *)
-Lemma domain_app_per {P} : forall {Δ : gctx P}f f' a a',
+Lemma domain_app_per {P} : forall {Δ : gctx P} f f' a a',
   {{ Dom f ≈ f' ∈ per_bot Δ }} ->
   {{ Dom a ≈ a' ∈ per_top Δ }} ->
   {{ Dom f a ≈ f' a' ∈ per_bot Δ }}.
@@ -229,7 +229,7 @@ Proof.
   mauto.
 Qed.
 
-
+    
 (** ** Basic rewrite rules *)
 (** Rewrite equivalent relations in rel_mod_eval *)
 Add Parametric Morphism {P} R0 `(R0_morphism : Proper _ ((@relation_equivalence (domain P)) ==> (@relation_equivalence (domain P))) R0) Δ A ρ A' ρ' : (rel_mod_eval R0 Δ A ρ A' ρ')
