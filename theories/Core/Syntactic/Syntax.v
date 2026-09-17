@@ -1,7 +1,6 @@
-From Coq Require Import List String.
+From Coq Require Import Arith List String.
 From Coq Require Import Program.Equality.
-From McPTS Require Import PtsSignature.
-From McPTS.Core Require Import Base.
+From McPTS Require Import PtsSignature Base.
 
 
 (** * Abstract Syntax Tree *)
@@ -14,7 +13,6 @@ Inductive exp (P : PtsSig) : Set :=
 | a_app : exp P -> exp P -> exp P
 (** Variable *)
 | a_var : nat -> exp P
-| a_gvar : string -> exp P
 (** Substitution Application *)
 | a_sub : exp P -> sub P -> exp P
 (** Naturals **)
@@ -34,7 +32,6 @@ Arguments a_pi {_ _ _ _}.
 Arguments a_fn {_ _ _ _}.
 Arguments a_app {_}.
 Arguments a_var {_}.
-Arguments a_gvar {_}.
 Arguments a_sub {_}.
 Arguments a_nat {_}.
 Arguments a_zero {_}.
@@ -48,8 +45,6 @@ Arguments a_extend {_}.
 
 Notation typ := (fun P => exp P).
 Notation ctx := (fun (P : PtsSig) => list (typ P)).
-(* Optional exp so we can have actual definitions (i.e. a constant bound to a value) or declarations *)
-Notation gctx := (fun (P : PtsSig) => list (string * typ P)).
 
 Fixpoint nat_to_exp {P : PtsSig} (n : nat) : exp P :=
   match n with
@@ -96,7 +91,6 @@ Inductive nf (P : PtsSig) : Set :=
 with ne (P : PtsSig) : Set :=
 | ne_app : ne P -> nf P -> ne P
 | ne_var : nat -> ne P
-| ne_gvar : string -> ne P
 | ne_natrec : nf P -> nf P -> nf P -> ne P -> ne P
 .
 
@@ -110,7 +104,6 @@ Arguments nf_neut {_}.
 
 Arguments ne_app {_}.
 Arguments ne_var {_}.
-Arguments ne_gvar {_}.
 Arguments ne_natrec {_}.
 
 Fixpoint nf_to_exp {P : PtsSig} (M : nf P) : exp P :=
@@ -127,7 +120,6 @@ with ne_to_exp {P : PtsSig} (M : ne P) : exp P :=
   match M with
   | ne_app M N => a_app (ne_to_exp M) (nf_to_exp N)
   | ne_var x => a_var x
-  | ne_gvar x => a_gvar x
   | ne_natrec A MZ MS M => a_natrec (nf_to_exp A) (nf_to_exp MZ) (nf_to_exp MS) (ne_to_exp M)
   end
 .
@@ -190,7 +182,7 @@ Proof.
       * right.
         injection.
         eassumption.
-  - intros; decide equality; [apply PeanoNat.Nat.eq_dec | apply string_dec].
+  - intros; decide equality; apply PeanoNat.Nat.eq_dec.
 Defined.
 
 Definition q {P : PtsSig} (σ : sub P) := a_extend (a_compose σ a_weaken) (a_var 0).
@@ -216,6 +208,7 @@ Module Syntax_Notations.
   Notation "'^' x" := x (in custom exp at level 0, x constr at level 0) : mcpts_scope.
   Notation "x" := x (in custom exp at level 0, x ident) : mcpts_scope.
 
+  (** Notation for expressions *)
   Notation "'Sort' @ s" := (a_st s) (in custom exp at level 0, s constr at level 0, format "'Sort' @ s") : mcpts_scope.
   Notation "'ℕ'" := a_nat (in custom exp at level 0) : mcpts_scope.
   Notation "'zero'" := a_zero (in custom exp at level 0) : mcpts_scope.
@@ -226,22 +219,19 @@ Module Syntax_Notations.
   Notation "'λ' r A B e" := (a_fn r A B e) (in custom exp at level 1, r constr at level 0, A custom exp at level 0, B custom exp at level 0, e custom exp at level 60) : mcpts_scope.
   Notation "f x .. y" := (a_app .. (a_app f x) .. y) (in custom exp at level 40, f custom exp, x custom exp at next level, y custom exp at next level) : mcpts_scope.
   Notation "'#' n" := (a_var n) (in custom exp at level 0, n constr at level 0, format "'#' n") : mcpts_scope.
-  Notation "'`#' x" := (a_gvar x) (in custom exp at level 0, x constr at level 0, format "'`#' x") : mcpts_scope.
-  
+
+  (** Notation for substitutions *)
   Notation "'Id'" := a_id (in custom exp at level 0) : mcpts_scope.
   Notation "'Wk'" := a_weaken (in custom exp at level 0) : mcpts_scope.
   Notation "σ ∘ τ" := (a_compose σ τ) (in custom exp at level 40, right associativity, format "σ ∘ τ") : mcpts_scope.
   Notation "σ ,, e" := (a_extend σ e) (in custom exp at level 50, left associativity, format "σ ,, e") : mcpts_scope.
   Notation "'q' σ" := (q σ) (in custom exp at level 30) : mcpts_scope.
 
+  (** Notation for contexts *)
   Notation "⋅" := nil (in custom exp at level 0) : mcpts_scope.
-  (* We need to define the extension of local contexts first, otherwise the notation engine always expects the := of global contexts *)
   Notation "Γ , A" := (cons A Γ) (in custom exp at level 50, left associativity, format "Γ ,  A") : mcpts_scope.
-  Notation "Δ , x : A" := (cons (x, A) Δ) (in custom exp at level 50, left associativity, format "Δ , x : A") : mcpts_scope.
-  (* Notation "Δ , x := [ M ] : A" := (cons (x, M, A) Δ) (in custom exp at level 50, left associativity, format "Δ , x := [ M ] : A") : mcpts_scope. *)
-  (* Notation "Δ , x := ∅ : A" := (cons (x, None, A) Δ) (in custom exp at level 50, left associativity, format "Δ , x := ∅ : A") : mcpts_scope. *)
-  (* Notation "Δ , x := M : A" := (cons (x, Some M, A) Δ) (in custom exp at level 50, left associativity, format "Δ , x := M : A") : mcpts_scope. *)
-  
+
+  (** Notation for neutral/normal forms *)
   Notation "n{{{ x }}}" := x (at level 0, x custom nf at level 99, format "'n{{{'  x  '}}}'") : mcpts_scope.
   Notation "( x )" := x (in custom nf at level 0, x custom nf at level 60) : mcpts_scope.
   Notation "'^' x" := x (in custom nf at level 0, x constr at level 0) : mcpts_scope.
@@ -256,6 +246,5 @@ Module Syntax_Notations.
   Notation "'λ' r A B e" := (nf_fn r A B e) (in custom nf at level 2, r constr at level 0, A custom nf at level 1, B custom nf at level 1, e custom nf at level 60) : mcpts_scope.
   Notation "f x .. y" := (ne_app .. (ne_app f x) .. y) (in custom nf at level 40, f custom nf, x custom nf at next level, y custom nf at next level) : mcpts_scope.
   Notation "'#' n" := (ne_var n) (in custom nf at level 0, n constr at level 0, format "'#' n") : mcpts_scope.
-  Notation "'`#' x" := (ne_gvar x) (in custom nf at level 0, x constr at level 0, format "'`#' x") : mcpts_scope.
   Notation "'⇑' M" := (nf_neut M) (in custom nf at level 0, M custom nf at level 99, format "'⇑'  M") : mcpts_scope.
 End Syntax_Notations.

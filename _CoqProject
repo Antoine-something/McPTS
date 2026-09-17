@@ -3,7 +3,7 @@
 -arg -w -arg -cast-in-pattern,-notation-overridden
 
 theories/LibTactics.v
-theories/Core/Base.v
+theories/Base.v
 
 ## PTS* signatures and their properties ##
 theories/PtsSignature/Signatures.v
@@ -16,8 +16,14 @@ theories/PtsSignature.v
 ## Declarative definition of PTS* ##
 theories/Core/Syntactic/Syntax.v
 theories/Core/Syntactic/System/Definitions.v
+theories/Core/Syntactic/System/Lemmas/Instances.v
+theories/Core/Syntactic/System/Lemmas/CorePresup.v
+theories/Core/Syntactic/System/Lemmas/SortLemmas.v
+theories/Core/Syntactic/System/Lemmas/NatLemmas.v
+theories/Core/Syntactic/System/Lemmas/SubstitutionLemmas.v
+theories/Core/Syntactic/System/Lemmas/TypeLemmas.v
+theories/Core/Syntactic/System/Lemmas/VariableLemmas.v
 theories/Core/Syntactic/System/Lemmas.v
-theories/Core/Syntactic/System/Tactics.v
 theories/Core/Syntactic/System.v
 theories/Core/Syntactic/CtxSub.v
 theories/Core/Syntactic/CtxEq.v
@@ -30,24 +36,24 @@ theories/Core/Syntactic/SystemAnnotated/Lemmas.v
 theories/Core/Syntactic/SystemAnnotated.v
 
 ## Evaluation of PTS* ##
-theories/Core/Semantic/Domain.v
-theories/Core/Semantic/Evaluation/Definitions.v
-theories/Core/Semantic/Evaluation/Lemmas.v
-theories/Core/Semantic/Evaluation/Tactics.v
-theories/Core/Semantic/Evaluation.v
-theories/Core/Semantic/Readback/Definitions.v
-theories/Core/Semantic/Readback/Lemmas.v
-theories/Core/Semantic/Readback.v
-theories/Core/Semantic/NbE.v
-theories/Core/Semantic/PER/Definitions.v
-theories/Core/Semantic/PER/CoreTactics.v
-theories/Core/Semantic/PER/CoreLemmas.v
-theories/Core/Semantic/PER/SortLemmas.v
-theories/Core/Semantic/PER/TypeLemmas.v
-theories/Core/Semantic/PER/SubtypingLemmas.v
-theories/Core/Semantic/PER/CtxLemmas.v
-theories/Core/Semantic/PER.v
-theories/Core/Semantic/Realizability.v
+# theories/Core/Semantic/Domain.v
+# theories/Core/Semantic/Evaluation/Definitions.v
+# theories/Core/Semantic/Evaluation/Lemmas.v
+# theories/Core/Semantic/Evaluation/Tactics.v
+# theories/Core/Semantic/Evaluation.v
+# theories/Core/Semantic/Readback/Definitions.v
+# theories/Core/Semantic/Readback/Lemmas.v
+# theories/Core/Semantic/Readback.v
+# theories/Core/Semantic/NbE.v
+# theories/Core/Semantic/PER/Definitions.v
+# theories/Core/Semantic/PER/CoreTactics.v
+# theories/Core/Semantic/PER/CoreLemmas.v
+# theories/Core/Semantic/PER/SortLemmas.v
+# theories/Core/Semantic/PER/TypeLemmas.v
+# theories/Core/Semantic/PER/SubtypingLemmas.v
+# theories/Core/Semantic/PER/CtxLemmas.v
+# theories/Core/Semantic/PER.v
+# theories/Core/Semantic/Realizability.v
 
 
 ## Completeness of normalization ##

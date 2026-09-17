@@ -1,1 +1,1 @@
-From McPTS.Core.Syntactic.System Require Export Definitions Lemmas Tactics.
+From McPTS.Core.Syntactic.System Require Export Definitions Lemmas.
