@@ -18,34 +18,30 @@ Section completeness_fundamental.
 
   Theorem completeness_fundamental :
     (forall Γ, {{ ⊢ Γ }} -> {{ ⟪ pred_P ⟫ ⊨ Γ }}) /\
-      (forall Γ Γ', {{ ⊢ Γ ⊆ Γ' }} -> {{ ⟪ pred_P ⟫ SubE Γ <: Γ' }}) /\
-      (forall Γ Δ, {{ ⊢ Γ ≈ Δ }} -> {{ ⟪ pred_P ⟫ ⊨ Γ ≈ Δ }}) /\
+      (forall Γ Γ', {{ ⊢ Γ ⊆ Γ' }} -> {{ SubC Γ <: Γ' ∈ per_ctx_subtyp pred_P }}) /\
+      (* (forall Γ Δ, {{ ⊢ Γ ≈ Δ }} -> {{ ⟪ pred_P ⟫ ⊨ Γ ≈ Δ }}) /\ *)
       (forall Γ A M, {{ Γ ⊢ M : A }} -> {{ ⟪ pred_P ⟫ Γ ⊨u M : A }}) /\
       (forall Γ A M M', {{ Γ ⊢ M ≈ M' : A }} -> {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : A }}) /\
-      (forall Γ Δ σ, {{ Γ ⊢s σ : Δ }} -> {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }}) /\
-      (forall Γ Δ σ σ', {{ Γ ⊢s σ ≈ σ' : Δ }} -> {{ ⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Δ }}) /\
-      (forall Γ A A', {{ Γ ⊢ A ⊆ A' }} -> {{ ⟪ pred_P ⟫ Γ ⊨ A ⊆ A' }}) /\
       (forall Γ A, {{ Γ ⊢ A }} -> {{ ⟪ pred_P ⟫ Γ ⊨ A }}) /\
-      (forall Γ A A', {{ Γ ⊢ A ≈ A' }} -> {{ ⟪ pred_P ⟫ Γ ⊨ A ≈ A' }}).
+      (forall Γ A A', {{ Γ ⊢ A ≈ A' }} -> {{ ⟪ pred_P ⟫ Γ ⊨ A ≈ A' }}) /\
+      (forall Γ A A', {{ Γ ⊢ A ⊆ A' }} -> {{ ⟪ pred_P ⟫ Γ ⊨ A ⊆ A' }}) /\
+      (forall Γ Δ σ, {{ Γ ⊢s σ : Δ }} -> {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }}) /\
+      (forall Γ Δ σ σ', {{ Γ ⊢s σ ≈ σ' : Δ }} -> {{ ⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Δ }}).
   Proof using Type.
     apply syntactic_wf_mut_ind;
       mauto 3.
 
-    - intros.
-      eapply @valid_exp_var; mauto.
+    intros.
+    eapply @valid_exp_var; mauto.
 Qed.
 
   #[local]
   Ltac solve_it := pose proof completeness_fundamental; firstorder.
 
-
   Theorem completeness_fundamental_ctx : forall Γ, {{ ⊢ Γ }} -> {{ ⟪ pred_P ⟫ ⊨ Γ }}.
   Proof using Type. solve_it. Qed.
 
-  Theorem completeness_fundamental_ctx_sub : forall Γ Γ', {{ ⊢ Γ ⊆ Γ' }} -> {{ ⟪ pred_P ⟫ SubE Γ <: Γ' }}.
-  Proof using Type. solve_it. Qed.
-
-  Theorem completeness_fundamental_ctx_eq : forall Γ Γ', {{ ⊢ Γ ≈ Γ' }} -> {{ ⟪ pred_P ⟫ ⊨ Γ ≈ Γ' }}.
+  Theorem completeness_fundamental_ctx_sub : forall Γ Γ', {{ ⊢ Γ ⊆ Γ' }} -> {{ SubC Γ <: Γ' ∈ per_ctx_subtyp pred_P }}.
   Proof using Type. solve_it. Qed.
 
   Theorem completeness_fundamental_exp : forall Γ M A, {{ Γ ⊢ M : A }} -> {{ ⟪ pred_P ⟫ Γ ⊨u M : A }}.
@@ -54,18 +50,25 @@ Qed.
   Theorem completeness_fundamental_exp_eq : forall Γ A M M', {{ Γ ⊢ M ≈ M' : A }} -> {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : A }}.
   Proof using Type. solve_it. Qed.
 
-  Theorem completeness_fundamental_sub : forall Γ σ Δ, {{ Γ ⊢s σ : Δ }} -> {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }}.
-  Proof using Type. solve_it. Qed.
-
-  Theorem completeness_fundamental_sub_eq : forall Γ Δ σ σ', {{ Γ ⊢s σ ≈ σ' : Δ }} -> {{ ⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Δ }}.
-  Proof using Type. solve_it. Qed.
-
-  Theorem completeness_fundamental_typ_subtyp : forall Γ A A', {{ Γ ⊢ A ⊆ A' }} -> {{ ⟪ pred_P ⟫ Γ ⊨ A ⊆ A' }}.
-  Proof using Type. solve_it. Qed.
-  
   Theorem completeness_fundamental_typ : forall Γ A, {{ Γ ⊢ A }} -> {{ ⟪ pred_P ⟫ Γ ⊨ A }}.
   Proof using Type. solve_it. Qed.
 
   Theorem completeness_fundamental_typ_eq : forall Γ A A', {{ Γ ⊢ A ≈ A' }} -> {{ ⟪ pred_P ⟫ Γ ⊨ A ≈ A' }}.
   Proof using Type. solve_it. Qed.
+
+  Theorem completeness_fundamental_typ_subtyp : forall Γ A A', {{ Γ ⊢ A ⊆ A' }} -> {{ ⟪ pred_P ⟫ Γ ⊨ A ⊆ A' }}.
+  Proof using Type. solve_it. Qed.
+
+  Theorem completeness_fundamental_sub : forall Γ σ Δ, {{ Γ ⊢s σ : Δ }} -> {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }}.
+  Proof using Type. solve_it. Qed.
+
+  Theorem completeness_fundamental_sub_eq : forall Γ Δ σ σ', {{ Γ ⊢s σ ≈ σ' : Δ }} -> {{ ⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Δ }}.
+  Proof using Type. solve_it. Qed.
+  
+  Theorem completeness_fundamental_ctx_eq : forall Γ Γ', {{ ⊢ Γ ≈ Γ' }} -> {{ ⟪ pred_P ⟫ ⊨ Γ ≈ Γ' }}.
+  Proof using Type.
+    induction 1; mauto 3.
+    pose proof completeness_fundamental; destruct_conjs.
+    eapply rel_ctx_extend; mauto 2.
+  Qed.
 End completeness_fundamental.

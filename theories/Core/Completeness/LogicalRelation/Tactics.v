@@ -1,5 +1,4 @@
-From McPTS Require Import LibTactics.
-From McPTS.Core Require Import Base.
+From McPTS Require Import LibTactics Base.
 From McPTS.Core.Semantic Require Import PER.
 Import Domain_Notations.
 

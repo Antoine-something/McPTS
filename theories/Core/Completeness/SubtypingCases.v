@@ -1,7 +1,6 @@
 From Coq Require Import Morphisms_Relations Relation_Definitions.
 
-From McPTS Require Import PtsSignature LibTactics.
-From McPTS.Core Require Import Base.
+From McPTS Require Import PtsSignature LibTactics Base.
 From McPTS.Core.Completeness Require Import LogicalRelation SortCases TermStructureCases FunctionCases.
 Import Domain_Notations.
 
@@ -27,9 +26,9 @@ Import Domain_Notations.
 (*     etransitivity; try eassumption; symmetry; eassumption. *)
 (* Qed. *)
 
-Lemma subtyp_refl_unsorted {P : PtsSig} {pred_P : PredicativeSig P}  : forall Δ Γ M M',
-    {{ ⟪ pred_P ⟫ Δ ▶ Γ ⊨ M ≈ M' }} ->
-    {{ ⟪ pred_P ⟫ Δ ▶ Γ ⊨ M ⊆ M' }}.
+Lemma subtyp_refl_unsorted {P : PtsSig} {pred_P : PredicativeSig P}  : forall Γ M M',
+    {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ M' }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨ M ⊆ M' }}.
 Proof.
   intros * [env_relΓ].
   destruct_conjs.
@@ -61,10 +60,10 @@ Qed.
 (*     etransitivity; try eassumption; symmetry; eassumption. *)
 (* Qed. *)
 
-Lemma subtyp_trans {P : PtsSig} {pred_P : PredicativeSig P } : forall Δ Γ M M' M'',
-    {{ ⟪ pred_P ⟫ Δ ▶ Γ ⊨ M ⊆ M' }} ->
-    {{ ⟪ pred_P ⟫ Δ ▶ Γ ⊨ M' ⊆ M'' }} ->
-    {{ ⟪ pred_P ⟫ Δ ▶ Γ ⊨ M ⊆ M'' }}.
+Lemma subtyp_trans {P : PtsSig} {pred_P : PredicativeSig P } : forall Γ M M' M'',
+    {{ ⟪ pred_P ⟫ Γ ⊨ M ⊆ M' }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨ M' ⊆ M'' }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨ M ⊆ M'' }}.
 Proof.
   intros * [env_relΓ [? ?]] [? [? ?]].
   destruct_conjs.
@@ -85,14 +84,14 @@ Proof.
 Qed.
 
 #[export]
-Instance subtyp_Transitive {P} {pred_P : PredicativeSig P} Δ Γ : Transitive (subtyp_under_ctx pred_P Δ Γ).
+Instance subtyp_Transitive {P} {pred_P : PredicativeSig P} Γ : Transitive (subtyp_under_ctx pred_P Γ).
 Proof. eauto using subtyp_trans. Qed.
 
-Lemma subtyp_sort {P} {pred_P : PredicativeSig P} : forall Δ Γ s1 s2,
-    {{ ⟪ pred_P ⟫ Δ ▶ Γ }} ->
+Lemma subtyp_sort {P} {pred_P : PredicativeSig P} : forall Γ s1 s2,
+    {{ ⟪ pred_P ⟫ ⊨ Γ }} ->
     Ax_sub P s1 s2 -> 
     (* st_subtyp s1 s2 -> *)
-    {{ ⟪ pred_P ⟫ Δ ▶ Γ ⊨ Sort@s1 ⊆ Sort@s2 }}.
+    {{ ⟪ pred_P ⟫ Γ ⊨ Sort@s1 ⊆ Sort@s2 }}.
 Proof.
   intros * [env_relΓ] ?.
   eexists_subtyp.
@@ -102,12 +101,12 @@ Proof.
 Qed.
 
 
-Lemma subtyp_pi {P} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru_pi P s1 s2 s3} Δ Γ A A' B B',
-  {{ ⟪ pred_P ⟫ Δ ▶ Γ ⊨u A ≈ A' : Sort@s1 }} ->
-  {{ ⟪ pred_P ⟫ Δ ▶ Γ, A ⊨u B : Sort@s2 }} ->
-  {{ ⟪ pred_P ⟫ Δ ▶ Γ, A' ⊨u B' : Sort@s2 }} ->
-  {{ ⟪ pred_P ⟫ Δ ▶ Γ, A' ⊨ B ⊆ B' }} ->
-  {{ ⟪ pred_P ⟫ Δ ▶ Γ ⊨ Π r A B ⊆ Π r A' B' }}.
+Lemma subtyp_pi {P} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru_pi P s1 s2 s3} Γ A A' B B',
+  {{ ⟪ pred_P ⟫ Γ ⊨u A ≈ A' : Sort@s1 }} ->
+  {{ ⟪ pred_P ⟫ Γ, A ⊨u B : Sort@s2 }} ->
+  {{ ⟪ pred_P ⟫ Γ, A' ⊨u B' : Sort@s2 }} ->
+  {{ ⟪ pred_P ⟫ Γ, A' ⊨ B ⊆ B' }} ->
+  {{ ⟪ pred_P ⟫ Γ ⊨ Π r A B ⊆ Π r A' B' }}.
 Proof.
   intros * [env_relΓ]%rel_exp_unsorted_of_typ_inversion1 []%rel_exp_unsorted_of_typ_inversion1 []%rel_exp_unsorted_of_typ_inversion1 [? [? ?]].
   destruct_conjs.
@@ -131,17 +130,17 @@ Proof.
   assert (forall c c', head_rel ρ ρ' equiv_ρ_ρ' c c' -> cons_per_ctx_env env_relΓ head_rel d{{{ ρ ↦ c }}} d{{{ ρ' ↦ c' }}}) as HΓA'
       by (intros; econstructor; mauto).
   
-  assert (per_sort_elem pred_P Δ s1 (head_relA ρ ρ H2) a a) by mauto 2.
-  assert (per_sort_elem pred_P Δ s1 (head_relA ρ ρ H2) a0 a) by mauto 2.
-  assert (per_sort_elem pred_P Δ s1 (head_relA ρ ρ H2) a0 a0) by mauto 2.
-  assert (per_sort_elem pred_P Δ s1 (head_rel ρ ρ H2) a2 a2) by (symmetry in H28; mauto 2).
-  assert (per_sort_elem pred_P Δ s1 (head_rel ρ ρ H2) a3 a2) by (symmetry in H31; mauto 2).
-  assert (per_sort_elem pred_P Δ s1 (head_rel ρ ρ H2) a3 a3) by (symmetry in H28; mauto 2).
+  assert (per_sort_elem pred_P s1 (head_relA ρ ρ H2) a a) by mauto 2.
+  assert (per_sort_elem pred_P s1 (head_relA ρ ρ H2) a0 a) by mauto 2.
+  assert (per_sort_elem pred_P s1 (head_relA ρ ρ H2) a0 a0) by mauto 2.
+  assert (per_sort_elem pred_P s1 (head_rel ρ ρ H2) a2 a2) by (symmetry in H28; mauto 2).
+  assert (per_sort_elem pred_P s1 (head_rel ρ ρ H2) a3 a2) by (symmetry in H31; mauto 2).
+  assert (per_sort_elem pred_P s1 (head_rel ρ ρ H2) a3 a3) by (symmetry in H28; mauto 2).
   handle_per_sort_elem_irrel.
 
   (** The proofs for the next two assertions are basically the same *)
   exvar (relation (domain P))
-    ltac:(fun R => assert ({{ DF Π r a0 ρ B ≈ Π r a ρ' B ∈ per_sort_elem pred_P Δ s3 ↘ R }})).
+    ltac:(fun R => assert ({{ DF Π r a0 ρ B ≈ Π r a ρ' B ∈ per_sort_elem pred_P s3 ↘ R }})).
   {
     intros.
     per_sort_elem_econstructor; [econstructor | | | solve_refl].
@@ -153,7 +152,7 @@ Proof.
       econstructor; mauto.
   }
   exvar (relation (domain P))
-    ltac:(fun R => assert ({{ DF Π r a0 ρ B' ≈ Π r a ρ' B' ∈ per_sort_elem pred_P Δ s3 ↘ R }})).
+    ltac:(fun R => assert ({{ DF Π r a0 ρ B' ≈ Π r a ρ' B' ∈ per_sort_elem pred_P s3 ↘ R }})).
   {
     per_sort_elem_econstructor; [econstructor | | | solve_refl].
     - eauto.
@@ -169,7 +168,7 @@ Proof.
   }
   
   exvar (relation (domain P))
-    ltac:(fun R => assert ({{ DF Π r a3 ρ B ≈ Π r a2 ρ' B ∈ per_sort_elem pred_P Δ s3 ↘ R }})).
+    ltac:(fun R => assert ({{ DF Π r a3 ρ B ≈ Π r a2 ρ' B ∈ per_sort_elem pred_P s3 ↘ R }})).
   {
     intros.
     per_sort_elem_econstructor; [econstructor | mauto 2 | | solve_refl].
@@ -182,7 +181,7 @@ Proof.
   }
   
   exvar (relation (domain P))
-    ltac:(fun R => assert ({{ DF Π r a3 ρ B' ≈ Π r a2 ρ' B' ∈ per_sort_elem pred_P Δ s3 ↘ R }})).
+    ltac:(fun R => assert ({{ DF Π r a3 ρ B' ≈ Π r a2 ρ' B' ∈ per_sort_elem pred_P s3 ↘ R }})).
   {
     per_sort_elem_econstructor; [econstructor | mauto 2 | | solve_refl].
     - eapply rel_exp_pi_core'; [| reflexivity].

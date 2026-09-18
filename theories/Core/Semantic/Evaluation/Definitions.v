@@ -1,13 +1,12 @@
-From McPTS Require Import PtsSignature.
-From McPTS.Core Require Import Base.
+From McPTS Require Import PtsSignature Base.
 From McPTS.Core.Syntactic Require Import System.
 From McPTS.Core.Semantic Require Export Domain.
 Import Domain_Notations.
 
-Reserved Notation "Δ ▶ '⟦' M '⟧' ρ '↘' r" (in custom judg at level 80, M custom exp at level 99, Δ custom exp, ρ custom domain at level 99, r custom domain at level 99).
-Reserved Notation "Δ ▶ '$|' m '&' n '|↘' r" (in custom judg at level 80, Δ custom exp, m custom domain at level 99, n custom domain at level 99, r custom domain at level 99).
-Reserved Notation "Δ ▶ 'rec' m '⟦return' A | 'zero' -> MZ | 'succ' -> MS 'end⟧' ρ '↘' r" (in custom judg at level 80, m custom domain at level 99, A custom exp at level 99, MZ custom exp at level 99, MS custom exp at level 99, Δ custom exp, ρ custom domain at level 99, r custom domain at level 99).
-Reserved Notation "Δ ▶ '⟦' σ '⟧s' ρ '↘' ρσ" (in custom judg at level 80, σ custom exp at level 99, Δ custom exp, ρ custom domain at level 99, ρσ custom domain at level 99).
+Reserved Notation "'⟦' M '⟧' ρ '↘' r" (in custom judg at level 80, M custom exp at level 99, ρ custom domain at level 99, r custom domain at level 99).
+Reserved Notation "'$|' m '&' n '|↘' r" (in custom judg at level 80, m custom domain at level 99, n custom domain at level 99, r custom domain at level 99).
+Reserved Notation "'rec' m '⟦return' A | 'zero' -> MZ | 'succ' -> MS 'end⟧' ρ '↘' r" (in custom judg at level 80, m custom domain at level 99, A custom exp at level 99, MZ custom exp at level 99, MS custom exp at level 99, ρ custom domain at level 99, r custom domain at level 99).
+Reserved Notation "'⟦' σ '⟧s' ρ '↘' ρσ" (in custom judg at level 80, σ custom exp at level 99, ρ custom domain at level 99, ρσ custom domain at level 99).
 Reserved Notation "'#|' ρ '[' n ']' '|↘' m" (in custom judg at level 80, ρ custom domain, n constr at level 0, m custom domain at level 99).
 
 
@@ -22,83 +21,83 @@ where "'#|' ρ '[' n ']' '|↘' m" := (env_lookup ρ n m) (in custom judg).
 #[export]
 Hint Constructors env_lookup : mcpts.
 
-Inductive eval_exp {P : PtsSig} : gctx P -> exp P -> env P -> domain P -> Prop :=
+Inductive eval_exp {P : PtsSig} : exp P -> env P -> domain P -> Prop :=
+(** Sorts *)
 | eval_exp_typ :
-  `( {{ Δ ▶ ⟦ Sort@s ⟧ ρ ↘ Sort@s }} )
+  `( {{ ⟦ Sort@s ⟧ ρ ↘ Sort@s }} )
+(** Variables *)
 | eval_exp_var :
   `( {{ #| ρ[x] |↘ m }} ->
-     {{ Δ ▶ ⟦ #x ⟧ ρ ↘ m }} )
-| eval_exp_gvar :
-  `( {{ `#x : A ∈ Δ }} ->
-     {{ Δ ▶ ⟦ A ⟧ ⋅ ↘ a }} ->
-     {{ Δ ▶ ⟦ `#x ⟧ ρ ↘ ⇑`! a x }} )
+     {{ ⟦ #x ⟧ ρ ↘ m }} )
+(** Functions *)
 | eval_exp_pi :
   `( forall r : Ru_pi P s1 s2 s3,
-        {{ Δ ▶ ⟦ A ⟧ ρ ↘ a }} ->
-        {{ Δ ▶ ⟦ Π r A B ⟧ ρ ↘ Π r a ρ B }} )
+        {{ ⟦ A ⟧ ρ ↘ a }} ->
+        {{ ⟦ Π r A B ⟧ ρ ↘ Π r a ρ B }} )
 | eval_exp_fn :
   `( forall r : Ru_pi P s1 s2 s3,
-      {{ Δ ▶ ⟦ λ r A B M ⟧ ρ ↘ λ r ρ M }} )
+      {{ ⟦ λ r A B M ⟧ ρ ↘ λ r ρ M }} )
 | eval_exp_app :
-  `( {{ Δ ▶ ⟦ M ⟧ ρ ↘ m }} ->
-     {{ Δ ▶ ⟦ N ⟧ ρ ↘ n }} ->
-     {{ Δ ▶ $| m & n |↘ m' }} ->
-     {{ Δ ▶ ⟦ M N ⟧ ρ ↘ m' }} )
+  `( {{ ⟦ M ⟧ ρ ↘ m }} ->
+     {{ ⟦ N ⟧ ρ ↘ n }} ->
+     {{ $| m & n |↘ m' }} ->
+     {{ ⟦ M N ⟧ ρ ↘ m' }} )
 (** Naturals *)
 | eval_exp_nat :
-  `( {{ Δ ▶ ⟦ ℕ ⟧ ρ ↘ ℕ }} )
+  `( {{ ⟦ ℕ ⟧ ρ ↘ ℕ }} )
 | eval_exp_zero :
-  `( {{ Δ ▶ ⟦ zero ⟧ ρ ↘ zero }} )
+  `( {{ ⟦ zero ⟧ ρ ↘ zero }} )
 | eval_exp_succ :
-  `( {{ Δ ▶ ⟦ M ⟧ ρ ↘ m }} ->
-     {{ Δ ▶ ⟦ succ M ⟧ ρ ↘ succ m }} )
+  `( {{ ⟦ M ⟧ ρ ↘ m }} ->
+     {{ ⟦ succ M ⟧ ρ ↘ succ m }} )
 | eval_exp_natrec :
-  `( {{ Δ ▶ ⟦ M ⟧ ρ ↘ m }} ->
-     {{ Δ ▶ rec m ⟦return A | zero -> MZ | succ -> MS end⟧ ρ ↘ r }} ->
-     {{ Δ ▶ ⟦ rec M return A | zero -> MZ | succ -> MS end ⟧ ρ ↘ r }} )
+  `( {{ ⟦ M ⟧ ρ ↘ m }} ->
+     {{ rec m ⟦return A | zero -> MZ | succ -> MS end⟧ ρ ↘ r }} ->
+     {{ ⟦ rec M return A | zero -> MZ | succ -> MS end ⟧ ρ ↘ r }} )
+(** Closures *)
 | eval_exp_sub :
-  `( {{ Δ ▶ ⟦ σ ⟧s ρ ↘ ρ' }} ->
-     {{ Δ ▶ ⟦ M ⟧ ρ' ↘ m }} ->
-     {{ Δ ▶ ⟦ M[σ] ⟧ ρ ↘ m }} )
-where "Δ ▶ '⟦' M '⟧' ρ '↘' m" := (eval_exp Δ M ρ m) (in custom judg)
+  `( {{ ⟦ σ ⟧s ρ ↘ ρ' }} ->
+     {{ ⟦ M ⟧ ρ' ↘ m }} ->
+     {{ ⟦ M[σ] ⟧ ρ ↘ m }} )
+where "'⟦' M '⟧' ρ '↘' m" := (eval_exp M ρ m) (in custom judg)
                                                                   
-with eval_app {P : PtsSig} : gctx P -> domain P -> domain P -> domain P -> Prop :=
+with eval_app {P : PtsSig} : domain P -> domain P -> domain P -> Prop :=
 | eval_app_fn :
   `( forall r : Ru_pi P s1 s2 s3,
-      {{ Δ ▶ ⟦ M ⟧ ρ ↦ n ↘ m }} ->
-      {{ Δ ▶ $| λ r ρ M & n |↘ m }} )
+      {{ ⟦ M ⟧ ρ ↦ n ↘ m }} ->
+      {{ $| λ r ρ M & n |↘ m }} )
 | eval_app_neut :
   `( forall r : Ru_pi P s1 s2 s3,
-      {{ Δ ▶ ⟦ B ⟧ ρ ↦ n ↘ b }} ->
-      {{ Δ ▶ $| ⇑ (Π r a ρ B) m & n |↘ ⇑ b (m (⇓ a n)) }} )
-where "Δ ▶ '$|' m '&' n '|↘' m'" := (eval_app Δ m n m') (in custom judg)
-with eval_natrec {P : PtsSig} : gctx P -> exp P -> exp P -> exp P -> domain P -> env P -> domain P -> Prop :=
+      {{ ⟦ B ⟧ ρ ↦ n ↘ b }} ->
+      {{ $| ⇑ (Π r a ρ B) m & n |↘ ⇑ b (m (⇓ a n)) }} )
+where "'$|' m '&' n '|↘' m'" := (eval_app m n m') (in custom judg)
+with eval_natrec {P : PtsSig} : exp P -> exp P -> exp P -> domain P -> env P -> domain P -> Prop :=
 | eval_natrec_zero :
-  `( {{ Δ ▶ ⟦ MZ ⟧ ρ ↘ mz }} ->
-     {{ Δ ▶ rec zero ⟦return A | zero -> MZ | succ -> MS end⟧ ρ ↘ mz }} )
+  `( {{ ⟦ MZ ⟧ ρ ↘ mz }} ->
+     {{ rec zero ⟦return A | zero -> MZ | succ -> MS end⟧ ρ ↘ mz }} )
 | eval_natrec_succ :
-  `( {{ Δ ▶ rec b ⟦return A | zero -> MZ | succ -> MS end⟧ ρ ↘ r }} ->
-     {{ Δ ▶ ⟦ MS ⟧ (ρ ↦ b) ↦ r ↘ ms }} ->
-     {{ Δ ▶ rec succ b ⟦return A | zero -> MZ | succ -> MS end⟧ ρ ↘ ms }} )
+  `( {{ rec b ⟦return A | zero -> MZ | succ -> MS end⟧ ρ ↘ r }} ->
+     {{ ⟦ MS ⟧ (ρ ↦ b) ↦ r ↘ ms }} ->
+     {{ rec succ b ⟦return A | zero -> MZ | succ -> MS end⟧ ρ ↘ ms }} )
 | eval_natrec_neut :
-  `( {{ Δ ▶ ⟦ MZ ⟧ ρ ↘ mz }} ->
-     {{ Δ ▶ ⟦ A ⟧ ρ ↦ ⇑ b m ↘ a }} ->
-     {{ Δ ▶ rec ⇑ b m ⟦return A | zero -> MZ | succ -> MS end⟧ ρ ↘ ⇑ a (rec m under ρ return A | zero -> mz | succ -> MS end) }} )
-where "Δ ▶ 'rec' m '⟦return' A | 'zero' -> MZ | 'succ' -> MS 'end⟧' ρ '↘' r" := (eval_natrec Δ A MZ MS m ρ r) (in custom judg)
-with eval_sub {P : PtsSig} : gctx P -> sub P -> env P -> env P -> Prop :=
+  `( {{ ⟦ MZ ⟧ ρ ↘ mz }} ->
+     {{ ⟦ A ⟧ ρ ↦ ⇑ b m ↘ a }} ->
+     {{ rec ⇑ b m ⟦return A | zero -> MZ | succ -> MS end⟧ ρ ↘ ⇑ a (rec m under ρ return A | zero -> mz | succ -> MS end) }} )
+where "'rec' m '⟦return' A | 'zero' -> MZ | 'succ' -> MS 'end⟧' ρ '↘' r" := (eval_natrec A MZ MS m ρ r) (in custom judg)
+with eval_sub {P : PtsSig} : sub P -> env P -> env P -> Prop :=
 | eval_sub_id :
-  `( {{ Δ ▶ ⟦ Id ⟧s ρ ↘ ρ }} )
+  `( {{ ⟦ Id ⟧s ρ ↘ ρ }} )
 | eval_sub_weaken :
-  `( {{ Δ ▶ ⟦ Wk ⟧s ρ ↘ ρ ↯ }} )
+  `( {{ ⟦ Wk ⟧s ρ ↘ ρ ↯ }} )
 | eval_sub_extend :
-  `( {{ Δ ▶ ⟦ σ ⟧s ρ ↘ ρσ }} ->
-     {{ Δ ▶ ⟦ M ⟧ ρ ↘ m }} ->
-     {{ Δ ▶ ⟦ σ ,, M ⟧s ρ ↘ ρσ ↦ m }} )
+  `( {{ ⟦ σ ⟧s ρ ↘ ρσ }} ->
+     {{ ⟦ M ⟧ ρ ↘ m }} ->
+     {{ ⟦ σ ,, M ⟧s ρ ↘ ρσ ↦ m }} )
 | eval_sub_compose :
-  `( {{ Δ ▶ ⟦ τ ⟧s ρ ↘ ρτ }} ->
-     {{ Δ ▶ ⟦ σ ⟧s ρτ ↘ ρτσ }} ->
-     {{ Δ ▶ ⟦ σ ∘ τ ⟧s ρ ↘ ρτσ }} )
-where "Δ ▶ '⟦' σ '⟧s' ρ '↘' ρσ" := (eval_sub Δ σ ρ ρσ) (in custom judg)
+  `( {{ ⟦ τ ⟧s ρ ↘ ρτ }} ->
+     {{ ⟦ σ ⟧s ρτ ↘ ρτσ }} ->
+     {{ ⟦ σ ∘ τ ⟧s ρ ↘ ρτσ }} )
+where "'⟦' σ '⟧s' ρ '↘' ρσ" := (eval_sub σ ρ ρσ) (in custom judg)
 .
 
 Scheme eval_exp_mut_ind := Induction for eval_exp Sort Prop

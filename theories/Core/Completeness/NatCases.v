@@ -1,27 +1,26 @@
 From Coq Require Import Morphisms_Relations.
 
-From McPTS Require Import PtsSignature LibTactics.
-From McPTS.Core Require Import Base.
+From McPTS Require Import PtsSignature LibTactics Base.
 From McPTS.Core.Completeness Require Import LogicalRelation SubstitutionCases TermStructureCases SortCases.
 From McPTS.Core.Semantic Require Import Realizability.
 Import Domain_Notations.
 
-Lemma rel_exp_of_nat_inversion {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M M'},
-    {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ M' : ℕ }} ->
-    exists env_rel (_ : {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }}),
-    forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_rel }}),
-      rel_exp M ρ M' ρ' per_nat.
-Proof.
-  intros * [env_relΓ].
-  destruct_conjs.
-  eexists.
-  eexists; [eassumption |].
-  intros.
-  (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head (@rel_typ P).
-  invert_rel_typ_body.
-  apply H3.
-Qed.
+(* Lemma rel_exp_of_nat_inversion {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M M'}, *)
+(*     {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ M' : ℕ }} -> *)
+(*     exists env_rel (_ : {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }}), *)
+(*     forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_rel }}), *)
+(*       rel_exp M ρ M' ρ' per_nat. *)
+(* Proof. *)
+(*   intros * [env_relΓ]. *)
+(*   destruct_conjs. *)
+(*   eexists. *)
+(*   eexists; [eassumption |]. *)
+(*   intros. *)
+(*   (on_all_hyp: destruct_rel_by_assumption env_relΓ). *)
+(*   destruct_by_head (@rel_typ P). *)
+(*   invert_rel_typ_body. *)
+(*   apply H3. *)
+(* Qed. *)
 
 Lemma rel_exp_unsorted_of_nat_inversion {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M M'},
     {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : ℕ }} ->
@@ -42,25 +41,25 @@ Proof.
   apply H2.
 Qed.
 
-Lemma rel_exp_of_nat {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M M' s} {r : Ru_nat P s},
-    (exists env_rel (_ : {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }}),
-      forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_rel }}),
-        rel_exp M ρ M' ρ' per_nat) ->
-    {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ M' : ℕ }}.
-Proof.
-  intros * Hru [env_relΓ].
-  destruct_conjs.
-  eexists.
-  split.
-  eassumption.
-  intros.
-  eexists.
-  intros.
-  eexists; split; mauto.
-  econstructor; mauto.
-  per_sort_elem_econstructor; mauto.
-  reflexivity.
-Qed.
+(* Lemma rel_exp_of_nat {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M M' s} {r : Ru_nat P s}, *)
+(*     (exists env_rel (_ : {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }}), *)
+(*       forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_rel }}), *)
+(*         rel_exp M ρ M' ρ' per_nat) -> *)
+(*     {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ M' : ℕ }}. *)
+(* Proof. *)
+(*   intros * Hru [env_relΓ]. *)
+(*   destruct_conjs. *)
+(*   eexists. *)
+(*   split. *)
+(*   eassumption. *)
+(*   intros. *)
+(*   eexists. *)
+(*   intros. *)
+(*   eexists; split; mauto. *)
+(*   econstructor; mauto. *)
+(*   per_sort_elem_econstructor; mauto. *)
+(*   reflexivity. *)
+(* Qed. *)
 
 Lemma rel_exp_unsorted_of_nat {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ M M' s} {r : Ru_nat P s},
     (exists env_rel (_ : {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }}),
@@ -184,27 +183,27 @@ Qed.
   Hint Resolve rel_exp_unsorted_succ_cong : mcpts.
 
 
-Ltac invert_rel_exp_2 H l :=
-  (unshelve (epose proof (rel_exp_clean_inversion _ H); deex); shelve_unifiable; [eassumption |]; clear H)
-    + (destruct H as [l [? H]]; deex_in H).
+(* Ltac invert_rel_exp_2 H l := *)
+(*   (unshelve (epose proof (rel_exp_clean_inversion _ H); deex); shelve_unifiable; [eassumption |]; clear H) *)
+(*     + (destruct H as [l [? H]]; deex_in H). *)
 
 
 
-Lemma rel_exp_of_sub_id_zero_inversion  {P} {pred_P : PredicativeSig P} : forall {Γ M M' A},
-    {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ M' : A[Id,,zero] }} ->
-    exists env_rel (_ : {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }}) s,
-    forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_rel }}),
-    exists elem_rel, rel_typ pred_P s A d{{{ ρ ↦ zero }}} A d{{{ ρ' ↦ zero }}} elem_rel /\ rel_exp M ρ M' ρ' elem_rel.
-Proof.
-  intros * HM.
-  invert_rel_exp_2 HM env_relΓ.
-  eexists_rel_exp.
-  intros.
-  (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head (@rel_typ P).
-  simplify_evals.
-  mauto.
-Qed.
+(* Lemma rel_exp_of_sub_id_zero_inversion  {P} {pred_P : PredicativeSig P} : forall {Γ M M' A}, *)
+(*     {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ M' : A[Id,,zero] }} -> *)
+(*     exists env_rel (_ : {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }}) s, *)
+(*     forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_rel }}), *)
+(*     exists elem_rel, rel_typ pred_P s A d{{{ ρ ↦ zero }}} A d{{{ ρ' ↦ zero }}} elem_rel /\ rel_exp M ρ M' ρ' elem_rel. *)
+(* Proof. *)
+(*   intros * HM. *)
+(*   invert_rel_exp_2 HM env_relΓ. *)
+(*   eexists_rel_exp. *)
+(*   intros. *)
+(*   (on_all_hyp: destruct_rel_by_assumption env_relΓ). *)
+(*   destruct_by_head (@rel_typ P). *)
+(*   simplify_evals. *)
+(*   mauto. *)
+(* Qed. *)
 
 
 Lemma rel_exp_unsorted_of_sub_id_zero_inversion  {P} {pred_P : PredicativeSig P} : forall {Γ M M' A},
@@ -245,22 +244,22 @@ Ltac eexists_rel_exp_unsorted_of_sub_id_zero :=
   eexists_rel_exp_untyped.
 
 
-Lemma rel_exp_of_sub_wkwk_succ_var1_inversion {P} {pred_P : PredicativeSig P} : forall {Γ M M' A s} (r : Ru_nat P s),
-    {{ ⟪ pred_P ⟫ Γ, ℕ, A ⊨ M ≈ M' : A[Wk∘Wk,,succ(#1)] }} ->
-    exists env_rel (_ : {{ EF Γ, ℕ, A ≈ Γ, ℕ, A ∈ per_ctx_env pred_P ↘ env_rel }}) s'',
-    forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_rel }}) d d',
-      env_lookup ρ 1 d -> env_lookup ρ' 1 d' ->
-    exists elem_rel, rel_typ pred_P s'' A d{{{ ρ ↯ ↯ ↦ succ d }}} A d{{{ ρ' ↯ ↯ ↦ succ d' }}} elem_rel /\ rel_exp M ρ M' ρ' elem_rel.
-Proof.
-  intros * ? HM.
-  invert_rel_exp_2 HM env_relΓℕA.
-  eexists_rel_exp.
-  intros.
-  (on_all_hyp: destruct_rel_by_assumption env_relΓℕA).
-  destruct_by_head (@rel_typ P).
-  invert_rel_typ_body.
-  mauto.
-Qed.
+(* Lemma rel_exp_of_sub_wkwk_succ_var1_inversion {P} {pred_P : PredicativeSig P} : forall {Γ M M' A s} (r : Ru_nat P s), *)
+(*     {{ ⟪ pred_P ⟫ Γ, ℕ, A ⊨ M ≈ M' : A[Wk∘Wk,,succ(#1)] }} -> *)
+(*     exists env_rel (_ : {{ EF Γ, ℕ, A ≈ Γ, ℕ, A ∈ per_ctx_env pred_P ↘ env_rel }}) s'', *)
+(*     forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_rel }}) d d', *)
+(*       env_lookup ρ 1 d -> env_lookup ρ' 1 d' -> *)
+(*     exists elem_rel, rel_typ pred_P s'' A d{{{ ρ ↯ ↯ ↦ succ d }}} A d{{{ ρ' ↯ ↯ ↦ succ d' }}} elem_rel /\ rel_exp M ρ M' ρ' elem_rel. *)
+(* Proof. *)
+(*   intros * ? HM. *)
+(*   invert_rel_exp_2 HM env_relΓℕA. *)
+(*   eexists_rel_exp. *)
+(*   intros. *)
+(*   (on_all_hyp: destruct_rel_by_assumption env_relΓℕA). *)
+(*   destruct_by_head (@rel_typ P). *)
+(*   invert_rel_typ_body. *)
+(*   mauto. *)
+(* Qed. *)
 
 Lemma rel_exp_unsorted_of_sub_wkwk_succ_var1_inversion {P} {pred_P : PredicativeSig P} : forall {Γ M M' A s} (r : Ru_nat P s),
     {{ ⟪ pred_P ⟫ Γ, ℕ, A ⊨u M ≈ M' : A[Wk∘Wk,,succ(#1)] }} ->
@@ -306,52 +305,62 @@ Ltac eexists_rel_exp_unsorted_of_sub_id_N r :=
   eexists_rel_exp_untyped.
 
 
-Ltac invert_rel_exp_of_typ_2 H l :=
-  (unshelve epose proof (rel_exp_of_typ_inversion2 _ _ H); shelve_unifiable; [eassumption |]; clear H)
-  + (pose proof (rel_exp_of_typ_inversion1 _ H) as [l []]; clear H)
-  + invert_rel_exp_2 H l.
+(* Ltac invert_rel_exp_of_typ_2 H l := *)
+(*   (unshelve epose proof (rel_exp_of_typ_inversion2 _ _ H); shelve_unifiable; [eassumption |]; clear H) *)
+(*   + (pose proof (rel_exp_of_typ_inversion1 _ H) as [l []]; clear H) *)
+(*   + invert_rel_exp_2 H l. *)
+
+(* Ltac invert_rel_exp_of_typ_unsorted_2 H l := *)
+(*   (unshelve epose proof (rel_exp_of_typ_unsorted_inversion2 _ _ H); shelve_unifiable; [eassumption |]; clear H) *)
+(*   + (pose proof (rel_exp_of_typ_unsorted_inversion1 _ H) as [l []]; clear H) *)
+(*   + invert_rel_exp_2 H l. *)
+
+(* Ltac invert_rel_exp_unsorted_of_typ_unsorted_2 H l := *)
+(*   (unshelve epose proof (rel_exp_unsorted_of_typ_inversion2 _ _ H); shelve_unifiable; [eassumption |]; clear H) *)
+(*   + (pose proof (rel_exp_unsorted_of_typ_inversion1 _ H) as [l []]; clear H) *)
+(*   + invert_rel_exp_2 H l. *)
+
 
 Ltac invert_rel_exp_of_typ_unsorted_2 H l :=
   (unshelve epose proof (rel_exp_of_typ_unsorted_inversion2 _ _ H); shelve_unifiable; [eassumption |]; clear H)
-  + (pose proof (rel_exp_of_typ_unsorted_inversion1 _ H) as [l []]; clear H)
-  + invert_rel_exp_2 H l.
+  + (pose proof (rel_exp_of_typ_unsorted_inversion1 _ H) as [l []]; clear H).
 
 Ltac invert_rel_exp_unsorted_of_typ_unsorted_2 H l :=
   (unshelve epose proof (rel_exp_unsorted_of_typ_inversion2 _ _ H); shelve_unifiable; [eassumption |]; clear H)
-  + (pose proof (rel_exp_unsorted_of_typ_inversion1 _ H) as [l []]; clear H)
-  + invert_rel_exp_2 H l.
+  + (pose proof (rel_exp_unsorted_of_typ_inversion1 _ H) as [l []]; clear H).
 
-Lemma eval_natrec_sub_neut {P} {pred_P : PredicativeSig P} : forall {Γ env_relΓ σ Δ env_relΔ MZ MZ' MS MS' A A' m m' s} (r : Ru_nat P s),
+
+Lemma eval_natrec_sub_neut {P} {pred_P : PredicativeSig P} : forall {Γ env_relΓ σ Γ' env_relΓ' MZ MZ' MS MS' A A' m m' s} (r : Ru_nat P s),
     {{ DF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_relΓ }} ->
-    {{ DF Δ ≈ Δ ∈ per_ctx_env pred_P ↘ env_relΔ }} ->
-    {{ ⟪ pred_P ⟫ Δ, ℕ ⊨ A ≈ A' }} ->
-    {{ ⟪ pred_P ⟫ Δ ⊨u MZ ≈ MZ' : A[Id,,zero] }} ->
-    {{ ⟪ pred_P ⟫ Δ, ℕ, A ⊨u MS ≈ MS' : A[Wk∘Wk,,succ(#1)] }} ->
+    {{ DF Γ' ≈ Γ' ∈ per_ctx_env pred_P ↘ env_relΓ' }} ->
+    {{ ⟪ pred_P ⟫ Γ', ℕ ⊨ A ≈ A' }} ->
+    {{ ⟪ pred_P ⟫ Γ' ⊨u MZ ≈ MZ' : A[Id,,zero] }} ->
+    {{ ⟪ pred_P ⟫ Γ', ℕ, A ⊨u MS ≈ MS' : A[Wk∘Wk,,succ(#1)] }} ->
     {{ Dom m ≈ m' ∈ per_bot }} ->
     (forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}) ρσ ρ'σ' mz mz',
         {{ ⟦ σ ⟧s ρ ↘ ρσ }} ->
         {{ ⟦ σ ⟧s ρ' ↘ ρ'σ' }} ->
-        {{ Dom ρσ ≈ ρ'σ' ∈ env_relΔ }} ->
+        {{ Dom ρσ ≈ ρ'σ' ∈ env_relΓ' }} ->
         {{ ⟦ MZ ⟧ ρσ ↘ mz }} ->
         {{ ⟦ MZ' ⟧ ρ'σ' ↘ mz' }} ->
         {{ Dom rec m under ρσ return A | zero -> mz | succ -> MS end ≈ rec m' under ρ' return A'[q σ] | zero -> mz' | succ -> MS'[q (q σ)] end ∈ per_bot }}).
 Proof.
   intros * ?.
-  intros equiv_Γ_Γ equiv_Δ_Δ
-         [env_relΔℕ]%rel_exp_of_typ_unsorted_inversion1
+  intros equiv_Γ_Γ equiv_Γ'_Γ'
+         [env_relΓ'ℕ]%rel_exp_of_typ_unsorted_inversion1
          []%rel_exp_unsorted_of_sub_id_zero_inversion
-         [env_relΔℕA]%(rel_exp_unsorted_of_sub_wkwk_succ_var1_inversion r)
+         [env_relΓ'ℕA]%(rel_exp_unsorted_of_sub_wkwk_succ_var1_inversion r)
          equiv_m_m'.
   destruct_conjs.
-  pose env_relΔℕA.
-  pose env_relΔℕ.
+  pose env_relΓ'ℕA.
+  pose env_relΓ'ℕ.
   handle_per_ctx_env_irrel.
-  invert_per_ctx_envs_unsorted_of pred_P env_relΔℕA.
+  invert_per_ctx_envs_of pred_P env_relΓ'ℕA.
   handle_per_ctx_env_irrel.
-  invert_per_ctx_envs_unsorted_of pred_P env_relΔℕ.
+  invert_per_ctx_envs_of pred_P env_relΓ'ℕ.
   handle_per_ctx_env_irrel.
   intros.
-  (on_all_hyp: destruct_rel_by_assumption env_relΔ).
+  (on_all_hyp: destruct_rel_by_assumption env_relΓ').
   destruct_by_head (@rel_typ_unsorted P).
 
   simplify_evals.
@@ -369,41 +378,41 @@ Proof.
   intro t.
   assert {{ Dom ⇑! ℕ t ≈ ⇑! ℕ t ∈ (@per_nat P) }} by mauto.
 
-  assert {{ Dom ρσ ↦ ⇑! ℕ t ≈ ρ'σ ↦ ⇑! ℕ t ∈ env_relΔℕ }} as HinΔℕs.
+  assert {{ Dom ρσ ↦ ⇑! ℕ t ≈ ρ'σ ↦ ⇑! ℕ t ∈ env_relΓ'ℕ }} as HinΔℕs.
   {
     apply_relation_equivalence; econstructor; mauto 2.
     eapply H12; mauto.
   }
   (on_all_hyp: fun H => destruct (H _ _ HinΔℕs)).
   assert {{ Dom succ (⇑! ℕ t) ≈ succ (⇑! ℕ t) ∈ per_nat }} by mauto.
-  assert {{ Dom ρσ ↦ succ (⇑! ℕ t) ≈ ρ'σ ↦ succ (⇑! ℕ t) ∈ env_relΔℕ }} as HinΔℕsuccs.
+  assert {{ Dom ρσ ↦ succ (⇑! ℕ t) ≈ ρ'σ ↦ succ (⇑! ℕ t) ∈ env_relΓ'ℕ }} as HinΓ'ℕsuccs.
   {
     apply_relation_equivalence; econstructor; mauto 2.
     eapply H12; mauto.
   }
-  (on_all_hyp: fun H => destruct (H _ _ HinΔℕsuccs)).
-  assert {{ Dom ρσ ↦ ⇑! ℕ t ≈ ρ'σ ↦ ⇑! ℕ t ∈ env_relΔℕ }} as HinΔℕs'.
+  (on_all_hyp: fun H => destruct (H _ _ HinΓ'ℕsuccs)).
+  assert {{ Dom ρσ ↦ ⇑! ℕ t ≈ ρ'σ ↦ ⇑! ℕ t ∈ env_relΓ'ℕ }} as HinΓ'ℕs'.
   {
     apply_relation_equivalence; econstructor; mauto 2.
     eapply H12; mauto.
   }
-  assert {{ Dom ρσ ↦ succ (⇑! ℕ t) ≈ ρ'σ ↦ succ (⇑! ℕ t) ∈ env_relΔℕ }} as HinΔℕsuccs'.
+  assert {{ Dom ρσ ↦ succ (⇑! ℕ t) ≈ ρ'σ ↦ succ (⇑! ℕ t) ∈ env_relΓ'ℕ }} as HinΓ'ℕsuccs'.
   {
     apply_relation_equivalence; econstructor; mauto 2.
     eapply H12; mauto.
   }
 
   assert {{ Dom zero ≈ zero ∈ (@per_nat P) }}  by econstructor.
-  assert {{ Dom ρσ ↦ zero ≈ ρ'σ ↦ zero ∈ env_relΔℕ }} as HinΔℕz.
+  assert {{ Dom ρσ ↦ zero ≈ ρ'σ ↦ zero ∈ env_relΓ'ℕ }} as HinΓ'ℕz.
   {
     apply_relation_equivalence; econstructor; mauto 2.
     eapply H12; mauto.
   }
   apply_relation_equivalence.
 
-  (on_all_hyp: fun H => destruct (H _ _  HinΔℕs')).
-  (on_all_hyp: fun H => destruct (H _ _ HinΔℕsuccs')).
-  (on_all_hyp: fun H => destruct (H _ _ HinΔℕz)).
+  (on_all_hyp: fun H => destruct (H _ _  HinΓ'ℕs')).
+  (on_all_hyp: fun H => destruct (H _ _ HinΓ'ℕsuccs')).
+  (on_all_hyp: fun H => destruct (H _ _ HinΓ'ℕz)).
   destruct_by_head (@per_typ P).
 
   assert (per_typ_elem pred_P x1 m0 m'0) by mauto 2.
@@ -417,7 +426,7 @@ Proof.
   rename a1 into asucc.
   rename m'1 into asucc'.
 
-  assert {{ Dom (ρσ ↦ ⇑! ℕ t) ↦ ⇑! a (S t) ≈ (ρ'σ ↦ ⇑! ℕ t) ↦ ⇑! a' (S t) ∈ env_relΔℕA }} as HinΔℕA.
+  assert {{ Dom (ρσ ↦ ⇑! ℕ t) ↦ ⇑! a (S t) ≈ (ρ'σ ↦ ⇑! ℕ t) ↦ ⇑! a' (S t) ∈ env_relΓ'ℕA }} as HinΓ'ℕA.
   {
     apply_relation_equivalence.
     eexists; mauto.
@@ -426,7 +435,7 @@ Proof.
   }
   apply_relation_equivalence.
 
-  edestruct (H3 _ _ HinΔℕA d{{{ ⇑! ℕ t }}} d{{{ ⇑! ℕ t }}}); [do 2 econstructor | do 2 econstructor |].
+  edestruct (H3 _ _ HinΓ'ℕA d{{{ ⇑! ℕ t }}} d{{{ ⇑! ℕ t }}}); [do 2 econstructor | do 2 econstructor |].
   destruct_conjs.
   destruct_by_head (@rel_typ_unsorted P).
   destruct_by_head (@rel_exp P).
@@ -568,7 +577,6 @@ Proof.
     assert (rel_typ_unsorted pred_P {{{ ℕ }}} ρ {{{ ℕ }}} ρ' (head_rel _ _ equiv_ρ_ρ')) by mauto 2.
     destruct_conjs.
     destruct_by_head (@rel_typ_unsorted P).
-    destruct_by_head (@rel_typ P).
     destruct_by_head (@rel_exp P).
     invert_rel_typ_unsorted_body.
     invert_rel_typ_body.
@@ -703,37 +711,36 @@ Qed.
 #[export]
 Hint Resolve rel_exp_unsorted_natrec_cong : mcpts.
 
-Lemma eval_natrec_sub_rel {P} {pred_P : PredicativeSig P} : forall {Γ env_relΓ σ Δ env_relΔ MZ MZ' MS MS' A A' m m' s} {r : Ru_nat P s},
+Lemma eval_natrec_sub_rel {P} {pred_P : PredicativeSig P} : forall {Γ env_relΓ σ Γ' env_relΓ' MZ MZ' MS MS' A A' m m' s} {r : Ru_nat P s},
     {{ DF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_relΓ }} ->
-    {{ DF Δ ≈ Δ ∈ per_ctx_env pred_P ↘ env_relΔ }} ->
-    {{ ⟪ pred_P ⟫ Δ, ℕ ⊨ A ≈ A' }} ->
-    {{ ⟪ pred_P ⟫ Δ ⊨u MZ ≈ MZ' : A[Id,,zero] }} ->
-    {{ ⟪ pred_P ⟫ Δ, ℕ, A ⊨u MS ≈ MS' : A[Wk∘Wk,,succ(#1)] }} ->
+    {{ DF Γ' ≈ Γ' ∈ per_ctx_env pred_P ↘ env_relΓ' }} ->
+    {{ ⟪ pred_P ⟫ Γ', ℕ ⊨ A ≈ A' }} ->
+    {{ ⟪ pred_P ⟫ Γ' ⊨u MZ ≈ MZ' : A[Id,,zero] }} ->
+    {{ ⟪ pred_P ⟫ Γ', ℕ, A ⊨u MS ≈ MS' : A[Wk∘Wk,,succ(#1)] }} ->
     {{ Dom m ≈ m' ∈ per_nat }} ->
     (forall ρ ρ'
         (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }})
         o o' elem_rel,
         {{ ⟦ σ ⟧s ρ ↘ o }} ->
         {{ ⟦ σ ⟧s ρ' ↘ o' }} ->
-        {{ Dom o ≈ o' ∈ env_relΔ }} ->
+        {{ Dom o ≈ o' ∈ env_relΓ' }} ->
         rel_typ_unsorted pred_P A d{{{ o ↦ m }}} A d{{{ o' ↦ m' }}} elem_rel ->
         exists r r',
           {{ rec m ⟦return A | zero -> MZ | succ -> MS end⟧ o ↘ r }} /\
             {{ rec m' ⟦return A'[q σ] | zero -> MZ'[σ] | succ -> MS'[q (q σ)] end⟧ ρ' ↘ r' }} /\
             {{ Dom r ≈ r' ∈ elem_rel }}).
 Proof.
-  intros * r equiv_Γ_Γ equiv_Δ_Δ HA HMZ HMS equiv_m_m'.
+  intros * r equiv_Γ_Γ equiv_Γ'_Γ' HA HMZ HMS equiv_m_m'.
   induction equiv_m_m'; intros;
-    apply rel_exp_of_typ_unsorted_inversion1 in HA as [env_relΔℕ];
+    apply rel_exp_of_typ_unsorted_inversion1 in HA as [env_relΓ'ℕ];
     apply rel_exp_unsorted_of_sub_id_zero_inversion in HMZ as [];
     destruct_conjs;
-    pose env_relΔℕ.
+    pose env_relΓ'ℕ.
   - handle_per_ctx_env_irrel.
     invert_per_ctx_envs.
     handle_per_ctx_env_irrel.
-    (on_all_hyp: destruct_rel_by_assumption env_relΔ).
+    (on_all_hyp: destruct_rel_by_assumption env_relΓ').
     destruct_by_head (@rel_typ_unsorted P).
-    destruct_by_head (@rel_typ P).
     destruct_by_head (@rel_exp P).
     handle_per_typ_elem_irrel.
     handle_per_sort_elem_irrel.
@@ -742,16 +749,16 @@ Proof.
     | _: per_nat m ?n |- _ =>
         rename n into m'
     end.
-    assert {{ ⟪ pred_P ⟫ Δ, ℕ ⊨ A ≈ A }} as []%rel_exp_of_typ_unsorted_inversion1 by (etransitivity; mauto).
-    apply (rel_exp_unsorted_of_sub_wkwk_succ_var1_inversion r) in HMS as [env_relΔℕA].
+    assert {{ ⟪ pred_P ⟫ Γ', ℕ ⊨ A ≈ A }} as []%rel_exp_of_typ_unsorted_inversion1 by (etransitivity; mauto).
+    apply (rel_exp_unsorted_of_sub_wkwk_succ_var1_inversion r) in HMS as [env_relΓ'ℕA].
     destruct_conjs.
-    pose env_relΔℕA.
+    pose env_relΓ'ℕA.
     handle_per_ctx_env_irrel.
-    invert_per_ctx_envs_of pred_P env_relΔℕA.
+    invert_per_ctx_envs_of pred_P env_relΓ'ℕA.
     handle_per_ctx_env_irrel.
-    invert_per_ctx_envs_of pred_P env_relΔℕ.
+    invert_per_ctx_envs_of pred_P env_relΓ'ℕ.
     handle_per_ctx_env_irrel.
-    (on_all_hyp_rev: destruct_rel_by_assumption env_relΔ).
+    (on_all_hyp_rev: destruct_rel_by_assumption env_relΓ').
     match goal with
     | _: {{ ⟦ σ ⟧s ρ ↘ ^?ρ1 }},
         _: {{ ⟦ σ ⟧s ρ' ↘ ^?ρ2 }} |- _ =>
@@ -762,24 +769,24 @@ Proof.
     invert_rel_typ_unsorted_body.
     invert_rel_typ_body.
     
-    assert {{ Dom ρσ ↦ m ≈ ρ'σ ↦ m' ∈ env_relΔℕ }}.
+    assert {{ Dom ρσ ↦ m ≈ ρ'σ ↦ m' ∈ env_relΓ'ℕ }}.
     {
       apply_relation_equivalence.
       econstructor; mauto.
       intuition.
     }
-    (on_all_hyp: destruct_rel_by_assumption env_relΔℕ).
-    assert {{ Dom ρσ ↦ m ≈ ρ'σ ↦ m' ∈ env_relΔℕ }} as HinΔℕ.
+    (on_all_hyp: destruct_rel_by_assumption env_relΓ'ℕ).
+    assert {{ Dom ρσ ↦ m ≈ ρ'σ ↦ m' ∈ env_relΓ'ℕ }} as HinΓ'ℕ.
     {
       apply_relation_equivalence.
       econstructor; mauto.
       intuition.
     }
     apply_relation_equivalence.
-    (on_all_hyp: fun H => directed destruct (H _ _ HinΔℕ)).
+    (on_all_hyp: fun H => directed destruct (H _ _ HinΓ'ℕ)).
     destruct_by_head (@per_typ P).
 
-    assert (env_relΔℕ d{{{ ρσ ↦ m }}} d{{{ ρ'σ ↦ m' }}}) by mauto.
+    assert (env_relΓ'ℕ d{{{ ρσ ↦ m }}} d{{{ ρ'σ ↦ m' }}}) by mauto.
     simplify_evals.
     handle_per_typ_elem_irrel.
     assert (rel_typ_unsorted pred_P A d{{{ ρσ ↦ m }}} A d{{{ ρ'σ ↦ m' }}} (head_rel _ _ ltac:(eassumption))) by mauto 2.
@@ -794,12 +801,11 @@ Proof.
         rename r0 into rm;
         rename r0' into rm'
     end.
-    assert {{ Dom (ρσ ↦ m) ↦ rm ≈ (ρ'σ ↦ m') ↦ rm' ∈ env_relΔℕA }} as HinΔℕA by (apply_relation_equivalence; mauto).
+    assert {{ Dom (ρσ ↦ m) ↦ rm ≈ (ρ'σ ↦ m') ↦ rm' ∈ env_relΓ'ℕA }} as HinΓ'ℕA by (apply_relation_equivalence; mauto).
     apply_relation_equivalence.
-    (on_all_hyp: fun H => directed destruct (H _ _ HinΔℕA)).
+    (on_all_hyp: fun H => directed destruct (H _ _ HinΓ'ℕA)).
     destruct_conjs.
     destruct_by_head (@rel_typ_unsorted P).
-    destruct_by_head (@rel_typ P).
     destruct_by_head (@rel_exp P).
     handle_per_typ_elem_irrel.
 
@@ -819,8 +825,8 @@ Proof.
     handle_per_ctx_env_irrel.
     invert_per_ctx_envs.
     handle_per_ctx_env_irrel.
-    (on_all_hyp: destruct_rel_by_assumption env_relΔ).
-    (on_all_hyp_rev: destruct_rel_by_assumption env_relΔ).
+    (on_all_hyp: destruct_rel_by_assumption env_relΓ').
+    (on_all_hyp_rev: destruct_rel_by_assumption env_relΓ').
     invert_rel_typ_unsorted_body.
     invert_rel_typ_body.
      match goal with
@@ -830,18 +836,17 @@ Proof.
         rename ρ2 into ρ'σ
     end.
     assert {{ Dom ⇑ a m ≈ ⇑ a' m' ∈ per_nat }} by (econstructor; eassumption).
-    assert {{ Dom ρσ ↦ ⇑ a m ≈ ρ'σ ↦ ⇑ a' m' ∈ env_relΔℕ }} as HinΔℕ.
+    assert {{ Dom ρσ ↦ ⇑ a m ≈ ρ'σ ↦ ⇑ a' m' ∈ env_relΓ'ℕ }} as HinΓ'ℕ.
     {
       apply_relation_equivalence.
       econstructor; mauto.
       intuition.
     }
     apply_relation_equivalence.
-    (on_all_hyp: fun H => directed destruct (H _ _ HinΔℕ)).
+    (on_all_hyp: fun H => directed destruct (H _ _ HinΓ'ℕ)).
     unfold per_sort in *.
     destruct_conjs.
     destruct_by_head (@rel_typ_unsorted P).
-    destruct_by_head (@rel_typ P).
     destruct_by_head (@rel_exp P).
     destruct_by_head (@per_typ P).
     invert_rel_typ_unsorted_body.
@@ -851,28 +856,28 @@ Proof.
 
     eapply per_bot_then_per_typ_elem; [eassumption |].
     eapply (@eval_natrec_sub_neut _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ s r); only 7: eauto; mauto 2.
-    + assert {{ EF Δ, ℕ ≈ Δ, ℕ ∈ per_ctx_env pred_P ↘ env_relΔℕ }} by (per_ctx_env_econstructor; eauto).
+    + assert {{ EF Γ', ℕ ≈ Γ', ℕ ∈ per_ctx_env pred_P ↘ env_relΓ'ℕ }} by (per_ctx_env_econstructor; eauto).
       apply_relation_equivalence.
       mauto 3.
     + eexists_rel_exp_unsorted_of_sub_id_zero.
       eauto.
 Qed.
 
-Lemma rel_exp_unsorted_natrec_sub_rel_typ {P} {pred_P : PredicativeSig P} : forall {Γ σ Δ A M env_relΓ s} {r : Ru_nat P s},
+Lemma rel_exp_unsorted_natrec_sub_rel_typ {P} {pred_P : PredicativeSig P} : forall {Γ σ Γ' A M env_relΓ s} {r : Ru_nat P s},
     {{ DF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_relΓ }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }} ->
-    {{ ⟪ pred_P ⟫ Δ, ℕ ⊨ A }} ->
-    {{ ⟪ pred_P ⟫ Δ ⊨u M : ℕ }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨s σ : Γ' }} ->
+    {{ ⟪ pred_P ⟫ Γ', ℕ ⊨ A }} ->
+    {{ ⟪ pred_P ⟫ Γ' ⊨u M : ℕ }} ->
     forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}),
     exists elem_rel,
       rel_typ_unsorted pred_P {{{ A[σ,,M[σ]] }}} ρ {{{ A[σ,,M[σ]] }}} ρ' elem_rel.
 Proof.
   intros.
   assert {{ ⟪ pred_P ⟫ ⊨ Γ }} by (eexists; eauto).
-  assert {{ ⟪ pred_P ⟫ ⊨ Δ }} by (eapply presup_rel_sub; eauto).
+  assert {{ ⟪ pred_P ⟫ ⊨ Γ' }} by (eapply presup_rel_sub; eauto).
   assert {{ ⟪ pred_P ⟫ Γ ⊨u M[σ] : ℕ[σ] }} by mauto.
-  assert {{ ⟪ pred_P ⟫ Δ ⊨u ℕ : Sort@s }} by mauto.
-  assert {{ ⟪ pred_P ⟫ Γ ⊨s σ,,M[σ] : Δ, ℕ }} by mauto.
+  assert {{ ⟪ pred_P ⟫ Γ' ⊨u ℕ : Sort@s }} by mauto.
+  assert {{ ⟪ pred_P ⟫ Γ ⊨s σ,,M[σ] : Γ', ℕ }} by mauto.
   assert {{ ⟪ pred_P ⟫ Γ ⊨ A[σ,,M[σ]] }} as HAσ by mauto.
   apply rel_exp_of_typ_unsorted_inversion1 in HAσ.
   destruct_conjs.
@@ -884,15 +889,15 @@ Proof.
 Qed.
 
 
-Lemma rel_exp_unsorted_natrec_sub {P} {pred_P : PredicativeSig P} : forall {Γ σ Δ MZ MS A M s} {r : Ru_nat P s},
-    {{ ⟪ pred_P ⟫ Γ ⊨s σ : Δ }} ->
-    {{ ⟪ pred_P ⟫ Δ, ℕ ⊨ A }} ->
-    {{ ⟪ pred_P ⟫ Δ ⊨u MZ : A[Id,,zero] }} ->
-    {{ ⟪ pred_P ⟫ Δ, ℕ, A ⊨u MS : A[Wk∘Wk,,succ(#1)] }} ->
-    {{ ⟪ pred_P ⟫ Δ ⊨u M : ℕ }} ->
+Lemma rel_exp_unsorted_natrec_sub {P} {pred_P : PredicativeSig P} : forall {Γ σ Γ' MZ MS A M s} {r : Ru_nat P s},
+    {{ ⟪ pred_P ⟫ Γ ⊨s σ : Γ' }} ->
+    {{ ⟪ pred_P ⟫ Γ', ℕ ⊨ A }} ->
+    {{ ⟪ pred_P ⟫ Γ' ⊨u MZ : A[Id,,zero] }} ->
+    {{ ⟪ pred_P ⟫ Γ', ℕ, A ⊨u MS : A[Wk∘Wk,,succ(#1)] }} ->
+    {{ ⟪ pred_P ⟫ Γ' ⊨u M : ℕ }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨u rec M return A | zero -> MZ | succ -> MS end[σ] ≈ rec M[σ] return A[q σ] | zero -> MZ[σ] | succ -> MS[q (q σ)] end : A[σ,,M[σ]] }}.
 Proof.
-  intros * ? [env_relΓ [? [env_relΔ]]] HA ? ? []%rel_exp_unsorted_of_nat_inversion.
+  intros * ? [env_relΓ [? [env_relΓ']]] HA ? ? []%rel_exp_unsorted_of_nat_inversion.
   destruct_conjs.
   handle_per_ctx_env_irrel.
   eexists_rel_exp_untyped.
@@ -903,7 +908,7 @@ Proof.
   destruct_by_head (@rel_typ_unsorted P).
   split; [econstructor; mautosolve 3 |].
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  (on_all_hyp: destruct_rel_by_assumption env_relΔ).
+  (on_all_hyp: destruct_rel_by_assumption env_relΓ').
   invert_rel_typ_unsorted_body.
   match goal with
   | _: {{ ⟦ σ ⟧s ^?ρ0 ↘ ^?ρσ0 }},
@@ -935,7 +940,7 @@ Proof.
   intros * ?.
   intros [env_relΓ]%rel_exp_unsorted_of_sub_id_zero_inversion [env_relΓℕA]%(rel_exp_unsorted_of_sub_wkwk_succ_var1_inversion r).
   destruct_conjs.
-  assert {{ ⟪ pred_P ⟫ ⊨ Γ, ℕ }} as [env_relΓℕ] by (invert_per_ctx_envs_unsorted_of pred_P env_relΓℕA; eexists; eauto).
+  assert {{ ⟪ pred_P ⟫ ⊨ Γ, ℕ }} as [env_relΓℕ] by (invert_per_ctx_envs_of pred_P env_relΓℕA; eexists; eauto).
   destruct_conjs.
   pose env_relΓℕ.
   pose env_relΓℕA.
@@ -966,7 +971,7 @@ Proof.
 Qed.
 
 #[export]
-  Hint Resolve rel_exp_unsorted_nat_beta_zero : mcpts.
+Hint Resolve rel_exp_unsorted_nat_beta_zero : mcpts.
 
 Lemma rel_exp_unsorted_nat_beta_succ_rel_typ {P} {pred_P : PredicativeSig P} : forall {Γ env_relΓ A M s} {r : Ru_nat P s},
     {{ DF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_relΓ }} ->

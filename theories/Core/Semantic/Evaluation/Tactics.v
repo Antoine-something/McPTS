@@ -1,5 +1,4 @@
-From McPTS Require Import LibTactics.
-From McPTS.Core Require Import Base.
+From McPTS Require Import LibTactics Base.
 From McPTS.Core.Semantic.Evaluation Require Import Definitions Lemmas.
 Import Domain_Notations.
 

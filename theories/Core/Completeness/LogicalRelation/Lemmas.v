@@ -1,18 +1,17 @@
 From Coq Require Import Morphisms Morphisms_Relations RelationClasses Relation_Definitions.
 
-From McPTS Require Import PtsSignature LibTactics.
-From McPTS.Core Require Import Base.
+From McPTS Require Import PtsSignature LibTactics Base.
 From McPTS.Core.Completeness.LogicalRelation Require Import Definitions Tactics.
 Import Domain_Notations.
 
-Add Parametric Morphism {P : PtsSig} Δ M ρ M' ρ' : (rel_exp Δ M ρ M' ρ')
+Add Parametric Morphism {P : PtsSig} M ρ M' ρ' : (rel_exp M ρ M' ρ')
     with signature (@relation_equivalence (domain P)) ==> iff as rel_exp_morphism.
 Proof.
   intros R R' HRR'.
   split; intros []; econstructor; intuition.
 Qed.
 
-Add Parametric Morphism {P : PtsSig} Δ σ ρ σ' ρ' : (rel_sub Δ σ ρ σ' ρ')
+Add Parametric Morphism {P : PtsSig} σ ρ σ' ρ' : (rel_sub σ ρ σ' ρ')
     with signature (@relation_equivalence (env P)) ==> iff as rel_sub_morphism.
 Proof.
   intros R R' HRR'.
@@ -29,9 +28,9 @@ Qed.
 (*   mauto. *)
 (* Qed. *)
 
-Lemma rel_exp_implies_rel_typ_unsorted {P} {pred_P : PredicativeSig P} : forall {Δ A ρ A' ρ'},
-    rel_exp Δ A ρ A' ρ' (per_typ pred_P Δ) ->
-    exists R, rel_typ_unsorted pred_P Δ A ρ A' ρ' R.
+Lemma rel_exp_implies_rel_typ_unsorted {P} {pred_P : PredicativeSig P} : forall {A ρ A' ρ'},
+    rel_exp A ρ A' ρ' (per_typ pred_P) ->
+    exists R, rel_typ_unsorted pred_P A ρ A' ρ' R.
 Proof.
   intros.
   destruct_by_head (@rel_exp P).
@@ -51,9 +50,9 @@ Hint Resolve rel_exp_implies_rel_typ_unsorted : mcpts.
 (*   mauto. *)
 (* Qed. *)
 
-Lemma rel_typ_unsorted_implies_rel_exp {P} {pred_P : PredicativeSig P} : forall {Δ A ρ A' ρ' R},
-    rel_typ_unsorted pred_P Δ A ρ A' ρ' R ->
-    rel_exp Δ A ρ A' ρ' (per_typ pred_P Δ).
+Lemma rel_typ_unsorted_implies_rel_exp {P} {pred_P : PredicativeSig P} : forall {A ρ A' ρ' R},
+    rel_typ_unsorted pred_P A ρ A' ρ' R ->
+    rel_exp A ρ A' ρ' (per_typ pred_P).
 Proof.
   intros.
   destruct_by_head (@rel_typ_unsorted P).
@@ -82,12 +81,12 @@ Hint Resolve rel_typ_unsorted_implies_rel_exp : mcpts.
 (*   (unshelve (epose proof (rel_exp_clean_inversion _ H); deex); shelve_unifiable; [eassumption |]; clear H) *)
 (*   + dependent destruction H. *)
 
-Lemma rel_exp_unsorted_clean_inversion {P : PtsSig} {pred_P : PredicativeSig P} : forall {Δ Γ env_rel A M M'},
-    {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P Δ ↘ env_rel }} ->
-    {{ ⟪ pred_P ⟫ Δ ▶ Γ ⊨u M ≈ M' : A }} ->
+Lemma rel_exp_unsorted_clean_inversion {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ env_rel A M M'},
+    {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : A }} ->
     forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_rel }}),
     exists (elem_rel : relation (domain P)),
-      rel_typ_unsorted pred_P Δ A ρ A ρ' elem_rel /\ rel_exp Δ M ρ M' ρ' elem_rel.
+      rel_typ_unsorted pred_P A ρ A ρ' elem_rel /\ rel_exp M ρ M' ρ' elem_rel.
 Proof.
   intros * ? [].
   destruct_conjs.
@@ -124,13 +123,13 @@ Tactic Notation "invert_rel_exp_unsorted" hyp(H) simple_intropattern(l) :=
 (* #[export] *)
 (* Hint Resolve rel_exp_implies_rel_exp_unsorted : mcpts. *)
 
-Lemma rel_sub_clean_inversion1_left {P} {pred_P : PredicativeSig P} : forall {Δ Γ Γ' Γ'' env_relΓ σ σ'},
-    {{ EF Γ ≈ Γ' ∈ per_ctx_env pred_P Δ ↘ env_relΓ }} ->
-    {{ ⟪ pred_P ⟫ Δ ▶ Γ ⊨s σ ≈ σ' : Γ'' }} ->
+Lemma rel_sub_clean_inversion1_left {P} {pred_P : PredicativeSig P} : forall {Γ Γ' Γ'' env_relΓ σ σ'},
+    {{ EF Γ ≈ Γ' ∈ per_ctx_env pred_P ↘ env_relΓ }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Γ'' }} ->
     exists env_relΓ'',
-      {{ EF Γ'' ≈ Γ'' ∈ per_ctx_env pred_P Δ ↘ env_relΓ'' }} /\
+      {{ EF Γ'' ≈ Γ'' ∈ per_ctx_env pred_P ↘ env_relΓ'' }} /\
         (forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}),
-            rel_sub Δ σ ρ σ' ρ' env_relΓ'').
+            rel_sub σ ρ σ' ρ' env_relΓ'').
 Proof.
   intros * ? [].
   destruct_conjs.
@@ -139,13 +138,13 @@ Proof.
   eassumption.
 Qed.
 
-Lemma rel_sub_clean_inversion1_right {P} {pred_P : PredicativeSig P} : forall {Δ Γ Γ' Γ'' env_relΓ σ σ'},
-    {{ EF Γ' ≈ Γ ∈ per_ctx_env pred_P Δ ↘ env_relΓ }} ->
-    {{ ⟪ pred_P ⟫ Δ ▶ Γ ⊨s σ ≈ σ' : Γ'' }} ->
+Lemma rel_sub_clean_inversion1_right {P} {pred_P : PredicativeSig P} : forall {Γ Γ' Γ'' env_relΓ σ σ'},
+    {{ EF Γ' ≈ Γ ∈ per_ctx_env pred_P ↘ env_relΓ }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Γ'' }} ->
     exists env_relΓ'',
-      {{ EF Γ'' ≈ Γ'' ∈ per_ctx_env pred_P Δ ↘ env_relΓ'' }} /\
+      {{ EF Γ'' ≈ Γ'' ∈ per_ctx_env pred_P ↘ env_relΓ'' }} /\
         (forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}),
-            rel_sub Δ σ ρ σ' ρ' env_relΓ'').
+            rel_sub σ ρ σ' ρ' env_relΓ'').
 Proof.
   intros * ? [].
   destruct_conjs.
@@ -154,13 +153,13 @@ Proof.
   eassumption.
 Qed.
 
-Lemma rel_sub_clean_inversion2_left {P} {pred_P : PredicativeSig P} : forall {Δ Γ σ σ' Γ' Γ'' env_relΓ'},
-    {{ EF Γ' ≈ Γ'' ∈ per_ctx_env pred_P Δ ↘ env_relΓ' }} ->
-    {{ ⟪ pred_P ⟫ Δ ▶ Γ ⊨s σ ≈ σ' : Γ' }} ->
+Lemma rel_sub_clean_inversion2_left {P} {pred_P : PredicativeSig P} : forall {Γ σ σ' Γ' Γ'' env_relΓ'},
+    {{ EF Γ' ≈ Γ'' ∈ per_ctx_env pred_P ↘ env_relΓ' }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Γ' }} ->
     exists env_relΓ,
-      {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P Δ ↘ env_relΓ }} /\
+      {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_relΓ }} /\
         (forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}),
-            rel_sub Δ σ ρ σ' ρ' env_relΓ').
+            rel_sub σ ρ σ' ρ' env_relΓ').
 Proof.
   intros * ? [].
   destruct_conjs.
@@ -169,13 +168,13 @@ Proof.
   eassumption.
 Qed.
 
-Lemma rel_sub_clean_inversion2_right {P} {pred_P : PredicativeSig P} : forall {Δ Γ σ σ' Γ' Γ'' env_relΓ'},
-    {{ EF Γ'' ≈ Γ' ∈ per_ctx_env pred_P Δ ↘ env_relΓ' }} ->
-    {{ ⟪ pred_P ⟫ Δ ▶ Γ ⊨s σ ≈ σ' : Γ' }} ->
+Lemma rel_sub_clean_inversion2_right {P} {pred_P : PredicativeSig P} : forall {Γ σ σ' Γ' Γ'' env_relΓ'},
+    {{ EF Γ'' ≈ Γ' ∈ per_ctx_env pred_P ↘ env_relΓ' }} ->
+    {{ ⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Γ' }} ->
     exists env_relΓ,
-      {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P Δ ↘ env_relΓ }} /\
+      {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_relΓ }} /\
         (forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}),
-            rel_sub Δ σ ρ σ' ρ' env_relΓ').
+            rel_sub σ ρ σ' ρ' env_relΓ').
 Proof.
   intros * ? [].
   destruct_conjs.
@@ -184,12 +183,12 @@ Proof.
   eassumption.
 Qed.
 
-Lemma rel_sub_clean_inversion3_left_left {P} {pred_P : PredicativeSig P} : forall {Δ Γ1 Γ1' env_relΓ1 σ σ' Γ2 Γ2' env_relΓ2},
-    {{ EF Γ1 ≈ Γ1' ∈ per_ctx_env pred_P Δ ↘ env_relΓ1 }} ->
-    {{ EF Γ2 ≈ Γ2' ∈ per_ctx_env pred_P Δ ↘ env_relΓ2 }} ->
-    {{ ⟪ pred_P ⟫ Δ ▶ Γ1 ⊨s σ ≈ σ' : Γ2 }} ->
+Lemma rel_sub_clean_inversion3_left_left {P} {pred_P : PredicativeSig P} : forall {Γ1 Γ1' env_relΓ1 σ σ' Γ2 Γ2' env_relΓ2},
+    {{ EF Γ1 ≈ Γ1' ∈ per_ctx_env pred_P ↘ env_relΓ1 }} ->
+    {{ EF Γ2 ≈ Γ2' ∈ per_ctx_env pred_P ↘ env_relΓ2 }} ->
+    {{ ⟪ pred_P ⟫ Γ1 ⊨s σ ≈ σ' : Γ2 }} ->
     forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ1 }}),
-      rel_sub Δ σ ρ σ' ρ' env_relΓ2.
+      rel_sub σ ρ σ' ρ' env_relΓ2.
 Proof.
   intros * HΓ ?.
   intros []%(rel_sub_clean_inversion1_left HΓ).
@@ -198,12 +197,12 @@ Proof.
   eassumption.
 Qed.
 
-Lemma rel_sub_clean_inversion3_left_right {P} {pred_P : PredicativeSig P} : forall {Δ Γ1 Γ1' env_relΓ1 σ σ' Γ2 Γ2' env_relΓ2},
-    {{ EF Γ1 ≈ Γ1' ∈ per_ctx_env pred_P Δ ↘ env_relΓ1 }} ->
-    {{ EF Γ2' ≈ Γ2 ∈ per_ctx_env pred_P Δ ↘ env_relΓ2 }} ->
-    {{ ⟪ pred_P ⟫ Δ ▶ Γ1 ⊨s σ ≈ σ' : Γ2 }} ->
+Lemma rel_sub_clean_inversion3_left_right {P} {pred_P : PredicativeSig P} : forall {Γ1 Γ1' env_relΓ1 σ σ' Γ2 Γ2' env_relΓ2},
+    {{ EF Γ1 ≈ Γ1' ∈ per_ctx_env pred_P ↘ env_relΓ1 }} ->
+    {{ EF Γ2' ≈ Γ2 ∈ per_ctx_env pred_P ↘ env_relΓ2 }} ->
+    {{ ⟪ pred_P ⟫ Γ1 ⊨s σ ≈ σ' : Γ2 }} ->
     forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ1 }}),
-      rel_sub Δ σ ρ σ' ρ' env_relΓ2.
+      rel_sub σ ρ σ' ρ' env_relΓ2.
 Proof.
   intros * HΓ ?.
   intros []%(rel_sub_clean_inversion1_left HΓ).
@@ -212,12 +211,12 @@ Proof.
   eassumption.
 Qed.
 
-Lemma rel_sub_clean_inversion3_right_left {P} {pred_P : PredicativeSig P}  : forall {Δ Γ1 Γ1' env_relΓ1 σ σ' Γ2 Γ2' env_relΓ2},
-    {{ EF Γ1' ≈ Γ1 ∈ per_ctx_env pred_P Δ ↘ env_relΓ1 }} ->
-    {{ EF Γ2 ≈ Γ2' ∈ per_ctx_env pred_P Δ ↘ env_relΓ2 }} ->
-    {{ ⟪ pred_P ⟫ Δ ▶ Γ1 ⊨s σ ≈ σ' : Γ2 }} ->
+Lemma rel_sub_clean_inversion3_right_left {P} {pred_P : PredicativeSig P}  : forall {Γ1 Γ1' env_relΓ1 σ σ' Γ2 Γ2' env_relΓ2},
+    {{ EF Γ1' ≈ Γ1 ∈ per_ctx_env pred_P ↘ env_relΓ1 }} ->
+    {{ EF Γ2 ≈ Γ2' ∈ per_ctx_env pred_P ↘ env_relΓ2 }} ->
+    {{ ⟪ pred_P ⟫ Γ1 ⊨s σ ≈ σ' : Γ2 }} ->
     forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ1 }}),
-      rel_sub Δ σ ρ σ' ρ' env_relΓ2.
+      rel_sub σ ρ σ' ρ' env_relΓ2.
 Proof.
   intros * HΓ ?.
   intros []%(rel_sub_clean_inversion1_right HΓ).
@@ -226,12 +225,12 @@ Proof.
   eassumption.
 Qed.
 
-Lemma rel_sub_clean_inversion3_right_right {P} {pred_P : PredicativeSig P} : forall {Δ Γ1 Γ1' env_relΓ1 σ σ' Γ2 Γ2' env_relΓ2},
-    {{ EF Γ1' ≈ Γ1 ∈ per_ctx_env pred_P Δ ↘ env_relΓ1 }} ->
-    {{ EF Γ2' ≈ Γ2 ∈ per_ctx_env pred_P Δ ↘ env_relΓ2 }} ->
-    {{ ⟪ pred_P ⟫ Δ ▶ Γ1 ⊨s σ ≈ σ' : Γ2 }} ->
+Lemma rel_sub_clean_inversion3_right_right {P} {pred_P : PredicativeSig P} : forall {Γ1 Γ1' env_relΓ1 σ σ' Γ2 Γ2' env_relΓ2},
+    {{ EF Γ1' ≈ Γ1 ∈ per_ctx_env pred_P ↘ env_relΓ1 }} ->
+    {{ EF Γ2' ≈ Γ2 ∈ per_ctx_env pred_P ↘ env_relΓ2 }} ->
+    {{ ⟪ pred_P ⟫ Γ1 ⊨s σ ≈ σ' : Γ2 }} ->
     forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ1 }}),
-      rel_sub Δ σ ρ σ' ρ' env_relΓ2.
+      rel_sub σ ρ σ' ρ' env_relΓ2.
 Proof.
   intros * HΓ ?.
   intros []%(rel_sub_clean_inversion1_right HΓ).

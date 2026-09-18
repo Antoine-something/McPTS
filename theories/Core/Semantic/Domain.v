@@ -1,8 +1,7 @@
 From Coq Require Import String.
 From Equations Require Import Equations.
 
-From McPTS Require Import PtsSignature.
-From McPTS.Core Require Import Base.
+From McPTS Require Import PtsSignature Base.
 From McPTS.Core.Syntactic Require Export Syntax.
 
 Reserved Notation "'env'".
@@ -21,7 +20,6 @@ with domain_ne (P : PtsSig) : Set :=
     binding structure it currently exists in.
  *)
 | d_var : nat -> domain_ne P
-| d_gvar : string -> domain_ne P
 | d_app : domain_ne P -> domain_nf P -> domain_ne P
 | d_natrec : env P -> exp P -> domain P -> exp P -> domain_ne P -> domain_ne P
 with domain_nf (P : PtsSig) : Set :=
@@ -38,7 +36,6 @@ Arguments d_zero {_}.
 Arguments d_succ {_}.
 Arguments d_neut {_}.
 Arguments d_var {_}.
-Arguments d_gvar {_}.
 Arguments d_app {_}.
 Arguments d_natrec {_}.
 Arguments d_dom {_}.
@@ -79,11 +76,9 @@ Module Domain_Notations.
   Notation "'succ' m" := (d_succ m) (in custom domain at level 30, m custom domain at level 30) : mcpts_scope.
   Notation "'rec' m 'under' ρ 'return' A | 'zero' -> mz | 'succ' -> MS 'end'" := (d_natrec ρ A mz MS m) (in custom domain at level 0, A custom exp at level 60, mz custom domain at level 60, MS custom exp at level 60, ρ custom domain at level 60, m custom domain at level 60) : mcpts_scope.
   Notation "'!' n" := (d_var n) (in custom domain at level 0, n constr at level 0) : mcpts_scope.
-  Notation "'`!' x" := (d_gvar x) (in custom domain at level 0, x constr at level 0) : mcpts_scope.
   Notation "'⇑' a m" := (d_neut a m) (in custom domain at level 0, a custom domain at level 30, m custom domain at level 30) : mcpts_scope.
   Notation "'⇓' a m" := (d_dom a m) (in custom domain at level 0, a custom domain at level 30, m custom domain at level 30) : mcpts_scope.
   Notation "'⇑!' a n" := (d_neut a (d_var n)) (in custom domain at level 0, a custom domain at level 30, n constr at level 0) : mcpts_scope.
-  Notation "'⇑`!' a x" := (d_neut a (d_gvar x)) (in custom domain at level 0, a custom domain at level 30, x constr at level 0) : mcpts_scope.
   Notation "'⋅'" := (nil) (in custom domain at level 0) : mcpts_scope.
   Notation "ρ ↦ m" := (extend_env ρ m) (in custom domain at level 20, left associativity, ρ custom domain, m custom domain at level 30) : mcpts_scope.
   Notation "ρ '↯'" := (drop_env ρ) (in custom domain at level 10, ρ custom domain) : mcpts_scope.
