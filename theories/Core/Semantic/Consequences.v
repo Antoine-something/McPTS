@@ -1,5 +1,4 @@
-From McPTS Require Import PtsSignature LibTactics.
-From McPTS.Core Require Import Base.
+From McPTS Require Import PtsSignature LibTactics Base.
 From McPTS.Core Require Export Soundness.
 From McPTS.Core.Semantic Require Import Realizability.
 From McPTS.Core.Completeness.Consequences Require Export Types.
@@ -126,6 +125,7 @@ Proof.
   intros * HA.
   dependent induction HA.
   - eexists; split; mauto 3.
+    enough {{ Γ ⊢ A }}; mauto 3.
   - specialize (IHHA x A0 ltac:(reflexivity) ltac:(reflexivity)) as [B []].
     eexists; split; mauto 3.
 Qed.
@@ -192,10 +192,10 @@ Lemma wf_sort_sort_any_context {P}(pred_P : PredicativeSig P) : forall {Γ Δ : 
     {{ Δ ⊢ Sort@s : Sort@s' }}.
 Proof.
   intros.
-  destruct (wf_exp_sort_sort_implies_axiom H) as [s2 []].
+  pose proof wf_exp_sort_inversion H as [s2 []].
   assert (st_subtyp s2 s') by mauto 2 using subtyp_sort_sort_implies_st_subtyp.
   mauto 4.
-Qed.              
+Qed.
     
 Lemma exp_eq_pi_inversion {P} (pred_P : PredicativeSig P) : forall {Γ A B A' B' s1 s2 s3} {r : Ru_pi P s1 s2 s3},
     {{ Γ ⊢ Π r A B ≈ Π r A' B' : Sort@s3 }} ->
@@ -203,7 +203,7 @@ Lemma exp_eq_pi_inversion {P} (pred_P : PredicativeSig P) : forall {Γ A B A' B'
 Proof.
   intros * H.
   gen_presups.
-  (on_all_hyp: fun H => apply wf_pi_inversion' in H; destruct H).
+  (on_all_hyp: fun H => apply wf_exp_pi_inversion' in H; destruct H).
   (on_all_hyp: fun H => apply (@completeness P pred_P) in H).
   (on_all_hyp: fun H => apply (@soundness P pred_P) in H).
   destruct_conjs.
@@ -239,7 +239,7 @@ Proof.
   functional_eval_rewrite_clear.
   invert_rel_typ_unsorted_body.
   dependent destruction H12.
-  dependent destruction H6.
+  (* dependent destruction H6. *)
 
   gen_presups.
   (on_all_hyp: fun H => apply wf_typ_pi_inversion in H; destruct H).
@@ -271,11 +271,11 @@ Proof.
   assert (glu_rel_typ_with_sub pred_P s2 {{{ Γ, A' }}} B' {{{ Id }}} d{{{ ρ ↦ ⇑! a0 (length Γ) }}}) by mauto 3.
   destruct_glu_rel_typ_with_sub.
 
-  handle_per_sort_elem_lower.
+  clear_pi_sort_eq_and_pred_rel.
   handle_per_sort_elem_irrel.
   assert (@per_bot P d{{{ !(length Γ) }}} d{{{ !(length Γ) }}}) by mauto 3.
   assert (in_rel0 d{{{ ⇑! a0 (length Γ) }}}  d{{{ ⇑! a0 (length Γ) }}}) by (eapply per_bot_then_per_elem; mauto 2).
-  assert {{ ⟪ pred_P ⟫ Subs a1 <: m at s2 }} by mauto 3.
+  assert {{ SubT a1 <: m ∈ per_subtyp pred_P }} by mauto 3.
 
   autorewrite with mcpts in H51.
   autorewrite with mcpts in H54.
@@ -313,7 +313,7 @@ Inductive canonical_nat {P} : nf P -> Prop :=
 .
 
 #[export]
-  Hint Constructors canonical_nat : mcpts.
+Hint Constructors canonical_nat : mcpts.
 
 Theorem canonical_form_of_nat {P} (pred_P : PredicativeSig P) : forall {M : exp P},
     {{ ⋅ ⊢ M : ℕ }} ->
@@ -353,7 +353,7 @@ Proof with mautosolve 4.
 Qed.
 
 #[export]
-  Hint Resolve canonical_form_of_typ : mcpts.
+Hint Resolve canonical_form_of_typ : mcpts.
 
 Theorem subtyp_sort_implies_eq_typ_left {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {s A},
     {{ Γ ⊢ A ⊆ Sort@s }} ->

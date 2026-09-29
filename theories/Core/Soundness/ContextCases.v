@@ -1,19 +1,18 @@
-From McPTS Require Import PtsSignature LibTactics.
-From McPTS.Core Require Import Base.
+From McPTS Require Import PtsSignature LibTactics Base.
 From McPTS.Core.Soundness Require Import LogicalRelation.
 From McPTS.Core.Semantic Require Import Realizability.
 Import Domain_Notations.
 
-Lemma glu_rel_ctx_empty {P} (pred_P : PredicativeSig P) : {{ ⟪ pred_P ⟫ ⊩ ⋅ with nil}}.
+Lemma glu_rel_ctx_empty {P} (pred_P : PredicativeSig P) : {{ ⟪ pred_P ⟫ ⊩ ⋅ @ nil }}.
 Proof.
   do 2 econstructor; reflexivity.
 Qed.
 
 #[export]
-  Hint Resolve glu_rel_ctx_empty : mcpts.
+Hint Resolve glu_rel_ctx_empty : mcpts.
 
 Lemma glu_rel_typ_to_wf_exp {P} (pred_P : PredicativeSig P) : forall {anns Γ A s},
-    {{ ⟪ pred_P ⟫ Γ with anns ⊩ A @ s }} ->
+    {{ ⟪ pred_P ⟫ Γ @ anns ⊩ A @ s }} ->
     {{ Γ ⊢ A : Sort@s }}.
 Proof.
   intros * [Sb].
@@ -33,12 +32,12 @@ Qed.
 Hint Resolve glu_rel_typ_to_wf_exp : mcpts.
 
 Lemma glu_rel_ctx_extend_sorted {P} (pred_P : PredicativeSig P) : forall {anns Γ A s},
-    {{ ⟪ pred_P ⟫ ⊩ Γ with anns }} ->
-    {{ ⟪ pred_P ⟫ Γ with anns ⊩u A @ ^(so_Some s) }} ->
-    {{ ⟪ pred_P ⟫ ⊩ Γ, A with (so_Some s)::anns}}.
+    {{ ⟪ pred_P ⟫ ⊩ Γ @ anns }} ->
+    {{ ⟪ pred_P ⟫ Γ @ anns ⊩u A @ ^(so_Some s) }} ->
+    {{ ⟪ pred_P ⟫ ⊩ Γ, A @ (so_Some s)::anns}}.
 Proof.
   intros * [Sb] HA.
-  assert {{ ⟪ pred_P ⟫ Γ with anns ⊩ A @ s }} by mauto 2.
+  assert {{ ⟪ pred_P ⟫ Γ @ anns ⊩ A @ s }} by mauto 2.
   assert {{ Γ ⊢ A : Sort@s }} by mauto 4.
   inversion HA; subst.
   destruct_conjs.
@@ -48,9 +47,9 @@ Proof.
 Qed.
 
 Lemma glu_rel_ctx_extend_unsorted {P} (pred_P : PredicativeSig P) : forall {anns Γ A},
-    {{ ⟪ pred_P ⟫ ⊩ Γ with anns }} ->
-    {{ ⟪ pred_P ⟫ Γ with anns ⊩u A @ ^so_None }} ->
-    {{ ⟪ pred_P ⟫ ⊩ Γ, A with so_None::anns}}.
+    {{ ⟪ pred_P ⟫ ⊩ Γ @ anns }} ->
+    {{ ⟪ pred_P ⟫ Γ @ anns ⊩u A @ ^so_None }} ->
+    {{ ⟪ pred_P ⟫ ⊩ Γ, A @ so_None::anns}}.
 Proof.
   intros * [Sb] HA.
   inversion HA; subst.
@@ -61,9 +60,9 @@ Proof.
 Qed.
 
 Lemma glu_rel_ctx_extend {P} (pred_P : PredicativeSig P) : forall {anns Γ A so},
-    {{ ⟪ pred_P ⟫ ⊩ Γ with anns }} ->
-    {{ ⟪ pred_P ⟫ Γ with anns ⊩u A @ so }} ->
-    {{ ⟪ pred_P ⟫ ⊩ Γ, A with so::anns}}.
+    {{ ⟪ pred_P ⟫ ⊩ Γ @ anns }} ->
+    {{ ⟪ pred_P ⟫ Γ @ anns ⊩u A @ so }} ->
+    {{ ⟪ pred_P ⟫ ⊩ Γ, A @ so::anns}}.
 Proof.
   intros.
   destruct so;
@@ -71,4 +70,4 @@ Proof.
 Qed.
 
 #[export]
-  Hint Resolve glu_rel_ctx_extend : mcpts.
+Hint Resolve glu_rel_ctx_extend : mcpts.

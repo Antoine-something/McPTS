@@ -1,6 +1,5 @@
 From Coq Require Import RelationClasses.
-From McPTS Require Import PtsSignature LibTactics.
-From McPTS.Core Require Import Base.
+From McPTS Require Import PtsSignature LibTactics Base.
 From McPTS.Core Require Export Completeness.
 From McPTS.Core.Semantic Require Import Realizability.
 Import Domain_Notations.

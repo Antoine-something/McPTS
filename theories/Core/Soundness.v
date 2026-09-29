@@ -1,5 +1,4 @@
-From McPTS Require Import PtsSignature LibTactics.
-From McPTS.Core Require Import Base.
+From McPTS Require Import PtsSignature LibTactics Base.
 From McPTS.Core.Syntactic Require Import CoreInversions SystemAnnotated.
 From McPTS.Core Require Import Completeness.
 From McPTS.Core.Completeness Require Import FundamentalTheorem.

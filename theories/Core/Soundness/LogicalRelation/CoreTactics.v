@@ -1,7 +1,6 @@
 From Equations Require Import Equations.
 
-From McPTS Require Import PtsSignature LibTactics.
-From McPTS.Core Require Import Base.
+From McPTS Require Import PtsSignature LibTactics Base.
 From McPTS.Core.Soundness.LogicalRelation Require Import Definitions.
 
 Ltac basic_invert_glu_sort_elem H :=
