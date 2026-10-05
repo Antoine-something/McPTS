@@ -124,13 +124,14 @@ Qed.
 Hint Resolve glu_nat_resp_per_nat : mcpts.
 
 
-#[global]
-Ltac simpl_glu_rel :=
-  apply_equiv_left;
-  repeat invert_glu_rel1;
-  apply_equiv_left;
-  destruct_all;
-  gen_presups.
+(* #[global] *)
+(* Ltac simpl_glu_rel := *)
+(*   apply_equiv_left; *)
+(*   repeat invert_glu_rel1; *)
+(*   apply_equiv_left; *)
+(*   destruct_all; *)
+(*   gen_presups. *)
+
 
 Lemma glu_sort_elem_sort_lvl {P} (pred_P : PredicativeSig P) : forall s typ_rel exp_rel a,
     {{ DG a ∈ glu_sort_elem pred_P s ↘ typ_rel ↘ exp_rel }} ->
@@ -516,6 +517,7 @@ Proof.
   simpl_glu_rel.
   transitivity A; mauto 3.
 Qed.
+
 Add Parametric Morphism {P} (pred_P : PredicativeSig P) typ_rel exp_rel a (H : glu_typ_elem pred_P so_None typ_rel exp_rel a) Γ : (typ_rel Γ)
     with signature wf_typ_eq Γ  ==> iff as glu_typ_elem_typ_morphism_iff1.
 Proof.
@@ -536,6 +538,7 @@ Proof.
   inversion_clear H.
   eapply glu_sort_elem_typ_resp_exp_eq; mauto 2.
 Qed.
+
 Add Parametric Morphism {P} (pred_P : PredicativeSig P) s typ_rel exp_rel a (H : glu_typ_elem pred_P (so_Some s) typ_rel exp_rel a) Γ : (typ_rel Γ)
     with signature wf_exp_eq Γ {{{ Sort@s }}}  ==> iff as glu_typ_elem_some_typ_morphism_iff1.
 Proof.
@@ -647,6 +650,7 @@ Proof.
   - eapply glu_sort_elem_trm_escape; mauto 2.
 Qed.
 
+(* Duplicate of earlier 'glu_typ_elem_wf_typ' *)
 Lemma glu_typ_elem_typ_escape {P} (pred_P : PredicativeSig P) : forall so typ_rel exp_rel a,
     {{ DG a ∈ glu_typ_elem pred_P so ↘ typ_rel ↘ exp_rel }} ->
     forall Γ A,
@@ -695,7 +699,8 @@ Proof.
     repeat split; mauto 3.
   repeat eexists; mauto 2.
   eapply glu_sort_elem_typ_resp_exp_eq; mauto 2.
-Qed.  
+Qed.
+
 Add Parametric Morphism {P} (pred_P : PredicativeSig P) so typ_rel exp_rel a (H : glu_typ_elem pred_P so typ_rel exp_rel a) Γ T : (exp_rel Γ T)
     with signature wf_exp_eq Γ T ==> eq ==> iff as glu_typ_elem_trm_morphism_iff3.
 Proof.
@@ -1515,7 +1520,10 @@ Proof.
 Qed.
 
 
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) (s : P) a : (glu_elem_bot pred_P s a)
+(* Lemma wf_typ_eq_implies_wf_exp_eq {P} (pred_P : PredicativeSig P) *)
+
+
+Add Parametric Morphism {P} (pred_P : PredicativeSig P) so a : (glu_elem_bot pred_P so a)
     with signature wf_ctx_eq ==> eq ==> eq ==> eq ==> iff as glu_elem_bot_morphism_iff1.
 Proof.
   intros Γ Γ' HΓΓ' *.
@@ -1526,8 +1534,8 @@ Proof.
   eapply weakening_conv; mauto 3.
 Qed.
 
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) s a Γ : (glu_elem_bot pred_P s a Γ)
-    with signature wf_exp_eq Γ {{{ Sort@s }}} ==> eq ==> eq ==> iff as glu_elem_bot_morphism_iff2.
+Add Parametric Morphism {P} (pred_P : PredicativeSig P) s a Γ : (glu_elem_bot pred_P (so_Some s) a Γ)
+    with signature wf_exp_eq Γ {{{ Sort@s }}} ==> eq ==> eq ==> iff as glu_elem_bot_morphism_iff2_sorted.
 Proof.
   intros A A' HAA' *.
   split; intros []; econstructor; mauto 3;
@@ -1539,64 +1547,116 @@ Proof.
     mauto 4.
 Qed.
 
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) s a Γ A : (glu_elem_bot pred_P s a Γ A)
+Add Parametric Morphism {P} (pred_P : PredicativeSig P) a Γ : (glu_elem_bot pred_P so_None a Γ)
+    with signature wf_typ_eq Γ ==> eq ==> eq ==> iff as glu_elem_bot_morphism_iff2_unsorted.
+Proof.
+  intros A A' HAA' *.
+  split; intros []; econstructor; mauto 3;
+    [rewrite <- HAA' | | rewrite -> HAA' |];
+    try eassumption;
+    try split; intros;
+    try assert {{ Γ' ⊢ A[σ] ≈ A'[σ] }} as HAσA'σ by mauto 4;
+    try eapply wf_exp_eq_conv';
+    mauto 4.
+Qed.
+
+Add Parametric Morphism {P} (pred_P : PredicativeSig P) so a Γ A : (glu_elem_bot pred_P so a Γ A)
     with signature wf_exp_eq Γ A ==> eq ==> iff as glu_elem_bot_morphism_iff3.
 Proof.
   intros M M' HMM' *.
+
   split; intros []; econstructor; mauto 3; try (gen_presup HMM'; eassumption);
     intros;
-    assert {{ Γ ⊢ A : Sort@s }} by (eapply glu_sort_elem_sort_lvl; mauto 2);
-    assert {{ Γ' ⊢ M[σ] ≈ M'[σ] : A[σ] }} as HMσM'σ by mauto 5;
+    assert {{ Γ ⊢ A }} by (eapply glu_typ_elem_typ_escape; mauto 2);
+    saturate_weakening_escape;
+    assert {{ Γ' ⊢ M[σ] ≈ M'[σ] : A[σ] }} as HMσM'σ by mauto 4;
     [rewrite <- HMσM'σ | rewrite -> HMσM'σ ];
     mauto 3.
 Qed.
 
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) a Γ : (glu_elem_bot_unsorted pred_P so_None a Γ)
-    with signature wf_typ_eq Γ  ==> eq ==> eq ==> iff as glu_elem_bot_unsorted_morphism_iff2.
-Proof.
-  intros A A' HAA' *.  
-  split; intros Hglu; dependent destruction Hglu; econstructor; mauto 3.
-  - rewrite <- HAA'.
-    eassumption.
-  - intros.
-    assert {{ Γ' ⊢ M[σ] ≈ M' : A[σ] }} by mauto 3.
-    mauto 4.
-  - rewrite HAA'.
-    eassumption.
-  - intros.
-    assert {{ Γ' ⊢ M[σ] ≈ M' : A'[σ] }} by mauto 3.
-    mauto.
-Qed.
 
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) so a Γ A : (glu_elem_bot_unsorted pred_P so a Γ A)
-    with signature wf_exp_eq Γ A ==> eq ==> iff as glu_elem_bot_unsorted_morphism_iff3.
-Proof.
-  intros M M' HMM' *.
-  split; intros Hglu; dependent destruction Hglu; econstructor; mauto 3; try (gen_presup HMM'; eassumption); intros.
-  - assert {{ Γ' ⊢ M[σ] ≈ M'0 : A[σ] }} by mauto 3.
-    assert {{ Γ' ⊢s σ ≈ σ : Γ }} by mauto 3.
-    gen_presup HMM'.
-    assert {{ Γ' ⊢ M[σ] ≈ M'[σ] : A[σ] }} by mauto 3.
-    mauto 3.
-  - assert {{ Γ' ⊢ M[σ] ≈ M'0 : A[σ] }} by mauto 3.
-    assert {{ Γ' ⊢s σ ≈ σ : Γ }} by mauto 3.
-    gen_presup HMM'.
-    assert {{ Γ' ⊢ M[σ] ≈ M'[σ] : A[σ] }} by mauto 3.
-    mauto 3.
-  - assert {{ Γ' ⊢ M0[σ] ≈ M' : A[σ] }} by mauto 3.
-    assert {{ Γ' ⊢s σ ≈ σ : Γ }} by mauto 3.
-    gen_presup HMM'.
-    assert {{ Γ' ⊢ M[σ] ≈ M0[σ] : A[σ] }} by mauto 3.
-    mauto 3.
-  - assert {{ Γ' ⊢ M0[σ] ≈ M' : A[σ] }} by mauto 3.
-    assert {{ Γ' ⊢s σ ≈ σ : Γ }} by mauto 3.
-    gen_presup HMM'.
-    assert {{ Γ' ⊢ M[σ] ≈ M0[σ] : A[σ] }} by mauto 3.
-    mauto 3.
-Qed.
+(* Add Parametric Morphism {P} (pred_P : PredicativeSig P) so a : (glu_elem_bot pred_P s a) *)
+(*     with signature wf_ctx_eq ==> eq ==> eq ==> eq ==> iff as glu_elem_bot_morphism_iff1. *)
+(* Proof. *)
+(*   intros Γ Γ' HΓΓ' *. *)
+(*   split; intros []; econstructor; mauto 4; [rewrite <- HΓΓ' | | rewrite -> HΓΓ']; try eassumption. *)
+
+(*   intros. *)
+(*   eapply H3; mauto 2. *)
+(*   eapply weakening_conv; mauto 3. *)
+(* Qed. *)
+
+(* Add Parametric Morphism {P} (pred_P : PredicativeSig P) s a Γ : (glu_elem_bot pred_P s a Γ) *)
+(*     with signature wf_exp_eq Γ {{{ Sort@s }}} ==> eq ==> eq ==> iff as glu_elem_bot_morphism_iff2. *)
+(* Proof. *)
+(*   intros A A' HAA' *. *)
+(*   split; intros []; econstructor; mauto 3; *)
+(*     [rewrite <- HAA' | | rewrite -> HAA' |]; *)
+(*     try eassumption; *)
+(*     try split; intros; *)
+(*     try assert {{ Γ' ⊢ A[σ] ≈ A'[σ] : Sort@s }} as HAσA'σ by mauto 4; *)
+(*     try eapply wf_exp_eq_conv'; *)
+(*     mauto 4. *)
+(* Qed. *)
+
+(* Add Parametric Morphism {P} (pred_P : PredicativeSig P) s a Γ A : (glu_elem_bot pred_P s a Γ A) *)
+(*     with signature wf_exp_eq Γ A ==> eq ==> iff as glu_elem_bot_morphism_iff3. *)
+(* Proof. *)
+(*   intros M M' HMM' *. *)
+(*   split; intros []; econstructor; mauto 3; try (gen_presup HMM'; eassumption); *)
+(*     intros; *)
+(*     assert {{ Γ ⊢ A : Sort@s }} by (eapply glu_sort_elem_sort_lvl; mauto 2); *)
+(*     assert {{ Γ' ⊢ M[σ] ≈ M'[σ] : A[σ] }} as HMσM'σ by mauto 5; *)
+(*     [rewrite <- HMσM'σ | rewrite -> HMσM'σ ]; *)
+(*     mauto 3. *)
+(* Qed. *)
+
+(* Add Parametric Morphism {P} (pred_P : PredicativeSig P) a Γ : (glu_elem_bot_unsorted pred_P so_None a Γ) *)
+(*     with signature wf_typ_eq Γ  ==> eq ==> eq ==> iff as glu_elem_bot_unsorted_morphism_iff2. *)
+(* Proof. *)
+(*   intros A A' HAA' *.   *)
+(*   split; intros Hglu; dependent destruction Hglu; econstructor; mauto 3. *)
+(*   - rewrite <- HAA'. *)
+(*     eassumption. *)
+(*   - intros. *)
+(*     assert {{ Γ' ⊢ M[σ] ≈ M' : A[σ] }} by mauto 3. *)
+(*     mauto 4. *)
+(*   - rewrite HAA'. *)
+(*     eassumption. *)
+(*   - intros. *)
+(*     assert {{ Γ' ⊢ M[σ] ≈ M' : A'[σ] }} by mauto 3. *)
+(*     mauto. *)
+(* Qed. *)
+
+(* Add Parametric Morphism {P} (pred_P : PredicativeSig P) so a Γ A : (glu_elem_bot_unsorted pred_P so a Γ A) *)
+(*     with signature wf_exp_eq Γ A ==> eq ==> iff as glu_elem_bot_unsorted_morphism_iff3. *)
+(* Proof. *)
+(*   intros M M' HMM' *. *)
+(*   split; intros Hglu; dependent destruction Hglu; econstructor; mauto 3; try (gen_presup HMM'; eassumption); intros. *)
+(*   - assert {{ Γ' ⊢ M[σ] ≈ M'0 : A[σ] }} by mauto 3. *)
+(*     assert {{ Γ' ⊢s σ ≈ σ : Γ }} by mauto 3. *)
+(*     gen_presup HMM'. *)
+(*     assert {{ Γ' ⊢ M[σ] ≈ M'[σ] : A[σ] }} by mauto 3. *)
+(*     mauto 3. *)
+(*   - assert {{ Γ' ⊢ M[σ] ≈ M'0 : A[σ] }} by mauto 3. *)
+(*     assert {{ Γ' ⊢s σ ≈ σ : Γ }} by mauto 3. *)
+(*     gen_presup HMM'. *)
+(*     assert {{ Γ' ⊢ M[σ] ≈ M'[σ] : A[σ] }} by mauto 3. *)
+(*     mauto 3. *)
+(*   - assert {{ Γ' ⊢ M0[σ] ≈ M' : A[σ] }} by mauto 3. *)
+(*     assert {{ Γ' ⊢s σ ≈ σ : Γ }} by mauto 3. *)
+(*     gen_presup HMM'. *)
+(*     assert {{ Γ' ⊢ M[σ] ≈ M0[σ] : A[σ] }} by mauto 3. *)
+(*     mauto 3. *)
+(*   - assert {{ Γ' ⊢ M0[σ] ≈ M' : A[σ] }} by mauto 3. *)
+(*     assert {{ Γ' ⊢s σ ≈ σ : Γ }} by mauto 3. *)
+(*     gen_presup HMM'. *)
+(*     assert {{ Γ' ⊢ M[σ] ≈ M0[σ] : A[σ] }} by mauto 3. *)
+(*     mauto 3. *)
+(* Qed. *)
 
 
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) s a : (glu_elem_top pred_P s a)
+Add Parametric Morphism {P} (pred_P : PredicativeSig P) so a : (glu_elem_top pred_P so a)
     with signature wf_ctx_eq ==> eq ==> eq ==> eq ==> iff as glu_elem_top_morphism_iff1.
 Proof.
   intros Γ Γ' HΓΓ' *.
@@ -1607,8 +1667,8 @@ Proof.
   eapply weakening_conv; mauto 3.  
 Qed.
 
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) s a Γ : (glu_elem_top pred_P s a Γ)
-    with signature wf_exp_eq Γ {{{ Sort@s }}} ==> eq ==> eq ==> iff as glu_elem_top_morphism_iff2.
+Add Parametric Morphism {P} (pred_P : PredicativeSig P) s a Γ : (glu_elem_top pred_P (so_Some s) a Γ)
+    with signature wf_exp_eq Γ {{{ Sort@s }}} ==> eq ==> eq ==> iff as glu_elem_top_morphism_iff2_sorted.
 Proof.
   intros A A' HAA' *.
   split; intros []; econstructor; mauto 3;
@@ -1620,19 +1680,71 @@ Proof.
     mauto 4.
 Qed.
 
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) s a Γ A : (glu_elem_top pred_P s a Γ A)
+Add Parametric Morphism {P} (pred_P : PredicativeSig P) a Γ : (glu_elem_top pred_P so_None a Γ)
+    with signature wf_typ_eq Γ ==> eq ==> eq ==> iff as glu_elem_top_morphism_iff2_unsorted.
+Proof.
+  intros A A' HAA' *.
+  split; intros []; econstructor; mauto 3;
+    [rewrite <- HAA' | | rewrite -> HAA' | ];
+    try eassumption;
+    intros;
+    assert {{ Γ' ⊢ A[σ] ≈ A'[σ] }} as HAσA'σ by mauto 5;
+    eapply wf_exp_eq_conv';
+    mauto 4.
+Qed.
+
+
+(* Add Parametric Morphism {P} (pred_P : PredicativeSig P) s a Γ : (glu_elem_top pred_P s a Γ) *)
+(*     with signature wf_exp_eq Γ {{{ Sort@s }}} ==> eq ==> eq ==> iff as glu_elem_top_morphism_iff2. *)
+(* Proof. *)
+(*   intros A A' HAA' *. *)
+(*   split; intros []; econstructor; mauto 3; *)
+(*     [rewrite <- HAA' | | rewrite -> HAA' | ]; *)
+(*     try eassumption; *)
+(*     intros; *)
+(*     assert {{ Γ' ⊢ A[σ] ≈ A'[σ] : Sort@s }} as HAσA'σ by mauto 5; *)
+(*     eapply wf_exp_eq_conv'; *)
+(*     mauto 4. *)
+(* Qed. *)
+
+Add Parametric Morphism {P} (pred_P : PredicativeSig P) so a Γ A : (glu_elem_top pred_P so a Γ A)
     with signature wf_exp_eq Γ A ==> eq ==> iff as glu_elem_top_morphism_iff3.
 Proof.
   intros M M' HMM' *.
   split; intros []; econstructor; mauto 3; try (gen_presup HMM'; eassumption);
     intros;
-    assert {{ Γ ⊢ A : Sort@s }} by (eapply glu_sort_elem_sort_lvl; mauto 2);
-    assert {{ Γ' ⊢ M[σ] ≈ M'[σ] : A[σ] }} as HMσM'σ by mauto 5;
+    assert {{ Γ ⊢ A }} by (eapply glu_typ_elem_typ_escape; mauto 2);
+    saturate_weakening_escape;
+    assert {{ Γ' ⊢ M[σ] ≈ M'[σ] : A[σ] }} as HMσM'σ by mauto 4;
     [rewrite <- HMσM'σ | rewrite -> HMσM'σ];
     mauto.
 Qed.
 
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) s a : (glu_typ_top pred_P s a)
+Add Parametric Morphism {P} (pred_P : PredicativeSig P) s a : (glu_typ_top_of_sort pred_P s a)
+    with signature wf_ctx_eq ==> eq ==> iff as glu_typ_top_of_sort_morphism_iff1.
+Proof.
+  intros Γ Γ' HΓΓ' *.
+  split; intros []; econstructor; mauto 4.
+
+  intros.
+  eapply H1; mauto 3.
+  eapply weakening_conv; mauto 3.
+Qed.
+
+Add Parametric Morphism {P} (pred_P : PredicativeSig P) s a Γ : (glu_typ_top_of_sort pred_P s a Γ)
+    with signature wf_exp_eq Γ {{{ Sort@s }}} ==> iff as glu_typ_top_of_sort_morphism_iff2.
+Proof.
+  intros A A' HAA' *.
+  split; intros []; econstructor; mauto 3;
+    try (gen_presup HAA'; eassumption);
+    intros;
+    assert {{ Γ' ⊢ A[σ] ≈ A'[σ] : Sort@s }} as HAσA'σ by mauto 4;
+    [rewrite <- HAσA'σ | rewrite -> HAσA'σ];
+    mauto.
+Qed.
+
+
+Add Parametric Morphism {P} (pred_P : PredicativeSig P) a : (glu_typ_top pred_P a)
     with signature wf_ctx_eq ==> eq ==> iff as glu_typ_top_morphism_iff1.
 Proof.
   intros Γ Γ' HΓΓ' *.
@@ -1643,17 +1755,48 @@ Proof.
   eapply weakening_conv; mauto 3.
 Qed.
 
-Add Parametric Morphism {P} (pred_P : PredicativeSig P) s a Γ : (glu_typ_top pred_P s a Γ)
-    with signature wf_exp_eq Γ {{{ Sort@s }}} ==> iff as glu_typ_top_morphism_iff2.
+Add Parametric Morphism {P} (pred_P : PredicativeSig P) a Γ : (glu_typ_top pred_P a Γ)
+    with signature wf_typ_eq Γ ==> iff as glu_typ_top_morphism_iff2.
 Proof.
   intros A A' HAA' *.
   split; intros []; econstructor; mauto 3;
     try (gen_presup HAA'; eassumption);
     intros;
-    assert {{ Γ' ⊢ A[σ] ≈ A'[σ] : Sort@s }} as HAσA'σ by mauto 4;
+    assert {{ Γ' ⊢ A[σ] ≈ A'[σ] }} as HAσA'σ by mauto 4;
     [rewrite <- HAσA'σ | rewrite -> HAσA'σ];
     mauto.
 Qed.
+
+Lemma glu_typ_top_of_sort_implies_glu_typ_top {P} (pred_P : PredicativeSig P) : forall {Γ : ctx P} {s a A},
+    {{ Γ ⊢ A ® glu_typ_top_of_sort pred_P s a }} ->
+    {{ Γ ⊢ A ® glu_typ_top pred_P a }}.
+Proof.
+  intros * [].
+  econstructor; mauto 3.
+Qed.  
+
+(* Add Parametric Morphism {P} (pred_P : PredicativeSig P) s a : (glu_typ_top pred_P s a) *)
+(*     with signature wf_ctx_eq ==> eq ==> iff as glu_typ_top_morphism_iff1. *)
+(* Proof. *)
+(*   intros Γ Γ' HΓΓ' *. *)
+(*   split; intros []; econstructor; mauto 4. *)
+
+(*   intros. *)
+(*   eapply H1; mauto 3. *)
+(*   eapply weakening_conv; mauto 3. *)
+(* Qed. *)
+
+(* Add Parametric Morphism {P} (pred_P : PredicativeSig P) s a Γ : (glu_typ_top pred_P s a Γ) *)
+(*     with signature wf_exp_eq Γ {{{ Sort@s }}} ==> iff as glu_typ_top_morphism_iff2. *)
+(* Proof. *)
+(*   intros A A' HAA' *. *)
+(*   split; intros []; econstructor; mauto 3; *)
+(*     try (gen_presup HAA'; eassumption); *)
+(*     intros; *)
+(*     assert {{ Γ' ⊢ A[σ] ≈ A'[σ] : Sort@s }} as HAσA'σ by mauto 4; *)
+(*     [rewrite <- HAσA'σ | rewrite -> HAσA'σ]; *)
+(*     mauto. *)
+(* Qed. *)
 
 (** *** Simple Morphism instance for [glu_ctx_env] *)
 Add Parametric Morphism {P} (pred_P : PredicativeSig P) (anns : ctx_anns P) : (glu_ctx_env pred_P anns)
@@ -1683,8 +1826,8 @@ Qed.
 #[export]
 Hint Resolve glu_sort_elem_per_sort : mcpts.
 
-Lemma glu_typ_elem_per_elem {P} (pred_P : PredicativeSig P) : forall s0 typ_rel exp_rel a,
-    {{ DG a ∈ glu_typ_elem pred_P s0 ↘ typ_rel ↘ exp_rel }} ->
+Lemma glu_typ_elem_per_elem {P} (pred_P : PredicativeSig P) : forall so typ_rel exp_rel a,
+    {{ DG a ∈ glu_typ_elem pred_P so ↘ typ_rel ↘ exp_rel }} ->
     forall Γ M A m R,
       {{ Γ ⊢ M : A ® m ∈ exp_rel }} ->
       {{ DF a ≈ a ∈ per_typ_elem pred_P ↘ R }} ->

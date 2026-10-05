@@ -28,3 +28,11 @@ Ltac invert_glu_rel1 :=
   | H : neut_glu_exp_pred _ _ _ _ _ _ |- _ =>
       progressive_invert H
   end.
+
+#[global]
+Ltac simpl_glu_rel :=
+  apply_equiv_left;
+  repeat invert_glu_rel1;
+  apply_equiv_left;
+  destruct_all;
+  gen_presups.
