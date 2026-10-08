@@ -16,8 +16,8 @@ McPTS is a fork of McTT, a project with similar goals, but specialized to Martin
 ## Dependencies
 
 * [OCaml](https://ocaml.org/) 4.14.2
-* [Menhir](http://cambium.inria.fr/~fpottier/menhir/)
-* [Coq-Menhirlib](https://gitlab.inria.fr/fpottier/menhir/-/tree/master/coq-menhirlib)
+* [Menhir](http://cambium.inria.fr/~fpottier/menhir/) 20240715
+* [Coq-Menhirlib](https://gitlab.inria.fr/fpottier/menhir/-/tree/master/coq-menhirlib) 20240715
 * [Coq](https://coq.inria.fr/) 8.20.0
 * [Coq-Equations](https://github.com/mattam82/Coq-Equations) 1.3
 
@@ -42,26 +42,34 @@ opam install -y --deps-only .
 
 ## Build from source
 
-If downloaded from [Anonymous GitHub](https://anonymous.4open.science/), run
+Use the top-level `make` to build the core McPTS infrastructure. 
+Makefile will try to find out the number of your CPU cores and parallel as much as possible.
 
-```bash
-find . -type f -exec touch {} +
+## Extraction
+
+Compilers defined in a directory `theories/CaseStudies/<name>` can be extracted by using `make extract-<name>` from the top-level. 
+Alternatively, every compiler defined in `theories/CaseStudies` can be extracted at once by running `make extract`. 
+
+## Running our Examples
+
+Our three examples can be compiled at once with `make extract`, or individually with
+
+```
+make extract-MiniML
+make extract-LF
+make extract-MLTTCumul
 ```
 
-as file timestamps may be incorrect.
-
-Use the toplevel `make` to build the whole project, including the three examples of verified compilers (from the root directory):
-
-```bash
-make
-```
-Makefile will try to find out the number of your CPU cores and parallel as much as
-possible.
-
-One `make` finishes, you can run any of the extracted compiler.
-The names of the executable are `mcpts_miniml`, `mcpts_lf`, and `mcpts_mlttcumul`.
-For example:
+The names of the executable are `mcpts_miniml`, `mcpts_lf`, and `mcpts_mlttcumul`. 
+They can be run using `dune exec`, for example:
 
 ```bash
 dune exec mcpts_mlttcumul theories/CaseStudies/MLTTCumul/examples/let-nary.mltt
 ```
+
+Each case study contains a README file detailing the grammar of each front-end language:
+- [MiniML](theories/CaseStudies/MiniML/README.md)
+
+### Creating a Case Study
+
+The directory `theories/CaseStudies/Template` contains a skeleton of how a case study should be structured for extraction.
