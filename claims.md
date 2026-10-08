@@ -1,3 +1,64 @@
+# List of key definitions
+
+
+## PTS* signatures
+
+Definitions relevant to PTS* signature are located in the folder "theories/PtsSignature".
+There are four main definitions:
+- PTS* signatures themselve (Definition 2.1) are defined in the Coq file "theories/PtsSignature/Signatures.v", as the record "PtsSig".
+- Predicativity of signatures (Definition 2.2) is defined in the Coq file "theories/PtsSignature/Predicativity.v", as the record "PredicativeSig"
+- Functionality of signatures (Definition 2.3) is defined in the Coq file "theories/PtsSignature/Functionality.v", as the record "FunctionalSig"
+- Decidability of signatures (Definition 2.4) is defined in the Coq file "theories/PtsSignature/Decidability.v", as the record "DecidableSig"
+
+
+## Declarative definitions
+
+### Syntactic definitions
+
+The syntax (Section 3) of an arbitrary PTS* is defined in the Coq file "theories/Core/Syntactic/Syntax.v".
+It consists of the mutual definitions "exp" and "sub", and the shorthand "ctx".
+The files also includes the notation that use throughout the mechanization.
+
+
+The declarative judgments (Section 3.1) of an abitrary PTS* are defined in the Coq file "theories/Core/Syntactic/System/Definitions.v".
+It consists of several mutual definitions:
+- "wf_ctx" (for well-formed contexts),
+- "wf_ctx_sub" (for context subtyping),
+- "wf_exp" (for typing/well-formed expressions),
+- "wf_sub" (for well-formed substitutions),
+- "wf_ctx_eq" (for equality of contexts),
+- "wf_exp_eq" (for equality of expressions),
+- "wf_sub_eq" (for equality of substitutions),
+- "wf_subtyp" (for subtyping),
+- "wf_typ" (for well-formed types), and
+- "wf_typ_eq" (for equality of types.
+
+
+The annotated judgments (discussed in section 4.2.2) of an arbitrary PTS* are defined in the Coq file "theories/Core/Syntactic/SystemAnnotated/Definitions.v".
+It consists of several mutual definitions (one for each ordinary well-formedness judgment):
+- "wf_ctx_ann" (for well-formed contexts),
+- "wf_exp_ann" (for typing/well-formed expressions),
+- "wf_sub_ann" (for well-formed substitutions), and
+- "wf_typ_ann" (for well-formed types).
+
+
+Weakening substitutions (Section 4.2.1) of an arbitrary PTS* are define in the Coq file "theories/Core/Soundness/Weakening/Definitions.v".
+
+
+### Semantic definitions
+
+
+
+
+## Algorithmic definitions
+
+
+## Case studies
+
+
+
+
+
 # List of claims
 
 ## Generic properties for arbitrary signatures
