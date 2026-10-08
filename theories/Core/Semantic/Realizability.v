@@ -107,7 +107,7 @@ Qed.
 Hint Resolve per_elem_then_per_top : mcpts.
 
 
-(* Realizability for per_typ_elem *)
+(** Realizability for per_typ_elem *)
 Lemma realize_per_typ_elem_gen {P : PtsSig} {pred_P : PredicativeSig P} : forall {a a' R},
     {{ DF a ≈ a' ∈ per_typ_elem pred_P ↘ R }} ->
     {{ Dom a ≈ a' ∈ per_top_typ }}
