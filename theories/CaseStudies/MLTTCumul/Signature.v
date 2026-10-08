@@ -106,19 +106,19 @@ Section MLTTCumulFunctional.
 End MLTTCumulFunctional.
 
 Section MLTTCumulDecidable.
-  Lemma MLTTCumul_dec_st_eq : forall (s s' : P), ({s = s'} + {s <> s'})%type.
+  Definition MLTTCumul_dec_st_eq : forall (s s' : P), ({s = s'} + {s <> s'})%type.
   Proof.
     intros [] [].
     assert ({n = n0} + {n <> n0}) as [] by eapply eq_dec;
       [left | right; inversion 1]; auto.
-  Qed.
+  Defined.
 
-  Lemma MLTTCumul_dec_ax_typ : forall (s : P), ( {s' & Ax_typ P s s'} + {forall s', ~Ax_typ P s s'} )%type.
+  Definition MLTTCumul_dec_ax_typ : forall (s : P), ( {s' & Ax_typ P s s'} + {forall s', ~Ax_typ P s s'} )%type.
   Proof.
     intros [i]; left; eexists; econstructor.
-  Qed.
+  Defined.
 
-  Lemma MLTTCumul_dec_st_sub_help : forall i j, @st_subtyp P (s_univ i) (s_univ j) <-> i <= j.
+  Definition MLTTCumul_dec_st_sub_help : forall i j, @st_subtyp P (s_univ i) (s_univ j) <-> i <= j.
   Proof.
     split.
     - intros H; dependent induction H; [lia |].
@@ -131,34 +131,34 @@ Section MLTTCumulDecidable.
       transitivity (s_univ m); auto.
       enough (MLTTCumul_Ax_sub (s_univ m) (s_univ (S m))) by (econstructor; [eauto | reflexivity]).
       econstructor.
-  Qed.
+  Defined.
   
-  Lemma MLTTCumul_dec_st_sub : forall (s s' : P), ({st_subtyp s s'} + {~ st_subtyp s s'})%type.
+  Definition MLTTCumul_dec_st_sub : forall (s s' : P), ({st_subtyp s s'} + {~ st_subtyp s s'})%type.
   Proof.
     intros [] [].
     assert ({n <= n0} + {~ n <= n0 }) as [] by eapply le_dec.
     left; eapply MLTTCumul_dec_st_sub_help; eassumption.
     right; intros H%(MLTTCumul_dec_st_sub_help); auto.
-  Qed.
+  Defined.
 
-  Lemma MLTTCumul_dec_ru_pi : forall (s1 s2 : P), ({s3 & Ru_pi P s1 s2 s3} + {forall s3, Ru_pi P s1 s2 s3 -> False})%type.
+  Definition MLTTCumul_dec_ru_pi : forall (s1 s2 : P), ({s3 & Ru_pi P s1 s2 s3} + {forall s3, Ru_pi P s1 s2 s3 -> False})%type.
   Proof.
     intros [i] [j]; left; eexists; econstructor.
-  Qed.
+  Defined.
   
-  Lemma MLTTCumul_dec_ru_pi_eq : forall (s1 s2 s3 : P) (r : Ru_pi P s1 s2 s3) (r' : Ru_pi P s1 s2 s3),
+  Definition MLTTCumul_dec_ru_pi_eq : forall (s1 s2 s3 : P) (r : Ru_pi P s1 s2 s3) (r' : Ru_pi P s1 s2 s3),
       ( { r = r'} + {r <> r'} )%type.
   Proof.
     simpl.
     intros s1 s2 s3 [] r'.
     dependent destruction r'.
     left; reflexivity.
-  Qed.
+  Defined.
 
-  Lemma MLTTCumul_dec_ru_nat : ({s & Ru_nat P s} + {forall s, Ru_nat P s -> False})%type.
+  Definition MLTTCumul_dec_ru_nat : ({s & Ru_nat P s} + {forall s, Ru_nat P s -> False})%type.
   Proof.
     left; eexists; econstructor.
-  Qed.
+  Defined.
   
   Definition MLTTCumul_Decidable : DecidableSig P :=
     mkDecidableSig MLTTCumul_Sig MLTTCumul_dec_st_eq MLTTCumul_dec_ax_typ MLTTCumul_dec_st_sub MLTTCumul_dec_ru_pi MLTTCumul_dec_ru_pi_eq MLTTCumul_dec_ru_nat.

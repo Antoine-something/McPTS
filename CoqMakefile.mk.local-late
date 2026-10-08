@@ -3,8 +3,11 @@ space := $(empty) $(empty)
 
 MENHIR := menhir
 
-CASESTUDY ?= MiniML
-CASESTUDYDIRECTORY = theories/CaseStudies/$(CASESTUDY)
+HAS_ENTRYPOINT = $(notdir $(patsubst %/,%,$(dir $(wildcard theories/CaseStudies/*/Entrypoint.v))))
+HAS_PARSER = $(notdir $(patsubst %/,%,$(dir $(wildcard theories/CaseStudies/*/Parser.vy))))
+CASESTUDIES = $(filter $(HAS_ENTRYPOINT),$(HAS_PARSER))
+EXTRACT_TARGETS = $(addprefix extract-, $(CASESTUDIES))
+CASESTUDYDIRECTORY = theories/CaseStudies/$*
 
 PARSERMESSAGEBASE := parserMessages.messages
 FRONTENDDIR := Frontend
@@ -27,9 +30,10 @@ COQDOCFLAGS := \
 export COQDOCFLAGS
 DOC_BASE ?= ""
 
-define extract
-	@echo "MENHIR $(COQPARSERORIGFILE)"
-	@$(MENHIR) --coq "$(COQPARSERORIGFILE)"
+.PHONY: extract $(EXTRACT_TARGETS)
+extract : $(EXTRACT_TARGETS)
+
+$(EXTRACT_TARGETS) : extract-% : $(VOFILES)
 	@echo "MENHIR $(COQPARSERORIGFILE) PARSER MESSAGE"
 	@$(MENHIR) --coq "$(COQPARSERORIGFILE)" --compile-errors "$(PARSERMESSAGEFILE)" > "$(PARSERMESSAGEEXTRACTIONFILE)"
 	@echo "MENHIR $(COQPARSERORIGFILE) CHECK PARSER MESSAGE"
@@ -37,24 +41,7 @@ define extract
 	@$(MENHIR) --coq "$(COQPARSERORIGFILE)" --compare-errors "$(PARSERMESSAGETEMPFILE)" --compare-errors "$(PARSERMESSAGEFILE)"
 	@rm "$(PARSERMESSAGETEMPFILE)"
 	@echo "Separate Extraction main." | $(COQTOP) $(COQFLAGS) $(COQLIBS) -topfile $(CASESTUDYDIRECTORY)/Entrypoint.v -l $(CASESTUDYDIRECTORY)/Entrypoint.v
-endef
-
-.PHONY: extract_MiniML extract_LF extract_MLTTCumul
-extract_MiniML: CASESTUDY = MiniML
-extract_LF: CASESTUDY = LF
-extract_MLTTCumul: CASESTUDY = MLTTCumul
-
-extract_MiniML:
-	$(extract)
-
-extract_LF:
-	$(extract)
-
-extract_MLTTCumul:
-	$(extract)
-
-post-all:: extract_MiniML extract_LF extract_MLTTCumul
-	dune build
+	@dune build "$(CASESTUDYDIRECTORY)"
 
 .PHONY: update_parserMessages
 update_parserMessages:
