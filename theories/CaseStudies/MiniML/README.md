@@ -1,6 +1,15 @@
 # Description
 
-MiniML is a language containing simple function spaces and recursion over natural numbers. 
+MiniML is a language containing simple function spaces and recursion over natural numbers.
+Formally, it is defined with the following signature:
+
+```
+St := {Type}
+Ax_typ := {}
+Ax_sub := {}
+Ru_nat := {Type}
+Ru_pi := {(Type, Type, Type)}
+```
 
 # Grammar
 
