@@ -1,0 +1,5 @@
+(library
+ (name McptsExtracted_Template)
+ (public_name mcpts.extracted_template))
+
+(documentation)

@@ -3,8 +3,11 @@ space := $(empty) $(empty)
 
 MENHIR := menhir
 
-HAS_ENTRYPOINT = $(notdir $(patsubst %/,%,$(dir $(wildcard theories/CaseStudies/*/Entrypoint.v))))
-HAS_PARSER = $(notdir $(patsubst %/,%,$(dir $(wildcard theories/CaseStudies/*/Parser.vy))))
+HAS_ENTRYPOINT = $(notdir $(patsubst %/,%,$(dir $(filter $(VOFILES), $(patsubst %.v,%.vo,$(wildcard theories/CaseStudies/*/Entrypoint.v))))))
+HAS_PARSER = $(notdir $(patsubst %/,%,$(dir $(filter $(VOFILES), $(patsubst %.vy,%.vo,$(wildcard theories/CaseStudies/*/Parser.vy))))))
+#$(notdir $(patsubst %/,%,$(dir $(wildcard theories/CaseStudies/*/Entrypoint.v))))
+# HAS_PARSER = $(notdir $(patsubst %/,%,$(dir $(wildcard theories/CaseStudies/*/Parser.vy))))
+
 CASESTUDIES = $(filter $(HAS_ENTRYPOINT),$(HAS_PARSER))
 EXTRACT_TARGETS = $(addprefix extract-, $(CASESTUDIES))
 CASESTUDYDIRECTORY = theories/CaseStudies/$*

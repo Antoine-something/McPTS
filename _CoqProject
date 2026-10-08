@@ -124,6 +124,7 @@ theories/CaseStudies/MLTTCumul/Frontend.v
 theories/CaseStudies/MLTTCumul/Parser.v
 theories/CaseStudies/MLTTCumul/Entrypoint.v
 
+## Signatures ##
 theories/CaseStudies/MLTTNonCumul/Signature.v
 theories/CaseStudies/MLTTOmega/Signature.v
 theories/CaseStudies/STLC/Signature.v
