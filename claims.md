@@ -1,7 +1,48 @@
-# List of key definitions
+# Overview of the codebase
+
+All the Coq files are located in the "theories" folder.
+We recommend taking a look at the "_CoqProject" file.
+It contains the list of all Coq files in the project, in the order in which they should be consulted.
+There are four main components in the project:
+
+1. The "PtsSignature" module include definitions of PTS* signatures and their properties.
+All of the subsequent definitions and results are parameterized by at least a PTS* signature, and sometimes also by properties of that signature (predicativity, functionality, and decidability), so the module is imported across the whole codebase.
+
+2. The "Core" module is the largest component and contains everything to do with the declarative definition of PTS*.
+   It is separated into four sub-components that build upon the previous ones:
+   i. "Syntactic" includes the definition of the language and its type system, and proofs of simple properties.
+      The entire "Syntactic" sub-component applies to arbitrary PTS* signatures, with the exception of one theorem to establish that syntactic equality of normal forms is decidable, for which we need the PTS* signature to satisfy the decidability condition.
+   ii. "Semantic" includes the definition of the domain model and the normalization procedure, as well as a proof that evaluation is deterministic.
+       This applies to arbitrary PTS* signatures.
+       The "Semantic" sub-component also includes the definition of PER model and its key properties, in particular the realizability theorem.
+       Everything related to PER model is done only for predicative PTS* signatures.
+   iii. "Completeness" contains the proof of completeness of normalization.
+   	This includes the definitions of logical relations and the associated fundamental theorem.
+	Since this proof is large, we instead prove each case as a separate lemma, and organize the cases across different files based on the relevant language features.
+	For example, cases related to natural numbers are in the Coq file "NatCases.v", while cases related to contexts are in the file "ContextCases.v".
+	(Almost) everything in the "Completess" sub-component requires predicative PTS* signatures.
+   iv. "Soundness" focuses on the proof of soundness of normalization.
+       This includes the definition of the gluing model and the logical relations, as well as the proofs of realizability and the fundamental theorem, among others.
+       Like for completeness, we separate the proof of the fundamental theorem across several lemmas, organized in different files.
+       (Almost) everything in the "Soundness" sub-component requires predicative PTS* signatures.
+	
+3. The "Algorithmic" module includes the definitions of all algorithmic judgments, as well as the proofs that they are equivalent to the declarative judgments.
+   The algorithmic judgments depend on normalization, and therefore also requires the predicativity of PTS* signatures.
+   The functionality requirement is used only to establish that the type inference procedure really is functional, in the sense that it can only infer a unique type.
+
+4. The "Extraction" module includes a functional implementation of the algorithmic judgments in Coq.
+   The type checking algorithm (located in "TypeCheck.v") uses all three properties of signature (predicativity, functionality, and decidability).
+
+In addition to these four main components, there are the case studies, which are located in "theories/CaseStudies/[name of case study]"
+__should put the structure of case studies here__
+In addition, there is a "Frontend" component, whose main purpose is to provide a generic elaboration procedure to convert named variables into de Bruijn indices.
+
+Below, we give a detailed description of where the important definitions and theorems are located.
+
+## List of key definitions
 
 
-## PTS* signatures
+### PTS* signatures
 
 Definitions relevant to PTS* signature are located in the folder "theories/PtsSignature".
 There are four main definitions:
@@ -11,9 +52,9 @@ There are four main definitions:
 - Decidability of signatures (Definition 2.4) is defined in the Coq file "theories/PtsSignature/Decidability.v", as the record "DecidableSig"
 
 
-## Declarative definitions
+### Declarative definitions
 
-### Syntactic definitions
+#### Syntactic definitions
 
 The syntax (Section 3) of an arbitrary PTS* is defined in the Coq file "theories/Core/Syntactic/Syntax.v".
 It consists of the mutual definitions "exp" and "sub", and the shorthand "ctx".
@@ -45,23 +86,23 @@ It consists of several mutual definitions (one for each ordinary well-formedness
 Weakening substitutions (Section 4.2.1) of an arbitrary PTS* are define in the Coq file "theories/Core/Soundness/Weakening/Definitions.v".
 
 
-### Semantic definitions
+#### Semantic definitions
 
 
 
 
-## Algorithmic definitions
+### Algorithmic definitions
 
 
-## Case studies
+### Case studies
 
 
 
 
 
-# List of claims
+## List of claims
 
-## Generic properties for arbitrary signatures
+### Generic properties for arbitrary signatures
 
 Lemma 3.1 (Presupposition) is separated in several lemmas in the mechanization:
 - For context equality: the lemma "presup_ctx_eq" in the Coq file "theories/Core/Syntactic/System/Lemmas.v"
@@ -82,9 +123,9 @@ Equivalence of standard judgments and annotated judgments (discussed in section 
 - Soundness of annotated judgments: the lemma "wf_judg_ann_implies_wf_judg" in  the Coq file "theories/Core/Syntactic/SystemAnnotated/Lemmas.v"
 
 
-## Normalization for predicative signatures
+### Normalization for predicative signatures
 
-### Completeness of NbE
+#### Completeness of NbE
 
 Functionality of the PERs (mentionned in text, section 4.1) has three parts:
 - Functionality of the PER for sorts: the lemmas "per_sort_elem_right_irrel", "per_sort_elem_left_irrel", and "per_sort_elem_cross_irrel" in the Coq file "theories/Core/Semantic/PER/Lemmas.v"
@@ -101,7 +142,7 @@ Theorem 4.2 (Fundamental theorem of completeness): the theorem "completeness_fun
 Corollary 4.3 (Completeness of normalization): the theorem "completeness" in the Coq file "theories/Core/Completeness.v"
 
 
-### Soundness of NbE
+#### Soundness of NbE
 
 
 Functionality of the gluing relations (Section 4.2.1) has two parts:
@@ -121,7 +162,7 @@ Theorem 4.5 (Fundamental theorem of soundness):
 Theorem 4.6 (Soundness of normalization): the theorem "soundness" in the Coq file "theories/Core/Soundness.v"
 
 
-## Algorithmic type checking for predicative and functional signatures
+### Algorithmic type checking for predicative and functional signatures
 
 
 Theorem 5.1 (Equivalence of algorithmic and declarative subtyping):
@@ -137,7 +178,7 @@ Theorem 5.3 (Completeness of algorithmic typing): the lemma "alg_type_complete" 
 
 
 
-## Extraction of verified type checkers for predicative, functional, and decidable signatures
+### Extraction of verified type checkers for predicative, functional, and decidable signatures
 
 
 This section does not have any formal claims, but the ability to extract type checkers is the central claim of the paper, so it deserves a discussion.  The crucial part of the extraction is to provide a functional implementation of our judgments in Coq.  This is done across the several files in "theories/Extraction", e.g. "theories/Extraction/TypeCheck.v" implements the algorithmic type checking judgment.
