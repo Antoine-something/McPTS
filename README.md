@@ -69,7 +69,45 @@ dune exec mcpts_mlttcumul theories/CaseStudies/MLTTCumul/examples/let-nary.mltt
 
 Each case study contains a README file detailing the grammar of each front-end language:
 - [MiniML](theories/CaseStudies/MiniML/README.md)
+- [Cumulative MLTT](theories/CaseStudies/MLTTCumul/README.md)
+- [LF](theories/CaseStudies/LF/README.md)
 
-### Creating a Case Study
+## Writing Examples
 
-The directory `theories/CaseStudies/Template` contains a skeleton of how a case study should be structured for extraction.
+### Verifying Signatures
+
+To verify a signature, use the `PtsSig` record type from `theories/PtsSignature/Signatures.v`.
+The `PredicativeSig`, `FunctionalSig`, and `DecidableSig` records can then be used to prove properties
+required in the rest of the McPTS infrastructure.
+
+### Extractions
+
+The example extractions in `theories/CaseStudies` have the following overall structure:
+```
+<Name>/
+├─ driver
+│  ├─ extracted
+|  │  ├─ dune
+│  ├─ Lexer.mll
+│  ├─ Main.ml
+│  ├─ Mcpts_<name>.ml
+│  ├─ PrettyPrinter.ml
+│  ├─ Test.ml
+│  ├─ dune
+├─ Entrypoint.v
+├─ Frontend.v
+├─ Parser.vy
+├─ Signature.v
+├─ parserMessages.messages
+```
+
+Remaining files are created during the build or extraction.
+
+New extractions can be created by following this template. Additionally, the files
+- `theories/CaseStudies/<name>/Signature.v`
+- `theories/CaseStudies/<name>/Frontend.v`
+- `theories/CaseStudies/<name>/Parser.v`
+- `theories/CaseStudies/<name>/Entrypoint.v`
+
+should be added to `_CoqProject`. Then, `make extract-<Name>` will extract the compiler, which can be
+executed with `dune exec` and the executable name specified in `theories/CaseStudies/<Name>/driver/dune`.
