@@ -1,5 +1,12 @@
 # Overview of the codebase
 
+To facilitate understanding the artifact, we give a description of the structure of the codebase.
+Below, we also give a detailed description of where the important definitions and theorems are located.
+
+## Structure of codebase
+
+### Main components
+
 All the Coq files are located in the "theories" folder.
 We recommend taking a look at the "_CoqProject" file.
 It contains the list of all Coq files in the project, in the order in which they should be consulted.
@@ -33,11 +40,17 @@ All of the subsequent definitions and results are parameterized by at least a PT
 4. The "Extraction" module includes a functional implementation of the algorithmic judgments in Coq.
    The type checking algorithm (located in "TypeCheck.v") uses all three properties of signature (predicativity, functionality, and decidability).
 
+### Case studies
+
 In addition to these four main components, there are the case studies, which are located in "theories/CaseStudies/[name of case study]"
 __should put the structure of case studies here__
 In addition, there is a "Frontend" component, whose main purpose is to provide a generic elaboration procedure to convert named variables into de Bruijn indices.
 
-Below, we give a detailed description of where the important definitions and theorems are located.
+There are three main cases studies: "MiniML", "LF", and "MLTTCumul".
+For these, we include the whole structure described above to perform extraction.
+We also include three additional signatures "STLC", "MLTTNonCumul", and "MLTTOmega" to demonstrate the flexibility of our framework.
+For these, we did not define a parser, elaborator, or entrypoint, as they would be redundant.
+
 
 ## List of key definitions
 

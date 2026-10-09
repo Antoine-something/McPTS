@@ -42,9 +42,14 @@ opam install -y --deps-only .
 
 ## Build from source
 
-Use the top-level `make` to build the core McPTS infrastructure. 
+Use the top-level `make` from the root directory to build the core McPTS infrastructure. 
 This will compile all the proofs without extracting anything.
 Makefile will try to find out the number of your CPU cores and parallel as much as possible.
+
+__\*Warning\*__ 
+Compilation takes a long time, up to ~30 minutes using four relatively recent i7 cores.
+It also occasionally seems stuck (e.g. on "theories/Core/Soundness/NatCases.v"), but it is not.
+To alleviate this for the artifact evaluation, we gave a VM image with the codebase pre-compiled.
 
 ## Extraction
 
