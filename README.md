@@ -43,6 +43,7 @@ opam install -y --deps-only .
 ## Build from source
 
 Use the top-level `make` to build the core McPTS infrastructure. 
+This will compile all the proofs without extracting anything.
 Makefile will try to find out the number of your CPU cores and parallel as much as possible.
 
 ## Extraction
@@ -83,6 +84,7 @@ required in the rest of the McPTS infrastructure.
 ### Extractions
 
 The example extractions in `theories/CaseStudies` have the following overall structure:
+
 ```
 <Name>/
 ├─ driver
