@@ -1,18 +1,20 @@
 # Description
 
-LF is a language containing two sorts, ★ and □. Typically, it contains the function rules
+LF is a language containing two sorts, ★ and □ (of types and kinds, respectively). Typically, it contains the function rules
 (★, ★, ★) and (★, □, □), allowing for simple and dependent function spaces.
-Because PTS* signatures do not allow type variables, we extend this with another rule, (□, □, □), 
-giving us function spaces like Π(x: ★).★. It is only usable in type variable definitions.
+A typical LF program is a list of declarations.
+Since we do not currently support declarations, we elaborate the LF program into a big function space, where each declaration becomes a variable.
+Since the LF PTS* signature does not allow type variables, we cannot represent type declarations in this way.
+To work around the issue, we extend this with another rule, (□, □, □), giving us function spaces like `Π(x: ★).★`, where we interpret `x` as a type declaration.
 
-The signature for our implementation is defined as follows:
+Thus, the signature for our implementation is formally defined as follows:
 
 ```
 St := {★, □}
 Ax_typ := {(★, □)}
 Ax_sub := {}
 Ru_nat := {}
-Ru_pi := {(★, ★, ★), (★, □, □), (★, □, □)}
+Ru_pi := {(★, ★, ★), (★, □, □), (□, □, □)}
 ```
 
 # Grammar

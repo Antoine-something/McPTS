@@ -1,11 +1,11 @@
-# Overview of the codebase
+## Overview of the codebase
 
 To facilitate understanding the artifact, we give a description of the structure of the codebase.
 Below, we also give a detailed description of where the important definitions and theorems are located.
 
-## Structure of codebase
+### Structure of codebase
 
-### Main components
+#### Main components
 
 All the Coq files are located in the "theories" folder.
 We recommend taking a look at the "_CoqProject" file.
@@ -40,7 +40,7 @@ All of the subsequent definitions and results are parameterized by at least a PT
 4. The "Extraction" module includes a functional implementation of the algorithmic judgments in Coq.
    The type checking algorithm (located in "TypeCheck.v") uses all three properties of signature (predicativity, functionality, and decidability).
 
-### Case studies
+#### Case studies
 
 In addition to these four main components, there are the case studies, which are located in "theories/CaseStudies/[name of case study]"
 __should put the structure of case studies here__
@@ -52,10 +52,10 @@ We also include three additional signatures "STLC", "MLTTNonCumul", and "MLTTOme
 For these, we did not define a parser, elaborator, or entrypoint, as they would be redundant.
 
 
-## List of key definitions
+### List of key definitions
 
 
-### PTS* signatures
+#### PTS* signatures
 
 Definitions relevant to PTS* signature are located in the folder "theories/PtsSignature".
 There are four main definitions:
@@ -65,9 +65,9 @@ There are four main definitions:
 - Decidability of signatures (Definition 2.4) is defined in the Coq file "theories/PtsSignature/Decidability.v", as the record "DecidableSig"
 
 
-### Declarative definitions
+#### Declarative definitions
 
-#### Syntactic definitions
+##### Syntactic definitions
 
 The syntax (Section 3) of an arbitrary PTS* is defined in the Coq file "theories/Core/Syntactic/Syntax.v".
 It consists of the mutual definitions "exp" and "sub", and the shorthand "ctx".
@@ -96,26 +96,94 @@ It consists of several mutual definitions (one for each ordinary well-formedness
 - "wf_typ_ann" (for well-formed types).
 
 
-Weakening substitutions (Section 4.2.1) of an arbitrary PTS* are define in the Coq file "theories/Core/Soundness/Weakening/Definitions.v".
+Weakening substitutions (Section 4.2.1) of an arbitrary PTS* are defined in the Coq file "theories/Core/Soundness/Weakening/Definitions.v".
 
 
-#### Semantic definitions
+##### Semantic definitions
+
+
+The domain model (Section 3.2.1) of an arbitrary PTS* is defined in the Coq file "theories/Core/Semantic/Domain.v", by mutual definitions "domain", "domain_ne", "domain_nf", and "env".
+
+
+Evaluation of syntactic expressions into domain objects (Figure 5) is defined in the Coq file "theories/Core/Semantic/Evaluation/Definitions.v".
+It consists of four mutual definitions "eval_exp", "eval_app", "eval_natrec", and "eval_sub".
+
+
+Readback of domain objects into syntactic normal forms (Figure 6) is defined in the Coq file "theories/Core/Semantic/Readback/Definitions.v".
+It consists of three mutual definitions "read_nf", "read_ne", and "read_typ".
+
+
+The normalization procedures (Section 3.2.4) are defined in the Coq file "theories/Core/Semantic/NbE.v".
+The procedure for expressions is "nbe" and the procedure for types is "nbe_ty".
+
+
+##### Completeness
+
+The PER model (Section 4.1) is defined in the Coq file "theories/Core/Semantic/PER/Definitions.v".
+This consists of several definitions:
+- The PERs Ne, Nf, and Typ (Figure 7) correspond to the definitions "per_bot", "per_top", and "per_top_typ", respectively;
+- The PER Neu (Figure 7) corresponds to the definition "per_ne";
+- The PER Nat (Figure 7) corresponds to the definition "per_nat";
+- The PER for sorts (Figure 7) corresponds to the definition "per_sort_elem".
+  To define "per_sort_elem", we first define a more abstract version "per_sort_elem_core" that leverages impredicativity.
+- The PER for types (Figure 7) corresponds to the definition "per_typ_elem";
+- The PER for contexts corresponds to the definition "per_ctx_env";
+- The semantic subtyping relation (Figure 8) corresponds to the definitions "per_subtyp_sorted" (for the sorted one) and "per_subtyp" (for the general one);
+- The context subtyping relation corresponds to the definition "per_ctx_subtyp".
+
+
+The logical relations for completeness (Section 4.1.2) are defined in the Coq file "theories/Core/Completeness/LogicalRelation/Definitions.v".
+This consists of several definitions:
+- For equality of expressions, the definition "rel_exp_under_ctx_unsorted";
+- For well-formed expressions, the definition "valid_exp_under_ctx_unsorted";
+- For equality of types, the definition "rel_typ_under_ctx";
+- For well-formed types, the definition "valid_typ_under_ctx";
+- For subtyping, the definition "subtyp_under_ctx";
+- For equality of substitutions, the definition "rel_sub_under_ctx";
+- For well-formed substitutions, the definition "valid_sub_under_ctx".
+
+
+##### Soundness
+
+The gluing model (Section 4.2.1) is defined in the Coq file "theories/Core/Soundness/LogicalRelation/Definitions.v".
+This consists of several definitions:
+- The gluing relations associated to neutral types (Figure 9) correspond to "neut_glu_typ_pred" (type relation) and "neut_glu_exp_pred" (expression relation);
+- The gluing relations associated to natural numbers (Figure 9) correspond to "nat_glu_typ_pred" (type relation) and "nat_glu_exp_pred" (expression relation);
+- The gluing relations associated to function spaces (Figure 9) correspond to "pi_glu_typ_pred" (type relation) and "pi_glu_exp_pred" (expression relation);
+- The gluing relation for sorts (Figure 10) correspond to "glu_sort_elem" (functional relation).
+  Like for the PER model, it is defined in terms of a more abstract "glu_sort_elem_core" to leverage impredicativity.
+- The gluing relation for types (Figure 10) correspond to "glu_typ_elem" (functional relation);
+- The gluing relation for contexts correspond to "glu_ctx_env" (functional relation);
+- The gluing relations Ne, Nf, and Typ correspond to "glu_elem_bot_unsorted", "glu_elem_top_unsorted", and "glu_typ_top_unsorted", respectively.
+
+
+The logical relations for soundness (Section 4.2.2) are defined in the Coq file "theories/Core/Soundness/LogicalRelation/Definitions.v".
+It consists of several definitions:
+- The relation for well-formed contexts correspond to "glu_rel_ctx";
+- The relation for well-formed substitutions correspond to "glu_rel_sub";
+- The relation for well-formed expressions corresponds to "glu_rel_exp_unsorted";
+- The relation for well-formed types corresponds to "glu_rel_typ_unsorted".
 
 
 
+#### Algorithmic definitions
 
-### Algorithmic definitions
+The algorithmic subtyping judgments (Section 5.1) are defined in the Coq file "theories/Algorithmic/Subtyping/Definitions.v".
+It consists of two definitions:
+- Subtyping for normal forms corresponds to "alg_subtyping_nf";
+- Subtyping for arbitrary expressions corresponds to "alg_subtyping".
+
+The algorithmic typing judgments (Section 5.2) are defined in the Coq file  "theories/Algorithmic/Typing/Definitions.v".
+It consists of three mutual definitions:
+- Type checking corresponds to "alg_type_check";
+- Type inference corresponds to "alg_type_infer";
+- Type well-formedness corresponds to "alg_wf_type".
 
 
-### Case studies
 
+### List of claims
 
-
-
-
-## List of claims
-
-### Generic properties for arbitrary signatures
+#### Generic properties for arbitrary signatures
 
 Lemma 3.1 (Presupposition) is separated in several lemmas in the mechanization:
 - For context equality: the lemma "presup_ctx_eq" in the Coq file "theories/Core/Syntactic/System/Lemmas.v"
@@ -136,9 +204,9 @@ Equivalence of standard judgments and annotated judgments (discussed in section 
 - Soundness of annotated judgments: the lemma "wf_judg_ann_implies_wf_judg" in  the Coq file "theories/Core/Syntactic/SystemAnnotated/Lemmas.v"
 
 
-### Normalization for predicative signatures
+#### Normalization for predicative signatures
 
-#### Completeness of NbE
+##### Completeness of NbE
 
 Functionality of the PERs (mentionned in text, section 4.1) has three parts:
 - Functionality of the PER for sorts: the lemmas "per_sort_elem_right_irrel", "per_sort_elem_left_irrel", and "per_sort_elem_cross_irrel" in the Coq file "theories/Core/Semantic/PER/Lemmas.v"
@@ -155,7 +223,7 @@ Theorem 4.2 (Fundamental theorem of completeness): the theorem "completeness_fun
 Corollary 4.3 (Completeness of normalization): the theorem "completeness" in the Coq file "theories/Core/Completeness.v"
 
 
-#### Soundness of NbE
+##### Soundness of NbE
 
 
 Functionality of the gluing relations (Section 4.2.1) has two parts:
@@ -175,7 +243,7 @@ Theorem 4.5 (Fundamental theorem of soundness):
 Theorem 4.6 (Soundness of normalization): the theorem "soundness" in the Coq file "theories/Core/Soundness.v"
 
 
-### Algorithmic type checking for predicative and functional signatures
+#### Algorithmic type checking for predicative and functional signatures
 
 
 Theorem 5.1 (Equivalence of algorithmic and declarative subtyping):
@@ -191,7 +259,7 @@ Theorem 5.3 (Completeness of algorithmic typing): the lemma "alg_type_complete" 
 
 
 
-### Extraction of verified type checkers for predicative, functional, and decidable signatures
+#### Extraction of verified type checkers for predicative, functional, and decidable signatures
 
 
 This section does not have any formal claims, but the ability to extract type checkers is the central claim of the paper, so it deserves a discussion.  The crucial part of the extraction is to provide a functional implementation of our judgments in Coq.  This is done across the several files in "theories/Extraction", e.g. "theories/Extraction/TypeCheck.v" implements the algorithmic type checking judgment.
