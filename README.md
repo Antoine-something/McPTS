@@ -348,6 +348,20 @@ This section does not have any formal claims, but the ability to extract type ch
 
 The extraction itself is enabled in the case studies (folder "theories/CaseStudies"), by extracting the "main" function of the corresponding "Entrypoint.v" file (e.g. "theories/CaseStudies/LF/Entrypoint.v").  Each case study has a generated parser and a "Frontend.v" file that performs elaboration from a surface language to our internal representation.  The "main" function basically invokes the generated parser, performs elaboration, and calls the type checker.
 
+### Checking and Assumptions
+
+`coqchk` can be used to check the claims above and list the axioms. Run
+
+```
+./check.sh
+```
+
+to run `coqchk` on all core Coq files, as well as the signatures of the included case studies. The output should state that all modules were
+successfully checked, as well as listing the axioms used in McPTS:
+- Coq.Logic.ProofIrrelevance.proof_irrelevance
+- Coq.Logic.FunctionalExtensionality.functional_extensionality_dep
+- Coq.Logic.Eqdep.Eq_rect_eq.eq_rect_eq
+
 
 
 ## Writing Examples
