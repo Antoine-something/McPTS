@@ -193,6 +193,18 @@ Each case study contains a README file detailing the specification of the PTS* s
 - [Cumulative MLTT](theories/CaseStudies/MLTTCumul/README.md)
 - [LF](theories/CaseStudies/LF/README.md)
 
+The executable for each compiler takes a program in the associated front-end language and outputs pretty-printed syntax trees after parsing, elaboration, and normalization.  
+Output has the form:
+
+```
+Parsed:                                
+  <Syntax tree of parsed input>
+Elaborated:
+  <Syntax tree of elaborated input>
+Normalized Result:
+  <Syntax tree of normalized result>
+
+```
 
 We provide a number of example programs (i.e. tests) for each of our extracted compilers.
 You can run the compiler on an example program using the following pattern:
@@ -213,6 +225,30 @@ You can run them as follows:
 - MiniML: `./test_miniml.sh` 
 - Cumulative MLTT: `./test_mlttcumul.sh`
 - LF: `./test_lf.sh`
+
+#### Provided examples
+
+#### MiniML
+- simple-fn.miniml
+- simple-let.miniml
+- simple-nat.miniml
+- add.miniml
+- add-numbers.miniml
+- let-two-vars.miniml
+- let-mult.miniml
+
+#### Cumulative MLTT:
+- simple-fn.mltt
+- simple-let.mltt
+- simple-nat.mltt
+- simple-rec.mltt
+- let-two-vars.mltt
+- let-nary.mltt
+
+#### LF:
+- hoas.lf
+- plus.lf
+- lambda.lf
 
 
 
@@ -273,42 +309,9 @@ You can run them as follows:
 - Cumulative MLTT: `./test_mlttcumul.sh`
 - LF: `./test_lf.sh`
 
-Each program can also be manually executed using
-
-```
-dune exec <executable> <path-to-case-study>/<program>
-```
-
-For example:
-
-```
-dune exec mcpts_mlttcumul theories/CaseStudies/MLTTCumul/examples/let-nary.mltt
-```
+Instructions on running tests manually can also be found in the above section "Case studies and running tests"
 
 
-The following test programs are provided:
-
-#### MiniML
-- simple-fn.miniml
-- simple-let.miniml
-- simple-nat.miniml
-- add.miniml
-- add-numbers.miniml
-- let-two-vars.miniml
-- let-mult.miniml
-
-#### Cumulative MLTT:
-- simple-fn.mltt
-- simple-let.mltt
-- simple-nat.mltt
-- simple-rec.mltt
-- let-two-vars.mltt
-- let-nary.mltt
-
-#### LF:
-- hoas.lf
-- plus.lf
-- lambda.lf
 
 
 
