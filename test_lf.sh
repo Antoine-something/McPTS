@@ -9,7 +9,7 @@ tests=(
     "lambda.lf"
 )
 expected=(
-    "arsed:                               
+    "Parsed:                               
   forall (exp : Type)
          (b : exp)
          (let_hoas : forall (e : exp)
