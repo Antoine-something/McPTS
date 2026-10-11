@@ -267,7 +267,11 @@ CONTEXT SUMMARY
 
 
 
-### Step 4: Inspect the codebase
+### Step 4: Confirm the correspondence of claims
+
+The last step is to validate that the claims in the paper match the claims in the implementation.
+See the "List of claims" section above for the locations of each result in the codebase.
+The Coq notation is very similar to the notation used in the paper, so it should be straightforward to understand the statements of theorem.
 
 
 
