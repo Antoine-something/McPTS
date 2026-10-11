@@ -23,7 +23,7 @@ McPTS is a fork of McTT, a project with similar goals, but specialized to Martin
 
 We recommend to install dependencies in the following way:
 
-```bash
+```
 # setup OPAM switch
 opam update
 opam switch create coq-8.20.0 4.14.2
@@ -69,7 +69,7 @@ make extract-MLTTCumul
 The names of the executable are `mcpts_miniml`, `mcpts_lf`, and `mcpts_mlttcumul`. 
 They can be run using `dune exec`, for example:
 
-```bash
+```
 dune exec mcpts_mlttcumul theories/CaseStudies/MLTTCumul/examples/let-nary.mltt
 ```
 
@@ -91,6 +91,7 @@ Below, we also give a detailed description of where the important definitions an
 All the Coq files are located in the "theories" folder.
 We recommend taking a look at the "_CoqProject" file.
 It contains the list of all Coq files in the project, in the order in which they should be consulted.
+We have also generated a coqdoc which can be opened in-browser by opening `html/indexpage.html`.
 There are four main components in the project:
 
 1. The "PtsSignature" module include definitions of PTS* signatures and their properties.
@@ -167,7 +168,7 @@ It consists of several mutual definitions:
 - "wf_sub_eq" (for equality of substitutions),
 - "wf_subtyp" (for subtyping),
 - "wf_typ" (for well-formed types), and
-- "wf_typ_eq" (for equality of types.
+- "wf_typ_eq" (for equality of types).
 
 
 The annotated judgments (discussed in section 4.2.2) of an arbitrary PTS* are defined in the Coq file "theories/Core/Syntactic/SystemAnnotated/Definitions.v".
