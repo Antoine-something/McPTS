@@ -52,3 +52,7 @@ CONTEXT SUMMARY
 
 ### Step 3: Run test programs
 
+
+
+### Step 4: Inspect the codebase
+

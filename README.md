@@ -360,8 +360,7 @@ to run `coqchk` on all core Coq files, as well as the signatures of the included
 successfully checked, as well as listing the axioms used in McPTS:
 - Coq.Logic.ProofIrrelevance.proof_irrelevance
 - Coq.Logic.FunctionalExtensionality.functional_extensionality_dep
-- Coq.Logic.Eqdep.Eq_rect_eq.eq_rect_eq
-
+- Coq.Logic.Eqdep.Eq_rect_eq.eq_rect_eq (equivalent to UIP)
 
 
 ## Writing Examples
