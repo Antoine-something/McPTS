@@ -11,9 +11,13 @@ YELLOW_BOLD="\e[1;33m"
 GREEN_BG_BOLD="\e[1;42m"
 
 
+prog_path="theories/CaseStudies/$1/examples/$3" 
 
 echo -e "${GREEN_BG_BOLD}Testing $1 example:${CLEAR} $3"
+echo -e "${YELLOW_BOLD}Input program:${CLEAR}"
+cat "$prog_path"
+echo -e "\n"
 echo -e "${YELLOW_BOLD}Expected output:${CLEAR}"
 printf "$4\n\n"
 echo -e "${YELLOW_BOLD}Actual output:${CLEAR}"
-dune exec "$2" "theories/CaseStudies/$1/examples/$3"
+dune exec "$2" "$prog_path"
