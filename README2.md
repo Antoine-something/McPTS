@@ -208,10 +208,11 @@ dune exec mcpts_mlttcumul theories/CaseStudies/MLTTCumul/examples/let-nary.mltt
 ```
 
 Additionally, we provide for each case study a script to run all the tests associated to that case study.
+Each script runs the compiler on each included test file and displays the expected output along with the actual output. 
 You can run them as follows:
-- (MiniML) 
-- (Cumulative MLTT)
-- (LF)
+- MiniML: `./test_miniml.sh` 
+- Cumulative MLTT: `./test_mlttcumul.sh`
+- LF: `./test_lf.sh`
 
 
 
@@ -264,6 +265,50 @@ CONTEXT SUMMARY
 
 
 ### Step 3: Run test programs
+
+Convenience scripts have been provided to run all available tests on each of the three included case studies.
+For each test, the scripts output the program being tested, the expected output for comparison, and the result from the compiler.
+You can run them as follows:
+- MiniML: `./test_miniml.sh` 
+- Cumulative MLTT: `./test_mlttcumul.sh`
+- LF: `./test_lf.sh`
+
+Each program can also be manually executed using
+
+```
+dune exec <executable> <path-to-case-study>/<program>
+```
+
+For example:
+
+```
+dune exec mcpts_mlttcumul theories/CaseStudies/MLTTCumul/examples/let-nary.mltt
+```
+
+
+The following test programs are provided:
+
+#### MiniML
+- simple-fn.miniml
+- simple-let.miniml
+- simple-nat.miniml
+- add.miniml
+- add-numbers.miniml
+- let-two-vars.miniml
+- let-mult.miniml
+
+#### Cumulative MLTT:
+- simple-fn.mltt
+- simple-let.mltt
+- simple-nat.mltt
+- simple-rec.mltt
+- let-two-vars.mltt
+- let-nary.mltt
+
+#### LF:
+- hoas.lf
+- plus.lf
+- lambda.lf
 
 
 
