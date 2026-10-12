@@ -143,7 +143,7 @@ Alternatively, you can access it from the terminal by running the following comm
 cd Desktop/McPTS
 ```
 
-In the McPTS folder, you will find the README.md (which are currently reading) with further instructions.
+In the McPTS folder, you will find the `README.md` (which are currently reading) with further instructions.
 We have included a browser-based MarkDown reader for rendering in the virutal machine.
 From the McPTS directory you can open MarkDown files with the following command:
 
