@@ -130,28 +130,78 @@ Should you need it, the password is 'artifact'.
 
 __Note.__ By the time you reach this point, you are already running the virtual image, so this step should be done.
 
+#### Obtaining the Virtual Machine Images
+
+We have included two virtual machines: "mcpts_artifact_x64" for an x64 architecture, and "mcpts_artifact_arm" for an ARM architecture.
+Due to upload restrictions, we have split the image files into sevaral parts, hosted at the Zenodo link.
+For x64 machines, download each `mcpts_artifact_x64_a*` file and (optionally) `SHA256SUM_x64`.
+For ARM machines, download each `mcpts_artifact_arm_a*` file and (optionally) `SHA256SUM_arm`.
+
+##### Combining the Files
+
+Instructions are given for combining the x64 files. 
+To combine the ARM files, replace "x64" with "arm" in the following commands.
+
+###### On Linux or MacOS
+
+Navigate to the directory containing the downloaded files.
+Run 
+```
+cat mcpts_artifact_x64_* > mcpts_artifact_x64.ova
+```
+
+Optionally, run
+```
+sha256sum -c SHA256SUM_x64
+```
+
+to verify the combined image.
+
+###### On Windows
+In a PowerShell, navigate to the directory containing the downloaded files.
+Run 
+```
+cmd /c "copy /b .\mcpts_artifact_x64_* mcpts_artifact_x64.ova"
+```
+
+Optionally, run
+```
+(certutil -hashfile .\final_mcpts_artifact_x64.ova SHA256).Hash -eq "e97c9373570a61b4d3d3d8dc2ad1d5afaefc0a3421cd986ccfbfe10da5108773".Hash
+```
+
+to verify the combined x86 image or
+
+```
+(certutil -hashfile .\final_mcpts_artifact_arm.ova SHA256).Hash -eq "b815df26a462d8fbfcfb1f1f5a3eb129218ab7b56f2c4a24eb14bf88e7b64c8c".Hash
+```
+
+for the ARM image.
+
+#### Running the Virtual Machine
+
 First, install VirtualBox.  We recommend version 7.2.18, since this is the only one we tested.
-Second, download the virtual machine image from the Zenodo link and import it to VirtualBox.
-We have included two images: use "mcpts_artifact_x64" an x64 architecture, and "mcpts_artifact_arm" for an ARM architecture.
-Third, run the artifact using VirtualBox.
+The x64 virtual machine image runs Ubuntu 22.04.5 LTS and the ARM image runs Ubuntu 24.04.5 LTS. 
+Each machine has some utilities included to facilitate the artifact evaluation process.
 
+From the VirtualBox File menu, choose "Import Appliance" and select the .ova file from the previous section.
 
-To access the artifact itself, open the 'McPTS' folder on the desktop.
+To access the artifact itself from inside the virutal machine, open the 'McPTS' folder on the desktop.
 Alternatively, you can access it from the terminal by running the following command:
 
 ```
 cd Desktop/McPTS
 ```
 
-In the McPTS folder, you will find the `README.md` (which are currently reading) with further instructions.
-We have included a browser-based MarkDown reader for rendering in the virtual machine.
-From the McPTS directory you can open MarkDown files with the following command:
+In the McPTS folder, you will find the README.md (which are currently reading) with further instructions.
+We have included the MarkDown reader ReText in the virutal machine.
+From the McPTS you can run it with the following command:
 
 ```
 open README.md
 ```
 
 or by double-clicking `README.md` in the file explorer.
+
 
 ### Dependencies of the artifact
 
