@@ -214,6 +214,7 @@ Qed.
 #[export]
 Hint Resolve wf_typ_inversion : mcpts.
 
+
 (** ** For functions *)
 Corollary wf_typ_pi_inversion {P : PtsSig} : forall {Γ A B s1 s2 s3} {r : Ru_pi P s1 s2 s3},
     {{ Γ ⊢ Π r A B }} ->

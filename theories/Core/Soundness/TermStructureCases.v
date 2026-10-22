@@ -627,21 +627,21 @@ Hint Resolve glu_rel_exp_sub : mcpts.
 (* Hint Resolve glu_rel_exp_sub_unsorted : mcpts. *)
 
 (* This should go in LogicalRelation/Lemmas.v *)
-Lemma glu_rel_typ_implies_wf_typ {P} (pred_P : PredicativeSig P) : forall {Γ anns A so},
-    {{ ⟪ pred_P ⟫ Γ @ anns ⊩ A @ so }} ->
-    {{ Γ ⊢ A }}.
-Proof.
-  intros * [SbΓ []].
-  assert (exists env_rel, {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }}) as [env_rel] by mauto 3.
-  assert (exists ρ ρ', initial_env Γ ρ /\ initial_env Γ ρ' /\ {{ Dom ρ ≈ ρ' ∈ env_rel }}) as [ρ [ρ' []]] by mauto using per_ctx_then_per_env_initial_env.
-  assert (SbΓ Γ {{{ Id }}} ρ) by (eapply initial_env_glu_rel_exp; mauto 3).
-  destruct_glu_rel_typ_with_sub.
-  assert {{ Γ ⊢ A[Id] }} by (eapply glu_typ_elem_wf_typ; mauto 2).
-  mauto 3.
-Qed.
+(* Lemma glu_rel_typ_implies_wf_typ {P} (pred_P : PredicativeSig P) : forall {Γ anns A so}, *)
+(*     {{ ⟪ pred_P ⟫ Γ @ anns ⊩ A @ so }} -> *)
+(*     {{ Γ ⊢ A }}. *)
+(* Proof. *)
+(*   intros * [SbΓ []]. *)
+(*   assert (exists env_rel, {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }}) as [env_rel] by mauto 3. *)
+(*   assert (exists ρ ρ', initial_env Γ ρ /\ initial_env Γ ρ' /\ {{ Dom ρ ≈ ρ' ∈ env_rel }}) as [ρ [ρ' []]] by mauto using per_ctx_then_per_env_initial_env. *)
+(*   assert (SbΓ Γ {{{ Id }}} ρ) by (eapply initial_env_glu_rel_exp; mauto 3). *)
+(*   destruct_glu_rel_typ_with_sub. *)
+(*   assert {{ Γ ⊢ A[Id] }} by (eapply glu_typ_elem_wf_typ; mauto 2). *)
+(*   mauto 3. *)
+(* Qed. *)
 
-#[export]
-Hint Resolve glu_rel_typ_implies_wf_typ : mcpts.
+(* #[export] *)
+(* Hint Resolve glu_rel_typ_implies_wf_typ : mcpts. *)
  
 Lemma glu_rel_typ_sub {P} (pred_P : PredicativeSig P) : forall {anns Γ σ anns' Γ' A so},
     {{ ⟪ pred_P ⟫ Γ @ anns ⊩s σ : Γ' @ anns' }} ->
@@ -908,54 +908,54 @@ Qed.
 Hint Resolve glu_rel_exp_conv : mcpts.
 
 (* This should go to LogicalRelation/Lemmas.v *)
-Lemma glu_typ_elem_exp_conv {P} (pred_P : PredicativeSig P) : forall {so so' a a' typ_rel typ_rel' exp_rel exp_rel' Γ A M m},
-    {{ Dom a ≈ a' ∈ per_typ pred_P }} ->
-    {{ DG a ∈ glu_typ_elem pred_P so ↘ typ_rel ↘ exp_rel }} ->
-    {{ DG a' ∈ glu_typ_elem pred_P so' ↘ typ_rel' ↘ exp_rel' }} ->
-    {{ Γ ⊢ M : A ® m ∈ exp_rel }} ->
-    {{ Γ ⊢ A ® typ_rel' }} ->
-    {{ Γ ⊢ M : A ® m ∈ exp_rel' }}.
-Proof.
-  intros * [R Hper] Hglu Hglu' ? ?.
-  inversion Hglu; subst;
-    dependent destruction Hglu'.
-  - assert (s = s0). (* This should be proven as a lemma in PER/Lemmas *)
-    {
-      inversion Hper; subst; try reflexivity.
-      invert_per_sort_elem H5.
-      reflexivity.
-    }
-    subst.
-    eapply H0.
-    eapply H4.
-    eassumption.
-  - assert (a = d{{{ Sort@s }}}).
-    {
-      inversion Hper; subst; try reflexivity.
-      invert_per_sort_elem H4; reflexivity.
-    }
-    subst.
-    invert_glu_sort_elem H.
-    simpl_glu_rel.
-    assert {{ Γ ⊢ M : Sort@s }} by (eapply glu_sort_elem_sort_lvl; mauto 2).
-    split; mauto 3.
-    split; mauto 2.
-    unfold glu_sort_typ_rec.
-    eauto.
-  - symmetry in Hper.
-    assert (a = d{{{ Sort@s0 }}}).
-    {
-      inversion Hper; subst; try reflexivity.
-      invert_per_sort_elem H4; reflexivity.
-    }
-    subst.
-    invert_glu_sort_elem H3.
-    simpl_glu_rel.
-    split; mauto 2.
-  - assert (per_sort pred_P s a a) as [R'] by mauto 2.
-    assert (per_sort pred_P s a a0) by (eexists; mauto 2).
-    eapply (glu_sort_elem_exp_conv pred_P H4 H2 H); eassumption.
-Qed.
+(* Lemma glu_typ_elem_exp_conv {P} (pred_P : PredicativeSig P) : forall {so so' a a' typ_rel typ_rel' exp_rel exp_rel' Γ A M m}, *)
+(*     {{ Dom a ≈ a' ∈ per_typ pred_P }} -> *)
+(*     {{ DG a ∈ glu_typ_elem pred_P so ↘ typ_rel ↘ exp_rel }} -> *)
+(*     {{ DG a' ∈ glu_typ_elem pred_P so' ↘ typ_rel' ↘ exp_rel' }} -> *)
+(*     {{ Γ ⊢ M : A ® m ∈ exp_rel }} -> *)
+(*     {{ Γ ⊢ A ® typ_rel' }} -> *)
+(*     {{ Γ ⊢ M : A ® m ∈ exp_rel' }}. *)
+(* Proof. *)
+(*   intros * [R Hper] Hglu Hglu' ? ?. *)
+(*   inversion Hglu; subst; *)
+(*     dependent destruction Hglu'. *)
+(*   - assert (s = s0). (* This should be proven as a lemma in PER/Lemmas *) *)
+(*     { *)
+(*       inversion Hper; subst; try reflexivity. *)
+(*       invert_per_sort_elem H5. *)
+(*       reflexivity. *)
+(*     } *)
+(*     subst. *)
+(*     eapply H0. *)
+(*     eapply H4. *)
+(*     eassumption. *)
+(*   - assert (a = d{{{ Sort@s }}}). *)
+(*     { *)
+(*       inversion Hper; subst; try reflexivity. *)
+(*       invert_per_sort_elem H4; reflexivity. *)
+(*     } *)
+(*     subst. *)
+(*     invert_glu_sort_elem H. *)
+(*     simpl_glu_rel. *)
+(*     assert {{ Γ ⊢ M : Sort@s }} by (eapply glu_sort_elem_sort_lvl; mauto 2). *)
+(*     split; mauto 3. *)
+(*     split; mauto 2. *)
+(*     unfold glu_sort_typ_rec. *)
+(*     eauto. *)
+(*   - symmetry in Hper. *)
+(*     assert (a = d{{{ Sort@s0 }}}). *)
+(*     { *)
+(*       inversion Hper; subst; try reflexivity. *)
+(*       invert_per_sort_elem H4; reflexivity. *)
+(*     } *)
+(*     subst. *)
+(*     invert_glu_sort_elem H3. *)
+(*     simpl_glu_rel. *)
+(*     split; mauto 2. *)
+(*   - assert (per_sort pred_P s a a) as [R'] by mauto 2. *)
+(*     assert (per_sort pred_P s a a0) by (eexists; mauto 2). *)
+(*     eapply (glu_sort_elem_exp_conv pred_P H4 H2 H); eassumption. *)
+(* Qed. *)
 
 
 Lemma glu_rel_exp_conv_ann {P} (pred_P : PredicativeSig P) : forall {anns Γ M A so so'},

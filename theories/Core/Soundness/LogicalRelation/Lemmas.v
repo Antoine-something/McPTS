@@ -1072,20 +1072,20 @@ Hint Resolve glu_ctx_env_per_ctx_env : mcpts.
 
 
 (* This lemma should go in Syntactic/CoreInversion.v (or Corollaries) *)
-Lemma wf_exp_of_sort_compose_decompose {P} : forall {Γ1 : ctx P} {σ σ' A s},
-    {{ Γ1 ⊢ A[σ∘σ'] : Sort@s }} ->
-    {{ Γ1 ⊢ A[σ∘σ'] ≈ A[σ][σ'] : Sort@s }}.
-Proof.
-  intros.
-  pose proof (wf_exp_sub_inversion H) as [Γ3 [A' [? []]]].
-  pose proof (wf_sub_compose_inversion H0) as [Γ2 []].
-  gen_presup H1.
-  assert {{ Γ1 ⊢ A[σ∘σ'] ≈ A[σ][σ'] : A'[σ∘σ'] }} by mauto 3.
-  mauto 3.
-Qed.
+(* Lemma wf_exp_of_sort_compose_decompose {P} : forall {Γ1 : ctx P} {σ σ' A s}, *)
+(*     {{ Γ1 ⊢ A[σ∘σ'] : Sort@s }} -> *)
+(*     {{ Γ1 ⊢ A[σ∘σ'] ≈ A[σ][σ'] : Sort@s }}. *)
+(* Proof. *)
+(*   intros. *)
+(*   pose proof (wf_exp_sub_inversion H) as [Γ3 [A' [? []]]]. *)
+(*   pose proof (wf_sub_compose_inversion H0) as [Γ2 []]. *)
+(*   gen_presup H1. *)
+(*   assert {{ Γ1 ⊢ A[σ∘σ'] ≈ A[σ][σ'] : A'[σ∘σ'] }} by mauto 3. *)
+(*   mauto 3. *)
+(* Qed. *)
 
-#[export]
-Hint Resolve wf_exp_of_sort_compose_decompose : mcpts.
+(* #[export] *)
+(* Hint Resolve wf_exp_of_sort_compose_decompose : mcpts. *)
 
 Lemma glu_ctx_env_sub_resp_sub_eq {P} (pred_P : PredicativeSig P) : forall {anns Γ Sb},
     {{ EG Γ ∈ glu_ctx_env pred_P anns ↘ Sb }} ->
@@ -1379,20 +1379,20 @@ Qed.
 
 
 (* This lemma should go in CoreInversion.v (or Corollaries) *)
-Lemma wf_typ_compose_decompose {P} : forall {Γ1 : ctx P} {σ σ' A},
-    {{ Γ1 ⊢ A[σ∘σ'] }} ->
-    {{ Γ1 ⊢ A[σ∘σ'] ≈ A[σ][σ'] }}.
-Proof.
-  intros.
-  inversion H; subst; mauto 3.
-  pose proof (wf_sub_compose_inversion H3) as [Γ2 []].
-  mauto 3.
-Qed.
+(* Lemma wf_typ_compose_decompose {P} : forall {Γ1 : ctx P} {σ σ' A}, *)
+(*     {{ Γ1 ⊢ A[σ∘σ'] }} -> *)
+(*     {{ Γ1 ⊢ A[σ∘σ'] ≈ A[σ][σ'] }}. *)
+(* Proof. *)
+(*   intros. *)
+(*   inversion H; subst; mauto 3. *)
+(*   pose proof (wf_sub_compose_inversion H3) as [Γ2 []]. *)
+(*   mauto 3. *)
+(* Qed. *)
 
-#[export]
-Hint Resolve wf_typ_compose_decompose : mcpts.
+(* #[export] *)
+(* Hint Resolve wf_typ_compose_decompose : mcpts. *)
 
-(* This lemma would be helpful earlier *) 
+(* This lemma would be helpful earlier (can probably be done in CoreLemmas) *) 
 Lemma glu_typ_elem_typ_rel_sub_compose_decompose {P} (pred_P : PredicativeSig P) : forall {so a typ_rel exp_rel Γ A σ σ'},
     {{ DG a ∈ glu_typ_elem pred_P so ↘ typ_rel ↘ exp_rel }} ->
     {{ Γ ⊢ A[σ∘σ'] ® typ_rel }} ->
@@ -1734,52 +1734,52 @@ Proof.
 Qed.
 
 (* This lemma should go in CoreInversion.v (or Corollaries).  It would also be better with an inversion on {{ Γ ⊢ A[σ] }} *)
-Lemma wf_typ_sub_sub_compose {P} : forall {Γ1 : ctx P} {σ σ' A},
-    {{ Γ1 ⊢ A[σ][σ'] }} ->
-    {{ Γ1 ⊢ A[σ∘σ'] ≈ A[σ][σ'] }}.
-Proof.
-  intros.
-  inversion H; subst; mauto 3.
-  - pose proof (wf_exp_sub_inversion H0) as [Γ2 [K [? []]]].
-    pose proof (wf_exp_sub_inversion H2) as [Γ3 [K' [? []]]].
-    assert {{ Γ1 ⊢ K'[σ][σ'] ⊆ K[σ'] }} by mauto 3.
-    assert {{ Γ1 ⊢ K'[σ][σ'] ⊆ Sort@s }} by mauto 3.
-    gen_presup H5.
-    assert {{ Γ1 ⊢ K'[σ∘σ'] ≈ K'[σ][σ'] }} by mauto 3.
-    assert {{ Γ1 ⊢ A[σ∘σ'] ≈ A[σ][σ'] : K'[σ][σ'] }} by mauto 4.
-    mauto 3.
-  - inversion H4; subst; mauto 3.
-    pose proof (wf_exp_sub_inversion H0) as [Γ2 [K [? []]]].
-    gen_presup H2.
-    assert {{ Γ1 ⊢ A[σ∘σ'] ≈ A[σ][σ'] : K[σ][σ'] }} by mauto 4.
-    assert {{ Γ1 ⊢ K[σ][σ'] ⊆ Sort@s[σ'] }} by mauto 3.
-    assert {{ Γ1 ⊢ K[σ][σ'] ⊆ Sort@s }} by mauto 3.
-    mauto 3.
-Qed.
+(* Lemma wf_typ_sub_sub_compose {P} : forall {Γ1 : ctx P} {σ σ' A}, *)
+(*     {{ Γ1 ⊢ A[σ][σ'] }} -> *)
+(*     {{ Γ1 ⊢ A[σ∘σ'] ≈ A[σ][σ'] }}. *)
+(* Proof. *)
+(*   intros. *)
+(*   inversion H; subst; mauto 3. *)
+(*   - pose proof (wf_exp_sub_inversion H0) as [Γ2 [K [? []]]]. *)
+(*     pose proof (wf_exp_sub_inversion H2) as [Γ3 [K' [? []]]]. *)
+(*     assert {{ Γ1 ⊢ K'[σ][σ'] ⊆ K[σ'] }} by mauto 3. *)
+(*     assert {{ Γ1 ⊢ K'[σ][σ'] ⊆ Sort@s }} by mauto 3. *)
+(*     gen_presup H5. *)
+(*     assert {{ Γ1 ⊢ K'[σ∘σ'] ≈ K'[σ][σ'] }} by mauto 3. *)
+(*     assert {{ Γ1 ⊢ A[σ∘σ'] ≈ A[σ][σ'] : K'[σ][σ'] }} by mauto 4. *)
+(*     mauto 3. *)
+(*   - inversion H4; subst; mauto 3. *)
+(*     pose proof (wf_exp_sub_inversion H0) as [Γ2 [K [? []]]]. *)
+(*     gen_presup H2. *)
+(*     assert {{ Γ1 ⊢ A[σ∘σ'] ≈ A[σ][σ'] : K[σ][σ'] }} by mauto 4. *)
+(*     assert {{ Γ1 ⊢ K[σ][σ'] ⊆ Sort@s[σ'] }} by mauto 3. *)
+(*     assert {{ Γ1 ⊢ K[σ][σ'] ⊆ Sort@s }} by mauto 3. *)
+(*     mauto 3. *)
+(* Qed. *)
 
-#[export]
-Hint Resolve wf_typ_sub_sub_compose : mcpts.
+(* #[export] *)
+(* Hint Resolve wf_typ_sub_sub_compose : mcpts. *)
 
-Lemma wf_exp_of_sort_sub_sub_compose {P} : forall {Γ1 : ctx P} {σ σ' A s},
-    {{ Γ1 ⊢ A[σ][σ'] : Sort@s }} ->
-    {{ Γ1 ⊢ A[σ∘σ'] ≈ A[σ][σ'] : Sort@s }}.
-Proof.
-  intros.
-  pose proof (wf_exp_sub_inversion H) as [Γ2 [K [? []]]].
-  pose proof (wf_exp_sub_inversion H1) as [Γ3 [K' [? []]]].
-  assert {{ Γ1 ⊢ K'[σ][σ'] ⊆ K[σ'] }} by mauto 3.
-  assert {{ Γ1 ⊢ K'[σ][σ'] ⊆ Sort@s }} by mauto 3.
-  gen_presup H4.
-  assert {{ Γ1 ⊢ K'[σ∘σ'] ≈ K'[σ][σ'] }} by mauto 3.
-  assert {{ Γ1 ⊢ A[σ∘σ'] ≈ A[σ][σ'] : K'[σ][σ'] }} by mauto 4.
-  mauto 3.  
-Qed.
+(* Lemma wf_exp_of_sort_sub_sub_compose {P} : forall {Γ1 : ctx P} {σ σ' A s}, *)
+(*     {{ Γ1 ⊢ A[σ][σ'] : Sort@s }} -> *)
+(*     {{ Γ1 ⊢ A[σ∘σ'] ≈ A[σ][σ'] : Sort@s }}. *)
+(* Proof. *)
+(*   intros. *)
+(*   pose proof (wf_exp_sub_inversion H) as [Γ2 [K [? []]]]. *)
+(*   pose proof (wf_exp_sub_inversion H1) as [Γ3 [K' [? []]]]. *)
+(*   assert {{ Γ1 ⊢ K'[σ][σ'] ⊆ K[σ'] }} by mauto 3. *)
+(*   assert {{ Γ1 ⊢ K'[σ][σ'] ⊆ Sort@s }} by mauto 3. *)
+(*   gen_presup H4. *)
+(*   assert {{ Γ1 ⊢ K'[σ∘σ'] ≈ K'[σ][σ'] }} by mauto 3. *)
+(*   assert {{ Γ1 ⊢ A[σ∘σ'] ≈ A[σ][σ'] : K'[σ][σ'] }} by mauto 4. *)
+(*   mauto 3.   *)
+(* Qed. *)
 
-#[export]
-Hint Resolve wf_exp_of_sort_sub_sub_compose : mcpts.
+(* #[export] *)
+(* Hint Resolve wf_exp_of_sort_sub_sub_compose : mcpts. *)
 
 
-(* This lemma would be helpful earlier *) 
+(* This lemma would be helpful earlier (Can probably be done in CoreLemmas) *) 
 Lemma glu_typ_elem_typ_rel_sub_sub_compose {P} (pred_P : PredicativeSig P) : forall {so a typ_rel exp_rel Γ A σ σ'},
     {{ DG a ∈ glu_typ_elem pred_P so ↘ typ_rel ↘ exp_rel }} ->
     {{ Γ ⊢ A[σ][σ'] ® typ_rel }} ->    
@@ -1796,7 +1796,6 @@ Proof.
 Qed.
 
 
-(* STOPPED HERE *)
 Lemma glu_ctx_env_sub_monotone {P} (pred_P : PredicativeSig P) : forall anns Γ Sb,
     {{ EG Γ ∈ glu_ctx_env pred_P anns ↘ Sb }} ->
     forall Γ'' σ Γ' τ ρ,
@@ -2543,3 +2542,94 @@ Qed.
 
 (* #[export] *)
 (* Hint Resolve glu_rel_exp_with_sub_unsorted_typ_implies_glu_rel_typ_with_sub : mcpts. *)
+
+
+(* Taken from FunctionCases, may be helpful elsewhere *)
+Lemma glu_typ_elem_exp_rel_glu_sort_elem_typ_rel {P} (pred_P : PredicativeSig P) : forall {so s typ_rel exp_rel IP IEL Γ K A a},
+    glu_typ_elem pred_P so typ_rel exp_rel d{{{ Sort @ s }}} ->
+    glu_sort_elem pred_P s IP IEL a ->
+    exp_rel Γ K A a ->
+    IP Γ A.
+Proof.
+  intros.
+  dependent destruction H.
+  - simpl_glu_rel.
+    handle_functional_glu_sort_elem P.
+    eassumption.
+  - invert_glu_sort_elem H.
+    simpl_glu_rel.
+    unfold glu_sort_typ_rec in *.
+    deex.
+    destruct_conjs.
+    handle_functional_glu_sort_elem P.
+    eassumption.
+Qed.
+
+
+(* Taken from SortCases *)
+Lemma glu_rel_typ_implies_wf_typ {P} (pred_P : PredicativeSig P) : forall {Γ anns A so},
+    {{ ⟪ pred_P ⟫ Γ @ anns ⊩ A @ so }} ->
+    {{ Γ ⊢ A }}.
+Proof.
+  intros * [SbΓ []].
+  assert (exists env_rel, {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }}) as [env_rel] by mauto 3.
+  assert (exists ρ ρ', initial_env Γ ρ /\ initial_env Γ ρ' /\ {{ Dom ρ ≈ ρ' ∈ env_rel }}) as [ρ [ρ' []]] by mauto using per_ctx_then_per_env_initial_env.
+  assert (SbΓ Γ {{{ Id }}} ρ) by (eapply initial_env_glu_rel_exp; mauto 3).
+  destruct_glu_rel_typ_with_sub.
+  assert {{ Γ ⊢ A[Id] }} by (eapply glu_typ_elem_wf_typ; mauto 2).
+  mauto 3.
+Qed.
+
+#[export]
+Hint Resolve glu_rel_typ_implies_wf_typ : mcpts.
+
+
+(* Taken from TermStructureCases *)
+Lemma glu_typ_elem_exp_conv {P} (pred_P : PredicativeSig P) : forall {so so' a a' typ_rel typ_rel' exp_rel exp_rel' Γ A M m},
+    {{ Dom a ≈ a' ∈ per_typ pred_P }} ->
+    {{ DG a ∈ glu_typ_elem pred_P so ↘ typ_rel ↘ exp_rel }} ->
+    {{ DG a' ∈ glu_typ_elem pred_P so' ↘ typ_rel' ↘ exp_rel' }} ->
+    {{ Γ ⊢ M : A ® m ∈ exp_rel }} ->
+    {{ Γ ⊢ A ® typ_rel' }} ->
+    {{ Γ ⊢ M : A ® m ∈ exp_rel' }}.
+Proof.
+  intros * [R Hper] Hglu Hglu' ? ?.
+  inversion Hglu; subst;
+    dependent destruction Hglu'.
+  - assert (s = s0). (* This should be proven as a lemma in PER/Lemmas *)
+    {
+      inversion Hper; subst; try reflexivity.
+      invert_per_sort_elem H5.
+      reflexivity.
+    }
+    subst.
+    eapply H0.
+    eapply H4.
+    eassumption.
+  - assert (a = d{{{ Sort@s }}}).
+    {
+      inversion Hper; subst; try reflexivity.
+      invert_per_sort_elem H4; reflexivity.
+    }
+    subst.
+    invert_glu_sort_elem H.
+    simpl_glu_rel.
+    assert {{ Γ ⊢ M : Sort@s }} by (eapply glu_sort_elem_sort_lvl; mauto 2).
+    split; mauto 3.
+    split; mauto 2.
+    unfold glu_sort_typ_rec.
+    eauto.
+  - symmetry in Hper.
+    assert (a = d{{{ Sort@s0 }}}).
+    {
+      inversion Hper; subst; try reflexivity.
+      invert_per_sort_elem H4; reflexivity.
+    }
+    subst.
+    invert_glu_sort_elem H3.
+    simpl_glu_rel.
+    split; mauto 2.
+  - assert (per_sort pred_P s a a) as [R'] by mauto 2.
+    assert (per_sort pred_P s a a0) by (eexists; mauto 2).
+    eapply (glu_sort_elem_exp_conv pred_P H4 H2 H); eassumption.
+Qed.

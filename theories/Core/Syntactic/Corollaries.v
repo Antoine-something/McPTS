@@ -134,6 +134,7 @@ Proof.
 Qed.
 
 
+(** ** Additional lemmas about substitutions and applying substitutions *)
 Lemma wf_sub_eq_q_cong {P : PtsSig} : forall {Γ' : ctx P} {A Γ σ σ'},
     {{ Γ' ⊢ A }} ->
     {{ Γ ⊢s σ ≈ σ' : Γ' }} ->
@@ -219,6 +220,73 @@ Qed.
 #[local]
 Hint Rewrite -> @sub_decompose_q using mauto : mcpts.
 
+(** *** Lemmas for composing and decomposing substitutions *)
+(* The next two could probably be made more general *)
+Lemma wf_exp_sub_sub_compose {P} : forall {Γ1 : ctx P} {σ σ' A K1},
+    {{ Γ1 ⊢ A[σ][σ'] : K1 }} ->
+    {{ Γ1 ⊢ A[σ∘σ'] ≈ A[σ][σ'] : K1 }}.
+Proof.
+  intros.
+  pose proof (wf_exp_sub_inversion H) as [Γ2 [K2 [? []]]].
+  pose proof (wf_exp_sub_inversion H1) as [Γ3 [K3 [? []]]].
+  assert {{ Γ1 ⊢ K3[σ][σ'] ⊆ K2[σ'] }} by mauto 3.
+  assert {{ Γ1 ⊢ K3[σ][σ'] ⊆ K1 }} by mauto 3.
+  gen_presups.
+  assert {{ Γ1 ⊢ K3[σ∘σ'] ≈ K3[σ][σ'] }} by mauto 3.
+  assert {{ Γ1 ⊢ A[σ∘σ'] ≈ A[σ][σ'] : K3[σ][σ'] }} by mauto 4.
+  mauto 3.  
+Qed.
+
+#[export]
+Hint Resolve wf_exp_sub_sub_compose : mcpts.
+
+Lemma wf_exp_sub_compose_decompose {P} : forall {Γ1 : ctx P} {σ σ' A K1},
+    {{ Γ1 ⊢ A[σ∘σ'] : K1 }} ->
+    {{ Γ1 ⊢ A[σ∘σ'] ≈ A[σ][σ'] : K1 }}.
+Proof.
+  intros.
+  pose proof (wf_exp_sub_inversion H) as [Γ3 [K3 [? []]]].
+  pose proof (wf_sub_compose_inversion H0) as [Γ2 []].
+  gen_presups.
+  assert {{ Γ1 ⊢ A[σ∘σ'] ≈ A[σ][σ'] : K3[σ∘σ'] }} by mauto 3.
+  mauto 3.
+Qed.
+
+#[export]
+Hint Resolve wf_exp_sub_compose_decompose : mcpts.
+
+Lemma wf_typ_sub_sub_compose {P} : forall {Γ1 : ctx P} {σ σ' A},
+    {{ Γ1 ⊢ A[σ][σ'] }} ->
+    {{ Γ1 ⊢ A[σ∘σ'] ≈ A[σ][σ'] }}.
+Proof.
+  intros.
+  inversion H; subst; mauto 3.
+  inversion H4; subst; mauto 3.
+  pose proof (wf_exp_sub_inversion H0) as [Γ2 [K [? []]]].
+  gen_presups.
+  assert {{ Γ1 ⊢ A[σ∘σ'] ≈ A[σ][σ'] : K[σ][σ'] }} by mauto 4.
+  assert {{ Γ1 ⊢ K[σ][σ'] ⊆ Sort@s[σ'] }} by mauto 3.
+  assert {{ Γ1 ⊢ K[σ][σ'] ⊆ Sort@s }} by mauto 3.
+  mauto 3.
+Qed.
+
+#[export]
+Hint Resolve wf_typ_sub_sub_compose : mcpts.
+
+Lemma wf_typ_compose_decompose {P} : forall {Γ1 : ctx P} {σ σ' A},
+    {{ Γ1 ⊢ A[σ∘σ'] }} ->
+    {{ Γ1 ⊢ A[σ∘σ'] ≈ A[σ][σ'] }}.
+Proof.
+  intros.
+  inversion H; subst; mauto 3.
+  pose proof (wf_sub_compose_inversion H3) as [Γ2 []].
+  mauto 3.
+Qed.
+
+#[export]
+Hint Resolve wf_typ_compose_decompose : mcpts.
+
+
 (** ** Lemmas about natural numbers *)
 Lemma wf_exp_nat_sub_lhs {P} : forall {Γ Γ' σ s} {r : Ru_nat P s},
     {{ Γ ⊢s σ : Γ' }} ->
@@ -285,8 +353,6 @@ Proof.
   assert {{ Γ'' ⊢s q σ∘(τ,,M) : Γ, A }} by mauto 4.
   assert  {{ Γ'' ⊢ B[q σ∘(τ,,M)] ≈ B[σ∘τ,,M] : Sort@s }} by mauto 3.
   transitivity {{{ B[(q σ)∘(τ,,M)] }}}; mauto 3.
-  assert {{ Γ'' ⊢ B[q σ∘(τ,,M)] ≈ B[q σ][τ,,M] : Sort@s[q σ∘(τ,,M)] }} by (eapply wf_exp_eq_sub_compose; mauto 3).
-  mauto 3.
 Qed.
 
 Lemma wf_sub_eq_p_q_sigma_compose_tau_extend {P : PtsSig} : forall {Γ'' : ctx P} {τ Γ' M A σ Γ},
