@@ -411,6 +411,28 @@ Hint Resolve glu_rel_sub_extend_nat : mcpts.
 (*   eapply glu_sort_elem_typ_resp_exp_eq; mauto 4. *)
 (* Qed. *)
 
+Lemma t {P} : forall {Γ : ctx P} {Γ' A σ M MZ MS},
+    {{ Γ' ⊢s σ : Γ }} ->
+    {{ Γ' ⊢ M ≈ zero : ℕ }} ->
+    {{ Γ, ℕ ⊢ A }} ->
+    {{ Γ ⊢ MZ : A[Id,,zero] }} ->
+    {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,, succ #1] }} ->
+    {{ Γ' ⊢ rec M return A[q σ] | zero -> MZ[σ] | succ -> MS[q (q σ)] end ≈ MZ[σ] : A[σ,,M] }}.
+Proof.
+  intros.
+  gen_presups.
+  inversion HA; subst.
+  pose proof wf_exp_nat_inversion H4 as [s' []].
+  assert {{ Γ' ⊢ ℕ[σ] ≈ ℕ }} by mauto 3.
+  assert {{ Γ' ⊢s (q σ)∘(Id,,M) ≈ σ,,M : Γ, ℕ }} by mauto 4.
+  assert {{ Γ' ⊢ A[σ,,M] ≈ A[q σ][Id,,M] }} as -> by mauto 4.
+
+  
+  assert {{ Γ' ⊢ rec zero return A[q σ] | zero -> MZ[σ] | succ -> MS[q (q σ)] end ≈ MZ[σ] : A[q σ][Id,,zero] }}.
+  {
+    eapply wf_exp_eq_nat_beta_zero; mauto 3.
+  }
+  
 (* STOPPED HERE *)
 Lemma glu_rel_exp_natrec_zero_helper {P} (pred_P : PredicativeSig P) : forall {sn sa anns Γ SbΓ A MZ MS Γ' M σ ρ am typ_rel exp_rel} {r : Ru_nat P sn},
     {{ EG Γ ∈ glu_ctx_env pred_P anns ↘ SbΓ }} ->
@@ -452,8 +474,20 @@ Proof.
   (* rename m into mz. *)
   (* eexists mz; split; mauto 3. *)
 
-
+  (* Next step is to show that rec M ... ≈ MZ[σ] : A[σ,,M].  This should be a syntactic lemma, so this proof becomes manageable *)
   assert {{ Γ' ⊢s σ : Γ }} by mauto 2.
+  assert {{ Γ' ⊢ M ≈ zero : ℕ }} by mauto 2. (* This one is redundant, I am putting it here to help me write the lemma *)
+  assert {{ Γ, ℕ ⊢ A }} by mauto 3.
+  assert {{ Γ ⊢ MZ : A[Id,,zero] }} by mauto 3.
+  assert {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,, succ #1] }} by mauto 3.
+  assert {{ Γ' ⊢ rec M return A[q σ] | zero -> MZ[σ] | succ -> MS[q (q σ)] end ≈ MZ[σ] : A[σ,,M] }} as -> by admit.
+
+  
+  
+  (* Next, we want that (exp_rel0 Γ' {{{ A[Id,,zero][σ] }}} {{{ MZ[σ] }}} mz) -> (exp_rel0 Γ' {{{ A[σ,,M] }}} {{{ MZ[σ] }}} mz), which basically holds because {{ Γ' ⊢s (Id,,zero)∘σ ≈ σ,,M : Γ,ℕ }}.  This should also be proved as a lemma *)
+  
+  
+  
   assert {{ ⊢ Γ' }} by mauto 2.
   assert {{ ⊢ Γ', ℕ }} by mauto 3.
   assert {{ Γ', ℕ ⊢s q σ : Γ, ℕ }} by mauto 3.
@@ -461,17 +495,35 @@ Proof.
   assert {{ Γ', ℕ ⊢ A[q σ] ≈ A[q σ] }} by mauto 2.  
   assert {{ Γ' ⊢ MZ[σ] ≈ MZ[σ] : A[Id,,zero][σ] }} by mauto 2.
   assert {{ Γ' ⊢ A[Id,,zero][σ] ≈ A[(Id,,zero)∘σ] }} by mauto 4.
-  assert {{ Γ' ⊢s (Id,,zero)∘σ ≈ σ,,zero : Γ, ℕ }} by mauto 4.
+  assert {{ ⊢ Γ }} by mauto 2.
+  assert {{ Γ ⊢s Id : Γ }} by mauto 2.
+  assert {{ Γ ⊢ zero : ℕ[Id] }} by mauto 3.
+  assert {{ Γ ⊢ ℕ }} by mauto 3.
+  assert {{ Γ' ⊢s (Id,,zero)∘σ ≈ Id∘σ,,zero[σ] : Γ, ℕ }} by mauto 2.
+  assert {{ Γ' ⊢s Id∘σ ≈ σ : Γ }} by mauto 3.
+  assert {{ Γ' ⊢ zero[σ] ≈ zero : ℕ }} by mauto 2.
+  assert {{ Γ' ⊢s Id∘σ,,zero[σ] ≈ σ,,zero : Γ, ℕ }} by mauto 3.
+  assert {{ Γ' ⊢s (Id,,zero)∘σ ≈ σ,,zero : Γ, ℕ }} by (etransitivity; mauto 2).
   assert {{ Γ' ⊢ A[Id,,zero][σ] ≈ A[σ,,zero] }} by (transitivity {{{ A[(Id,,zero)∘σ] }}}; mauto 3).
   
-  assert {{ ⊢ Γ', ℕ, A[q σ] }} by mauto 3.
-  
-  assert {{ Γ' ⊢s Id : Γ' }} by mauto 2.
+  assert {{ ⊢ Γ', ℕ, A[q σ] }} by mauto 3.  
+  (* assert {{ Γ' ⊢s Id : Γ' }} by mauto 2. *)
   assert {{ Γ' ⊢s σ,,M ≈ σ,,zero : Γ, ℕ }} by mauto 3.
   assert {{ Γ' ⊢s σ,,M : Γ, ℕ }} by mauto 4.
-  
-  
-  assert {{ Γ' ⊢ rec M return A[q σ] | zero -> MZ[σ] | succ -> MS[q (q σ)] end ≈ rec zero return A[q σ] | zero -> MZ[σ] | succ -> MS[q (q σ)] end : A[σ,,M] }} by mauto 4.
+
+  assert {{ Γ' ⊢ ℕ[σ] ≈ ℕ }} by mauto 3.
+  assert {{ Γ' ⊢ M : ℕ[σ] }} by (eapply wf_exp_conv_typ_eq; mauto 3).
+  assert {{ Γ' ⊢s (q σ)∘(Id,,M) ≈ σ,,M : Γ, ℕ }} by mauto 3.
+  assert {{ Γ' ⊢ A[q σ][Id,,M] ≈ A[σ,,zero] }} by mauto 4.
+  assert {{ Γ' ⊢ rec M return A[q σ] | zero -> MZ[σ] | succ -> MS[q (q σ)] end ≈ rec zero return A[q σ] | zero -> MZ[σ] | succ -> MS[q (q σ)] end : A[q σ][Id,,M] }}.
+  {
+    eapply wf_exp_eq_natrec_cong; mauto 3.
+    - assert {{ Γ' ⊢ A[q σ][Id,,zero] ≈ A[q σ][Id,,M] }} as -> by mauto 3.
+      rewrite -> H43.
+      rewrite <- H36.
+      eassumption.
+    - 
+  }
   
 
   assert {{ Γ', ℕ ⊢s Wk : Γ' }} by mauto 2.
