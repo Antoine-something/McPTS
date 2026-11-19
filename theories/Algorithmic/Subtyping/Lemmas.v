@@ -67,7 +67,7 @@ Proof.
 Qed.
 
 #[local]
-  Hint Resolve alg_subtyping_trans : mcpts.
+Hint Resolve alg_subtyping_trans : mcpts.
 
 #[local]
 Ltac progressive_invert_once H n :=
@@ -121,7 +121,7 @@ Proof.
     destruct_all.
     econstructor; mauto 2.
 
-    progressive_invert IHwf_subtyp.
+    progressive_invert IHwf_typ_subtyp.
     dir_inversion_clear_by_head @nbe.
     dir_inversion_clear_by_head @nbe_ty.
     dir_inversion_by_head @initial_env; subst.

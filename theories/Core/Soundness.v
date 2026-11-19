@@ -19,15 +19,15 @@ Proof.
   destruct_conjs.
   functional_initial_env_rewrite_clear.
   assert {{ Γ ⊢s Id ® p ∈ Sb }} by (eapply initial_env_glu_rel_exp; mauto).
-  destruct_glu_rel_exp_with_sub_unsorted.
-  - assert {{ Γ ⊢ M[Id] : A[Id] ® m ∈ glu_elem_top_unsorted pred_P so_None d{{{ Sort@s }}} }} by (eapply realize_glu_elem_top_unsorted; mauto).
-    simpl in H8.
-    dependent destruction H8.
+  destruct_glu_rel_exp_with_sub.
+  inversion H9; subst.
+  - assert {{ Γ ⊢ M[Id] : A[Id] ® m ∈ glu_elem_top pred_P so_None d{{{ Sort@s }}} }} by (eapply realize_glu_typ_elem_top; mauto).
+    match_by_head @glu_elem_top ltac:(fun H => dependent destruction H).
     match_by_head (@per_top P) ltac:(fun H => destruct (H (length Γ)) as [W []]).
     eexists.
     split; [econstructor |]; mauto 3.
-    dependent destruction H10.
-    dependent destruction H13.
+    (* match_by_head @read_nf ltac:(fun H => dependent destruction H). *)
+    (* rename A0 into W. *)
     simpl_glu_rel.
     assert {{ Γ ⊢ M[Id][Id] ≈ W : A[Id][Id] }} as HM by mauto 3.
     assert {{ Γ ⊢ M[Id][Id] ≈ W : A[Id][Id] }} as HM' by mauto 3.
@@ -36,11 +36,11 @@ Proof.
     assert {{ Γ ⊢ A[Id] ≈ A }}  as <- by mauto 3.
     assert {{ Γ ⊢ A[Id][Id] ≈ A[Id] }} as <- by mauto 3.
     transitivity {{{ M[Id][Id] }}}; mauto 3.
-  - assert {{ Γ ⊢ M[Id] : A[Id] ® m ∈ glu_elem_top pred_P s a }} as [] by (eapply realize_glu_elem_top; mauto).
+  - assert {{ Γ ⊢ M[Id] : A[Id] ® m ∈ glu_elem_top pred_P (so_Some s) a }} as [] by (eapply realize_glu_typ_elem_top; mauto).
     match_by_head (@per_top P) ltac:(fun H => destruct (H (length Γ)) as [W []]).
     eexists.
     split; [econstructor |]; try eassumption.
-    assert {{ Γ ⊢ A[Id] : Sort@s }} by (eapply glu_sort_elem_sort_lvl; mauto 2).
+    assert {{ Γ ⊢ A[Id] : Sort@s }} by (eapply glu_typ_elem_sort_lvl; mauto 2).
     assert {{ Γ ⊢ A[Id] ≈ A : Sort@s }} by mauto 3.
     assert {{ Γ ⊢ A[Id][Id] ≈ A : Sort@s }} as HA by (transitivity {{{ A[Id] }}}; mauto 3).
     assert {{ Γ ⊢ M[Id][Id] ≈ W : A[Id][Id] }} as HM by mauto 3.
@@ -70,9 +70,9 @@ Proof.
   eapply wf_typ_inversion in H as [s []].
   - assert {{ ⟪ pred_P ⟫ ⊨ Γ }} as [env_relΓ] by (eapply completeness_fundamental_ctx; mauto 2).
     unshelve (epose proof completeness_typ_unsorted H as [W []]); try eassumption.
-    inversion H3; subst.
+    match_by_head @nbe_ty ltac:(fun H => directed inversion H; subst).
     simplify_evals.
-    inversion H6; subst.
+    match_by_head @read_typ ltac:(fun H => directed inversion H; subst).
     eexists; split; mauto 3.
   - assert (exists W, nbe Γ A {{{ Sort@s }}} W /\ {{ Γ ⊢ A ≈ W : Sort@s }}) as [W [?%nbe_type_to_nbe_ty Heq]] by mauto using soundness.
     eexists; split; mauto 3.

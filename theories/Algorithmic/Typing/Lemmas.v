@@ -141,7 +141,7 @@ Proof with (f_equiv; mautosolve 4).
          reflexivity).
   - assert {{ Γ ⊢ A }} by mauto 2.
     eapply idempotent_nbe_ty_unsorted; mauto 2.
-  - destruct (wf_fn_inversion H0) as [].
+  - destruct (wf_exp_fn_inversion H0) as [].
     gen_presup H7.
     assert ({{ Γ ⊢ A : Sort@s1 }} /\ {{ Γ, A ⊢ B : Sort@s2 }}) as [] by mauto 2.
     assert {{ Γ ⊢ A ≈ C : Sort@s1 }} by mauto 3 using soundness'.
@@ -285,15 +285,15 @@ Ltac invert_ue :=
 
 Lemma alg_type_complete {P} (pred_P : PredicativeSig P) :
   (forall {Γ : ctx P}, {{ ⊢ Γ }} -> True) /\
-      (forall {Γ : ctx P} Γ', {{ ⊢ Γ ⊆ Γ' }} -> True) /\
-      (forall {Γ : ctx P} Δ, {{ ⊢ Γ ≈ Δ }} -> True) /\
-      (forall {Γ : ctx P} A M, {{ Γ ⊢ M : A }} -> user_exp P M -> {{ Γ ⊢a M ⟸ A }}) /\
-      (forall {Γ : ctx P} A M M', {{ Γ ⊢ M ≈ M' : A }} -> True) /\
-      (forall {Γ : ctx P} Δ σ, {{ Γ ⊢s σ : Δ }} -> True) /\
-      (forall {Γ : ctx P} Δ σ σ', {{ Γ ⊢s σ ≈ σ' : Δ }} -> True) /\
-      (forall {Γ : ctx P} A A', {{ Γ ⊢ A ⊆ A' }} -> True) /\
-      (forall {Γ : ctx P} A, {{ Γ ⊢ A }} -> user_exp P A -> {{ Γ ⊢aty A }}) /\
-      (forall {Γ : ctx P} A A', {{ Γ ⊢ A ≈ A' }} -> True).
+    (forall {Γ : ctx P} Γ', {{ ⊢ Γ ⊆ Γ' }} -> True) /\
+    (* (forall {Γ : ctx P} Δ, {{ ⊢ Γ ≈ Δ }} -> True) /\ *)
+    (forall {Γ : ctx P} A M, {{ Γ ⊢ M : A }} -> user_exp P M -> {{ Γ ⊢a M ⟸ A }}) /\
+    (forall {Γ : ctx P} A M M', {{ Γ ⊢ M ≈ M' : A }} -> True) /\
+    (forall {Γ : ctx P} A, {{ Γ ⊢ A }} -> user_exp P A -> {{ Γ ⊢aty A }}) /\
+    (forall {Γ : ctx P} A A', {{ Γ ⊢ A ≈ A' }} -> True) /\
+    (forall {Γ : ctx P} A A', {{ Γ ⊢ A ⊆ A' }} -> True) /\
+    (forall {Γ : ctx P} Δ σ, {{ Γ ⊢s σ : Δ }} -> True) /\
+    (forall {Γ : ctx P} Δ σ σ', {{ Γ ⊢s σ ≈ σ' : Δ }} -> True).
 Proof.
   apply syntactic_wf_mut_ind; mauto 2; intros;  gen_presups; invert_ue; mauto 4 using alg_subtyping_complete, alg_type_check_subtyp.
   - econstructor; mauto 3 using alg_subtyping_complete.

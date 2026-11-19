@@ -13,8 +13,8 @@ Import Domain_Notations.
 Section soundness_fundamental.
   Theorem soundness_fundamental {P} (pred_P : PredicativeSig P) :
     (forall Γ anns, {{ ⊫ Γ @ anns }} -> {{ ⟪ pred_P ⟫ ⊩ Γ @ anns }}) /\
-      (forall Γ anns A s M, {{ Γ @ anns ⊫ M : A @ s }} -> {{ ⟪ pred_P ⟫ Γ @ anns ⊩u M : A @ s }}) /\
-      (forall Γ anns A s, {{ Γ @ anns ⊫ A @ s }} -> {{ ⟪ pred_P ⟫ Γ @ anns ⊩u A @ s }}) /\
+      (forall Γ anns A s M, {{ Γ @ anns ⊫ M : A @ s }} -> {{ ⟪ pred_P ⟫ Γ @ anns ⊩ M : A @ s }}) /\
+      (forall Γ anns A s, {{ Γ @ anns ⊫ A @ s }} -> {{ ⟪ pred_P ⟫ Γ @ anns ⊩ A @ s }}) /\
       (forall Γ anns Γ' anns' σ, {{ Γ @ anns ⊫s σ : Γ' @ anns' }} -> {{ ⟪ pred_P ⟫ Γ @ anns ⊩s σ : Γ' @ anns' }}).
   Proof.
     apply syntactic_wf_ann_mut_ind; mauto.
@@ -34,11 +34,11 @@ Section soundness_fundamental.
   Proof. solve_it pred_P. Qed.
 
   Corollary soundness_fundamental_exp_ann {P} (pred_P : PredicativeSig P) :
-    forall anns Γ A so M, {{ Γ @ anns ⊫ M : A @ so }} -> {{ ⟪ pred_P ⟫ Γ @ anns ⊩u M : A @ so }}.
+    forall anns Γ A so M, {{ Γ @ anns ⊫ M : A @ so }} -> {{ ⟪ pred_P ⟫ Γ @ anns ⊩ M : A @ so }}.
   Proof. solve_it pred_P. Qed.
 
   Corollary soundness_fundamental_typ_ann {P} (pred_P : PredicativeSig P) :
-    forall anns Γ A so, {{ Γ @ anns ⊫ A @ so }} -> {{ ⟪ pred_P ⟫ Γ @ anns ⊩u A @ so }}.
+    forall anns Γ A so, {{ Γ @ anns ⊫ A @ so }} -> {{ ⟪ pred_P ⟫ Γ @ anns ⊩ A @ so }}.
   Proof. solve_it pred_P. Qed.
 
   Corollary soundness_fundamental_sub_ann {P} (pred_P : PredicativeSig P) :
@@ -56,7 +56,7 @@ Section soundness_fundamental.
   Qed.
 
   Theorem soundness_fundamental_exp {P} (pred_P : PredicativeSig P) :
-    forall Γ M A, {{ Γ ⊢ M : A }} -> exists anns so, {{ ⟪ pred_P ⟫ Γ @ anns ⊩u M : A @ so }}.
+    forall Γ M A, {{ Γ ⊢ M : A }} -> exists anns so, {{ ⟪ pred_P ⟫ Γ @ anns ⊩ M : A @ so }}.
   Proof.
     intros.
     assert (exists anns, {{ ⊫ Γ @ anns }}) as [anns] by mauto 3.
@@ -66,7 +66,7 @@ Section soundness_fundamental.
   Qed.
 
   Theorem soundness_fundamental_typ {P} (pred_P : PredicativeSig P) :
-    forall Γ A, {{ Γ ⊢ A }} -> exists anns so, {{ ⟪ pred_P ⟫ Γ @ anns ⊩u A @ so }}.
+    forall Γ A, {{ Γ ⊢ A }} -> exists anns so, {{ ⟪ pred_P ⟫ Γ @ anns ⊩ A @ so }}.
   Proof.
     intros.
     assert (exists anns, {{ ⊫ Γ @ anns }}) as [anns] by mauto 3.

@@ -267,8 +267,8 @@ Proof.
   assert {{ Γ, A' ⊢s Id ® (ρ ↦ ⇑! a0 (length Γ))  ∈ Sb }} by (eapply initial_env_glu_rel_exp; mauto).
   assert {{ Γ, A' ⊢s Id ® (ρ ↦ ⇑! a0 (length Γ)) ∈ Sb' }} by (eapply initial_env_glu_rel_exp; mauto).
 
-  assert (glu_rel_typ_with_sub pred_P s2 {{{ Γ, A' }}} B {{{ Id }}} d{{{ ρ ↦ ⇑! a0 (length Γ) }}}) by mauto 3.
-  assert (glu_rel_typ_with_sub pred_P s2 {{{ Γ, A' }}} B' {{{ Id }}} d{{{ ρ ↦ ⇑! a0 (length Γ) }}}) by mauto 3.
+  assert (glu_rel_typ_with_sub pred_P (so_Some s2) {{{ Γ, A' }}} B {{{ Id }}} d{{{ ρ ↦ ⇑! a0 (length Γ) }}}) by mauto 3.
+  assert (glu_rel_typ_with_sub pred_P (so_Some s2) {{{ Γ, A' }}} B' {{{ Id }}} d{{{ ρ ↦ ⇑! a0 (length Γ) }}}) by mauto 3.
   destruct_glu_rel_typ_with_sub.
 
   clear_pi_sort_eq_and_pred_rel.
@@ -279,8 +279,9 @@ Proof.
 
   autorewrite with mcpts in H51.
   autorewrite with mcpts in H54.
-  assert {{ Γ, A' ⊢ B ⊆ B' }}.
-  eapply glu_sort_elem_per_subtyp_typ_sorted_escape; mauto 3.
+  assert {{ Γ, A' ⊢ B ⊆ B' }} by 
+    (match_by_head @glu_typ_elem ltac:(fun H => directed inversion H; subst);
+     eapply glu_sort_elem_per_subtyp_typ_sorted_escape; mauto 3).
   split; eassumption.
 Qed.
 
