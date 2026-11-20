@@ -89,8 +89,6 @@ with wf_exp {P : PtsSig} : ctx P -> typ P -> exp P -> Prop :=
 (** Variables *)
 | wf_exp_vlookup :
   `( {{ ⊢ Γ }} ->
-     (** This premise is redundant, but helpful for soundness *)
-     (* {{ Γ ⊢ A }} -> *)
      {{ #x : A ∈ Γ }} ->
      {{ Γ ⊢ #x : A }} )
   

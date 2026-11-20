@@ -32,6 +32,11 @@ theories/Core/Syntactic/CtxEq.v
 theories/Core/Syntactic/CoreInversions.v
 theories/Core/Syntactic/Presup.v
 theories/Core/Syntactic/SystemOpt.v
+theories/Core/Syntactic/Corollaries/Contexts.v
+theories/Core/Syntactic/Corollaries/Substitutions.v
+theories/Core/Syntactic/Corollaries/TermStructure.v
+theories/Core/Syntactic/Corollaries/Functions.v
+theories/Core/Syntactic/Corollaries/Naturals.v
 theories/Core/Syntactic/Corollaries.v
 theories/Core/Syntactic/SystemAnnotated/Definitions.v
 theories/Core/Syntactic/SystemAnnotated/Lemmas.v
@@ -122,21 +127,21 @@ theories/Extraction/TypeCheck.v
 
 
 ## Case studies ##
-theories/CaseStudies/MiniML/Signature.v
-theories/CaseStudies/MiniML/Frontend.v
-theories/CaseStudies/MiniML/Parser.v
-theories/CaseStudies/MiniML/Entrypoint.v
+# theories/CaseStudies/MiniML/Signature.v
+# theories/CaseStudies/MiniML/Frontend.v
+# theories/CaseStudies/MiniML/Parser.v
+# theories/CaseStudies/MiniML/Entrypoint.v
 
-theories/CaseStudies/LF/Signature.v
-theories/CaseStudies/LF/Frontend.v
-theories/CaseStudies/LF/Parser.v
-theories/CaseStudies/LF/Entrypoint.v
+# theories/CaseStudies/LF/Signature.v
+# theories/CaseStudies/LF/Frontend.v
+# theories/CaseStudies/LF/Parser.v
+# theories/CaseStudies/LF/Entrypoint.v
 
-theories/CaseStudies/MLTTCumul/Signature.v
-theories/CaseStudies/MLTTCumul/Frontend.v
-theories/CaseStudies/MLTTCumul/Parser.v
-theories/CaseStudies/MLTTCumul/Entrypoint.v
+# theories/CaseStudies/MLTTCumul/Signature.v
+# theories/CaseStudies/MLTTCumul/Frontend.v
+# theories/CaseStudies/MLTTCumul/Parser.v
+# theories/CaseStudies/MLTTCumul/Entrypoint.v
 
-theories/CaseStudies/MLTTNonCumul/Signature.v
-theories/CaseStudies/MLTTOmega/Signature.v
-theories/CaseStudies/STLC/Signature.v
+# theories/CaseStudies/MLTTNonCumul/Signature.v
+# theories/CaseStudies/MLTTOmega/Signature.v
+# theories/CaseStudies/STLC/Signature.v

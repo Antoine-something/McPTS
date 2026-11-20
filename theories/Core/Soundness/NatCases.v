@@ -132,83 +132,6 @@ Qed.
 Hint Resolve glu_rel_sub_extend_nat : mcpts.
 
 
-(* This should move to syntactic lemmas (probably Corollaries.v) *)
-Lemma wf_typ_nat_inversion {P} : forall {Γ : ctx P},
-    {{ Γ ⊢ ℕ }} ->
-    exists s (r : Ru_nat P s), True.
-Proof.
-  inversion 1; subst.
-  pose proof wf_exp_nat_inversion H0 as [s' [r]].
-  eauto.
-Qed.
-
-Lemma wf_exp_eq_natrec_beta_zero_cong {P} : forall {Γ : ctx P} {A M MZ MS},
-    {{ Γ, ℕ ⊢ A }} ->
-    {{ Γ ⊢ M ≈ zero : ℕ }} ->
-    {{ Γ ⊢ MZ : A[Id,,zero] }} ->
-    {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,, succ #1] }} ->
-    {{ Γ ⊢ rec M return A | zero -> MZ | succ -> MS end ≈ MZ : A[Id,,M] }}.
-Proof.
-  intros.
-  gen_presups.
-  pose proof wf_typ_nat_inversion HA as [s [r Htriv]]; clear Htriv.
-  assert {{ Γ ⊢ rec M return A | zero -> MZ | succ -> MS end ≈  rec zero return A | zero -> MZ | succ -> MS end : A[Id,,M] }} as -> by (eapply wf_exp_eq_natrec_cong; mauto 3).
-  assert {{ Γ ⊢s Id,,M ≈ Id,,zero : Γ, ℕ }} as -> by mauto 3.
-  mauto 2.
-Qed.
-
-#[export]
-Hint Resolve wf_exp_eq_natrec_beta_zero_cong : mcpts.
-
-Lemma wf_exp_eq_natrec_beta_zero_cong_under_sub {P} : forall {Γ : ctx P} {Γ' A σ M MZ MS},
-    {{ Γ' ⊢s σ : Γ }} ->
-    {{ Γ' ⊢ M ≈ zero : ℕ }} ->
-    {{ Γ, ℕ ⊢ A }} ->
-    {{ Γ ⊢ MZ : A[Id,,zero] }} ->
-    {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,, succ #1] }} ->
-    {{ Γ' ⊢ rec M return A[q σ] | zero -> MZ[σ] | succ -> MS[q (q σ)] end ≈ MZ[σ] : A[σ,,M] }}.
-Proof.
-  intros.
-  gen_presups.
-  pose proof wf_typ_nat_inversion HA as [s [r Htriv]]; clear Htriv.
-  assert {{ Γ' ⊢ ℕ[σ] ≈ ℕ }} by mauto 3.
-  assert {{ Γ' ⊢s (q σ)∘(Id,,M) ≈ σ,,M : Γ, ℕ }} by mauto 4.
-  assert {{ Γ' ⊢ A[σ,,M] ≈ A[q σ][Id,,M] }} as -> by mauto 4.
-  assert {{ Γ', ℕ ⊢ A[q σ] }} by mauto 3.
-  
-  (* Proving that {{ Γ' ⊢ MZ[σ] : A[q σ][Id,,zero] }} *) 
-  assert {{ Γ' ⊢s (q σ)∘(Id,,zero) ≈ σ,,zero : Γ, ℕ }} by mauto 4.
-  assert {{ Γ' ⊢s (Id,,zero)∘σ ≈ Id∘σ,,zero[σ] : Γ, ℕ }} by mauto 4.
-  assert {{ Γ' ⊢s Id∘σ ≈ σ : Γ }} by mauto 3.
-  assert {{ Γ' ⊢ zero[σ] ≈ zero : ℕ }} by mauto 3.
-  assert {{ Γ' ⊢s Id∘σ,,zero[σ] ≈ σ,,zero : Γ, ℕ }} by mauto 4.
-  assert {{ Γ' ⊢s (Id,,zero)∘σ ≈ σ,,zero : Γ, ℕ }} by mauto 4.
-  assert {{ Γ' ⊢s (q σ)∘(Id,,zero) ≈ (Id,,zero)∘σ : Γ,ℕ }} by mauto 4.
-  assert {{ Γ' ⊢s (q σ)∘(Id,,zero) ≈ (Id,,zero)∘σ : Γ, ℕ }} by mauto 3.
-  assert {{ Γ' ⊢ A[q σ][Id,,zero] ≈ A[(q σ)∘(Id,,zero)] }} by mauto 4.
-  assert {{ Γ' ⊢ A[(q σ)∘(Id,,zero)] ≈ A[(Id,,zero)∘σ] }} by mauto 3.
-  assert {{ Γ' ⊢ A[q σ][Id,,zero] ≈ A[(Id,,zero)∘σ] }} by mauto 3.
-  assert {{ Γ' ⊢ A[(Id,,zero)∘σ] ≈ A[Id,,zero][σ] }} by mauto 3.
-  assert {{ Γ' ⊢ A[q σ][Id,,zero] ≈ A[Id,,zero][σ] }} by mauto 3.
-  assert {{ Γ' ⊢ MZ[σ] : A[Id,,zero][σ] }} by mauto 2.
-  assert {{ Γ' ⊢ MZ[σ] : A[q σ][Id,,zero] }} by mauto 3.  
-
-  (* Proving that {{ Γ', ℕ, A[q σ] ⊢ MS[q (q σ)] : A[q σ][Wk∘Wk,,succ #1] }} *)
-  assert {{ Γ', ℕ, A[q σ] ⊢s (q σ)∘(Wk∘Wk,,succ #1) ≈ (Wk∘Wk,,succ #1)∘(q (q σ)) : Γ, ℕ }} as HqWkWk by mauto 3.
-  gen_presup HqWkWk.
-  assert {{ Γ', ℕ, A[q σ] ⊢ A[q σ][Wk∘Wk,,succ #1] ≈ A[(q σ)∘(Wk∘Wk,,succ #1)] }} by mauto 4.
-  assert {{ Γ', ℕ, A[q σ] ⊢ A[(q σ)∘(Wk∘Wk,,succ #1)] ≈ A[(Wk∘Wk,,succ #1)∘(q (q σ))] }} by mauto 3.
-  assert {{ Γ', ℕ, A[q σ] ⊢ A[(Wk∘Wk,,succ #1)∘(q (q σ))] ≈ A[Wk∘Wk,,succ #1][q (q σ)] }} by mauto 3.
-  assert {{ Γ', ℕ, A[q σ] ⊢ A[q σ][Wk∘Wk,,succ #1] ≈ A[Wk∘Wk,,succ #1][q (q σ)] }} by mauto 3.
-  assert {{ Γ', ℕ, A[q σ] ⊢ MS[q (q σ)] : A[Wk∘Wk,,succ #1][q (q σ)] }} by mauto 3.
-  assert {{ Γ', ℕ, A[q σ] ⊢ MS[q (q σ)] : A[q σ][Wk∘Wk,,succ #1] }} by mauto 3.
-  mauto 3.
-Qed.
-
-#[export]
-Hint Resolve wf_exp_eq_natrec_beta_zero_cong_under_sub : mcpts.
-
-
 (* The next few lemmas should move to LogicalRelation/Lemmas.v *)
 Lemma glu_typ_elem_exp_rel_trm_sub_sub_compose {P} (pred_P : PredicativeSig P) : forall {so a typ_rel exp_rel Γ A M σ σ' m},
     {{ DG a ∈ glu_typ_elem pred_P so ↘ typ_rel ↘ exp_rel }} ->
@@ -279,12 +202,21 @@ Corollary wf_typ_ann_of_sort_implies_wf_exp_of_sort {P} : forall {Γ : ctx P} {a
 Proof.
   intros * ?%wf_typ_ann_of_sort_implies_wf_exp_ann; mauto 2.
 Qed.
-  
+
+Lemma glu_rel_typ_to_wf_typ_or_wf_exp_of_sort {P} {pred_P : PredicativeSig P} : forall {Γ anns A sa},
+    {{ ⟪ pred_P ⟫ Γ @ anns ⊩ A @ sa }} ->
+    (sa = so_None) \/ (exists s, sa = so_Some s /\ {{ Γ ⊢ A : Sort@s }}).
+Proof.
+  intros.
+  destruct sa.
+  - left; reflexivity.
+  - right; eexists; split; try reflexivity.
+    mauto 3.
+Qed.
+
 Lemma glu_rel_exp_natrec_zero_helper {P} (pred_P : PredicativeSig P) : forall {sn sa anns Γ SbΓ A MZ MS Γ' M σ ρ am typ_rel exp_rel} {r : Ru_nat P sn},
     {{ EG Γ ∈ glu_ctx_env pred_P anns ↘ SbΓ }} ->
     {{ ⟪ pred_P ⟫ Γ, ℕ @ anns, ^(so_Some sn) ⊩ A @ sa }} ->
-    (* {{ Γ, ℕ ⊢ A }} -> *)
-    (* {{ Γ, ℕ @ anns, ^(so_Some sn) ⊫ A @ sa }} -> *)
     {{ ⟪ pred_P ⟫ Γ @ anns ⊩ A[Id,,zero] @ sa }} ->
     {{ ⟪ pred_P ⟫ Γ @ anns ⊩ MZ : A[Id,,zero] @ sa }} ->
     {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,,succ #1] }} ->
@@ -296,14 +228,8 @@ Lemma glu_rel_exp_natrec_zero_helper {P} (pred_P : PredicativeSig P) : forall {s
       {{ rec zero ⟦return A | zero -> MZ | succ -> MS end⟧ ρ ↘ r }} /\
         {{ Γ' ⊢ rec M return A[q σ] | zero -> MZ[σ] | succ -> MS[q (q σ)] end : A[σ,,M] ® r ∈ exp_rel }}.
 Proof.
-  intros * ? ? ? HA HMZ **.
-  assert (sa = so_None \/ exists s, sa = so_Some s /\ {{ Γ, ℕ ⊢ A : Sort@s }}) as HAofSort.
-  {
-    destruct sa.
-    - left; reflexivity.
-    - right; eexists; split; try reflexivity.
-      mauto 3.
-  }  
+  intros * ? ? HA' HA HMZ **.
+  pose proof glu_rel_typ_to_wf_typ_or_wf_exp_of_sort HA' as HAofSort.
   assert {{ Γ ⊢ MZ : A[Id,,zero] }} by mauto 3.
   inversion HA as [SbΓ' []].
   assert {{ ⟪ pred_P ⟫ Γ @ anns ⊩ ℕ : Sort@sn @ ^so_None }} as [SbΓ'' []] by mauto 3.
@@ -318,31 +244,26 @@ Proof.
   handle_functional_glu_typ_elem P.
   rename m into mz.
   eexists; split; mauto 3.
-
+  
   assert {{ Γ' ⊢s σ : Γ }} by mauto 2.
+  assert {{ Γ ⊢ ℕ }} by mauto 3.
+  assert {{ Γ' ⊢s (Id,,zero)∘σ ≈ σ,,zero : Γ, ℕ }} by mauto 3.
+  assert {{ Γ' ⊢s σ,,M ≈ σ,,zero : Γ, ℕ }} by mauto 3.
+  assert {{ Γ' ⊢s (Id,,zero)∘σ ≈ σ,,M : Γ,ℕ }} by mauto 3.
   assert {{ Γ, ℕ ⊢ A }} by mauto 3.
   assert {{ Γ ⊢ MZ : A[Id,,zero] }} by mauto 3.
   assert {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,, succ #1] }} by mauto 3.
   assert {{ Γ' ⊢ rec M return A[q σ] | zero -> MZ[σ] | succ -> MS[q (q σ)] end ≈ MZ[σ] : A[σ,,M] }} as -> by mauto 2.
-  assert (exp_rel0 Γ' {{{ A[(Id,,zero)∘σ] }}} {{{ MZ[σ] }}} mz) by (eapply glu_typ_elem_exp_rel_typ_sub_sub_compose; mauto 2).
-  assert {{ Γ' ⊢s σ,,M ≈ σ,,zero : Γ, ℕ }} by mauto 3.
-  assert {{ Γ' ⊢s Id∘σ ≈ σ : Γ }} by mauto 3.
-  assert {{ Γ' ⊢ zero[σ] ≈ zero : ℕ }} by mauto 3.
-  assert {{ Γ ⊢ ℕ }} by mauto 3.
-  assert {{ Γ' ⊢ ℕ }} by mauto 3.
-  assert {{ Γ' ⊢ ℕ[Id∘σ] ≈ ℕ }} by (transitivity {{{ ℕ[σ] }}}; mauto 3).
-  assert {{ Γ' ⊢s (Id,,zero)∘σ ≈ Id∘σ,,zero[σ] : Γ, ℕ }} by (eapply wf_sub_eq_extend_compose; mauto 4).
-  assert {{ Γ' ⊢s (Id,,zero)∘σ ≈ σ,,zero : Γ, ℕ }} by (transitivity {{{ Id∘σ,,zero[σ] }}}; mauto 4).
 
+  assert (exp_rel0 Γ' {{{ A[(Id,,zero)∘σ] }}} {{{ MZ[σ] }}} mz) by (eapply glu_typ_elem_exp_rel_typ_sub_sub_compose; mauto 2).
   destruct sa; match_by_head @glu_typ_elem ltac:(fun H => directed inversion H; subst).
-  (* inversion H16; subst. (* H16 : glu_typ_elem pred_P sa typ_rel0 exp_rel0 am *) *)
-  - enough {{ Γ' ⊢ A[(Id,,zero)∘σ] ≈ A[σ,,M] }} as Heq by (rewrite <- Heq; eassumption).    
+  - enough {{ Γ' ⊢ A[(Id,,zero)∘σ] ≈ A[σ,,M] }} as Heq by (rewrite <- Heq; eassumption). 
     transitivity {{{ A[σ,,zero] }}}; mauto 3.
   - enough {{ Γ' ⊢ A[(Id,,zero)∘σ] ≈ A[σ,,M] : Sort@s }} as Heq by (rewrite <- Heq; eassumption).
     destruct HAofSort as [Heq | [s' [Heq HAs']]];
-      inversion Heq; subst.  
+      inversion Heq; subst.
     assert {{ Γ ⊢ MZ : A[Id,,zero] }} by mauto 3.
-    assert {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,, succ #1] }} by mauto 3.
+    assert {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,, succ #1] }} by mauto 3.    
     transitivity {{{ A[σ,,zero] }}}; mauto 3.
 Qed.    
 
@@ -391,156 +312,178 @@ Ltac invert_glu_rel_typ H :=
 
 
 (* This goes to syntactic corollaries *)
-Lemma wf_sub_eq_extend_id_zero_compose_sigma {P} : forall {Γ : ctx P} {Γ' σ},
-    {{ Γ' ⊢s σ : Γ }} ->
-    {{ Γ ⊢ ℕ }} ->
-    {{ Γ' ⊢s (Id,,zero)∘σ ≈ σ,,zero : Γ, ℕ }}.
-Proof.
-  intros * Hσ Hℕ.
-  pose proof wf_typ_nat_inversion Hℕ as [s [r Htriv]]; clear Htriv.
-  assert {{ Γ ⊢ zero : ℕ }} by mauto 3.
-  transitivity {{{ σ,,zero[σ] }}}; mauto 3.
-  assert {{ Γ' ⊢ zero[σ] ≈ zero : ℕ }} by mauto 3.
-  mauto 3.
-Qed.
+(* Lemma wf_sub_eq_extend_id_zero_compose_sigma {P} : forall {Γ : ctx P} {Γ' σ}, *)
+(*     {{ Γ' ⊢s σ : Γ }} -> *)
+(*     {{ Γ ⊢ ℕ }} -> *)
+(*     {{ Γ' ⊢s (Id,,zero)∘σ ≈ σ,,zero : Γ, ℕ }}. *)
+(* Proof. *)
+(*   intros * Hσ Hℕ. *)
+(*   pose proof wf_typ_nat_inversion Hℕ as [s [r Htriv]]; clear Htriv. *)
+(*   assert {{ Γ ⊢ zero : ℕ }} by mauto 3. *)
+(*   transitivity {{{ σ,,zero[σ] }}}; mauto 3. *)
+(*   assert {{ Γ' ⊢ zero[σ] ≈ zero : ℕ }} by mauto 3. *)
+(*   mauto 3. *)
+(* Qed. *)
 
-#[export]
-Hint Resolve wf_sub_eq_extend_id_zero_compose_sigma : mcpts.
+(* #[export] *)
+(* Hint Resolve wf_sub_eq_extend_id_zero_compose_sigma : mcpts. *)
 
-Lemma wf_exp_natrec_under_sub {P} : forall {Γ : ctx P} {Γ' A σ M MZ MS},
-    {{ Γ' ⊢s σ : Γ }} ->
-    {{ Γ' ⊢ M : ℕ }} ->
-    {{ Γ, ℕ ⊢ A }} ->
-    {{ Γ ⊢ MZ : A[Id,,zero] }} ->
-    {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,, succ #1] }} ->
-    {{ Γ' ⊢ rec M return A[q σ] | zero -> MZ[σ] | succ -> MS[q (q σ)] end : A[σ,,M] }}.
-Proof.
-  intros.
-  gen_presups.
-  inversion_clear HAwf1.
-  pose proof wf_exp_nat_inversion ltac:(eassumption) as [s' [r]].
-  assert {{ Γ', ℕ ⊢s q σ : Γ, ℕ }} by mauto 2.
-  assert {{ Γ', ℕ ⊢ A[q σ] }} by mauto 2.
-  assert {{ Γ' ⊢ ℕ[σ] ≈ ℕ }} by mauto 3.
-  assert {{ Γ ⊢s Id,,zero : Γ, ℕ }} by mauto 3.
-  assert {{ Γ' ⊢ A[q σ][Id,,zero] ≈ A[(q σ)∘(Id,,zero)] }} by mauto 3.
-  assert {{ Γ' ⊢s (q σ)∘(Id,,zero) ≈ σ,, zero : Γ, ℕ }} by (eapply wf_sub_eq_q_sigma_id_extend; mauto 3).
-  assert {{ Γ' ⊢ A[(q σ)∘(Id,,zero)] ≈ A[σ,,zero] }} by mauto 2.
-  assert {{ Γ' ⊢ MZ[σ] : A[Id,,zero][σ] }} by mauto 2.
-  assert {{ Γ' ⊢s (Id,,zero)∘σ ≈ σ,,zero : Γ, ℕ }} by mauto 3.
-  assert {{ Γ' ⊢ A[Id,,zero][σ] ≈ A[σ,,zero] }} by (transitivity {{{ A[(Id,,zero)∘σ] }}}; mauto 3).
-  assert {{ Γ' ⊢ A[q σ][Id,,zero] ≈ A[Id,,zero][σ] }} by (do 3 etransitivity; mauto 3).
-  assert {{ Γ' ⊢ MZ[σ] : A[q σ][Id,,zero] }} by mauto 3.
+(* Lemma wf_exp_natrec_under_sub {P} : forall {Γ : ctx P} {Γ' A σ M MZ MS}, *)
+(*     {{ Γ' ⊢s σ : Γ }} -> *)
+(*     {{ Γ' ⊢ M : ℕ }} -> *)
+(*     {{ Γ, ℕ ⊢ A }} -> *)
+(*     {{ Γ ⊢ MZ : A[Id,,zero] }} -> *)
+(*     {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,, succ #1] }} -> *)
+(*     {{ Γ' ⊢ rec M return A[q σ] | zero -> MZ[σ] | succ -> MS[q (q σ)] end : A[σ,,M] }}. *)
+(* Proof. *)
+(*   intros. *)
+(*   gen_presups. *)
+(*   inversion_clear HAwf1. *)
+(*   pose proof wf_exp_nat_inversion ltac:(eassumption) as [s' [r]]. *)
+(*   assert {{ Γ', ℕ ⊢s q σ : Γ, ℕ }} by mauto 2. *)
+(*   assert {{ Γ', ℕ ⊢ A[q σ] }} by mauto 2. *)
+(*   assert {{ Γ' ⊢ ℕ[σ] ≈ ℕ }} by mauto 3. *)
+(*   assert {{ Γ ⊢s Id,,zero : Γ, ℕ }} by mauto 3. *)
+(*   assert {{ Γ' ⊢ A[q σ][Id,,zero] ≈ A[(q σ)∘(Id,,zero)] }} by mauto 3. *)
+(*   assert {{ Γ' ⊢s (q σ)∘(Id,,zero) ≈ σ,, zero : Γ, ℕ }} by (eapply wf_sub_eq_q_sigma_id_extend; mauto 3). *)
+(*   assert {{ Γ' ⊢ A[(q σ)∘(Id,,zero)] ≈ A[σ,,zero] }} by mauto 2. *)
+(*   assert {{ Γ' ⊢ MZ[σ] : A[Id,,zero][σ] }} by mauto 2. *)
+(*   assert {{ Γ' ⊢s (Id,,zero)∘σ ≈ σ,,zero : Γ, ℕ }} by mauto 3. *)
+(*   assert {{ Γ' ⊢ A[Id,,zero][σ] ≈ A[σ,,zero] }} by (transitivity {{{ A[(Id,,zero)∘σ] }}}; mauto 3). *)
+(*   assert {{ Γ' ⊢ A[q σ][Id,,zero] ≈ A[Id,,zero][σ] }} by (do 3 etransitivity; mauto 3). *)
+(*   assert {{ Γ' ⊢ MZ[σ] : A[q σ][Id,,zero] }} by mauto 3. *)
 
-  assert {{ Γ', ℕ, A[q σ] ⊢s q (q σ) : Γ, ℕ, A }} by mauto 3.
-  assert {{ Γ', ℕ, A[q σ] ⊢s (q σ)∘(Wk∘Wk,,succ #1) ≈ (Wk∘Wk,,succ #1)∘(q (q σ)) : Γ, ℕ }} by mauto 3.
-  assert {{ Γ', ℕ, A[q σ] ⊢ MS[q (q σ)] : A[Wk∘Wk,,succ #1][q (q σ)] }} by mauto 3.
-  assert {{ Γ', ℕ, A[q σ] ⊢ A[Wk∘Wk,,succ #1][q (q σ)] ≈ A[(Wk∘Wk,,succ #1)∘(q (q σ))] }} by mauto 3.
-  assert {{ Γ', ℕ, A[q σ] ⊢ A[(Wk∘Wk,,succ #1)∘(q (q σ))] ≈ A[(q σ)∘(Wk∘Wk,,succ #1)] }} by mauto 3.
-  assert {{ Γ', ℕ, A[q σ] ⊢ A[(q σ)∘(Wk∘Wk,,succ #1)] ≈ A[q σ][Wk∘Wk,,succ #1] }} by mauto 3.
-  assert {{ Γ', ℕ, A[q σ] ⊢ A[Wk∘Wk,,succ #1][q (q σ)] ≈ A[q σ][Wk∘Wk,,succ #1] }} by (do 2 etransitivity; mauto 3).
-  assert {{ Γ', ℕ, A[q σ] ⊢ MS[q (q σ)] : A[q σ][Wk∘Wk,,succ #1] }} by mauto 3.
-  enough {{ Γ' ⊢ A[q σ][Id,,M] ≈ A[σ,,M] }} as <-; mauto 3.
-Qed.  
+(*   assert {{ Γ', ℕ, A[q σ] ⊢s q (q σ) : Γ, ℕ, A }} by mauto 3. *)
+(*   assert {{ Γ', ℕ, A[q σ] ⊢s (q σ)∘(Wk∘Wk,,succ #1) ≈ (Wk∘Wk,,succ #1)∘(q (q σ)) : Γ, ℕ }} by mauto 3. *)
+(*   assert {{ Γ', ℕ, A[q σ] ⊢ MS[q (q σ)] : A[Wk∘Wk,,succ #1][q (q σ)] }} by mauto 3. *)
+(*   assert {{ Γ', ℕ, A[q σ] ⊢ A[Wk∘Wk,,succ #1][q (q σ)] ≈ A[(Wk∘Wk,,succ #1)∘(q (q σ))] }} by mauto 3. *)
+(*   assert {{ Γ', ℕ, A[q σ] ⊢ A[(Wk∘Wk,,succ #1)∘(q (q σ))] ≈ A[(q σ)∘(Wk∘Wk,,succ #1)] }} by mauto 3. *)
+(*   assert {{ Γ', ℕ, A[q σ] ⊢ A[(q σ)∘(Wk∘Wk,,succ #1)] ≈ A[q σ][Wk∘Wk,,succ #1] }} by mauto 3. *)
+(*   assert {{ Γ', ℕ, A[q σ] ⊢ A[Wk∘Wk,,succ #1][q (q σ)] ≈ A[q σ][Wk∘Wk,,succ #1] }} by (do 2 etransitivity; mauto 3). *)
+(*   assert {{ Γ', ℕ, A[q σ] ⊢ MS[q (q σ)] : A[q σ][Wk∘Wk,,succ #1] }} by mauto 3. *)
+(*   enough {{ Γ' ⊢ A[q σ][Id,,M] ≈ A[σ,,M] }} as <-; mauto 3. *)
+(* Qed.   *)
+
+ 
+(* Lemma wf_exp_eq_natrec_beta_succ_cong {P} : forall {Γ : ctx P} {A M M' MZ MS}, *)
+(*     {{ Γ, ℕ ⊢ A }} -> *)
+(*     {{ Γ ⊢ M ≈ succ M' : ℕ }} -> *)
+(*     {{ Γ ⊢ MZ : A[Id,,zero] }} -> *)
+(*     {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,, succ #1] }} -> *)
+(*     {{ Γ ⊢ rec M return A | zero -> MZ | succ -> MS end ≈ MS[Id,,M',,rec M' return A | zero -> MZ | succ -> MS end] : A[Id,,M] }}. *)
+(* Proof. *)
+(*   intros. *)
+(*   gen_presups. *)
+(*   pose proof wf_typ_nat_inversion HA as [s [r Htriv]]; clear Htriv. *)
+(*   pose proof wf_exp_succ_inversion HN as []. *)
+(*   assert {{ Γ ⊢ rec M return A | zero -> MZ | succ -> MS end ≈  rec succ M' return A | zero -> MZ | succ -> MS end : A[Id,,M] }} as -> by (eapply wf_exp_eq_natrec_cong; mauto 3). *)
+(*   assert {{ Γ ⊢s Id,,M ≈ Id,,succ M' : Γ, ℕ }} as -> by mauto 3. *)
+(*   mauto 2. *)
+(* Qed. *)
+
+(* #[export] *)
+(* Hint Resolve wf_exp_eq_natrec_beta_succ_cong : mcpts. *)
 
 
-Lemma wf_exp_eq_natrec_beta_succ_cong {P} : forall {Γ : ctx P} {A M M' MZ MS},
-    {{ Γ, ℕ ⊢ A }} ->
-    {{ Γ ⊢ M ≈ succ M' : ℕ }} ->
-    {{ Γ ⊢ MZ : A[Id,,zero] }} ->
-    {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,, succ #1] }} ->
-    {{ Γ ⊢ rec M return A | zero -> MZ | succ -> MS end ≈ MS[Id,,M',,rec M' return A | zero -> MZ | succ -> MS end] : A[Id,,M] }}.
-Proof.
-  intros.
-  gen_presups.
-  pose proof wf_typ_nat_inversion HA as [s [r Htriv]]; clear Htriv.
-  pose proof wf_exp_succ_inversion HN as [].
-  assert {{ Γ ⊢ rec M return A | zero -> MZ | succ -> MS end ≈  rec succ M' return A | zero -> MZ | succ -> MS end : A[Id,,M] }} as -> by (eapply wf_exp_eq_natrec_cong; mauto 3).
-  assert {{ Γ ⊢s Id,,M ≈ Id,,succ M' : Γ, ℕ }} as -> by mauto 3.
-  mauto 2.
-Qed.
 
-#[export]
-Hint Resolve wf_exp_eq_natrec_beta_succ_cong : mcpts.
+(* Lemma wf_exp_eq_natrec_beta_succ_cong_under_sub {P} : forall {Γ : ctx P} {Γ' A σ M M' MZ MS}, *)
+(*     {{ Γ' ⊢s σ : Γ }} -> *)
+(*     {{ Γ' ⊢ M ≈ succ M' : ℕ }} -> *)
+(*     {{ Γ, ℕ ⊢ A }} -> *)
+(*     {{ Γ ⊢ MZ : A[Id,,zero] }} -> *)
+(*     {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,, succ #1] }} -> *)
+(*     {{ Γ' ⊢ rec M return A[q σ] | zero -> MZ[σ] | succ -> MS[q (q σ)] end ≈ MS[q (q σ)][Id,,M',,rec M' return A[q σ] | zero -> MZ[σ] | succ -> MS[q (q σ)] end] : A[σ,,M] }}. *)
+(* Proof. *)
+(*   intros. *)
+(*   gen_presups. *)
+(*   pose proof wf_typ_nat_inversion HA as [s [r Htriv]]; clear Htriv. *)
+(*   pose proof wf_exp_succ_inversion HN as []. *)
 
-Lemma wf_exp_eq_natrec_beta_succ_cong_under_sub {P} : forall {Γ : ctx P} {Γ' A σ M M' MZ MS},
-    {{ Γ' ⊢s σ : Γ }} ->
-    {{ Γ' ⊢ M ≈ succ M' : ℕ }} ->
-    {{ Γ, ℕ ⊢ A }} ->
-    {{ Γ ⊢ MZ : A[Id,,zero] }} ->
-    {{ Γ, ℕ, A ⊢ MS : A[Wk∘Wk,, succ #1] }} ->
-    {{ Γ' ⊢ rec M return A[q σ] | zero -> MZ[σ] | succ -> MS[q (q σ)] end ≈ MS[q (q σ)][Id,,M',,rec M' return A[q σ] | zero -> MZ[σ] | succ -> MS[q (q σ)] end] : A[σ,,M] }}.
-Proof.
-  intros.
-  gen_presups.
-  pose proof wf_typ_nat_inversion HA as [s [r Htriv]]; clear Htriv.
-  pose proof wf_exp_succ_inversion HN as [].
+(*   assert {{ Γ' ⊢s (q σ)∘(Id,,M) ≈ σ,,M : Γ, ℕ }} as <- by mauto 4. *)
+(*   assert {{ Γ' ⊢ A[(q σ)∘(Id,,M)] ≈ A[q σ][Id,,M] }} as -> by mauto 4. *)
 
-  assert {{ Γ' ⊢s (q σ)∘(Id,,M) ≈ σ,,M : Γ, ℕ }} as <- by mauto 4.
-  assert {{ Γ' ⊢ A[(q σ)∘(Id,,M)] ≈ A[q σ][Id,,M] }} as -> by mauto 4.
+(*   assert {{ Γ' ⊢ MZ[σ] : A[Id,,zero][σ] }} by mauto 3. *)
+(*   assert {{ Γ' ⊢ ℕ[σ] ≈ ℕ }} by mauto 3. *)
+(*   assert {{ Γ' ⊢s (Id,,zero)∘σ ≈ σ,,zero : Γ, ℕ }} by mauto 3. *)
+(*   assert {{ Γ' ⊢s σ,, zero ≈ (q σ)∘(Id,,zero) : Γ, ℕ }} by (symmetry; eapply wf_sub_eq_q_sigma_id_extend; mauto 3). *)
+(*   assert {{ Γ' ⊢s (Id,,zero)∘σ ≈ (q σ)∘(Id,,zero) : Γ, ℕ }} by (etransitivity; mauto 3). *)
+(*   assert {{ Γ' ⊢ A[Id,,zero][σ] ≈ A[(Id,,zero)∘σ] }} by mauto 3. *)
+(*   assert {{ Γ' ⊢ A[(Id,,zero)∘σ] ≈ A[(q σ)∘(Id,,zero)] }} by mauto 3. *)
+(*   assert {{ Γ' ⊢ A[(q σ)∘(Id,,zero)] ≈ A[q σ][Id,,zero] }} by mauto 4. *)
+(*   assert {{ Γ' ⊢ A[Id,,zero][σ] ≈ A[q σ][Id,,zero] }} by (do 2 etransitivity; mauto 3).   *)
+(*   assert {{ Γ' ⊢ MZ[σ] : A[q σ][Id,,zero] }} by mauto 3. *)
 
-  assert {{ Γ' ⊢ MZ[σ] : A[Id,,zero][σ] }} by mauto 3.
-  assert {{ Γ' ⊢ ℕ[σ] ≈ ℕ }} by mauto 3.
-  assert {{ Γ' ⊢s (Id,,zero)∘σ ≈ σ,,zero : Γ, ℕ }} by mauto 3.
-  assert {{ Γ' ⊢s σ,, zero ≈ (q σ)∘(Id,,zero) : Γ, ℕ }} by (symmetry; eapply wf_sub_eq_q_sigma_id_extend; mauto 3).
-  assert {{ Γ' ⊢s (Id,,zero)∘σ ≈ (q σ)∘(Id,,zero) : Γ, ℕ }} by (etransitivity; mauto 3).
-  assert {{ Γ' ⊢ A[Id,,zero][σ] ≈ A[(Id,,zero)∘σ] }} by mauto 3.
-  assert {{ Γ' ⊢ A[(Id,,zero)∘σ] ≈ A[(q σ)∘(Id,,zero)] }} by mauto 3.
-  assert {{ Γ' ⊢ A[(q σ)∘(Id,,zero)] ≈ A[q σ][Id,,zero] }} by mauto 4.
-  assert {{ Γ' ⊢ A[Id,,zero][σ] ≈ A[q σ][Id,,zero] }} by (do 2 etransitivity; mauto 3).  
-  assert {{ Γ' ⊢ MZ[σ] : A[q σ][Id,,zero] }} by mauto 3.
-
-  assert {{ Γ', ℕ, A[q σ] ⊢ MS[q (q σ)] : A[Wk∘Wk,,succ #1][q (q σ)] }} by mauto 3.
-  assert {{ Γ', ℕ ⊢s q σ : Γ, ℕ }} by mauto 3.
-  assert {{ Γ', ℕ, A[q σ] ⊢s q (q σ) : Γ, ℕ, A }} by mauto 3.
-  assert {{ Γ, ℕ, A ⊢s Wk∘Wk,,succ #1 : Γ, ℕ }} by mauto 3.
-  assert {{ Γ', ℕ, A[q σ] ⊢ A[Wk∘Wk,,succ #1][q (q σ)] ≈ A[(Wk∘Wk,,succ #1)∘(q (q σ))] }} by mauto 3.
-  assert {{ Γ', ℕ, A[q σ] ⊢s q σ∘(Wk∘Wk,,succ #1) ≈ (Wk∘Wk,,succ #1)∘q (q σ) : Γ, ℕ }} by mauto 3.
-  assert {{ Γ', ℕ, A[q σ] ⊢ A[q σ∘(Wk∘Wk,,succ #1)] ≈ A[(Wk∘Wk,,succ #1)∘q (q σ)] }} by mauto 3.
-  assert {{ Γ', ℕ, A[q σ] ⊢ A[q σ∘(Wk∘Wk,,succ #1)] ≈ A[q σ][Wk∘Wk,,succ #1] }} by mauto 4.
-  assert {{ Γ', ℕ, A[q σ] ⊢ A[Wk∘Wk,,succ #1][q (q σ)] ≈ A[q σ][Wk∘Wk,,succ #1] }} by (do 2 etransitivity; mauto 3).
-  assert {{ Γ', ℕ, A[q σ] ⊢ MS[q (q σ)] : A[q σ][Wk∘Wk,,succ #1] }} by mauto 3.
-  eapply wf_exp_eq_natrec_beta_succ_cong; mauto 3.
-Qed.
+(*   assert {{ Γ', ℕ, A[q σ] ⊢ MS[q (q σ)] : A[Wk∘Wk,,succ #1][q (q σ)] }} by mauto 3. *)
+(*   assert {{ Γ', ℕ ⊢s q σ : Γ, ℕ }} by mauto 3. *)
+(*   assert {{ Γ', ℕ, A[q σ] ⊢s q (q σ) : Γ, ℕ, A }} by mauto 3. *)
+(*   assert {{ Γ, ℕ, A ⊢s Wk∘Wk,,succ #1 : Γ, ℕ }} by mauto 3. *)
+(*   assert {{ Γ', ℕ, A[q σ] ⊢ A[Wk∘Wk,,succ #1][q (q σ)] ≈ A[(Wk∘Wk,,succ #1)∘(q (q σ))] }} by mauto 3. *)
+(*   assert {{ Γ', ℕ, A[q σ] ⊢s q σ∘(Wk∘Wk,,succ #1) ≈ (Wk∘Wk,,succ #1)∘q (q σ) : Γ, ℕ }} by mauto 3. *)
+(*   assert {{ Γ', ℕ, A[q σ] ⊢ A[q σ∘(Wk∘Wk,,succ #1)] ≈ A[(Wk∘Wk,,succ #1)∘q (q σ)] }} by mauto 3. *)
+(*   assert {{ Γ', ℕ, A[q σ] ⊢ A[q σ∘(Wk∘Wk,,succ #1)] ≈ A[q σ][Wk∘Wk,,succ #1] }} by mauto 4. *)
+(*   assert {{ Γ', ℕ, A[q σ] ⊢ A[Wk∘Wk,,succ #1][q (q σ)] ≈ A[q σ][Wk∘Wk,,succ #1] }} by (do 2 etransitivity; mauto 3). *)
+(*   assert {{ Γ', ℕ, A[q σ] ⊢ MS[q (q σ)] : A[q σ][Wk∘Wk,,succ #1] }} by mauto 3. *)
+(*   eapply wf_exp_eq_natrec_beta_succ_cong; mauto 3. *)
+(* Qed. *)
   
-#[export]
-Hint Resolve wf_exp_eq_natrec_beta_succ_cong_under_sub : mcpts.
+(* #[export] *)
+(* Hint Resolve wf_exp_eq_natrec_beta_succ_cong_under_sub : mcpts. *)
 
-Lemma wf_typ_eq_nat_beta_succ_rhs_typ_gen_of_sort {P} : forall {Γ : ctx P} {Γ' σ A M N s},
-    {{ Γ ⊢s σ : Γ' }} ->
-    {{ Γ', ℕ ⊢ A : Sort@s }} ->
-    {{ Γ ⊢ M : ℕ }} ->
-    {{ Γ ⊢ N : A[σ,,M] }} ->
-    {{ Γ ⊢ A[Wk∘Wk,,succ #1][σ,,M,,N] ≈ A[σ,,succ M] : Sort@s }}.
+(* Lemma wf_typ_eq_nat_beta_succ_rhs_typ_gen_of_sort {P} : forall {Γ : ctx P} {Γ' σ A M N s}, *)
+(*     {{ Γ ⊢s σ : Γ' }} -> *)
+(*     {{ Γ', ℕ ⊢ A : Sort@s }} -> *)
+(*     {{ Γ ⊢ M : ℕ }} -> *)
+(*     {{ Γ ⊢ N : A[σ,,M] }} -> *)
+(*     {{ Γ ⊢ A[Wk∘Wk,,succ #1][σ,,M,,N] ≈ A[σ,,succ M] : Sort@s }}. *)
+(* Proof. *)
+(*   intros. *)
+(*   gen_presup H1. *)
+(*   pose proof wf_typ_nat_inversion HAwf as [sn [r Htriv]]; clear Htriv. *)
+(*   assert {{ ⊢ Γ' }} by mauto 3. *)
+(*   assert {{ Γ', ℕ ⊢s Wk : Γ' }} by mauto 3. *)
+(*   assert {{ Γ', ℕ, A ⊢s Wk : Γ', ℕ }} by mauto 4. *)
+(*   assert {{ Γ', ℕ, A ⊢s Wk∘Wk : Γ' }} by mauto 3. *)
+(*   assert {{ Γ', ℕ, A ⊢s Wk∘Wk,,succ #1 : Γ', ℕ }} by mauto 4. *)
+(*   assert {{ Γ ⊢s σ,,M : Γ', ℕ }} by mauto 4. *)
+(*   assert {{ Γ ⊢s σ,,M,,N : Γ', ℕ, A }} by mauto 3. *)
+(*   autorewrite with mcpts. *)
+(*   assert {{ Γ ⊢s (Wk∘Wk,,succ #1)∘(σ,,M,,N) : Γ', ℕ }} by mauto 3. *)
+(*   assert {{ Γ ⊢s (Wk∘Wk,,succ #1)∘(σ,,M,,N) ≈ ((Wk∘Wk)∘(σ,,M,,N)),,(succ #1)[σ,,M,,N] : Γ', ℕ }} by mauto. *)
+(*   assert {{ Γ ⊢s (Wk∘Wk)∘(σ,,M,,N) ≈ Wk∘(Wk∘(σ,,M,,N)) : Γ' }} by mauto 3. *)
+(*   assert {{ Γ ⊢s Wk∘(σ,,M,,N) ≈ σ,,M : Γ', ℕ }} by (unshelve autorewrite with mcpts; mauto 3). *)
+(*   assert {{ Γ ⊢s (Wk∘Wk)∘(σ,,M,,N) ≈ Wk∘(σ,,M) : Γ' }} by (unshelve bulky_rewrite; constructor). *)
+(*   assert {{ Γ ⊢s (Wk∘Wk)∘(σ,,M,,N) ≈ σ : Γ' }} by bulky_rewrite. *)
+(*   assert {{ Γ ⊢ (succ #1)[σ,,M,,N] ≈ succ (#1[σ,,M,,N]) : ℕ }} by mauto 4. *)
+(*   assert {{ Γ ⊢ (succ #1)[σ,,M,,N] ≈ succ (#0[σ,,M]) : ℕ }} by (bulky_rewrite; mauto 4). *)
+(*   assert {{ Γ ⊢ (succ #1)[σ,,M,,N] ≈ succ M : ℕ }} by (bulky_rewrite; mauto 3). *)
+(*   assert {{ Γ ⊢s (Wk∘Wk)∘(σ,,M,,N),,(succ #1)[σ,,M,,N] ≈ σ,,succ M : Γ', ℕ }} by mauto 3. *)
+(*   assert {{ Γ ⊢ A[(Wk∘Wk,,succ #1)∘(σ,,M,,N)] ≈ A[(Wk∘Wk)∘(σ,,M,,N),,(succ #1)[σ,,M,,N]] }} by mauto 3. *)
+(*   assert {{ Γ ⊢s (Wk∘Wk,,succ #1)∘(σ,,M,,N) ≈ σ,,(succ M) : Γ', ℕ }} by mauto 3. *)
+(*   transitivity {{{ A[(Wk∘Wk)∘(σ,,M,,N),,(succ #1)[σ,,M,,N]] }}}; mauto 4. *)
+(* Qed. *)
+
+(* #[export] *)
+(* Hint Resolve wf_typ_eq_nat_beta_succ_rhs_typ_gen_of_sort : mcpts. *)
+
+(* Move to LogicalRelation/Lemmas *)
+Lemma cons_glu_sub_pred_helper {P} (pred_P : PredicativeSig P) : forall {anns Γ Sb Γ' σ ρ A a sa typ_rel exp_rel M c},
+    {{ EG Γ ∈ glu_ctx_env pred_P anns ↘ Sb }} ->
+    {{ Γ' ⊢s σ ® ρ ∈ Sb }} ->
+    {{ ⟪ pred_P ⟫ Γ @ anns ⊩ A @ sa }} ->
+    {{ ⟦ A ⟧ ρ ↘ a }} ->
+    {{ DG a ∈ glu_typ_elem pred_P sa ↘ typ_rel ↘ exp_rel }} ->
+    {{ Γ' ⊢ M : A[σ] ® c ∈ exp_rel }} ->
+    {{ Γ' ⊢s σ,,M ® ρ ↦ c ∈ cons_glu_sub_pred pred_P sa Γ A Sb }}.
 Proof.
-  intros.
-  gen_presup H1.
-  pose proof wf_typ_nat_inversion HAwf as [sn [r Htriv]]; clear Htriv.
-  assert {{ ⊢ Γ' }} by mauto 3.
-  assert {{ Γ', ℕ ⊢s Wk : Γ' }} by mauto 3.
-  assert {{ Γ', ℕ, A ⊢s Wk : Γ', ℕ }} by mauto 4.
-  assert {{ Γ', ℕ, A ⊢s Wk∘Wk : Γ' }} by mauto 3.
-  assert {{ Γ', ℕ, A ⊢s Wk∘Wk,,succ #1 : Γ', ℕ }} by mauto 4.
-  assert {{ Γ ⊢s σ,,M : Γ', ℕ }} by mauto 4.
-  assert {{ Γ ⊢s σ,,M,,N : Γ', ℕ, A }} by mauto 3.
-  autorewrite with mcpts.
-  assert {{ Γ ⊢s (Wk∘Wk,,succ #1)∘(σ,,M,,N) : Γ', ℕ }} by mauto 3.
-  assert {{ Γ ⊢s (Wk∘Wk,,succ #1)∘(σ,,M,,N) ≈ ((Wk∘Wk)∘(σ,,M,,N)),,(succ #1)[σ,,M,,N] : Γ', ℕ }} by mauto.
-  assert {{ Γ ⊢s (Wk∘Wk)∘(σ,,M,,N) ≈ Wk∘(Wk∘(σ,,M,,N)) : Γ' }} by mauto 3.
-  assert {{ Γ ⊢s Wk∘(σ,,M,,N) ≈ σ,,M : Γ', ℕ }} by (unshelve autorewrite with mcpts; mauto 3).
-  assert {{ Γ ⊢s (Wk∘Wk)∘(σ,,M,,N) ≈ Wk∘(σ,,M) : Γ' }} by (unshelve bulky_rewrite; constructor).
-  assert {{ Γ ⊢s (Wk∘Wk)∘(σ,,M,,N) ≈ σ : Γ' }} by bulky_rewrite.
-  assert {{ Γ ⊢ (succ #1)[σ,,M,,N] ≈ succ (#1[σ,,M,,N]) : ℕ }} by mauto 4.
-  assert {{ Γ ⊢ (succ #1)[σ,,M,,N] ≈ succ (#0[σ,,M]) : ℕ }} by (bulky_rewrite; mauto 4).
-  assert {{ Γ ⊢ (succ #1)[σ,,M,,N] ≈ succ M : ℕ }} by (bulky_rewrite; mauto 3).
-  assert {{ Γ ⊢s (Wk∘Wk)∘(σ,,M,,N),,(succ #1)[σ,,M,,N] ≈ σ,,succ M : Γ', ℕ }} by mauto 3.
-  assert {{ Γ ⊢ A[(Wk∘Wk,,succ #1)∘(σ,,M,,N)] ≈ A[(Wk∘Wk)∘(σ,,M,,N),,(succ #1)[σ,,M,,N]] }} by mauto 3.
-  assert {{ Γ ⊢s (Wk∘Wk,,succ #1)∘(σ,,M,,N) ≈ σ,,(succ M) : Γ', ℕ }} by mauto 3.
-  transitivity {{{ A[(Wk∘Wk)∘(σ,,M,,N),,(succ #1)[σ,,M,,N]] }}}; mauto 4.
+  intros * ? ? HA **.
+  pose proof glu_rel_typ_to_wf_typ_or_wf_exp_of_sort HA as HAofSort.
+  destruct sa;
+    destruct HAofSort as [Heq | [s' [Heq HAs']]]; inversion Heq; subst;
+    mauto 3.
 Qed.
 
 #[export]
-Hint Resolve wf_typ_eq_nat_beta_succ_rhs_typ_gen_of_sort : mcpts.
+Hint Resolve cons_glu_sub_pred_helper : mcpts.
 
 
 Lemma glu_rel_exp_natrec_succ_helper {P} (pred_P : PredicativeSig P) : forall {sa anns Γ SbΓ A MZ MS Γ' M M' m' σ ρ am typ_rel exp_rel sn} {r : Ru_nat P sn},
@@ -566,20 +509,15 @@ Lemma glu_rel_exp_natrec_succ_helper {P} (pred_P : PredicativeSig P) : forall {s
         {{ Γ' ⊢ rec M return A[q σ] | zero -> MZ[σ] | succ -> MS[q (q σ)] end : A[σ,,M] ® e ∈ exp_rel }}.
 Proof.
   intros * ? HA ? ? HMS **.
-  assert (sa = so_None \/ exists s, sa = so_Some s /\ {{ Γ, ℕ ⊢ A : Sort@s }}) as HAofSort.
-  {
-    destruct sa.
-    - left; reflexivity.
-    - right; eexists; split; try reflexivity.
-      mauto 3.
-  }
+  pose proof glu_rel_typ_to_wf_typ_or_wf_exp_of_sort HA as HAofSort.
   assert {{ ⟪ pred_P ⟫ ⊩ Γ @ anns }} by (eexists; eassumption).
   assert {{ ⟪ pred_P ⟫ Γ @ anns ⊩ ℕ : Sort@sn @ ^so_None }} as Hℕ by mauto 3.
   pose (SbΓℕ := cons_glu_sub_pred pred_P (so_Some sn) Γ {{{ ℕ }}} SbΓ).
   assert {{ EG Γ, ℕ  ∈ glu_ctx_env pred_P ((so_Some sn)::anns) ↘ SbΓℕ }} by (invert_glu_rel_exp Hℕ; econstructor; mauto 4; try reflexivity).
 
   assert {{ Γ, ℕ ⊢ A }} by mauto 3.
-  invert_glu_rel_typ HA.
+  pose proof HA as HA'.
+  invert_glu_rel_typ HA'.
 
   pose (SbΓℕA := cons_glu_sub_pred pred_P sa {{{ Γ, ℕ }}} A SbΓℕ).
   assert {{ EG Γ, ℕ, A ∈ glu_ctx_env pred_P (sa::(so_Some sn)::anns) ↘ SbΓℕA }} by (econstructor; mauto 3; reflexivity).
@@ -597,15 +535,7 @@ Proof.
   
   
   assert (SbΓℕ Γ' {{{ Wk∘(σ,,M',,R) }}} d{{{ ((ρ ↦ m') ↦ e') ↯ }}}) by (rewrite HWkσM'R; mauto 2).
-  assert {{ Γ' ⊢s σ,,M',,R ® (ρ ↦ m') ↦ e' ∈ SbΓℕA }}. (* Should prove this in a lemma *)
-  {
-    unfold SbΓℕA.
-    destruct sa; mauto 3.
-    eapply cons_glu_sub_pred_helper_sorted; mauto 3.
-    destruct HAofSort as [Heq | [s' [Heq]]]; inversion Heq; subst.
-    eassumption.
-  }
-  
+  assert {{ Γ' ⊢s σ,,M',,R ® (ρ ↦ m') ↦ e' ∈ SbΓℕA }} by (eapply cons_glu_sub_pred_helper; mauto 3).
   destruct_glu_rel_typ_with_sub.
   destruct_glu_rel_exp_with_sub.
   simplify_evals.
@@ -816,7 +746,7 @@ Proof.
   assert {{ Γ' ⊢ MZ[σ] : A[q σ][Id,,zero] }} by mauto 3. 
   assert {{ Γ', ℕ, A[q σ] ⊢s Wk∘Wk,,succ #1 : Γ', ℕ }} by mauto 3.
   assert {{ Γ', ℕ, A[q σ] ⊢ A[q σ][Wk∘Wk,,succ #1] ≈ A[Wk∘Wk,, succ #1][q (q σ)]  }} by mauto 3.
-  assert {{ Γ', ℕ, A[q σ] ⊢ MS[q (q σ)] : A[Wk∘Wk,,succ #1][q (q σ)] }} by mauto 3.
+  assert {{ Γ', ℕ, A[q σ] ⊢ MS[q (q σ)] : A[Wk∘Wk,,succ #1][q (q σ)] }} by mauto 4.
   assert {{ Γ', ℕ, A[q σ] ⊢ MS[q (q σ)] : A[q σ][Wk∘Wk,,succ #1] }} by mauto 3.
   pose (R := {{{ rec M return A[q σ] | zero -> MZ[σ] | succ -> MS[q (q σ)] end }}}).
   enough {{ Γ' ⊢ R : A[σ,,M] ® rec m under ρ return A | zero -> mz | succ -> MS end ∈ glu_elem_bot pred_P sa am }} by (eapply realize_glu_typ_elem_bot; mauto 3).

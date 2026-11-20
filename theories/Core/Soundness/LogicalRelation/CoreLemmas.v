@@ -1,10 +1,24 @@
 From Coq Require Import Equivalence Morphisms Morphisms_Prop Morphisms_Relations Relation_Definitions RelationClasses.
 
 From McPTS Require Import PtsSignature LibTactics Base.
-From McPTS.Core.Syntactic Require Import SystemAnnotated.
+From McPTS.Core.Syntactic Require Import Corollaries SystemAnnotated.
 From McPTS.Core.Soundness.LogicalRelation Require Import CoreTactics Definitions.
 From McPTS.Core.Syntactic.Weakening Require Export Lemmas.
 Import Domain_Notations.
+
+Lemma wf_exp_of_sort_under_q {P} : forall {Γ : ctx P} {Γ' σ A B s},
+    {{ Γ ⊢ A }} ->
+    {{ Γ, A ⊢ B : Sort@s }} ->
+    {{ Γ' ⊢s σ : Γ }} ->
+    {{ Γ', A[σ] ⊢ B[q σ] : Sort@s }}.
+Proof.
+  intros.
+  assert {{ Γ', A[σ] ⊢s q σ : Γ, A }} by mauto 3.
+  mauto 3.
+Qed.
+
+#[export]
+Hint Resolve wf_exp_of_sort_under_q : mcpts.
 
 Lemma glu_nat_per_nat {P} {s} (r : Ru_nat P s) : forall (Γ : ctx P) M a,
     glu_nat r Γ M a ->
@@ -1369,16 +1383,15 @@ Proof.
       enough (IEL Γ'0 {{{ IT[σ][σ0] }}} M m) by (eapply glu_sort_elem_trm_resp_typ_exp_eq; mauto).
       eassumption.
 
-  - destruct H7.
-    simpl_glu_rel.
-    econstructor; mauto 4;
+  - simpl_glu_rel.
+    econstructor; mauto 3;
       intros;
       saturate_weakening_escape.
     + transitivity {{{ (Π r IT OT)[σ] }}}; mauto 3.
       eapply wf_exp_eq_conv with (A := {{{ Sort@s3 }}}); mauto 3.
     + eapply IHglu_sort_elem; eauto.
     + saturate_glu_info.
-      invert_per_sort_elem H3.
+      match_by_head @per_sort_elem ltac:(fun H => directed invert_per_sort_elem H).
       apply_equiv_left.
       assert (per_sort_elem pred_P s1 in_rel0 a a) by (destruct_conjs; pose proof ord_ru_pi_sub pred_P r sub as [[] ?]; subst; mauto).
       handle_per_sort_elem_irrel.

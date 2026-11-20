@@ -214,6 +214,14 @@ Qed.
 #[export]
 Hint Resolve wf_typ_inversion : mcpts.
 
+Lemma wf_typ_nat_inversion {P} : forall {Γ : ctx P},
+    {{ Γ ⊢ ℕ }} ->
+    exists s (r : Ru_nat P s), True.
+Proof.
+  inversion 1; subst.
+  pose proof wf_exp_nat_inversion H0 as [s' [r]].
+  eauto.
+Qed.
 
 (** ** For functions *)
 Corollary wf_typ_pi_inversion {P : PtsSig} : forall {Γ A B s1 s2 s3} {r : Ru_pi P s1 s2 s3},
