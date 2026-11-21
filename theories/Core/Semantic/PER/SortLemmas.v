@@ -443,7 +443,7 @@ Proof.
   split.
   - instantiate (1 := fun n n' (equiv_n_n' : in_rel n n') m m' =>
                         forall R,
-                          rel_typ_unsorted pred_P B d{{{ ρ ↦ n }}} B' d{{{ ρ' ↦ n' }}} R ->
+                          rel_typ pred_P B d{{{ ρ ↦ n }}} B' d{{{ ρ' ↦ n' }}} R ->
                           R m m').
     intros.
     assert (in_rel0 n n') by intuition.
@@ -452,7 +452,7 @@ Proof.
     apply -> per_sort_elem_morphism_iff; eauto.
     split.
     + intros.
-      destruct_by_head (@rel_typ_unsorted).
+      destruct_by_head (@rel_typ).
       simplify_evals.
       assert (per_sort_elem pred_P s_out R a0 a'0) by mauto 2.
       handle_per_sort_elem_irrel.
@@ -464,7 +464,7 @@ Proof.
       [assert (in_rel0 n n') by intuition; (on_all_hyp: destruct_rel_by_assumption in_rel0)
       | assert (in_rel n n') by intuition; (on_all_hyp: destruct_rel_by_assumption in_rel)];
       econstructor; intuition.
-    + destruct_by_head (@rel_typ_unsorted P).
+    + destruct_by_head (@rel_typ P).
       simplify_evals.
       assert (per_sort_elem pred_P s_out R a0 a'0) by mauto 2.
       handle_per_sort_elem_irrel.

@@ -152,6 +152,31 @@ Hint Resolve wf_typ_eq_nat_beta_succ_rhs_typ_gen_of_sort : mcpts.
 
 
 (** ** Helper lemmas to deal with recursor *)
+Lemma wf_sub_eq_sub_decompose_double_q_with_id_double_extend {P} : forall {Γ : ctx P} {Γ' σ A B M N},
+    {{ Γ, A ⊢ B }} ->
+    {{ Γ' ⊢s σ : Γ }} ->
+    {{ Γ' ⊢ M : A[σ] }} ->
+    {{ Γ' ⊢ N : B[σ,,M] }} ->
+    {{ Γ' ⊢s (q (q σ))∘(Id,,M,,N) ≈ σ,,M,,N : Γ, A, B }}.
+Proof.
+  intros.
+  gen_presups.
+  assert {{ Γ ⊢ A }} by mauto 3.
+  assert {{ Γ', A[σ] ⊢s q σ : Γ, A }} by mauto 3.
+  assert {{ Γ' ⊢s Id,,M : Γ', A[σ] }} by mauto 3.
+  assert {{ Γ' ⊢s (q σ)∘(Id,,M) ≈ σ,,M : Γ, A }} by mauto 3.
+  assert {{ Γ' ⊢ B[q σ][Id,,M] }} by mauto 3.
+  assert {{ Γ' ⊢ B[q σ][Id,,M] ≈ B[σ,,M] }} by mauto 3.
+  assert {{ Γ' ⊢ N : B[q σ][Id,,M] }} by mauto 3.
+  assert {{ Γ' ⊢ N : B[(q σ)∘(Id,,M)] }} by mauto 3.
+  assert {{ Γ' ⊢s Id,,M,,N : Γ', A[σ], B[q σ] }} by mauto 3.
+  assert {{ Γ' ⊢s (q (q σ))∘(Id,,M,,N) : Γ, A, B }} by mauto 3.
+  transitivity {{{ (q σ)∘(Id,,M),,N }}}; mauto 3.
+Qed.  
+
+#[export]
+Hint Resolve wf_sub_eq_sub_decompose_double_q_with_id_double_extend : mcpts.
+
 Lemma wf_exp_eq_sub_decompose_double_q_with_id_double_extend {P : PtsSig} : forall {Γ : ctx P} {Γ' σ A B C M N L},
     {{ Γ, B, C ⊢ A }} ->
     {{ Γ, B, C ⊢ M : A }} ->
@@ -163,24 +188,9 @@ Proof.
   intros.
   gen_presups.
   assert {{ Γ ⊢ B }} by mauto 3.
-
-  assert {{ Γ', B[σ] ⊢s q σ : Γ, B }} by mauto 3.
-  assert {{ Γ' ⊢s Id,,N : Γ', B[σ] }} by mauto 3.
-  assert {{ Γ' ⊢s q σ∘(Id,,N) ≈ σ,,N : Γ, B }} by mauto 3.
-  assert {{ Γ, B ⊢ C }} by mauto 3.
-  assert {{ Γ' ⊢ C[q σ][Id,,N] }} by mauto 4.  
-  assert {{ Γ' ⊢ C[σ,,N] ≈ C[q σ][Id,,N] }} by mauto 4.
-  assert {{ Γ' ⊢ L : C[q σ][Id,,N] }} by mauto 3.
-  assert {{ Γ' ⊢ L : C[q σ∘(Id,,N)] }} by mauto 3.
-  assert {{ Γ' ⊢s Id,,N,,L : Γ', B[σ], C[q σ] }} by mauto 3.
-  assert {{ Γ' ⊢s q σ∘(Id,,N) ≈ σ,,N : Γ, B }} by mauto 3.
-  assert {{ Γ' ⊢ C[q σ∘(Id,,N)] ≈ C[σ,,N] }} by mauto 3.
-  assert {{ Γ' ⊢ C[q σ][Id,,N] ≈ C[σ,,N] }} by mauto 3.
-  assert {{ Γ' ⊢s q (q σ)∘(Id,,N,,L) : Γ, B, C }} by mauto 3.
-  assert {{ Γ' ⊢s q (q σ)∘(Id,,N,,L) ≈ (q σ∘(Id,,N)),,L : Γ, B, C }} by (eapply sub_decompose_q; mauto 3).
-  assert {{ Γ' ⊢s q (q σ)∘(Id,,N,,L) ≈ σ,,N,,L : Γ, B, C }} by (bulky_rewrite; mauto 3).
-  assert {{ Γ' ⊢ A[q (q σ)][Id,,N,,L] ≈ A[q (q σ)∘(Id,,N,,L)] }} by mauto 3.
-  assert {{ Γ' ⊢s q (q σ)∘(Id,,N,,L) ≈ σ,,N,,L : Γ, B, C }} by mauto 3.
+  assert {{ Γ' ⊢s (q (q σ))∘(Id,,N,,L) ≈ σ,,N,,L : Γ, B, C }} by mauto 3.
+  gen_presups.
+  assert {{ Γ' ⊢ A[q (q σ)][Id,,N,,L] ≈ A[q (q σ)∘(Id,,N,,L)] }} by mauto 4.
   assert {{ Γ' ⊢ A[q (q σ)∘(Id,,N,,L)] ≈ A[σ,,N,,L] }} by mauto 3.
   assert {{ Γ' ⊢ M[q (q σ)][Id,,N,,L] ≈ M[q (q σ)∘(Id,,N,,L)] : A[q (q σ)∘(Id,,N,,L)] }} by mauto 4.
   assert {{ Γ' ⊢ M[q (q σ)][Id,,N,,L] ≈ M[σ,,N,,L] : A[q (q σ)∘(Id,,N,,L)] }} by (bulky_rewrite; mauto 4).

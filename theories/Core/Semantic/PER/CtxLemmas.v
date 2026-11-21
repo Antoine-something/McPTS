@@ -30,7 +30,7 @@ Lemma per_ctx_env_right_irrel {P : PtsSig} {pred_P : PredicativeSig P} : forall 
     {{ EF Γ ≈ Γ' ∈ per_ctx_env pred_P ↘ R }} ->
     {{ EF Γ ≈ Γ'' ∈ per_ctx_env pred_P ↘ R' }} ->
     R <~> R'.
-Proof with (destruct_rel_typ_unsorted; handle_per_typ_elem_irrel; eexists; intuition).
+Proof with (destruct_rel_typ; handle_per_typ_elem_irrel; eexists; intuition).
   intros * Horig; gen Γ'' R'.  
   induction Horig; intros * Hright;
     dependent destruction Hright; subst;
@@ -41,9 +41,9 @@ Proof with (destruct_rel_typ_unsorted; handle_per_typ_elem_irrel; eexists; intui
     split; intros Hcons; dependent destruction Hcons;
     [ assert {{ Dom ρ ↯ ≈ ρ' ↯ ∈ tail_rel0 }} by intuition
     | assert {{ Dom ρ ↯ ≈ ρ' ↯ ∈ tail_rel }} by intuition ];
-    assert (rel_typ_unsorted pred_P A _ A' _ (head_rel _ _ ltac:(eassumption))) by mauto 3;
-    assert (rel_typ_unsorted pred_P A _ A'0 _ (head_rel0 _ _ ltac:(eassumption))) by mauto 3;
-    inversion_clear_by_head (@rel_typ_unsorted P);
+    assert (rel_typ pred_P A _ A' _ (head_rel _ _ ltac:(eassumption))) by mauto 3;
+    assert (rel_typ pred_P A _ A'0 _ (head_rel0 _ _ ltac:(eassumption))) by mauto 3;
+    inversion_clear_by_head (@rel_typ P);
     simplify_evals;
     handle_per_typ_elem_irrel;
     econstructor; mauto 3;
@@ -177,14 +177,14 @@ Proof with solve [eauto using per_typ_trans].
     + intros.
       assert (tail_rel ρ ρ) by intuition.
       assert (tail_rel0 ρ ρ') by intuition.
-      destruct_rel_typ_unsorted.
+      destruct_rel_typ.
       handle_per_typ_elem_irrel.
       econstructor; mauto; intuition.
       do 3 (etransitivity; mauto).
       symmetry; mauto.
   - destruct_by_head (@cons_per_ctx_env P).
     assert (tail_rel d{{{ ρ ↯ }}} d{{{ ρ' ↯ }}}) by eauto.
-    destruct_rel_typ_unsorted.
+    destruct_rel_typ.
     handle_per_typ_elem_irrel.
     eexists; [eassumption | eassumption |].
     apply_relation_equivalence.
@@ -233,7 +233,7 @@ Lemma per_ctx_env_cons' {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ Γ
                              env_rel,
     {{ EF Γ ≈ Γ' ∈ per_ctx_env pred_P ↘ tail_rel }} ->
     (forall {ρ ρ'} (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ tail_rel }}),
-        rel_typ_unsorted pred_P A ρ A' ρ' (head_rel equiv_ρ_ρ')) ->
+        rel_typ pred_P A ρ A' ρ' (head_rel equiv_ρ_ρ')) ->
     (env_rel <~> cons_per_ctx_env tail_rel (@head_rel)) ->
     {{ EF Γ, A ≈ Γ', A' ∈ per_ctx_env pred_P ↘ env_rel }}.
 Proof.
@@ -255,7 +255,7 @@ Lemma per_ctx_env_cons_clean_inversion {P : PtsSig} {pred_P : PredicativeSig P} 
     {{ EF Γ, A ≈ Γ', A' ∈ per_ctx_env pred_P ↘ env_relΓA }} ->
     exists (head_rel : forall {ρ ρ'} (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}), relation (domain P)),
       (forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}),
-          rel_typ_unsorted pred_P A ρ A' ρ' (head_rel equiv_ρ_ρ')) /\
+          rel_typ pred_P A ρ A' ρ' (head_rel equiv_ρ_ρ')) /\
         (env_relΓA <~> cons_per_ctx_env env_relΓ (@head_rel)).
 Proof with intuition.
   intros * HΓ HΓA.
@@ -265,21 +265,21 @@ Proof with intuition.
   split; intros.
   - instantiate (1 := fun ρ ρ' (equiv_ρ_ρ' : env_relΓ ρ ρ') m m' =>
                         forall R,
-                          rel_typ_unsorted pred_P A ρ A' ρ' R ->
+                          rel_typ pred_P A ρ A' ρ' R ->
                           {{ Dom m ≈ m' ∈ R }}).
     assert (tail_rel ρ ρ') by intuition.
     (on_all_hyp: destruct_rel_by_assumption tail_rel).
     econstructor; eauto.
     apply -> per_typ_elem_morphism_iff; eauto.
     split; intros...
-    destruct_by_head (@rel_typ_unsorted P).
+    destruct_by_head (@rel_typ P).
     handle_per_typ_elem_irrel...
   - intros ρ ρ'.
     split; intros; destruct_by_head (@cons_per_ctx_env P);
     assert {{ Dom ρ ↯ ≈ ρ' ↯ ∈ tail_rel }} by intuition;
       (on_all_hyp: destruct_rel_by_assumption tail_rel);
       unshelve (eexists; try eassumption); intros...
-    destruct_by_head (@rel_typ_unsorted P).
+    destruct_by_head (@rel_typ P).
     handle_per_typ_elem_irrel...
 Qed.
 
@@ -324,7 +324,7 @@ Proof.
   assert {{ Dom ρ ↯ ≈ ρ' ↯ ∈ tail_rel0 }} by intuition.
   eexists; try eassumption.
    
-  destruct_rel_typ_unsorted.
+  destruct_rel_typ.
   eapply per_elem_subtyping; try eassumption.
   - eauto.
   - saturate_refl.
@@ -345,7 +345,7 @@ Proof.
   destruct_all.
   econstructor; try solve [saturate_refl; mauto 2].
   intros.
-  destruct_rel_typ_unsorted.
+  destruct_rel_typ.
   simplify_evals.
   mauto.
 Qed.
@@ -376,7 +376,7 @@ Proof.
     assert {{ Dom ρ ≈ ρ' ∈ tail_rel0 }}
       by (apply_relation_equivalence; eapply per_ctx_env_subtyping; revgoals; eassumption).
     saturate_refl_for tail_rel.
-    destruct_rel_typ_unsorted.
+    destruct_rel_typ.
     handle_per_typ_elem_irrel.
     etransitivity; intuition mauto.
   - econstructor; intuition.

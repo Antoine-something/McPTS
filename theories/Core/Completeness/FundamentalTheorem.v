@@ -20,8 +20,8 @@ Section completeness_fundamental.
     (forall Γ, {{ ⊢ Γ }} -> {{ ⟪ pred_P ⟫ ⊨ Γ }}) /\
       (forall Γ Γ', {{ ⊢ Γ ⊆ Γ' }} -> {{ SubC Γ <: Γ' ∈ per_ctx_subtyp pred_P }}) /\
       (* (forall Γ Δ, {{ ⊢ Γ ≈ Δ }} -> {{ ⟪ pred_P ⟫ ⊨ Γ ≈ Δ }}) /\ *)
-      (forall Γ A M, {{ Γ ⊢ M : A }} -> {{ ⟪ pred_P ⟫ Γ ⊨u M : A }}) /\
-      (forall Γ A M M', {{ Γ ⊢ M ≈ M' : A }} -> {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : A }}) /\
+      (forall Γ A M, {{ Γ ⊢ M : A }} -> {{ ⟪ pred_P ⟫ Γ ⊨ M : A }}) /\
+      (forall Γ A M M', {{ Γ ⊢ M ≈ M' : A }} -> {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ M' : A }}) /\
       (forall Γ A, {{ Γ ⊢ A }} -> {{ ⟪ pred_P ⟫ Γ ⊨ A }}) /\
       (forall Γ A A', {{ Γ ⊢ A ≈ A' }} -> {{ ⟪ pred_P ⟫ Γ ⊨ A ≈ A' }}) /\
       (forall Γ A A', {{ Γ ⊢ A ⊆ A' }} -> {{ ⟪ pred_P ⟫ Γ ⊨ A ⊆ A' }}) /\
@@ -44,10 +44,10 @@ Qed.
   Theorem completeness_fundamental_ctx_sub : forall Γ Γ', {{ ⊢ Γ ⊆ Γ' }} -> {{ SubC Γ <: Γ' ∈ per_ctx_subtyp pred_P }}.
   Proof using Type. solve_it. Qed.
 
-  Theorem completeness_fundamental_exp : forall Γ M A, {{ Γ ⊢ M : A }} -> {{ ⟪ pred_P ⟫ Γ ⊨u M : A }}.
+  Theorem completeness_fundamental_exp : forall Γ M A, {{ Γ ⊢ M : A }} -> {{ ⟪ pred_P ⟫ Γ ⊨ M : A }}.
   Proof using Type. solve_it. Qed.
 
-  Theorem completeness_fundamental_exp_eq : forall Γ A M M', {{ Γ ⊢ M ≈ M' : A }} -> {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : A }}.
+  Theorem completeness_fundamental_exp_eq : forall Γ A M M', {{ Γ ⊢ M ≈ M' : A }} -> {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ M' : A }}.
   Proof using Type. solve_it. Qed.
 
   Theorem completeness_fundamental_typ : forall Γ A, {{ Γ ⊢ A }} -> {{ ⟪ pred_P ⟫ Γ ⊨ A }}.

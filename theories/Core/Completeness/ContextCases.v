@@ -33,7 +33,7 @@ Lemma rel_ctx_extend {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ Γ' A
     {{ ⟪ pred_P ⟫ Γ ⊨ A ≈ A' }} ->
     {{ ⟪ pred_P ⟫ ⊨ Γ, A ≈ Γ', A' }}.
 Proof with intuition.
-  intros * [] [env_relΓ]%rel_exp_of_typ_unsorted_inversion1.
+  intros * [] [env_relΓ]%rel_typ_inversion1.
   pose env_relΓ.
   destruct_conjs.
   handle_per_ctx_env_irrel.
@@ -41,15 +41,15 @@ Proof with intuition.
   per_ctx_env_econstructor; eauto.
   - instantiate (1 := fun ρ ρ' (equiv_ρ_ρ' : env_relΓ ρ ρ') m m' =>
                         forall R,
-                          rel_typ_unsorted pred_P A ρ A' ρ' R ->
+                          rel_typ pred_P A ρ A' ρ' R ->
                           R m m').
     intros.
     (on_all_hyp: destruct_rel_by_assumption env_relΓ).
     match_by_head (@per_typ P) ltac:(fun H => destruct H as [elem_relA]).
     econstructor; eauto.
     apply -> per_typ_elem_morphism_iff; eauto.
-    split; intros; destruct_by_head (@rel_typ_unsorted P); handle_per_typ_elem_irrel...
-    assert (rel_typ_unsorted pred_P A ρ A' ρ' elem_relA) by mauto.
+    split; intros; destruct_by_head (@rel_typ P); handle_per_typ_elem_irrel...
+    assert (rel_typ pred_P A ρ A' ρ' elem_relA) by mauto.
     intuition.
   - apply Equivalence_Reflexive.
 Qed.
@@ -64,16 +64,16 @@ Qed.
 (*     {{ ⟪ pred_P ⟫ Δ ⊨ A ≈ A' }} -> *)
 (*     {{ ⟪ pred_P ⟫ ⊨ Γ, A ≈ Δ, A' }}. *)
 (* Proof. *)
-(*   intros * [] [env_relΓ]%rel_exp_of_typ_unsorted_inversion1 []%rel_exp_of_typ_unsorted_inversion1 *)
-(*              [env_relΔ]%rel_exp_of_typ_unsorted_inversion1 []%rel_exp_of_typ_unsorted_inversion1 *)
-(*              []%rel_exp_of_typ_unsorted_inversion1 []%rel_exp_of_typ_unsorted_inversion1. *)
+(*   intros * [] [env_relΓ]%rel_typ_inversion1 []%rel_typ_inversion1 *)
+(*              [env_relΔ]%rel_typ_inversion1 []%rel_typ_inversion1 *)
+(*              []%rel_typ_inversion1 []%rel_typ_inversion1. *)
 (*   destruct_conjs. *)
 (*   handle_per_ctx_env_irrel. *)
 (*   eexists. *)
 (*   per_ctx_env_econstructor; eauto. *)
 (*   - instantiate (1 := fun ρ ρ' (equiv_ρ_ρ' : x ρ ρ') m m' => *)
 (*                         forall R, *)
-(*                           rel_typ_unsorted pred_P A ρ A' ρ' R -> *)
+(*                           rel_typ pred_P A ρ A' ρ' R -> *)
 (*                           R m m'). *)
 (*     intros. *)
 (*     (on_all_hyp: destruct_rel_by_assumption x). *)
@@ -83,8 +83,8 @@ Qed.
 (*     simplify_evals. *)
 (*     handle_per_typ_elem_irrel. *)
 (*     apply -> per_typ_elem_morphism_iff; [apply H2 | reflexivity | reflexivity |]. *)
-(*     split; intros; destruct_by_head (@rel_typ_unsorted P); handle_per_typ_elem_irrel; *)
-(*       assert (rel_typ_unsorted pred_P A ρ A' ρ' x1) by mauto; *)
+(*     split; intros; destruct_by_head (@rel_typ P); handle_per_typ_elem_irrel; *)
+(*       assert (rel_typ pred_P A ρ A' ρ' x1) by mauto; *)
 (*       intuition. *)
 
 (*   - apply Equivalence_Reflexive. *)

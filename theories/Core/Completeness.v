@@ -15,7 +15,7 @@ Proof with mautosolve.
   destruct_conjs.
   functional_initial_env_rewrite_clear.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head (@rel_typ_unsorted P).
+  destruct_by_head (@rel_typ P).
   functional_eval_rewrite_clear.
   destruct_by_head (@rel_exp P).
   unshelve epose proof (per_typ_elem_then_per_top _ _ (length Γ)) as [? []]; shelve_unifiable; mauto.
@@ -39,7 +39,7 @@ Proof.
   destruct_conjs.
   functional_initial_env_rewrite_clear.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head (@rel_typ_unsorted P).
+  destruct_by_head (@rel_typ P).
   assert (per_top_typ a a') by mauto 2.
   destruct (H6 (length Γ)) as [W []].
   exists W.

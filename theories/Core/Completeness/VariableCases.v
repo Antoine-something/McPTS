@@ -10,7 +10,7 @@ Lemma valid_lookup {P : PtsSig} {pred_P : PredicativeSig P} : forall {Γ x A env
     {{ #x : A ∈ Γ }} ->
     forall ρ ρ' (equiv_p_p' : {{ Dom ρ ≈ ρ' ∈ env_relΓ }}),
     exists elem_rel,
-      rel_typ_unsorted pred_P A ρ A ρ' elem_rel /\ rel_exp {{{ #x }}} ρ {{{ #x }}} ρ' elem_rel.
+      rel_typ pred_P A ρ A ρ' elem_rel /\ rel_exp {{{ #x }}} ρ {{{ #x }}} ρ' elem_rel.
 Proof with solve [split; mauto].
   intros * ? HxinΓ.
   assert {{ #x : A ∈ Γ }} as HxinΓ' by mauto.
@@ -31,8 +31,8 @@ Proof with solve [split; mauto].
     (on_all_hyp: destruct_rel_by_assumption tail_rel); destruct_conjs;
     eexists.
 
-    assert (rel_typ_unsorted pred_P B d{{{ ρ0 ↯ }}} B0 d{{{ ρ'0 ↯ }}} (head_rel d{{{ ρ0 ↯ }}} d{{{ ρ'0 ↯ }}} equiv_ρ_drop_ρ'_drop)) by mauto.
-    destruct_by_head (@rel_typ_unsorted P).
+    assert (rel_typ pred_P B d{{{ ρ0 ↯ }}} B0 d{{{ ρ'0 ↯ }}} (head_rel d{{{ ρ0 ↯ }}} d{{{ ρ'0 ↯ }}} equiv_ρ_drop_ρ'_drop)) by mauto.
+    destruct_by_head (@rel_typ P).
     destruct_by_head (@rel_exp P).
     dir_inversion_by_head (@eval_exp P); subst.
     simplify_evals.
@@ -42,7 +42,7 @@ Qed.
 Lemma valid_exp_var {P} {pred_P : PredicativeSig P} : forall {Γ x A},
     {{ ⟪ pred_P ⟫ ⊨ Γ }} ->
     {{ # x : A ∈ Γ }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊨u #x : A }}.
+    {{ ⟪ pred_P ⟫ Γ ⊨ #x : A }}.
 Proof.
   intros * [? equiv_Γ] Hx.
   eexists; split; [eassumption|].
@@ -56,7 +56,7 @@ Hint Resolve valid_exp_var : mcpts.
 Lemma rel_exp_var {P} {pred_P : PredicativeSig P} : forall {Γ x A},
     {{ ⟪ pred_P ⟫ ⊨ Γ }} ->
     {{ # x : A ∈ Γ }} ->
-    {{ ⟪ pred_P ⟫ Γ ⊨u #x ≈ #x : A}}.
+    {{ ⟪ pred_P ⟫ Γ ⊨ #x ≈ #x : A}}.
 Proof.
   intros.
   eapply valid_exp_var; mauto.
@@ -64,16 +64,16 @@ Qed.
 
 Lemma rel_exp_var_0_sub {P} {pred_P : PredicativeSig P} : forall {Γ M σ Γ' A},
   {{ ⟪ pred_P ⟫ Γ ⊨s σ : Γ' }} ->
-  {{ ⟪ pred_P ⟫ Γ ⊨u M : A[σ] }} ->
-  {{ ⟪ pred_P ⟫ Γ ⊨u #0[σ ,, M] ≈ M : A[σ] }}.
+  {{ ⟪ pred_P ⟫ Γ ⊨ M : A[σ] }} ->
+  {{ ⟪ pred_P ⟫ Γ ⊨ #0[σ ,, M] ≈ M : A[σ] }}.
 Proof with mautosolve.
   intros * [env_relΓ [? [env_relΓ']]] HM.
-  invert_rel_exp_unsorted HM.
+  invert_rel_exp HM.
   destruct_conjs.
   eexists; split; [eassumption|].
   intros.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head (@rel_typ_unsorted P).
+  destruct_by_head (@rel_typ P).
   destruct_by_head (@rel_exp P).
   dir_inversion_by_head (@eval_exp P); subst.
   functional_eval_rewrite_clear.
@@ -86,12 +86,12 @@ Hint Resolve rel_exp_var_0_sub : mcpts.
 
 Lemma rel_exp_var_S_sub {P} {pred_P : PredicativeSig P} : forall {Γ M σ Γ' A x B},
   {{ ⟪ pred_P ⟫ Γ ⊨s σ : Γ' }} ->
-  {{ ⟪ pred_P ⟫ Γ ⊨u M : A[σ] }} ->
+  {{ ⟪ pred_P ⟫ Γ ⊨ M : A[σ] }} ->
   {{ #x : B ∈ Γ' }} ->
-  {{ ⟪ pred_P ⟫ Γ ⊨u #(S x)[σ ,, M] ≈ #x[σ] : B[σ] }}.
+  {{ ⟪ pred_P ⟫ Γ ⊨ #(S x)[σ ,, M] ≈ #x[σ] : B[σ] }}.
 Proof with mautosolve.
   intros * [env_relΓ [? [env_relΓ']]] HM HxinΓ.
-  invert_rel_exp_unsorted HM.
+  invert_rel_exp HM.
   destruct_conjs.
   pose proof (valid_lookup ltac:(eassumption) HxinΓ).
   destruct_conjs.
@@ -99,7 +99,7 @@ Proof with mautosolve.
   intros.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
   (on_all_hyp: destruct_rel_by_assumption env_relΓ').
-  destruct_by_head (@rel_typ_unsorted P).
+  destruct_by_head (@rel_typ P).
   destruct_by_head (@rel_exp P).
   dir_inversion_by_head (@eval_exp P); subst.
   functional_eval_rewrite_clear.
@@ -114,7 +114,7 @@ Hint Resolve rel_exp_var_S_sub : mcpts.
 Lemma rel_exp_var_weaken {P} {pred_P : PredicativeSig P} : forall {Γ B x A},
     {{ ⟪ pred_P ⟫ ⊨ Γ, B }} ->
     {{ #x : A ∈ Γ }} ->
-    {{ ⟪ pred_P ⟫ Γ, B ⊨u #x[Wk] ≈ #(S x) : A[Wk] }}.
+    {{ ⟪ pred_P ⟫ Γ, B ⊨ #x[Wk] ≈ #(S x) : A[Wk] }}.
 Proof with mautosolve.
   intros * [env_relΓB] HxinΓ.
   invert_per_ctx_envs.
@@ -126,7 +126,7 @@ Proof with mautosolve.
   destruct_by_head (@cons_per_ctx_env P).
   rename tail_rel into env_relΓ.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head (@rel_typ_unsorted P).
+  destruct_by_head (@rel_typ P).
   destruct_by_head (@rel_exp P).
   dir_inversion_by_head (@eval_exp P); subst.
   eexists.

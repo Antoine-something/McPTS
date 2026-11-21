@@ -4,29 +4,7 @@ From McPTS Require Import PtsSignature LibTactics Base.
 From McPTS.Core.Completeness Require Import LogicalRelation SortCases TermStructureCases FunctionCases.
 Import Domain_Notations.
 
-
-(* Lemma subtyp_refl {P : PtsSig} {pred_P : PredicativeSig P}  : forall Δ Γ M M' s, *)
-(*     {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ M' : Sort@s }} -> *)
-(*     {{ ⟪ pred_P ⟫ Γ ⊨ M ⊆ M' }}. *)
-(* Proof. *)
-(*   intros * [env_relΓ]. *)
-(*   destruct_conjs. *)
-(*   eexists_subtyp. *)
-(*   intros. *)
-(*   saturate_refl. *)
-(*   (on_all_hyp: destruct_rel_by_assumption env_relΓ). *)
-(*   destruct_by_head (@rel_typ P). *)
-(*   invert_rel_typ_body. *)
-(*   destruct_by_head (@rel_exp P). *)
-(*   unfold per_sort_rec in *. *)
-(*   destruct_conjs. *)
-(*   handle_per_sort_elem_irrel. *)
-(*   do 2 eexists. *)
-(*   repeat split; econstructor; mauto 3; econstructor; *)
-(*     etransitivity; try eassumption; symmetry; eassumption. *)
-(* Qed. *)
-
-Lemma subtyp_refl_unsorted {P : PtsSig} {pred_P : PredicativeSig P}  : forall Γ M M',
+Lemma subtyp_refl {P : PtsSig} {pred_P : PredicativeSig P}  : forall Γ M M',
     {{ ⟪ pred_P ⟫ Γ ⊨ M ≈ M' }} ->
     {{ ⟪ pred_P ⟫ Γ ⊨ M ⊆ M' }}.
 Proof.
@@ -36,29 +14,11 @@ Proof.
   intros.
   saturate_refl.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head (@rel_typ_unsorted P).
+  destruct_by_head (@rel_typ P).
   handle_per_typ_elem_irrel.
   do 2 eexists.
   repeat split; econstructor; mauto 3; etransitivity; try eassumption; symmetry; try eassumption.
 Qed.
-
-(* Lemma subtyp_refl_unsorted' {P : PtsSig} {pred_P : PredicativeSig P}  : forall Γ M M' s, *)
-(*     {{ ⟪ pred_P ⟫ Γ ⊨u M ≈ M' : Sort@s }} -> *)
-(*     {{ ⟪ pred_P ⟫ Γ ⊨ M ⊆ M' }}. *)
-(* Proof. *)
-(*   intros * [env_relΓ]%rel_exp_unsorted_of_typ_inversion1. *)
-(*   destruct_conjs. *)
-(*   eexists_subtyp. *)
-(*   intros. *)
-(*   saturate_refl. *)
-(*   (on_all_hyp: destruct_rel_by_assumption env_relΓ). *)
-(*   destruct_by_head (@rel_typ_unsorted P). *)
-(*   destruct_by_head @per_sort. *)
-(*   handle_per_sort_elem_irrel. *)
-(*   do 2 eexists. *)
-(*   repeat split; repeat split; econstructor; mauto 3; econstructor; *)
-(*     etransitivity; try eassumption; symmetry; eassumption. *)
-(* Qed. *)
 
 Lemma subtyp_trans {P : PtsSig} {pred_P : PredicativeSig P } : forall Γ M M' M'',
     {{ ⟪ pred_P ⟫ Γ ⊨ M ⊆ M' }} ->
@@ -73,7 +33,7 @@ Proof.
   intros.
   saturate_refl.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head (@rel_typ_unsorted P).
+  destruct_by_head (@rel_typ P).
   destruct_by_head (@rel_exp P).
   destruct_conjs.
   handle_per_sort_elem_irrel.
@@ -90,7 +50,6 @@ Proof. eauto using subtyp_trans. Qed.
 Lemma subtyp_sort {P} {pred_P : PredicativeSig P} : forall Γ s1 s2,
     {{ ⟪ pred_P ⟫ ⊨ Γ }} ->
     Ax_sub P s1 s2 -> 
-    (* st_subtyp s1 s2 -> *)
     {{ ⟪ pred_P ⟫ Γ ⊨ Sort@s1 ⊆ Sort@s2 }}.
 Proof.
   intros * [env_relΓ] ?.
@@ -102,13 +61,13 @@ Qed.
 
 
 Lemma subtyp_pi {P} {pred_P : PredicativeSig P} : forall {s1 s2 s3} {r : Ru_pi P s1 s2 s3} Γ A A' B B',
-  {{ ⟪ pred_P ⟫ Γ ⊨u A ≈ A' : Sort@s1 }} ->
-  {{ ⟪ pred_P ⟫ Γ, A ⊨u B : Sort@s2 }} ->
-  {{ ⟪ pred_P ⟫ Γ, A' ⊨u B' : Sort@s2 }} ->
+  {{ ⟪ pred_P ⟫ Γ ⊨ A ≈ A' : Sort@s1 }} ->
+  {{ ⟪ pred_P ⟫ Γ, A ⊨ B : Sort@s2 }} ->
+  {{ ⟪ pred_P ⟫ Γ, A' ⊨ B' : Sort@s2 }} ->
   {{ ⟪ pred_P ⟫ Γ, A' ⊨ B ⊆ B' }} ->
   {{ ⟪ pred_P ⟫ Γ ⊨ Π r A B ⊆ Π r A' B' }}.
 Proof.
-  intros * [env_relΓ]%rel_exp_unsorted_of_typ_inversion1 []%rel_exp_unsorted_of_typ_inversion1 []%rel_exp_unsorted_of_typ_inversion1 [? [? ?]].
+  intros * [env_relΓ]%rel_exp_of_sort_inversion1 []%rel_exp_of_sort_inversion1 []%rel_exp_of_sort_inversion1 [? [? ?]].
   destruct_conjs.
   handle_per_ctx_env_irrel.
   invert_per_ctx_envs.
@@ -213,4 +172,4 @@ Proof.
 Qed.
 
 #[export]
-Hint Resolve subtyp_refl_unsorted subtyp_trans subtyp_sort subtyp_pi : mcpts.
+Hint Resolve subtyp_refl subtyp_trans subtyp_sort subtyp_pi : mcpts.

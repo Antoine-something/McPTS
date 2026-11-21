@@ -19,6 +19,45 @@ Arguments ord_ax_typ {_} _ {_ _}.
 Arguments ord_ru_pi {_} _ {_ _ _}.
 Arguments ord_ax_sub {_} _ {_ _}.
 
+
+Section OrderProperties.
+  Context {P : PtsSig} (pred_P : PredicativeSig P).
+
+  Instance pred_rel_StrictOrder : StrictOrder (pred_rel pred_P) := ord_rel pred_P.
+  Opaque pred_rel_StrictOrder.
+
+  Instance pred_rel_WellFounded : WellFounded (pred_rel pred_P) := wf_rel pred_P.
+  Opaque pred_rel_WellFounded.
+
+  Instance pred_rel_Asymmetric : Asymmetric (pred_rel pred_P).
+  Proof using.
+    typeclasses eauto.
+  Qed.
+
+  Let clos_refl_rel := fun s1 s2 => pred_rel pred_P s1 s2 \/ s1 = s2.
+
+  Instance clos_refl_rel_Reflexive : Reflexive clos_refl_rel.
+  Proof using.
+    solve [do 2 constructor].
+  Qed.
+
+  Instance clos_refl_rel_Transitive : Transitive clos_refl_rel.
+  Proof using.
+    intros ? * [] []; subst; try solve [do 2 constructor]; constructor; eauto.
+    etransitivity; eauto.
+  Qed.
+
+  Lemma ord_clos_refl_rel : order P clos_refl_rel.
+    constructor.
+    - intro. reflexivity.
+    - intros ? **.
+      etransitivity; eassumption.
+    - intros ? * [] Hyx; inversion_clear Hyx; subst; eauto.
+      exfalso. eapply pred_rel_Asymmetric; eassumption.
+  Qed.
+End OrderProperties.
+
+
 Lemma ord_st_subtyp {P} (pred_P : PredicativeSig P) : forall {s1 s2 : P}, st_subtyp s1 s2 -> (pred_rel pred_P s1 s2 \/ s1 = s2).
 Proof.
   induction 1.
@@ -59,39 +98,17 @@ Proof.
     + right; subst; eauto.
 Qed.
 
-Section OrderProperties.
-  Context {P : PtsSig} (pred_P : PredicativeSig P).
+Lemma pred_preserves_st {P : PtsSig} {pred_P : PredicativeSig P} : forall s s1 s2,
+    st_subtyp s1 s2 ->
+    pred_rel pred_P s s1 ->
+    pred_rel pred_P s s2.
+Proof.
+  intros.
+  assert (Transitive (pred_rel pred_P)) by (eapply (ord_rel pred_P)).
+  specialize (ord_st_subtyp pred_P H) as ?.
+  destruct H2; eauto.
+  subst; eauto.
+Qed.
 
-  Instance pred_rel_StrictOrder : StrictOrder (pred_rel pred_P) := ord_rel pred_P.
-  Opaque pred_rel_StrictOrder.
-
-  Instance pred_rel_WellFounded : WellFounded (pred_rel pred_P) := wf_rel pred_P.
-  Opaque pred_rel_WellFounded.
-
-  Instance pred_rel_Asymmetric : Asymmetric (pred_rel pred_P).
-  Proof using.
-    typeclasses eauto.
-  Qed.
-
-  Let clos_refl_rel := fun s1 s2 => pred_rel pred_P s1 s2 \/ s1 = s2.
-
-  Instance clos_refl_rel_Reflexive : Reflexive clos_refl_rel.
-  Proof using.
-    solve [do 2 constructor].
-  Qed.
-
-  Instance clos_refl_rel_Transitive : Transitive clos_refl_rel.
-  Proof using.
-    intros ? * [] []; subst; try solve [do 2 constructor]; constructor; eauto.
-    etransitivity; eauto.
-  Qed.
-
-  Lemma ord_clos_refl_rel : order P clos_refl_rel.
-    constructor.
-    - intro. reflexivity.
-    - intros ? **.
-      etransitivity; eassumption.
-    - intros ? * [] Hyx; inversion_clear Hyx; subst; eauto.
-      exfalso. eapply pred_rel_Asymmetric; eassumption.
-  Qed.
-End OrderProperties.
+#[export]
+Hint Resolve pred_preserves_st : mcpts.

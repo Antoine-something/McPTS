@@ -10,37 +10,20 @@ Arguments mk_rel_exp {_ _ _ _ _ _}.
 #[export]
 Hint Constructors rel_exp : mcpts.
 
-(* Definition rel_exp_under_ctx {P : PtsSig} (pred_P : PredicativeSig P) (Δ : gctx P) Γ A M M' := *)
-(*   exists env_rel, *)
-(*     {{ EF Γ ≈ Γ ∈ per_ctx_env Δ pred_P ↘ env_rel }} /\ *)
-(*       exists s, *)
-(*       forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_rel }}), *)
-(*       exists (elem_rel : relation (domain P)), *)
-(*         rel_typ pred_P s A ρ A ρ' elem_rel /\ rel_exp M ρ M' ρ' elem_rel. *)
-
-(* Definition valid_exp_under_ctx {P : PtsSig} (pred_P : PredicativeSig P) Γ A M := rel_exp_under_ctx pred_P Γ A M M. *)
-(* #[global] *)
-(* Arguments valid_exp_under_ctx {_} _ _ _ _ /. *)
-(* #[export] *)
-(* Hint Transparent valid_exp_under_ctx : mcpts. *)
-(* #[export] *)
-(* Hint Unfold valid_exp_under_ctx : mcpts. *)
-
-
-Definition rel_exp_under_ctx_unsorted {P} (pred_P : PredicativeSig P) (Γ : ctx P) A M M' :=
+Definition rel_exp_under_ctx {P} (pred_P : PredicativeSig P) (Γ : ctx P) A M M' :=
   exists env_rel,
     {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }} /\
       forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_rel }}),
       exists (elem_rel : relation (domain P)),
-        rel_typ_unsorted pred_P A ρ A ρ' elem_rel /\ rel_exp M ρ M' ρ' elem_rel.
+        rel_typ pred_P A ρ A ρ' elem_rel /\ rel_exp M ρ M' ρ' elem_rel.
 
-Definition valid_exp_under_ctx_unsorted {P : PtsSig} (pred_P : PredicativeSig P) Γ A M := rel_exp_under_ctx_unsorted pred_P Γ A M M.
+Definition valid_exp_under_ctx {P : PtsSig} (pred_P : PredicativeSig P) Γ A M := rel_exp_under_ctx pred_P Γ A M M.
 #[global]
-Arguments valid_exp_under_ctx_unsorted {_} _ _ _ _ /.
+Arguments valid_exp_under_ctx {_} _ _ _ _ /.
 #[export]
-Hint Transparent valid_exp_under_ctx_unsorted : mcpts.
+Hint Transparent valid_exp_under_ctx : mcpts.
 #[export]
-Hint Unfold valid_exp_under_ctx_unsorted : mcpts.
+Hint Unfold valid_exp_under_ctx : mcpts.
 
 
 Definition rel_typ_under_ctx {P} (pred_P : PredicativeSig P) (Γ : ctx P) A A' :=
@@ -48,7 +31,7 @@ Definition rel_typ_under_ctx {P} (pred_P : PredicativeSig P) (Γ : ctx P) A A' :
     {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }} /\
       forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_rel }}),
       exists (elem_rel : relation (domain P)),
-        rel_typ_unsorted pred_P A ρ A' ρ' elem_rel.
+        rel_typ pred_P A ρ A' ρ' elem_rel.
 
 Definition valid_typ_under_ctx {P} (pred_P : PredicativeSig P) Γ A := rel_typ_under_ctx pred_P Γ A A.
 #[global]
@@ -86,15 +69,13 @@ Definition subtyp_under_ctx {P : PtsSig} (pred_P : PredicativeSig P) Γ M M' :=
   exists env_rel,
     {{ EF Γ ≈ Γ ∈ per_ctx_env pred_P ↘ env_rel }} /\
       forall ρ ρ' (equiv_ρ_ρ' : {{ Dom ρ ≈ ρ' ∈ env_rel }}),
-        exists R R', rel_typ_unsorted pred_P M ρ M ρ' R /\ rel_typ_unsorted pred_P M' ρ M' ρ' R' /\ rel_exp M ρ M' ρ' (per_subtyp pred_P).
+        exists R R', rel_typ pred_P M ρ M ρ' R /\ rel_typ pred_P M' ρ M' ρ' R' /\ rel_exp M ρ M' ρ' (per_subtyp pred_P).
 
 
 Notation "⟪ pred_P ⟫ ⊨ Γ ≈ Γ'" := (per_ctx pred_P Γ Γ')  (in custom judg at level 80, pred_P constr, Γ custom exp, Γ' custom exp).
 Notation "⟪ pred_P ⟫ ⊨ Γ" := (valid_ctx pred_P Γ) (in custom judg at level 80, pred_P constr, Γ custom exp).
-(* Notation "⟪ pred_P ⟫ Δ ▶ Γ ⊨ M ≈ M' : A" := (rel_exp_under_ctx pred_P Δ Γ A M M') (in custom judg at level 80, pred_P constr, Δ custom exp, Γ custom exp, M custom exp, M' custom exp, A custom exp). *)
-(* Notation "⟪ pred_P ⟫ Γ ⊨ M : A" := (valid_exp_under_ctx pred_P Γ A M) (in custom judg at level 80, pred_P constr, Γ custom exp, M custom exp, A custom exp). *)
-Notation "⟪ pred_P ⟫ Γ ⊨u M ≈ M' : A" := (rel_exp_under_ctx_unsorted pred_P Γ A M M') (in custom judg at level 80, pred_P constr, Γ custom exp, M custom exp, M' custom exp, A custom exp).
-Notation "⟪ pred_P ⟫ Γ ⊨u M : A" := (valid_exp_under_ctx_unsorted pred_P Γ A M) (in custom judg at level 80, pred_P constr, Γ custom exp, M custom exp, A custom exp).
+Notation "⟪ pred_P ⟫ Γ ⊨ M ≈ M' : A" := (rel_exp_under_ctx pred_P Γ A M M') (in custom judg at level 80, pred_P constr, Γ custom exp, M custom exp, M' custom exp, A custom exp).
+Notation "⟪ pred_P ⟫ Γ ⊨ M : A" := (valid_exp_under_ctx pred_P Γ A M) (in custom judg at level 80, pred_P constr, Γ custom exp, M custom exp, A custom exp).
 Notation "⟪ pred_P ⟫ Γ ⊨ A ≈ A'" := (rel_typ_under_ctx pred_P Γ A A') (in custom judg at level 80, pred_P constr, Γ custom exp, A custom exp, A' custom exp).
 Notation "⟪ pred_P ⟫ Γ ⊨ A" := (valid_typ_under_ctx pred_P Γ A) (in custom judg at level 80, pred_P constr, Γ custom exp, A custom exp).
 Notation "⟪ pred_P ⟫ Γ ⊨s σ ≈ σ' : Γ'" := (rel_sub_under_ctx pred_P Γ Γ' σ σ') (in custom judg at level 80, pred_P constr, Γ custom exp, σ custom exp, σ' custom exp, Γ' custom exp).

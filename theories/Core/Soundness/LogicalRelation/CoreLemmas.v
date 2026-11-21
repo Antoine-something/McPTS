@@ -6,20 +6,6 @@ From McPTS.Core.Soundness.LogicalRelation Require Import CoreTactics Definitions
 From McPTS.Core.Syntactic.Weakening Require Export Lemmas.
 Import Domain_Notations.
 
-Lemma wf_exp_of_sort_under_q {P} : forall {Γ : ctx P} {Γ' σ A B s},
-    {{ Γ ⊢ A }} ->
-    {{ Γ, A ⊢ B : Sort@s }} ->
-    {{ Γ' ⊢s σ : Γ }} ->
-    {{ Γ', A[σ] ⊢ B[q σ] : Sort@s }}.
-Proof.
-  intros.
-  assert {{ Γ', A[σ] ⊢s q σ : Γ, A }} by mauto 3.
-  mauto 3.
-Qed.
-
-#[export]
-Hint Resolve wf_exp_of_sort_under_q : mcpts.
-
 Lemma glu_nat_per_nat {P} {s} (r : Ru_nat P s) : forall (Γ : ctx P) M a,
     glu_nat r Γ M a ->
     {{ Dom a ≈ a ∈ per_nat }}.

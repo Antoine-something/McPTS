@@ -308,17 +308,9 @@ Proof with mautosolve.
   reflexivity.
 Qed.
 
-(** Rewrite equivalent relations in rel_typ_unsorted *)
-Add Parametric Morphism {P} {pred_P : PredicativeSig P} A ρ A' ρ' : (rel_typ_unsorted pred_P A ρ A' ρ')
+(** Rewrite equivalent relations in rel_typ *)
+Add Parametric Morphism {P} {pred_P : PredicativeSig P} A ρ A' ρ' : (rel_typ pred_P A ρ A' ρ')
     with signature (@relation_equivalence (domain P)) ==> iff as rel_typ_morphism.
-Proof.
-  intros * HRR'.
-  split; intros []; econstructor; try eassumption;
-    [setoid_rewrite <- HRR' | setoid_rewrite HRR']; eassumption.
-Qed.
-
-Add Parametric Morphism {P} {pred_P : PredicativeSig P} A ρ A' ρ' : (rel_typ_unsorted pred_P A ρ A' ρ')
-    with signature (@relation_equivalence (domain P)) ==> iff as rel_typ_unsorted_morphism.
 Proof.
   intros * HRR'.
   split; intros []; econstructor; try eassumption;
