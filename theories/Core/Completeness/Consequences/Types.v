@@ -10,12 +10,12 @@ Lemma exp_eq_typ_implies_eq_level {P} (pred_P : PredicativeSig P) : forall {Γ :
     s1 = s2.
 Proof with mautosolve.
   intros * H.
-  assert {{ ⟪ pred_P ⟫ Γ ⊨u Sort@s1 ≈ Sort@s2 : Sort@s3 }} as [env_relΓ] by eauto using completeness_fundamental_exp_eq.
+  assert {{ ⟪ pred_P ⟫ Γ ⊨ Sort@s1 ≈ Sort@s2 : Sort@s3 }} as [env_relΓ] by eauto using completeness_fundamental_exp_eq.
   destruct_conjs.
   assert (exists p p', initial_env Γ p /\ initial_env Γ p' /\ {{ Dom p ≈ p' ∈ env_relΓ }}) as [p [? [? []]]] by eauto using per_ctx_then_per_env_initial_env.
   functional_initial_env_rewrite_clear.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head (@rel_typ_unsorted P).
+  destruct_by_head (@rel_typ P).
   invert_rel_typ_body.
   destruct_by_head (@rel_exp P).
   invert_rel_typ_body.
@@ -41,7 +41,7 @@ Proof with mautosolve.
   assert (exists p p', initial_env Γ p /\ initial_env Γ p' /\ {{ Dom p ≈ p' ∈ env_relΓ }}) as [p [? [? []]]] by eauto using per_ctx_then_per_env_initial_env.
   functional_initial_env_rewrite_clear.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head (@rel_typ_unsorted P).
+  destruct_by_head (@rel_typ P).
   invert_rel_typ_body.
   inversion H6; [reflexivity |]; subst.
   invert_per_sort_elem H3.
@@ -67,14 +67,14 @@ Theorem is_typ_constr_and_exp_eq_var_implies_eq_var {P} (pred_P : PredicativeSig
     A = {{{ #x }}}.
 Proof.
   intros * Histyp ?.
-  assert {{ ⟪ pred_P ⟫ Γ ⊨u A ≈ #x : Sort@s }} as [env_relΓ] by mauto using completeness_fundamental_exp_eq.
+  assert {{ ⟪ pred_P ⟫ Γ ⊨ A ≈ #x : Sort@s }} as [env_relΓ] by mauto using completeness_fundamental_exp_eq.
   destruct_conjs.
   assert (exists p p', initial_env Γ p /\ initial_env Γ p' /\ {{ Dom p ≈ p' ∈ env_relΓ }}) by mauto using per_ctx_then_per_env_initial_env.
   destruct_conjs.
   rename H2 into ρ, H3 into ρ'.
   functional_initial_env_rewrite_clear.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head (@rel_typ_unsorted P).
+  destruct_by_head (@rel_typ P).
   invert_rel_typ_body.
   destruct_by_head (@rel_exp P).
   gen_presups.
@@ -116,7 +116,7 @@ Proof.
   destruct_conjs.
   functional_initial_env_rewrite_clear.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head (@rel_typ_unsorted P).
+  destruct_by_head (@rel_typ P).
   invert_rel_typ_body.
   destruct_by_head (@rel_exp P).
   gen_presups.
@@ -161,7 +161,7 @@ Proof.
   destruct_conjs.
   functional_initial_env_rewrite_clear.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head (@rel_typ_unsorted P).
+  destruct_by_head (@rel_typ P).
   invert_rel_typ_body.
   destruct_by_head (@rel_exp).
   gen_presups.
@@ -206,7 +206,7 @@ Proof.
   destruct_conjs.
   functional_initial_env_rewrite_clear.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head (@rel_typ_unsorted P).
+  destruct_by_head (@rel_typ P).
   invert_rel_typ_body.
   destruct_by_head (@rel_exp).
   gen_presups.
@@ -245,13 +245,13 @@ Theorem is_typ_constr_and_exp_eq_typ_implies_eq_typ {P} (pred_P : PredicativeSig
     A = {{{ Sort@s }}}.
 Proof.
   intros * Histyp ?.
-  assert {{ ⟪ pred_P ⟫ Γ ⊨u A ≈ Sort@s : Sort@s' }} as [env_relΓ] by mauto using completeness_fundamental_exp_eq.
+  assert {{ ⟪ pred_P ⟫ Γ ⊨ A ≈ Sort@s : Sort@s' }} as [env_relΓ] by mauto using completeness_fundamental_exp_eq.
   destruct_conjs.
   assert (exists p p', initial_env Γ p /\ initial_env Γ p' /\ {{ Dom p ≈ p' ∈ env_relΓ }}) by mauto using per_ctx_then_per_env_initial_env.
   destruct_conjs.
   functional_initial_env_rewrite_clear.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head (@rel_typ_unsorted).
+  destruct_by_head (@rel_typ).
   invert_rel_typ_body.
   destruct_by_head @rel_exp.
   assert (per_typ_elem pred_P (per_sort pred_P s') d{{{ Sort@s' }}} d{{{ Sort@s' }}}) by (econstructor; reflexivity).
@@ -282,7 +282,7 @@ Proof.
   destruct_conjs.
   functional_initial_env_rewrite_clear.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head (@rel_typ_unsorted).
+  destruct_by_head (@rel_typ).
   invert_rel_typ_body.
   
   assert (per_typ_elem pred_P (per_sort pred_P s) d{{{ Sort@s }}} d{{{ Sort@s }}}) by (econstructor; reflexivity).
@@ -324,7 +324,7 @@ Proof.
   destruct_conjs.
   functional_initial_env_rewrite_clear.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head (@rel_typ_unsorted).
+  destruct_by_head (@rel_typ).
   destruct_by_head (@rel_exp).
   invert_rel_typ_body.
   destruct (per_subtyp_sort_inv_right pred_P H12) as [s' []].
@@ -361,7 +361,7 @@ Proof.
   destruct_conjs.
   functional_initial_env_rewrite_clear.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head (@rel_typ_unsorted).
+  destruct_by_head (@rel_typ).
   destruct_by_head (@rel_exp).
   invert_rel_typ_body.
   destruct (per_subtyp_sort_inv_left pred_P H12) as [s' []].
@@ -393,13 +393,13 @@ Theorem is_typ_constr_and_exp_eq_nat_implies_eq_nat {P} (pred_P : PredicativeSig
     A = {{{ ℕ }}}.
 Proof.
   intros * Histyp ?.
-  assert {{ ⟪ pred_P ⟫ Γ ⊨u A ≈ ℕ : Sort@s }} as [env_relΓ] by mauto using completeness_fundamental_exp_eq.
+  assert {{ ⟪ pred_P ⟫ Γ ⊨ A ≈ ℕ : Sort@s }} as [env_relΓ] by mauto using completeness_fundamental_exp_eq.
   destruct_conjs.
   assert (exists p p', initial_env Γ p /\ initial_env Γ p' /\ {{ Dom p ≈ p' ∈ env_relΓ }}) by mauto using per_ctx_then_per_env_initial_env.
   destruct_conjs.
   functional_initial_env_rewrite_clear.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head @rel_typ_unsorted.
+  destruct_by_head @rel_typ.
   invert_rel_typ_body.
   destruct_by_head @rel_exp.
   assert (per_typ_elem pred_P (per_sort pred_P s) d{{{ Sort@s }}} d{{{ Sort@s }}}) by (econstructor; reflexivity).
@@ -430,11 +430,8 @@ Proof.
   destruct_conjs.
   functional_initial_env_rewrite_clear.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head @rel_typ_unsorted.
+  destruct_by_head @rel_typ.
   invert_rel_typ_body.
-
-  inversion_clear H6.
-  invert_per_sort_elem H5.
   destruct Histyp;
     invert_rel_typ_body;
     destruct_conjs;
@@ -445,7 +442,7 @@ Proof.
 Qed.
 
 #[export]
-  Hint Resolve is_typ_constr_and_typ_eq_nat_implies_eq_nat : mcpts.
+Hint Resolve is_typ_constr_and_typ_eq_nat_implies_eq_nat : mcpts.
 
 Theorem is_typ_constr_and_typ_subset_nat_implies_eq_nat {P} (pred_P : PredicativeSig P) : forall (Γ : ctx P) A,
     is_typ_constr A ->
@@ -459,17 +456,13 @@ Proof.
   destruct_conjs.
   functional_initial_env_rewrite_clear.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head @rel_typ_unsorted.
+  destruct_by_head @rel_typ.
   destruct_by_head @rel_exp.
   invert_rel_typ_body.
 
   assert (a0 = d{{{ ℕ }}}) by (eapply per_subtyp_nat_inv_right; mauto 2).
   subst.
   handle_per_typ_elem_irrel.
-  
-  
-  inversion_clear H8.
-  invert_per_sort_elem H5.
   destruct Histyp;
     invert_rel_typ_body;
     invert_per_sort_elems.  
@@ -495,7 +488,7 @@ Proof.
   destruct_conjs.
   functional_initial_env_rewrite_clear.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head @rel_typ_unsorted.
+  destruct_by_head @rel_typ.
   destruct_by_head @rel_exp.
   invert_rel_typ_body.
 
@@ -524,13 +517,13 @@ Theorem is_typ_constr_and_exp_eq_pi_implies_eq_pi {P} (pred_P : PredicativeSig P
     exists B' C', A = {{{ Π r B' C' }}}.
 Proof.
   intros * Histyp ?.
-  assert {{ ⟪ pred_P ⟫ Γ ⊨u A ≈ Π r B C : Sort@s }} as [env_relΓ] by mauto using completeness_fundamental_exp_eq.
+  assert {{ ⟪ pred_P ⟫ Γ ⊨ A ≈ Π r B C : Sort@s }} as [env_relΓ] by mauto using completeness_fundamental_exp_eq.
   destruct_conjs.
   assert (exists p p', initial_env Γ p /\ initial_env Γ p' /\ {{ Dom p ≈ p' ∈ env_relΓ }}) by mauto using per_ctx_then_per_env_initial_env.
   destruct_conjs.
   functional_initial_env_rewrite_clear.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head @rel_typ_unsorted.
+  destruct_by_head @rel_typ.
   invert_rel_typ_body.
   destruct_by_head @rel_exp.
   assert (per_typ_elem pred_P (per_sort pred_P s) d{{{ Sort@s }}} d{{{ Sort@s }}}) by (econstructor; reflexivity).
@@ -561,11 +554,8 @@ Proof.
   destruct_conjs.
   functional_initial_env_rewrite_clear.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head @rel_typ_unsorted.
+  destruct_by_head @rel_typ.
   invert_rel_typ_body.
-
-  inversion_clear H6.
-  invert_per_sort_elem H7.
   destruct Histyp;
     invert_rel_typ_body;
     destruct_conjs;
@@ -590,7 +580,7 @@ Proof.
   destruct_conjs.
   functional_initial_env_rewrite_clear.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head @rel_typ_unsorted.
+  destruct_by_head @rel_typ.
   destruct_by_head @rel_exp.
   invert_rel_typ_body.
 
@@ -604,11 +594,11 @@ Proof.
   - do 2 eexists. reflexivity.
   - assert (is_typ_constr {{{ Π r B C }}}) as Histyp' by mauto 1.
     destruct (is_typ_constr_and_var_subtyp_typ_implies_eq_var pred_P _ _ _ Histyp' H).
-    inversion H6.
+    inversion H15. (* H15 : {{{ Π r B C }}} = {{{ #x0 }}} *)
 Qed.
 
 #[export]
-  Hint Resolve is_typ_constr_and_typ_subtyp_pi_implies_eq_pi : mcpts.
+Hint Resolve is_typ_constr_and_typ_subtyp_pi_implies_eq_pi : mcpts.
 
 Theorem is_typ_constr_and_pi_subtyp_typ_implies_eq_pi {P} (pred_P : PredicativeSig P) : forall Γ A B C s1 s2 s3 (r : Ru_pi P s1 s2 s3),
     is_typ_constr A ->
@@ -622,7 +612,7 @@ Proof.
   destruct_conjs.
   functional_initial_env_rewrite_clear.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head @rel_typ_unsorted.
+  destruct_by_head @rel_typ.
   destruct_by_head @rel_exp.
   invert_rel_typ_body.
 
@@ -636,5 +626,5 @@ Proof.
   - do 2 eexists. reflexivity.
   - assert (is_typ_constr {{{ Π r B C }}}) as Histyp' by mauto 1.
     destruct (is_typ_constr_and_typ_subtyp_var_implies_eq_var pred_P _ _ _ Histyp' H).
-    inversion H6.
+    inversion H15. (* H15 : {{{ Π r B C }}} = {{{ #x0 }}} *)
 Qed.

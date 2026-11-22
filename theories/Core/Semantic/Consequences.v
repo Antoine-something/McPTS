@@ -32,7 +32,7 @@ Proof.
   pose proof (per_ctx_then_per_env_initial_env ltac:(eassumption)); destruct_all.
   functional_initial_env_rewrite_clear.
   (on_all_hyp: fun H => directed (pose proof (H _ _ ltac:(eassumption)); destruct_all)).
-  destruct_by_head @rel_typ_unsorted.
+  destruct_by_head @rel_typ.
   invert_rel_typ_body.
   destruct_by_head @rel_exp.
   assert (per_typ_elem pred_P (per_sort pred_P s) d{{{ Sort@s }}} d{{{ Sort@s }}}) by (econstructor; reflexivity).
@@ -234,10 +234,10 @@ Proof.
   destruct_conjs.
   functional_initial_env_rewrite_clear.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head @rel_typ_unsorted.
+  destruct_by_head @rel_typ.
   destruct_by_head @rel_exp.
   functional_eval_rewrite_clear.
-  invert_rel_typ_unsorted_body.
+  invert_rel_typ_body.
   dependent destruction H12.
   (* dependent destruction H6. *)
 
@@ -367,7 +367,7 @@ Proof.
   destruct_conjs.
   functional_initial_env_rewrite_clear.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head (@rel_typ_unsorted).
+  destruct_by_head (@rel_typ).
   destruct_by_head (@rel_exp).
   invert_rel_typ_body.
   destruct (per_subtyp_sort_inv_right pred_P H12) as [s' []].
@@ -397,7 +397,7 @@ Proof.
   destruct_conjs.
   functional_initial_env_rewrite_clear.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head (@rel_typ_unsorted).
+  destruct_by_head (@rel_typ).
   destruct_by_head (@rel_exp).
   invert_rel_typ_body.
   destruct (per_subtyp_sort_inv_left pred_P H12) as [s' []].
@@ -495,7 +495,7 @@ Proof.
   destruct_conjs.
   functional_initial_env_rewrite_clear.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head @rel_typ_unsorted.
+  destruct_by_head @rel_typ.
   destruct_by_head @rel_exp.
   invert_rel_typ_body.
 
@@ -521,7 +521,7 @@ Proof.
   destruct_conjs.
   functional_initial_env_rewrite_clear.
   (on_all_hyp: destruct_rel_by_assumption env_relΓ).
-  destruct_by_head @rel_typ_unsorted.
+  destruct_by_head @rel_typ.
   destruct_by_head @rel_exp.
   invert_rel_typ_body.
 

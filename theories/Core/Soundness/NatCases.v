@@ -622,7 +622,7 @@ Proof.
     handle_functional_glu_typ_elem P.
     assert {{ ⟪ pred_P ⟫ ⊨ Γ }} as [env_relΓ] by mauto 3 using completeness_fundamental_ctx.
     assert {{ ⟪ pred_P ⟫ Γ, ℕ ⊨ A }} as [env_relΓℕ] by mauto 3 using completeness_fundamental_typ.
-    assert {{ ⟪ pred_P ⟫ Γ, ℕ, A ⊨u MS : A[Wk∘Wk,,succ #1] }} as [env_relΓℕA] by mauto 3 using completeness_fundamental_exp.
+    assert {{ ⟪ pred_P ⟫ Γ, ℕ, A ⊨ MS : A[Wk∘Wk,,succ #1] }} as [env_relΓℕA] by mauto 3 using completeness_fundamental_exp.
     destruct_conjs.
     pose env_relΓℕA.
     match_by_head (per_ctx_env pred_P env_relΓℕA) ltac:(fun H => invert_per_ctx_env H).
@@ -631,7 +631,7 @@ Proof.
     enough (exists e, {{ Rne rec m under ρ return A | zero -> mz | succ -> MS end in k ↘ e }}) as [] by (eexists; split; eassumption).
     assert {{ Dom ρ ≈ ρ ∈ env_relΓ }} by (eapply glu_ctx_env_per_env; revgoals; eassumption).
     mark HAofSort.
-    destruct_rel_typ_unsorted.
+    destruct_rel_typ.
     
     assert {{ Dom ! k ≈ ! k ∈ (@per_bot P) }} by mauto 3.
     assert {{ Dom ρ ↦ ⇑! ℕ k ≈ ρ ↦ ⇑! ℕ k ∈ env_relΓℕ }}.
@@ -655,8 +655,8 @@ Proof.
     }
 
     mark HAofSort.
-    destruct_rel_typ_unsorted.
-    invert_rel_typ_unsorted_body.
+    destruct_rel_typ.
+    invert_rel_typ_body.
     
     match goal with
     | _: {{ ⟦ A ⟧ ρ ↦ ⇑! ℕ k ↘ ^?a }}, _: {{ ⟦ A ⟧ ρ ↦ (succ ⇑! ℕ k) ↘ ^?a' }} |- _ =>
@@ -674,7 +674,7 @@ Proof.
     apply_relation_equivalence.
     (on_all_hyp_rev: fun H => destruct (H _ _ HΓℕA)).
     destruct_conjs.
-    inversion_clear_by_head (@rel_typ_unsorted P).
+    inversion_clear_by_head (@rel_typ P).
     inversion_clear_by_head (@rel_exp P).
     simplify_evals.
     

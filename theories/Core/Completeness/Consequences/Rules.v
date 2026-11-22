@@ -10,7 +10,7 @@ Lemma ctxeq_nbe_eq {P} (pred_P : PredicativeSig P) : forall (Γ : ctx P) Γ' M A
     exists W, nbe Γ M A W /\ nbe Γ' M A W.
 Proof.
   intros.
-  assert {{ ⟪ pred_P ⟫ Γ ⊨u M : A }} as [envR [Henv]] by eauto using completeness_fundamental_exp.
+  assert {{ ⟪ pred_P ⟫ Γ ⊨ M : A }} as [envR [Henv]] by eauto using completeness_fundamental_exp.
   assert {{ ⟪ pred_P ⟫ ⊨ Γ ≈ Γ' }} as [envR' Henv'] by eauto using completeness_fundamental_ctx_eq.
   handle_per_ctx_env_irrel.
   destruct (per_ctx_then_per_env_initial_env Henv') as [p [p' [? []]]].
