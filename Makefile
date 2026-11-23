@@ -42,6 +42,16 @@ clean: $(COQMAKEFILE)
 	@echo "CLEAN $(COQMAKEFILE) $(COQMAKEFILE).conf"
 	@rm -f "$(COQMAKEFILE)" "$(COQMAKEFILE).conf"
 
+.PHONY: extract
+extract: $(COQMAKEFILE)
+	 @+$(MAKE) -j "${NPROCS}" -f "$(COQMAKEFILE)" all
+	 @+$(MAKE) -j1 -f "$(COQMAKEFILE)" $@
+
+.PHONY: extract-%
+extract-%: $(COQMAKEFILE)
+	 @+$(MAKE) -j "${NPROCS}" -f "$(COQMAKEFILE)" all
+	 @+$(MAKE) -j1 -f "$(COQMAKEFILE)" $@
+
 .PHONY: force
 force: ;
 
