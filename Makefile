@@ -46,6 +46,9 @@ clean: $(COQMAKEFILE)
 extract: all
 	 @+$(MAKE) -j1 -f "$(COQMAKEFILE)" extract
 
+extract-%: all
+	 @+$(MAKE) -j1 -f "$(COQMAKEFILE)" $@
+
 .NOTPARALLEL:
 
 .PHONY: force
