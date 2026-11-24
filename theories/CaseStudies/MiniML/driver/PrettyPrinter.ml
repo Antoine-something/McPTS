@@ -25,12 +25,12 @@ let rec get_nat_of_obj : Cst.obj -> int option = function
   | Cst.Coq_succ e -> Option.map (( + ) 1) (get_nat_of_obj e)
   | _ -> None
 
-let rec get_fn_params_of_obj : Cst.obj -> (string * Cst.obj) list * Cst.obj =
-  function
-  | Cst.Coq_fn (px, ep, _, ebody) ->
-     let params, ebody' = get_fn_params_of_obj ebody in
-     ((px, ep) :: params, ebody')
-  | ebody -> ([], ebody)
+let rec get_fn_params_of_obj (px, ep, b, ebody) : (string * Cst.obj) list * Cst.obj * Cst.obj =
+  match ebody with
+  | Cst.Coq_fn (px', ep', b', ebody') ->
+     let params, b', ebody' = get_fn_params_of_obj (px', ep', b', ebody') in
+     ((px, ep) :: params, b', ebody')
+  | ebody -> ([(px, ep)], b, ebody)
 
 let rec get_pi_params_of_obj : Cst.obj -> (string * Cst.obj) list * Cst.obj =
   function
@@ -81,20 +81,20 @@ let rec format_obj_prec (p : int) (f : Format.formatter) : Cst.obj -> unit =
      pp_open_hvbox f 2;
      pp_print_paren_if (p >= 1) impl f ();
      pp_close_box f ()
-  | Cst.Coq_fn (px, ep, _, ebody) ->
-     let params, ebody' = get_fn_params_of_obj ebody in
+  | Cst.Coq_fn (px, ep, b, ebody) ->
+     let params, b', ebody' = get_fn_params_of_obj (px, ep, b, ebody) in
      let impl f () =
        pp_print_string f "fun ";
        pp_open_tbox f ();
        pp_set_tab f ();
-       pp_print_list ~pp_sep:pp_print_tab format_obj_param f ((px, ep) :: params);
+       pp_print_list ~pp_sep:pp_print_tab format_obj_param f (params);
        pp_close_tbox f ();
        begin
-         if List.compare_length_with params 0 = 0
+         if List.compare_length_with params 1 = 0
          then pp_print_space f ()
          else pp_force_newline f ()
        end;
-       fprintf f "-> @[<hov 2>%a@]" format_obj ebody'
+       fprintf f "-> (@[<hov 2>%a@] : %a)" format_obj ebody' format_obj b'
      in
      pp_open_hvbox f 2;
      pp_print_paren_if (p >= 1) impl f ();
