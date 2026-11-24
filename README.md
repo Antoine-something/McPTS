@@ -117,7 +117,8 @@ The extraction itself is enabled in the case studies (folder "theories/CaseStudi
 
 ### Information about the virtual machine image
 
-We have tested the virtual machine image on VirtualBox version 7.2.18.
+We have tested the virtual machine image on VirtualBox version 7.2.18. 
+Older versions were not tested and may not be compatible.
 
 The guest OS is Ubuntu 22.04.5 LTS.
 
@@ -180,6 +181,7 @@ for the ARM image.
 #### Running the Virtual Machine
 
 First, install VirtualBox.  We recommend version 7.2.18, since this is the only one we tested.
+There have been bugs reported when running VirtualBox 7.0, and compilation is not guaranteed for older versions.
 The x64 virtual machine image runs Ubuntu 22.04.5 LTS and the ARM image runs Ubuntu 24.04.5 LTS. 
 Each machine has some utilities included to facilitate the artifact evaluation process.
 
@@ -233,7 +235,10 @@ We provide a makefile with three main flags of interest to reviewers:
 - `make extract` compiles all the proofs and case studies, and performs the extraction of Coq implementations to OCaml.
 
 Further information on compilation is provided in the "Additional artifact description" section of this README file.
+Importantly, the jobs flag `-j`/`--jobs` is not passed to recursive `make` calls. 
+To specify the number of jobs, use the variable `J`, e.g.
 
+- `make J=4 extract`
 
 ### Sanity checks
 
@@ -426,7 +431,18 @@ opam install -y --deps-only .
 
 Use the top-level `make` from the root directory to build the core McPTS infrastructure. 
 This will compile all the proofs without extracting anything.
-Makefile will try to find out the number of your CPU cores and parallel as much as possible.
+
+The base `make [target]` commands will try to find out the number of your CPU cores and parallelize as much as possible.
+The standard flags `-j` and `--jobs` are overridden by this and will not have an effect on the number of jobs used for compilation.
+To specify the number of jobs `N` to be used for compilation, set the variable `J`:
+
+```
+make J=N [target]
+```
+
+Due to issues with running multiple Dune processes, the extraction steps are set to run sequentially.
+
+
 
 Compilers defined in a directory `theories/CaseStudies/<name>` can be extracted by using `make extract-<name>` from the top-level. 
 Alternatively, every compiler defined in `theories/CaseStudies` can be extracted at once by running `make extract`. 
