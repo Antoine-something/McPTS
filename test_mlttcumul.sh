@@ -17,22 +17,25 @@ Elaborated:
   fun (x1 : Nat) : Type@0 -> (x1 : Nat) : forall (x1 : Nat) : Type@0 -> Nat
 Normalized Result:
   fun (x1 : Nat) : Type@0 -> (x1 : Nat) : forall (x1 : Nat) : Type@0 -> Nat"
+
     "Parsed:                                
   (fun (x : Type@0)
        (y : Nat) : Type@1
-    -> (Nat : succ y)) Nat 0 : Nat
+    -> (succ y : Nat)) Nat 0 : Nat
 Elaborated:
   (fun (A1 : Type@0)
        (x2 : Nat) : Type@1
-    -> (Nat : succ x2)) Nat 0 : Nat
+    -> (succ x2 : Nat)) Nat 0 : Nat
 Normalized Result:
   1 : Nat"
-    "Parsed:                                
+
+    "Parsed:                               
   4 : Nat
 Elaborated:
   4 : Nat
 Normalized Result:
   4 : Nat"
+
     "Parsed:                                
   fun (x : Nat) : Type@0
     -> (rec x return y . Nat | zero => 1 | succ n, r => succ r end : Nat)
@@ -45,23 +48,25 @@ Normalized Result:
   fun (x1 : Nat) : Type@0
     -> (rec x1 return x2 . Nat | zero => 1 | succ x3, x4 => succ x4 end : Nat)
   : forall (x1 : Nat) : Type@0 -> Nat"
+
     "Parsed:                               
   (fun (x : Nat)
        (f : forall (y : Nat) : Type@0 -> Nat) : Type@0
-    -> (Nat : f x))
+    -> (f x : Nat))
     0
     (fun (n : Nat) : Type@0 -> (n : Nat))
   : Nat
 Elaborated:
   (fun (x1 : Nat)
        (x4 : forall (x5 : Nat) : Type@0 -> Nat) : Type@0
-    -> (Nat : x4 x1))
+    -> (x4 x1 : Nat))
     0
     (fun (x6 : Nat) : Type@0 -> (x6 : Nat))
   : Nat
 Normalized Result:
   0 : Nat"
-    "Parsed:                                
+
+    "Parsed:                               
   (fun (Nary : forall (n : Nat) : Type@1 -> Type@0)
        (toNat : forall (f : Nary 0) : Type@0 -> Nat)
        (appNary : forall (n : Nat)
@@ -100,10 +105,10 @@ Normalized Result:
           (a : Nat)
           (b : Nat)
           (c : Nat) : Type@0
-       -> (Nat : add a (add b c)))
+       -> (add a (add b c) : Nat))
       (fun (a : Nat)
            (b : Nat) : Type@0
-        -> (Nat : rec a return y . Nat | zero => b | succ m, r => succ r end)))
+        -> (rec a return y . Nat | zero => b | succ m, r => succ r end : Nat)))
   : Nat
 Elaborated:
   (fun (x1 : forall (x2 : Nat) : Type@1 -> Type@0)
@@ -144,13 +149,13 @@ Elaborated:
           (x65 : Nat)
           (x68 : Nat)
           (x70 : Nat) : Type@0
-       -> (Nat : x59 x65 (x59 x68 x70)))
+       -> (x59 x65 (x59 x68 x70) : Nat))
       (fun (x71 : Nat)
            (x73 : Nat) : Type@0
-        -> (Nat : rec x71 return x74 . Nat
-                  | zero => x73
-                  | succ x75, x76 => succ x76
-                  end)))
+        -> (rec x71 return x74 . Nat
+            | zero => x73
+            | succ x75, x76 => succ x76
+            end : Nat)))
   : Nat
 Normalized Result:
   6 : Nat"
