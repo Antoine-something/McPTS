@@ -28,7 +28,7 @@ let rec get_nat_of_obj : Cst.obj -> int option = function
 let rec get_fn_params_of_obj (px, ep, b, ebody) : (string * Cst.obj) list * Cst.obj * Cst.obj =
   match ebody with
   | Cst.Coq_fn (px', _, ep', b', ebody') ->
-      let params, ebody', b' = get_fn_params_of_obj (px', ep', b', ebody') in ((px,ep) :: params, b', ebody')
+      let params, b', ebody' = get_fn_params_of_obj (px', ep', b', ebody') in ((px,ep) :: params, b', ebody')
   | ebody -> ([(px, ep)], b, ebody)
 
 let rec get_pi_params_of_obj : Cst.obj -> (string * Cst.obj) list * Cst.obj =
